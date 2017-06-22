@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2011 Bluetooth SIG, Inc. All rights reserved. -->
+<Service xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/service.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="org.bluetooth.service.tx_power" uuid="1804" name="Tx Power">
+    <InformativeText>
+        <Abstract>
+    This service exposes a device’s current transmit power level when in a connection.            
+		</Abstract>
+        <Summary>
+    The Tx Power service is instantiated as a Primary Service.
+    There is only one instance of the Tx Power service on a device.
+    There is exactly one instance of the Tx Power Level characteristic</Summary>
+  </InformativeText>
+    <Dependencies>
+        <Dependency>This service has no dependencies on other GATT-based services.</Dependency>
+    </Dependencies>
+<!--    <GATTRequirements>
+        <Requirement subProcedure="Notification">Mandatory if one or more Tx Power Level characteristics supports notification</Requirement>
+        <Requirement subProcedure="Read Characteristic Descriptors">Mandotory if more than one Tx Power Level characteristics is exposed</Requirement>
+        <Requirement subProcedure="Write Characteristic Descriptors">Mandatory if Notification is claimed</Requirement>
+    </GATTRequirements>
+-->
+    <Transports>
+        <Classic>false</Classic>
+        <LowEnergy>true</LowEnergy>
+    </Transports>
+    <ErrorCodes>
+    	Replace table by: This service does not define any application error codes that are used in Attribute Protocol.        
+    </ErrorCodes>
+    <Characteristics>
+        <Characteristic name="Tx Power Level" type="org.bluetooth.characteristic.tx_power_level">
+            <InformativeText>
+        The Tx Power Level characteristic represents the current transmit power level of a physical layer for which the characteristic is associated.
+      </InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Properties>
+                <Read>Mandatory</Read>
+                <Write>Excluded</Write>
+                <WriteWithoutResponse>Excluded</WriteWithoutResponse>
+                <SignedWrite>Excluded</SignedWrite>
+                <ReliableWrite>Excluded</ReliableWrite>
+                <Notify>Excluded</Notify>
+                <Indicate>Excluded</Indicate>
+                <WritableAuxiliaries>Excluded</WritableAuxiliaries>
+                <Broadcast>Excluded</Broadcast>
+            </Properties>
+<!--            <SecuritySettings>
+
+                <Security>Authentication</Security> 
+            </SecuritySettings>
+-->      
+            <!--
+            <Descriptors>
+                <Descriptor name="Characteristic Presentation Format" type="org.bluetooth.descriptor.gatt.characteristic_presentation_format">
+                    <InformativeText>
+            If there is more than one instance of the Tx Power Level characteristic exposed by the Transmit Power service, the Characteristic Presentation Format descriptor is included to identify the physical layer and modulation scheme for which the transmit power level applies.
+          </InformativeText>
+                    <Requirement>if_multiple_characteristics_implemented</Requirement>
+                    <Properties>
+                        <Read>Mandatory</Read>
+                        <Write>Excluded</Write>
+                    </Properties>
+                </Descriptor>
+                <Descriptor name="Client Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+                    <InformativeText>
+            If the characteristic can be notified or indicated, as defined by a higher level specification, the Client Configuration Characteristic descriptor is included.
+          </InformativeText>
+                    <Requirement>if_notify_or_indicate_supported</Requirement>
+                    <Properties>
+                        <Read>Mandatory</Read>
+                        <Write>Mandatory</Write>
+                    </Properties>
+                </Descriptor>
+            </Descriptors>
+            -->
+        </Characteristic>
+    </Characteristics>
+</Service>

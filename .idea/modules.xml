@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/22d44.iml" filepath="$PROJECT_DIR$/22d44.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Bluegecko-android-private.iml" filepath="$PROJECT_DIR$/Bluegecko-android-private.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Bluegecko-android-private-v1.3.iml" filepath="$PROJECT_DIR$/Bluegecko-android-private-v1.3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libraries/libraries.iml" filepath="$PROJECT_DIR$/libraries/libraries.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1719584012/libraries.iml" filepath="$PROJECT_DIR$/.idea/modules/1719584012/libraries.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libraries/materialdesign/materialdesign.iml" filepath="$PROJECT_DIR$/libraries/materialdesign/materialdesign.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/470675720/materialdesign.iml" filepath="$PROJECT_DIR$/.idea/modules/470675720/materialdesign.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mobile.iml" filepath="$PROJECT_DIR$/.idea/modules/mobile.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-272549822/silicon-labs-demo-android-1.2.0.0.iml" filepath="$PROJECT_DIR$/.idea/modules/-272549822/silicon-labs-demo-android-1.2.0.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wear/wear.iml" filepath="$PROJECT_DIR$/wear/wear.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1011904212/wear.iml" filepath="$PROJECT_DIR$/.idea/modules/-1011904212/wear.iml" />
+    </modules>
+  </component>
+</project>

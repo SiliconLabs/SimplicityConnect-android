@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/about_blue_giga_dialog_title_height"
+        android:background="@color/hidden_debug_mode_calibration_title_background"
+        android:gravity="left|center_vertical"
+        android:paddingLeft="@dimen/about_dialog_title_padding_left"
+        android:text="@string/hidden_debug_calibrations_title"
+        android:textColor="@color/dialog_title_text"
+        android:textSize="@dimen/about_dialog_title_text_size"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/hidden_debug_beacon_section_label_vertical_margin"
+        android:layout_marginTop="@dimen/hidden_debug_beacon_section_label_vertical_margin"
+        android:paddingLeft="@dimen/about_dialog_title_padding_left"
+        android:text="@string/hidden_debug_beacon_section_label"
+        android:textSize="@dimen/hidden_debug_beacon_section_label_text_size" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/about_dialog_title_padding_left"
+        android:paddingRight="@dimen/about_dialog_title_padding_left">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".65"
+            android:gravity="bottom"
+            android:text="@string/hidden_debug_beacon_near_threshold" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".35"
+            android:gravity="bottom"
+            android:inputType="numberDecimal"
+            android:text="0.50"
+            android:textSize="@dimen/hidden_debug_edit_text_size" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/about_dialog_title_padding_left"
+        android:paddingRight="@dimen/about_dialog_title_padding_left">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".65"
+            android:gravity="bottom"
+            android:text="@string/hidden_debug_beacon_far_threshold" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".35"
+            android:gravity="bottom"
+            android:inputType="numberDecimal"
+            android:text="0.50"
+            android:textSize="@dimen/hidden_debug_edit_text_size" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="@dimen/about_dialog_title_padding_left"
+        android:layout_marginRight="@dimen/about_dialog_title_padding_left"
+        android:layout_marginTop="15dp"
+        android:background="@color/hidden_debug_mode_calibration_section_separator" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:paddingLeft="@dimen/about_dialog_title_padding_left"
+        android:text="@string/hidden_debug_key_fobs_section_label"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/about_dialog_title_padding_left"
+        android:paddingRight="@dimen/about_dialog_title_padding_left">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".65"
+            android:gravity="bottom"
+            android:text="@string/hidden_debug_key_fob_delta_threshold" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".35"
+            android:gravity="bottom"
+            android:inputType="numberSigned"
+            android:text="0.50"
+            android:textSize="@dimen/hidden_debug_edit_text_size" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/about_dialog_title_padding_left"
+        android:paddingRight="@dimen/about_dialog_title_padding_left">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".65"
+            android:gravity="bottom"
+            android:text="@string/hidden_debug_key_fob_min_delta" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".35"
+            android:gravity="bottom"
+            android:inputType="numberSigned"
+            android:text="0.50"
+            android:textSize="@dimen/hidden_debug_edit_text_size" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/about_dialog_title_padding_left"
+        android:paddingRight="@dimen/about_dialog_title_padding_left">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".65"
+            android:gravity="bottom"
+            android:text="@string/hidden_debug_key_fob_max_delta" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".35"
+            android:gravity="bottom"
+            android:inputType="numberSigned"
+            android:text="0.50"
+            android:textSize="@dimen/hidden_debug_edit_text_size" />
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="25dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/about_dialog_title_padding_left"
+        android:paddingRight="@dimen/about_dialog_title_padding_left">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight=".65"
+            android:text="@string/hidden_debug_display_debug_values" />
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight=".35" />
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="15dp" />
+
+    <Button
+        android:id="@+id/ok_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/about_blue_giga_dialog_close_btn_height"
+        android:background="@drawable/debug_mode_dialog_button_selector"
+        android:gravity="center"
+        android:text="@string/hidden_debug_save_btn"
+        android:textAllCaps="false"
+        android:textColor="@color/dialog_btn_text" />
+</LinearLayout>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/listChoiceBackgroundIndicator">
+
+    <ImageView
+        android:id="@android:id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="@dimen/device_selection_item_padding"
+        android:layout_marginBottom="@dimen/device_selection_item_padding"
+        android:src="@drawable/bt_level"
+        android:adjustViewBounds="false"/>
+
+    <TextView
+        android:id="@android:id/title"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginStart="@dimen/device_selection_item_margin"
+        android:layout_gravity="center_vertical"
+        android:paddingTop="@dimen/device_selection_item_padding"
+        style="@style/Subhead"
+        android:lines="2"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:drawableBottom="@drawable/item_divider"
+        android:drawablePadding="@dimen/device_selection_item_padding"
+        tools:text="Bluetooth Device"/>
+
+</LinearLayout>

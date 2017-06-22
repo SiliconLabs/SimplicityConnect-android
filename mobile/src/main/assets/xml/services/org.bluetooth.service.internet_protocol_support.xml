@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014 Bluetooth SIG, Inc. All rights reserved. -->
+<Service xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/service.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+name="Internet Protocol Support Service" type="org.bluetooth.service.internet_protocol_support" uuid="1820" last-modified="2014-12-15" approved="Yes">
+	<InformativeText>
+     <Abstract>
+           When in a GAP Discoverable Mode for an initial connection to a Router, the Node will include the IP Support Service UUID 0x1820 in the Service UUIDs AD type field 
+        of the advertising data. This enhances the user experience as a Node may be identified by the Router before initiating a connection.
+		</Abstract>
+        <Summary>This service does not define any characteristics</Summary>
+       
+	</InformativeText>
+	<Dependencies>
+		<Dependency>This service has no dependencies on other GATT-based services.</Dependency>
+	</Dependencies>
+	
+	<Transports>
+		<Classic>false</Classic>
+		<LowEnergy>true</LowEnergy>
+	</Transports>
+    		
+</Service>

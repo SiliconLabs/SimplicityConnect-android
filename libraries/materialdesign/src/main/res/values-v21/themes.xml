@@ -1,0 +1,11 @@
+<resources>
+
+    <style name="BaseAppThemeOverride.Light" parent="BaseAppThemeCommon.Light">
+        <item name="android:statusBarColor">@color/statusbar_background</item>
+    </style>
+
+    <style name="BaseAppThemeOverride.Dark" parent="BaseAppThemeCommon.Dark">
+        <item name="android:statusBarColor">@color/statusbar_background</item>
+    </style>
+
+</resources>

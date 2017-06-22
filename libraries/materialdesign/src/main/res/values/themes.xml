@@ -1,0 +1,45 @@
+<resources>
+
+    <!-- Themes apply styling to a container (e.g. ViewGroup, Activity, Window, etc) and all its children. -->
+
+
+    <style name="BaseAppThemeCommon.Light" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="toolbarStyle">@style/ToolbarStyle</item>
+
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primaryDarker</item>
+
+        <item name="android:textColorPrimary">@color/text_primary_light</item>
+        <item name="android:textColorSecondary">@color/text_secondary_light</item>
+        <item name="android:textColorHint">@color/text_light_hint</item>
+    </style>
+
+    <style name="BaseAppThemeOverride.Light" parent="BaseAppThemeCommon.Light">
+        <!-- Empty here, but can be filled in config-specific values folder -->
+    </style>
+
+
+
+    <style name="BaseAppThemeCommon.Dark" parent="Theme.AppCompat.NoActionBar">
+        <item name="toolbarStyle">@style/ToolbarStyle</item>
+
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primaryDarker</item>
+
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        <item name="android:textColorHint">@color/text_dark_hint</item>
+    </style>
+
+    <style name="BaseAppThemeOverride.Dark" parent="BaseAppThemeCommon.Dark">
+        <!-- Empty here, but can be filled in config-specific values folder -->
+    </style>
+
+
+    <!-- Override this one in your own app and choose appropriate BaseAppTheme -->
+    <style name="AppTheme" parent="BaseAppThemeOverride.Light"/>
+
+    <!-- Override this one in your own app and choose appropriate BaseAppTheme -->
+    <style name="ToolbarTheme" parent="BaseAppThemeCommon.Dark"/>
+
+</resources>

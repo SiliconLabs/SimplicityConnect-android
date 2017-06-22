@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginRight="@dimen/demo_item_value_margin_right">
+
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Body"
+        android:lines="1"
+        tools:text="Profile Name"/>
+
+    <TextView
+        android:id="@android:id/text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        style="@style/Caption"
+        tools:text="XWU"/>
+</LinearLayout>

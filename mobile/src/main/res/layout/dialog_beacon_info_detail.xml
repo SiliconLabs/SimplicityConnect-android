@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/device_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dialog_title_background"
+        android:paddingLeft="@dimen/advertisement_details_title_padding_left"
+        android:paddingTop="@dimen/beacon_details_dialog_device_name_padding_top"
+        android:text="@string/beacon_details_dialog_default_device_name"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/advertisement_details_title_text_size"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/device_mac_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/device_name"
+        android:background="@color/dialog_title_background"
+        android:paddingLeft="@dimen/advertisement_details_device_name_padding_left"
+        android:paddingTop="@dimen/advertisement_details_device_name_padding_top"
+        android:text="@string/beacon_details_dialog_default_mac_addr"
+        android:textColor="@color/dialog_title_text"
+        android:textSize="@dimen/advertisement_details_device_name_text_size" />
+
+    <LinearLayout
+        android:id="@+id/rssi_tx_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/device_mac_address"
+        android:background="@color/dialog_title_background"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/beacon_details_dialog_device_rssi_tx_container_padding_bottom"
+        android:paddingLeft="@dimen/advertisement_details_device_name_padding_left"
+        android:paddingRight="@dimen/advertisement_details_device_name_padding_left"
+        android:paddingTop="@dimen/beacon_details_dialog_device_rssi_tx_container_padding_top">
+
+        <TextView
+            android:id="@+id/beacon_rssi"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:textSize="@dimen/advertisement_details_device_name_text_size"
+            android:text="@string/beacon_details_dialog_default_rssi" />
+
+        <TextView
+            android:id="@+id/beacon_tx_power"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:textSize="@dimen/advertisement_details_device_name_text_size"
+            android:text="@string/beacon_details_dialog_default_tx_power" />
+    </LinearLayout>
+
+
+    <View
+        android:id="@+id/separator_title_beacon_data"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/rssi_tx_container"
+        android:background="@color/dialog_separator_dark_gray" />
+
+    <ScrollView
+        android:id="@+id/advertisement_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ad_dialog_extra_ad_info_scroll_height"
+        android:layout_below="@id/separator_title_beacon_data"
+        android:background="@android:color/white">
+
+        <LinearLayout
+            android:id="@+id/advertisement_linearlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:minHeight="@dimen/ad_dialog_extra_ad_info_scroll_height"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/beacon_details"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:minHeight="@dimen/ad_dialog_extra_ad_info_scroll_height"
+                android:padding="@dimen/ad_dialog_extra_ad_info_textview_padding"
+                android:text="@string/beacon_details_dialog_no_additional_info_text"
+                android:textSize="@dimen/ad_dialog_extra_ad_info_text_size" />
+        </LinearLayout>
+    </ScrollView>
+
+    <View
+        android:id="@+id/separator_ad_and_btns"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/advertisement_scrollview"
+        android:background="@color/dialog_separator_dark_red" />
+
+    <Button
+        android:id="@+id/close_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/beacon_details_dialog_ok_btn_height"
+        android:layout_below="@id/separator_ad_and_btns"
+        android:background="@drawable/debug_mode_dialog_button_selector"
+        android:gravity="center"
+        android:text="@string/ad_dialog_close_btn_default_text"
+        android:textAllCaps="false"
+        android:textColor="@color/dialog_btn_text" />
+</RelativeLayout>

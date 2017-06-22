@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/device_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"> <!--TODO Hide device container for filter :p-->
+
+    <TextView
+        android:id="@+id/devices_header_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/debug_mode_device_selection_margin"
+        android:paddingTop="@dimen/debug_mode_device_selection_margin"
+        android:text="@string/list_item_debug_mode_devices_label"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:textSize="@dimen/list_item_debug_mode_devices_header_label_text_size"
+        android:visibility="gone" />
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="1dp"
+        android:layout_marginStart="@dimen/debug_mode_device_selection_margin_left"
+        android:layout_marginEnd="@dimen/debug_mode_device_selection_margin_right"
+        android:background="@android:color/white"
+        android:elevation="@dimen/debug_mode_device_selection_cardview_elevation"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardCornerRadius="@dimen/debug_mode_device_selection_cardview_corner_radius">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:id="@+id/device_info_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:orientation="horizontal"
+                android:paddingBottom="@dimen/list_item_device_info_padding_vertical"
+                android:paddingLeft="@dimen/list_item_device_info_padding"
+                android:paddingRight="@dimen/list_item_device_info_padding"
+                android:paddingTop="@dimen/list_item_device_info_padding_vertical">
+                <Button
+                    android:id="@+id/button_extrainfo"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:background="@drawable/debug_expand"
+                    android:layout_margin="5dp" />
+                <LinearLayout
+                    android:id="@+id/device_name_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_weight="3">
+                    <LinearLayout
+
+                        android:layout_height="wrap_content"
+                        android:layout_width="150dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/device_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/listChoiceBackgroundIndicator"
+                            android:paddingBottom="@dimen/list_item_device_info_device_name_padding_vertical"
+                            android:paddingTop="@dimen/list_item_device_info_device_name_padding_vertical"
+                            android:text="@string/devices_list_list_item_default_device_name"
+                            android:textColor="@android:color/black"
+                            android:textSize="@dimen/list_item_device_name_text_size" />
+
+                        <TextView
+                            android:id="@+id/mac_address"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/default_mac_address"
+                            android:textColor="@color/default_mac_address_text"
+                            android:textSize="@dimen/default_mac_address_text_size" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/infocontainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:layout_weight="3">
+
+                        <LinearLayout
+                            android:id="@+id/container_rssi_tx"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="15dp"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:layout_width="80dp">
+
+
+                            <LinearLayout
+                                android:id="@+id/rssi_container"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/bt_strong"
+                                    android:id="@+id/imageView" />
+
+                                <TextView
+                                    android:id="@+id/rssi"
+                                    android:layout_height="match_parent"
+                                    android:text="@string/default_rssi_value"
+                                    android:textColor="@color/rssi_text_color"
+                                    android:layout_gravity="right"
+                                    android:layout_marginStart="3dp"
+                                    android:gravity="center"
+                                    android:textSize="@dimen/rssi_value_text_size"
+                                    android:layout_width="60dp" />
+
+                            </LinearLayout>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="35dp">
+                            <ProgressBar
+                                android:id="@+id/connecting_spinner"
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
+                                android:layout_margin="5dp"
+                                android:layout_gravity="center_vertical|right"
+                                android:indeterminate="true"
+                                android:indeterminateDrawable="@drawable/connecting_spinner_ring"
+                                android:visibility="visible" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+                            <Spinner
+                                android:id="@+id/submenu_spinner"
+                                android:layout_width="30dp"
+                                android:layout_height="match_parent"
+                                android:background="@android:color/white" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <com.siliconlabs.bledemo.views.FlowLayout
+                android:id="@+id/expanded_info_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:background="@color/expanded_info_container_background"
+                android:paddingBottom="@dimen/device_ad_details_flowlayout_vertical_padding"
+                android:paddingLeft="@dimen/expanded_info_conainer_padding"
+                android:paddingRight="@dimen/expanded_info_conainer_padding"
+                android:paddingTop="@dimen/device_ad_details_flowlayout_vertical_padding"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+</LinearLayout>
+

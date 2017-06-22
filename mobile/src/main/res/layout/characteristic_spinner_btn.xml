@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/service_caret_container_width"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_vertical"
+    android:gravity="center">
+
+    <ImageView
+        android:layout_width="@dimen/service_caret_width"
+        android:layout_height="@dimen/service_caret_height"
+        android:layout_centerVertical="true"
+        android:src="@drawable/debug_list_picker" />
+
+    <Button
+        android:id="@+id/btn_show_picker_dialog"
+        android:layout_width="@dimen/service_caret_btn_width"
+        android:layout_height="@dimen/service_caret_btn_height"
+        android:layout_centerVertical="true"
+        android:background="?android:attr/selectableItemBackground" />
+</RelativeLayout>

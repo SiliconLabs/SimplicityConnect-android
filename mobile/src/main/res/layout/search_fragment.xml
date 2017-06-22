@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/search_fragment"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+
+        <RelativeLayout
+            android:id="@+id/filter_rel1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp">
+
+            <EditText
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:layout_height="wrap_content"
+                android:layout_width="300dp"
+                android:text=""
+                android:layout_alignParentLeft="true"
+                android:ems="12"
+                android:id="@+id/search" />
+
+            <Button
+                android:id="@+id/search_filter"
+                android:icon="@drawable/search"
+                android:background="@drawable/search"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="32dp"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/filter_rel2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/filter_rel1"
+            android:padding="2dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:text="Order by RSSI"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="16dp"
+                        android:textAllCaps="true"
+                        android:textStyle="bold"
+                        android:layout_gravity="center_vertical|start"
+                        android:gravity="center_vertical" />
+
+                    <Switch
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/rssi_radio"
+                        android:layout_gravity="center_vertical|end"
+                        android:layout_weight="1"
+                        android:scaleX="1.3"
+                        android:scaleY="1.3"
+                        android:layout_marginRight="35dp"
+                        android:elevation="5dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:text="Filter Bonded"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical|start"
+                        android:elegantTextHeight="true"
+                        android:textSize="16dp"
+                        android:textAllCaps="true"
+                        android:textStyle="bold"
+                        android:gravity="center_vertical" />
+
+                    <Switch
+                        android:id="@+id/bondedradio"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical|end"
+                        android:scaleX="1.3"
+                        android:scaleY="1.3"
+                        android:layout_marginRight="35dp"
+                        android:elevation="6dp"
+                        android:layout_weight="2" />
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</FrameLayout>
+

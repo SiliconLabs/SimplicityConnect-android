@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/characteristic_picker_dialog_width"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dialog_charac_write_title_background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".6"
+            android:background="@color/dialog_charac_write_title_background"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:paddingBottom="@dimen/characteristic_dialog_header_padding_bottom"
+            android:paddingLeft="@dimen/characteristic_dialog_header_padding_left"
+            android:paddingTop="@dimen/characteristic_dialog_header_padding_top">
+
+            <TextView
+                android:id="@+id/picker_dialog_service_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/dialog_charac_write_title_background"
+                android:text="@string/characteristic_dialog_default_service_name"
+                android:textSize="@dimen/characteristic_dialog_header_service_name_text_size" />
+
+            <TextView
+                android:id="@+id/characteristic_dialog_characteristic_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/dialog_charac_write_title_background"
+                android:text="@string/characteristic_dialog_default_charac_name"
+                android:textSize="@dimen/characteristic_dialog_header_characteristic_name_text_size" />
+
+            <TextView
+                android:id="@+id/picker_dialog_characteristic_uuid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/dialog_charac_write_title_background"
+                android:lines="1"
+                android:text="@string/characteristic_dialog_default_uuid"
+                android:textSize="@dimen/characteristic_dialog_charac_uuid_textsize" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/picker_dialog_properties_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".4"
+            android:background="@color/dialog_charac_write_title_background"
+            android:gravity="center_vertical|right"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/characteristic_dialog_header_padding_bottom"
+            android:paddingRight="@dimen/characteristic_spinner_dialog_header_padding_right"
+            android:paddingTop="@dimen/characteristic_dialog_header_padding_top">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/transparent" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/characteristic_spinner_dialog_title_separator" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/characteristic_spinner_dialog_spinner_scroll_height">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioGroup
+                android:id="@+id/characteristic_dialog_radio_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/characteristic_spinner_dialog_radio_group_margin_left"
+                android:layout_marginRight="@dimen/characteristic_spinner_dialog_radio_group_margin_right"
+                android:layout_marginTop="@dimen/characteristic_spinner_dialog_radio_group_margin_top" />
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/confirm_selection_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/about_blue_giga_dialog_close_btn_height"
+        android:background="@drawable/debug_mode_dialog_button_selector"
+        android:gravity="center"
+        android:text="@string/characteristic_spinner_dialog_ok_btn_copy"
+        android:textAllCaps="false"
+        android:textColor="@color/dialog_btn_text" />
+</LinearLayout>

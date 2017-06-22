@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/device_tab_underline" />
+    <size
+        android:width="10000dp"
+        android:height="4dp" />
+    <padding
+        android:bottom="10dp"
+        android:left="0dp"
+        android:right="0dp"
+        android:top="0dp" />
+</shape>

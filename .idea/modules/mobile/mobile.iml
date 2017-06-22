@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":mobile" external.linked.project.path="$MODULE_DIR$/../../../silicon-labs-demo-android-1.2.0.0/mobile" external.root.project.path="$MODULE_DIR$/../../../silicon-labs-demo-android-1.2.0.0" external.system.id="GRADLE" external.system.module.group="silicon-labs-demo-android-1.2.0.0" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://C:/tmp/silicon-labs-demo-android-1.2.0.0/mobile/classes/main" />
+    <output-test url="file://C:/tmp/silicon-labs-demo-android-1.2.0.0/mobile/classes/test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../silicon-labs-demo-android-1.2.0.0/mobile">
+      <excludeFolder url="file://$MODULE_DIR$/../../../silicon-labs-demo-android-1.2.0.0/mobile/.gradle" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

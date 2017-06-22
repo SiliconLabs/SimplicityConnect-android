@@ -1,0 +1,50 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+    <item
+        android:id="@+id/menu_log"
+        android:orderInCategory="97"
+        android:text="LOG"
+        android:title="@string/action_log"
+        android:visible="false"
+        app:showAsAction="always" /> <!--TODO LOG Invisible-->
+    <item
+        android:id="@+id/refresh_services"
+        android:orderInCategory="98"
+        android:text="Refresh Services"
+        android:title="Refresh Services"
+        android:visible="true"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/request_mtu"
+        android:orderInCategory="98"
+        android:text="Request MTU"
+        android:title="Request MTU"
+        android:visible="true"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/request_priority"
+        android:orderInCategory="99"
+        android:text="Connection Interval"
+        android:title="Connection Interval"
+        android:visible="true"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/OTA_button"
+        android:orderInCategory="100"
+        android:text="OTA"
+        android:title="OTA"
+        android:visible="false"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/bluetooth_modules_website"
+        android:orderInCategory="101"
+        android:title="@string/about_blue_gecko_menu_label"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_item_license"
+        android:orderInCategory="102"
+        android:title="@string/about_menu_label"
+        app:showAsAction="never" />
+</menu>

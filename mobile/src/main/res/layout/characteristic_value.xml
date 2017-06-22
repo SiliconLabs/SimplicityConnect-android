@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?><!--  --><!-- Bluegiga’s Bluetooth Smart Android SW for Bluegiga BLE modules --><!-- Contact: support@bluegiga.com. --><!--  --><!-- This is free software distributed under the terms of the MIT license reproduced below. --><!--  --><!-- Copyright (c) 2013, Bluegiga Technologies --><!--  --><!-- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files ("Software") --><!-- to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, --><!-- and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: --><!--  --><!-- THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF --><!-- ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT --><!-- NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE. --><!--  --><!-- TODO extract dimens resources--><!-- TODO refactor ui-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/debug_mode_encoding_container_padding">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/encoding_header_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/encoded_values_vertical_margin"
+            android:layout_gravity="start"
+            android:text="@string/encoding_label"
+            android:textSize="@dimen/dialog_for_encoded_raw_vals_header_label"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/hex_text"
+            android:layout_width="@dimen/encoded_label_width"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
+            android:layout_marginRight="@dimen/encoded_values_horizontal_margin"
+            android:text="@string/hex"
+            android:textColor="@color/silicon_labs_dark_gray"
+            android:textSize="@dimen/encoded_label_text_size" />
+
+        <EditText
+            android:id="@+id/hexEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/encoded_val_hex_margin_top"
+            android:digits="0123456789ABCDEFabcdef"
+            android:imeOptions="actionDone"
+            android:inputType="text|textNoSuggestions"
+            android:singleLine="true"
+            android:textSize="@dimen/encoded_value_text_size"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/hex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
+            android:textColor="@color/silicon_labs_dark_gray"
+            android:textSize="@dimen/encoded_value_text_size"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/ascii_text"
+            android:layout_width="@dimen/encoded_label_width"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
+            android:layout_marginRight="@dimen/encoded_values_horizontal_margin"
+            android:text="@string/ascii"
+            android:textColor="@color/silicon_labs_dark_gray"
+            android:textSize="@dimen/encoded_label_text_size" />
+
+        <EditText
+            android:id="@+id/asciiEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/encoded_value_margin_top"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
+            android:textSize="@dimen/encoded_value_text_size" />
+
+        <TextView
+            android:id="@+id/ascii"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
+            android:textColor="@color/silicon_labs_dark_gray"
+            android:textSize="@dimen/encoded_value_text_size"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/decimal_text"
+            android:layout_width="@dimen/encoded_label_width"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
+            android:layout_marginRight="@dimen/encoded_values_horizontal_margin"
+            android:text="@string/decimal"
+            android:textColor="@color/silicon_labs_dark_gray"
+            android:textSize="@dimen/encoded_label_text_size" />
+
+        <EditText
+            android:id="@+id/decimalEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/encoded_value_margin_top"
+            android:digits="1234567890 "
+            android:imeOptions="actionDone"
+            android:inputType="number"
+            android:maxLines="1"
+            android:textSize="@dimen/encoded_value_text_size" />
+
+        <TextView
+            android:id="@+id/decimal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
+            android:textColor="@color/silicon_labs_dark_gray"
+            android:textSize="@dimen/encoded_value_text_size"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

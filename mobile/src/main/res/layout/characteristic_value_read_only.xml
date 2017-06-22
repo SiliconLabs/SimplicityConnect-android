@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?><!--  --><!-- Bluegiga’s Bluetooth Smart Android SW for Bluegiga BLE modules --><!-- Contact: support@bluegiga.com. --><!--  --><!-- This is free software distributed under the terms of the MIT license reproduced below. --><!--  --><!-- Copyright (c) 2013, Bluegiga Technologies --><!--  --><!-- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files ("Software") --><!-- to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, --><!-- and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: --><!--  --><!-- THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF --><!-- ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT --><!-- NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE. --><!--  --><!-- TODO extract dimens resources--><!-- TODO refactor ui-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/debug_mode_characteristic_encoding_read_only_container_padding">
+
+    <TextView
+        android:id="@+id/encoding_header_label_readonly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/encoded_values_vertical_margin"
+        android:text="@string/encoding_label"
+        android:textSize="@dimen/encoded_value_text_size" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:scrollbars="none"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/hex_edit_readonly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/encoded_values_horizontal_margin"
+                android:clickable="false"
+                android:digits="0123456789ABCDEFabcdef"
+                android:editable="false"
+                android:enabled="false"
+                android:imeOptions="actionDone"
+                android:inputType="text|textNoSuggestions"
+                android:singleLine="true"
+                android:textSize="@dimen/encoded_value_text_size"
+                android:visibility="visible" />
+
+            <EditText
+                android:id="@+id/hex_readonly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/encoded_values_horizontal_margin"
+                android:clickable="false"
+                android:editable="false"
+                android:enabled="false"
+                android:imeOptions="actionDone"
+                android:inputType="text|textNoSuggestions"
+                android:singleLine="true"
+                android:textSize="@dimen/encoded_value_text_size"
+                android:visibility="visible" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/hex_text_readonly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
+        android:text="@string/hex"
+        android:textColor="@color/silicon_labs_dark_gray"
+        android:textSize="@dimen/encoded_label_text_size" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:scrollbars="none"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/ascii_edit_readonly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/encoded_value_margin_top"
+                android:clickable="false"
+                android:editable="false"
+                android:enabled="false"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
+                android:textSize="@dimen/encoded_value_text_size" />
+
+            <EditText
+                android:id="@+id/ascii_readonly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/encoded_value_margin_top"
+                android:clickable="false"
+                android:editable="false"
+                android:enabled="false"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
+                android:textSize="@dimen/encoded_value_text_size" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/ascii_text_readonly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
+        android:text="@string/ascii"
+        android:textColor="@color/silicon_labs_dark_gray"
+        android:textSize="@dimen/encoded_label_text_size" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:scrollbars="none"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/decimalEdit_readonly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/encoded_value_margin_top"
+                android:clickable="false"
+                android:digits="1234567890 "
+                android:editable="false"
+                android:enabled="false"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:singleLine="true"
+                android:textSize="@dimen/encoded_value_text_size" />
+
+            <EditText
+                android:id="@+id/decimal_readonly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/encoded_value_margin_top"
+                android:clickable="false"
+                android:editable="false"
+                android:enabled="false"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:singleLine="true"
+                android:textSize="@dimen/encoded_value_text_size" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/decimal_text_readonly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
+        android:text="@string/decimal"
+        android:textColor="@color/silicon_labs_dark_gray"
+        android:textSize="@dimen/encoded_label_text_size" />
+</LinearLayout>

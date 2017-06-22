@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="primary">#FF9e9e9e</color>
+    <color name="primaryDarker">#FF616161</color>
+
+    <color name="statusbar_background">@color/primaryDarker</color>
+    <color name="toolbar_background">@color/primary</color>
+
+    <!-- Here, text color for light theme is black -->
+    <color name="text_light_primary">#DE000000</color> <!-- a=87% -->
+    <color name="text_light_secondary">#8A000000</color> <!-- a=54% -->
+    <color name="text_light_hint">#42000000</color> <!-- a=26% -->
+    <color name="text_disabled">#FFABABAB</color>
+
+    <!-- Here, text color for dark theme is white -->
+    <color name="text_dark_primary">#FFffffff</color> <!-- a=100% -->
+    <color name="text_dark_secondary">#B3ffffff</color> <!-- a=70% -->
+    <color name="text_dark_hint">#4Dffffff</color> <!-- a=30% -->
+
+</resources>

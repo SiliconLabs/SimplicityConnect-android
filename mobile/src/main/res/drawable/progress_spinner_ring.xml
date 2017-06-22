@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:innerRadiusRatio="2.5"
+    android:shape="ring"
+    android:thicknessRatio="12"
+    android:useLevel="false">
+
+    <size
+        android:width="@dimen/dialog_loading_spinner_diameter"
+        android:height="@dimen/dialog_loading_spinner_diameter" />
+
+    <gradient
+        android:centerColor="@color/dialog_loading_spinner_center"
+        android:endColor="@color/dialog_loading_spinner_end"
+        android:startColor="@color/dialog_loading_spinner_start"
+        android:type="sweep"
+        android:useLevel="false" />
+</shape>
