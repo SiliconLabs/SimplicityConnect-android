@@ -2308,7 +2308,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
                         byte[] ebl = null;
                         try {
                             Log.d("stackPath", "" + stackPath);
-                            Log.d("appPath", "" + stackPath);
+                            Log.d("appPath", "" + appPath);
                             File file;
                             if (!stackPath.equals("")) {
                                 file = new File(stackPath);
