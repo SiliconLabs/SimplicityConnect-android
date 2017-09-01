@@ -1970,8 +1970,8 @@ public class DeviceServicesActivity extends AppCompatActivity {
 
     }
 
-    //Not used - White with NO RESPONSE*************************************************/
-    public void whiteOtaData(final byte[] datathread) {
+    //Not used - Write with NO RESPONSE*************************************************/
+    public void writeOtaData(final byte[] datathread) {
         boolOTAdata = true;
         byte[] value = new byte[MTU-3];
         long start = System.currentTimeMillis();
@@ -2360,7 +2360,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
                             public void run() {
                                 if (reliable){
                                     otaWriteDataReliable();
-                                } else whiteOtaData(datathread);
+                                } else writeOtaData(datathread);
                             }
                         });
                         otaUpload.start();
