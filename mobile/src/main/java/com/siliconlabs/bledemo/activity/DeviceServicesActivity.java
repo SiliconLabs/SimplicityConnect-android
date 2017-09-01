@@ -465,7 +465,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
             }
 
             if(characteristic.getValue().length<10)
-            Log.d ("OnCharacteristicRead","Char: " + characteristic.getUuid().toString() + " Value: " + Converters.getHexValue(characteristic.getValue()) + " Status: " + status);
+            Log.d ("OnCharacteristicWrite","Char: " + characteristic.getUuid().toString() + " Value: " + Converters.getHexValue(characteristic.getValue()) + " Status: " + status);
 
             if (status != 0){ // Error Handling
                 Log.d("onCharWrite", "status: " + Integer.toHexString(status));
