@@ -1,0 +1,30 @@
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolbar"
+    style="@style/ToolbarStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:elevation="0dp"
+    android:fitsSystemWindows="true"
+    android:gravity="right">
+
+    <RelativeLayout
+        android:layout_width="@dimen/actionbar_main_help_btn_container_width"
+        android:layout_height="@dimen/actionbar_main_help_btn_container_height"
+        android:visibility="gone"
+        android:layout_gravity="right|center_vertical"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="@dimen/actionbar_main_help_icon_width"
+            android:layout_height="@dimen/actionbar_main_help_icon_height"
+            android:layout_centerInParent="true"
+            android:src="@drawable/home_help_phone" />
+
+        <Button
+            android:id="@+id/help_button"
+            android:layout_width="@dimen/actionbar_main_help_btn_width"
+            android:layout_height="@dimen/actionbar_main_help_btn_height"
+            android:layout_centerInParent="true"
+            android:background="?android:attr/selectableItemBackground" />
+    </RelativeLayout>
+</android.support.v7.widget.Toolbar>

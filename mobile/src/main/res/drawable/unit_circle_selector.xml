@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/device_tab_red_underline"/>
+
+    <size android:width="@dimen/unit_selector_circle_size"
+        android:height="@dimen/unit_selector_circle_size"/>
+
+</shape>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:showDividers="middle"
+    android:divider="@drawable/item_divider"
+    android:background="@color/gallery">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/item_margin">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="16"
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:id="@android:id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/HeadLine"
+                tools:text="RetailBeacon" />
+
+            <TextView
+                android:id="@android:id/text1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Body"
+                tools:text="Identify Beacons, etc" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/profiles_used"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="15"
+            android:layout_gravity="center_vertical">
+            <!--<include layout="@layout/demo_item_value"/>-->
+            <!--<include layout="@layout/demo_item_value"/>-->
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:paddingStart="@dimen/item_margin"
+        android:paddingEnd="@dimen/item_margin"
+        android:layout_height="72dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="16"
+            android:layout_gravity="center_vertical"
+            android:paddingEnd="24dp"
+
+            style="@style/HeadLine"
+            android:textSize="@dimen/text_size_subhead"
+
+            android:text="@string/select_device" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="15"
+            android:layout_gravity="center_vertical">
+            <include layout="@layout/include_device_list_tab"
+                android:id="@+id/blue_gecko_tab"/>
+            <View
+                android:layout_width="24dp"
+                android:layout_height="1dp"/>
+            <include layout="@layout/include_device_list_tab"
+                android:id="@+id/other_tab"/>
+        </LinearLayout>
+
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="invisible"/>
+</LinearLayout>

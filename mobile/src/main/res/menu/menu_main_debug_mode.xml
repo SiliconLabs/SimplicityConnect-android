@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+    <item
+        android:id="@+id/menu_log"
+        android:orderInCategory="98"
+        android:text="LOG"
+        android:title="@string/action_log"
+        android:visible="false"
+        app:showAsAction="always" /><!--TODO Hide LOG -->
+    <item
+        android:id="@+id/menu_filter"
+        android:orderInCategory="99"
+        android:icon="@drawable/filter_icon"
+        android:title="@string/action_filter"
+        android:visible="true"
+        app:showAsAction="always" /><!--TODO Hide Filter -->
+    <item
+        android:id="@+id/bluetooth_modules_website"
+        android:orderInCategory="100"
+        android:title="@string/about_blue_gecko_menu_label"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_item_license"
+        android:orderInCategory="101"
+        android:title="@string/about_menu_label"
+        app:showAsAction="never" />
+</menu>

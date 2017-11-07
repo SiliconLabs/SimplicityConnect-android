@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">@color/alizarin_crimson</color>
+    <color name="primaryDarker">@color/alizarin_crimson_darker</color>
+
+    <!-- Here, text color for light theme is red -->
+    <color name="text_light_primary">@color/masala</color> <!-- 87% -->
+    <color name="text_light_secondary">@color/boulder</color> <!-- 54% -->
+    <color name="text_light_hint">@color/silver_chalice</color> <!-- 26% -->
+
+    <!-- Here, text color for dark theme is yellow -->
+    <color name="text_dark_primary">#FFFFFFFF</color> <!-- 100% -->
+    <color name="text_dark_secondary">#B3FFFFFF</color> <!-- 70% -->
+    <color name="text_dark_hint">#4DFFFFFF</color> <!-- 30% -->
+
+    <color name="gallery">#FFF1EFEF</color>
+    <color name="gallery_light">#FFF8F6F6</color>
+    <color name="alizarin_crimson">#FFD71F2A</color>
+    <color name="alizarin_crimson_transparent">#99FA434D</color>
+    <color name="alizarin_crimson_darker">#FFA1171F</color>
+
+    <color name="masala">#FF504E4E</color>
+    <color name="masala_50a">#7F504E4E</color>
+    <color name="boulder">#FF7A7878</color>
+    <color name="silver_chalice">#FFA5A5A5</color>
+    <color name="line_grey">#FFD9D9D9</color>
+    <color name="dark_grey">#FF555555</color>
+
+    <color name="cerulean">#FF0099E8</color>
+    <color name="silver1">#FFCCCCCC</color>
+
+    <!-- key fob signal strength indicator -->
+    <color name="key_fob_signal_strength_indicator_light_gray">#FFCCCCCC</color>
+    <color name="key_fob_signal_strength_indicator_medium_gray">#FF888888</color>
+    <color name="key_fob_signal_strength_indicator_dark_gray">#FF7A7878</color>
+
+    <!-- key fob list view item colors -->
+    <color name="dark_gray_id_text">#FF444444</color>
+    <color name="light_gray_signal_strength_text">#FF555555</color>
+    <color name="other_fobs_header_background">#FFDFDFDF</color>
+    <color name="key_fob_listview_header_text">#FF6F6F6F</color>
+    <color name="key_fob_divider">#FFCFCFCF</color>
+    
+    <!-- loading spinner (dialog) -->
+    <color name="dialog_loading_spinner_center">#FF999999</color>
+    <color name="dialog_loading_spinner_end">#FF666666</color>
+    <color name="dialog_loading_spinner_start">#FFE6E6E6</color>
+    <color name="dialog_loading_veil_gradient_center">#22D1D1D1</color>
+    <color name="dialog_loading_veil_gradient_end">#883F3F3F</color>
+    <color name="dialog_loading_veil_gradient_start">#22D1D1D1</color>
+
+    <!-- general -->
+    <color name="black">#FF000000</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- Silicon Labs Debug Mode -->
+    <color name="silicon_labs_blue">#FF007AC9</color>
+    <color name="silicon_labs_green">#FF8FC84E</color>
+    <color name="silicon_labs_light_blue">#FFB2DCEE</color>
+    <color name="silicon_labs_dark_gray">#FF6D6E71</color>
+    <color name="silicon_labs_medium_gray">#FFE2E0DD</color>
+    <color name="silicon_labs_white">#FFFFFFFF</color>
+    <color name="light_blue">#FF9CC1D1</color>
+    <color name="banner_start">#FF9DB8E3</color>
+    <color name="banner_end">#FFDFE7F4</color>
+    <color name="silicon_labs_device_list_background">#FFEEEEEE</color>
+    <color name="dialog_separator_dark_red">#FFA1171F</color>
+    <color name="dialog_separator_dark_gray">#FFAAAAAA</color>
+    <color name="ad_dialog_device_extra_ad_info_btn_unpressed">#FFDDDDDD</color>
+    <color name="ad_dialog_device_extra_ad_info_btn_pressed">#FF888888</color>
+    <color name="dialog_charac_write_title_background">#FFDFDFDF</color>
+    <color name="dialog_title_background">#FFEEEEEE</color>
+    <color name="dialog_title_text">#FF333333</color>
+    <color name="dialog_btn_text">#FFFFFFFF</color>
+    <color name="dialog_btn_color">#FFD71F2A</color>
+    <color name="dialog_btn_color_selected">#FFA1171F</color>
+    <color name="services_list_service_name">#FF555555</color>
+    <color name="characteristic_value_write_btn_selected">#FF999999</color>
+    <color name="characteristic_value_screen_info_value_divider">#FFAAAAAA</color>
+    <color name="characteristic_value_screen_divider">#FFCCCCCC</color>
+    <color name="characteristic_value_screen_value">#FF666666</color>
+    <color name="characteristic_value_screen_section_header">#FF444444</color>
+    <color name="characteristic_value_screen_label">#FF999999</color>
+    <color name="characteristic_value_screen_spinner_box_disabled">#FF888888</color>
+    <color name="characteristic_value_screen_spinner_box_enabled">#FFD71F2A</color>
+    <color name="characteristic_selection_dialog_char_text_color">#FF777777</color>
+    <color name="characteristic_selection_dialog_char_divider_color">#FFCCCCCC</color>
+    <color name="device_selection_plus_btn_text">#FF666666</color>
+    <color name="debug_mode_device_submenu_btn_selected">#FFCCCCCC</color>
+    <color name="debug_mode_device_submenu_btn">#FFFFFFFF</color>
+    <color name="debug_mode_characteristic_expansion_background">#00000000</color>
+    <color name="debug_mode_characteristic_expansion_property_text_color">#FF999999</color>
+    <color name="name_of_service_text_color">#FF444444</color>
+    <color name="uuid_of_service_text_color">#FF666666</color>
+    <color name="uuid_label_of_service_text_color">#FFBBBBBB</color>
+    <color name="container_of_characteristics_for_service_background">#FFEEEEEE</color>
+    <color name="services_separator">#FFBBBBBB</color>
+    <color name="characteristic_background_color">#FFF2F2F2</color>
+    <color name="characteristic_name">#FF444444</color>
+    <color name="characteristic_uuid">#FF666666</color>
+    <color name="characteristic_uuid_label">#FFBBBBBB</color>
+    <color name="characteristic_separator">#FFBBBBBB</color>
+    <color name="scanning_animation_text_label">#FFFFFFFF</color>
+    <color name="scanning_animation_bar_background">#FFD71F2A</color>
+
+    <color name="characteristic_field_value">#FF444444</color>
+    <color name="characteristic_field_name">#FF777777</color>
+
+    <color name="characteristic_dialog_title_background">#FFF2F2F2</color>
+    <color name="characteristic_spinner_dialog_title_separator">#FFD4D3D2</color>
+
+    <color name="fragment_help_dialog_container_background">#FFFFFFFF</color>
+    <color name="list_item_debug_mode_device_name_separator">#FFDDDDDD</color>
+    <color name="default_mac_address_text">#FF4B4B4B</color>
+    <color name="mac_address_label_text_color">#FF969696</color>
+    <color name="rssi_text_color">#FF4B4B4B</color>
+    <color name="tx_text_color">#FF4B4B4B</color>
+    <color name="rssi_label_text_color">#FF969696</color>
+    <color name="tx_label_text_color">#FF969696</color>
+    <color name="device_more_info_separator">#FFDDDDDD</color>
+    <color name="expanded_info_container_background">#FFEEEEEE</color>
+    <color name="service_container_background">#FFEEEEEE</color>
+
+    <color name="help_item_question_mark_background">#FF7A7878</color>
+    <color name="fragment_demo_item_help_item_spacing">#FFDDDDDD</color>
+    <color name="beacon_list_fragment_background">#FFF2F2F2</color>
+    <color name="beacon_list_item_rssi_label_text_color">#FF999999</color>
+    <color name="beacon_radar_bar_separator">#FFCCCCCC</color>
+
+    <color name="debug_connecting_background">#CC111111</color>
+
+    <color name="hidden_debug_mode_calibration_title_background">#FFDDDDDD</color>
+    <color name="hidden_debug_mode_calibration_section_separator">#FFCCCCCC</color>
+</resources>

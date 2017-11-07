@@ -1,0 +1,100 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/gallery"
+        android:orientation="vertical"
+        tools:context="com.siliconlabs.bledemo.activity.KeyFobsActivityFindingDeviceFragment">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/alizarin_crimson"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/find_key_fob_sub_header_left_offset">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/alizarin_crimson"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/find_key_fob_sub_header_padding_bottom"
+                android:paddingTop="@dimen/find_key_fob_sub_header_padding_top">
+
+                <TextView
+                    android:id="@+id/finding_keyfob_label"
+                    style="@style/ThermoLabelText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/finding_device_screen_current_action_label"
+                    android:textColor="@android:color/white"/>
+
+                <TextView
+                    android:id="@+id/finding_keyfob_device_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/finding_device_default_device_name"
+                    android:textColor="@android:color/white"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/finding_key_fobs_divider_height"
+            android:background="@color/key_fob_divider"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/gallery">
+
+                <ImageView
+                    android:id="@+id/led_bulb_rays"
+                    android:layout_width="@dimen/finding_key_fob_rays_width"
+                    android:layout_height="@dimen/finding_key_fob_rays_height"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/finding_key_fob_rays_margin_top"
+                    android:src="@drawable/blinking_image_phone"/>
+
+                <ImageView
+                    android:id="@+id/led_bulb"
+                    android:layout_width="@dimen/finding_key_fob_bulb_width"
+                    android:layout_height="@dimen/finding_key_fob_bulb_height"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/finding_key_fob_bulb_margin_top"
+                    android:src="@drawable/led_phone"/>
+
+                <TextView
+                    android:id="@+id/blinking_notice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/led_bulb"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/finding_key_fob_blinking_notice_margin_top"
+                    android:text="@string/finding_key_fob_blinking_notice"
+                    android:textSize="@dimen/finding_key_fob_blinking_notice_text_size"/>
+
+                <TextView
+                    android:id="@+id/blinking_explanation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/blinking_notice"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/finding_key_fob_blinking_explanation_margin_top"
+                    android:gravity="center"
+                    android:text="@string/finding_key_fob_blinking_explanation"
+                    android:textSize="@dimen/finding_key_fob_blinking_explanation_text_size"/>
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

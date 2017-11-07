@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/gallery">
+
+    <ImageView
+        android:id="@+id/beacon_scan_radar"
+        android:layout_width="@dimen/beacon_scan_image_size"
+        android:layout_height="@dimen/beacon_scan_image_size"
+        android:background="@drawable/retail_big_radar"/>
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/beacon_scan_space_height" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/looking_for_beacons"
+        android:textSize="@dimen/beacon_scan_text_size"/>
+
+</LinearLayout>

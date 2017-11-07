@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+        These are decibel levels,
+            weak <= -80
+            -80 < medium < -50 ==> -79 <= medium <= -51
+            strong >= -50
+            Unknown = 0
+        but since all levels must be positive, 80 has been added.
+    -->
+    <item
+        android:drawable="@drawable/bt_weak"
+        android:maxLevel="0" />
+    <item
+        android:drawable="@drawable/bt_medium"
+        android:maxLevel="29"
+        android:minLevel="1" />
+    <item
+        android:drawable="@drawable/bt_strong"
+        android:maxLevel="79"
+        android:minLevel="30" />
+    <item
+        android:drawable="@android:color/transparent"
+        android:minLevel="80" />
+</level-list>

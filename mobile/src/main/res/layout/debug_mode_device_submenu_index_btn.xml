@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImageView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/debug_mode_device_selection_plus_btn_width"
+    android:layout_height="@dimen/debug_mode_device_selection_plus_btn_width"
+    android:layout_alignParentRight="true"
+    android:layout_centerVertical="true"
+    android:background="@android:color/white"
+    android:src="@drawable/ic_action_navigation_more_vert"
+    android:textColor="@color/device_selection_plus_btn_text" />
