@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:showDividers="middle"
+    android:divider="@drawable/item_divider">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/item_margin"
+        android:background="@color/gallery">
+
+        <TextView
+            android:id="@android:id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Body"
+            android:textSize="@dimen/text_size_caption"
+            android:lines="1"
+            android:textAllCaps="true"
+            tools:text="RetailBeacon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_gravity="center_vertical"
+            android:paddingEnd="24dp"
+            style="@style/HeadLine"
+            android:textSize="@dimen/text_size_subhead"
+            android:text="@string/select_device" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:showDividers="end"
+        android:paddingStart="@dimen/item_margin"
+        android:paddingEnd="@dimen/item_margin"
+        android:paddingTop="@dimen/item_margin"
+        android:divider="@drawable/item_divider"
+        android:background="@android:color/white"
+        >
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingEnd="24dp"
+                android:paddingBottom="14dp"
+                style="@style/Body"
+                android:textSize="@dimen/text_size_tab"
+                android:textAllCaps="true"
+                android:text="@string/device_list" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:layout_gravity="center_vertical">
+                <include layout="@layout/include_device_list_tab"
+                    android:id="@+id/blue_gecko_tab"/>
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

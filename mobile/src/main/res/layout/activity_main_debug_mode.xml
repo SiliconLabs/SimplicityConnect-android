@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bluegiga's Bluetooth Smart Android SW for Bluegiga BLE modules --><!-- Contact: support@bluegiga.com. -->
+<!-- This is free software distributed under the terms of the MIT license reproduced below. -->
+<!-- Copyright (c) 2013, Bluegiga Technologies --><!-- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files ("Software") --><!-- to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, --><!-- and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: --><!--  --><!-- THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF --><!-- ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT --><!-- NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE. --><!--  -->
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.MainActivityDebugMode"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        tools:context=".MainActivityBlueGiga"
+        >
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/actionbar_debug_device_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            />
+
+        <RelativeLayout
+            android:id="@+id/bluetooth_enable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/toolbar"
+            android:background="@color/alizarin_crimson_darker"
+            android:padding="@dimen/bluetooth_enable_bar_padding"
+            android:visibility="gone"
+            >
+
+            <TextView
+                android:id="@+id/bluetooth_enable_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="@string/bluetooth_adapter_bar_disabled"
+                android:textColor="@android:color/white"
+                />
+
+            <TextView
+                android:id="@+id/bluetooth_enable_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="?android:listChoiceBackgroundIndicator"
+                android:text="@string/bluetooth_adapter_enable_bar_enable"
+                android:textColor="@android:color/white"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/filter_body"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@+id/bluetooth_enable"
+            android:animateLayoutChanges="true"
+            android:background="@color/silicon_labs_white"
+            android:paddingTop="3dp"
+            android:visibility="gone"
+            >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/alizarin_crimson"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/debug_body"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/filter_body"
+            android:background="@color/silicon_labs_device_list_background"
+            >
+
+
+            <LinearLayout
+                android:id="@+id/no_devices_found"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/silicon_labs_dark_gray"
+                android:gravity="center"
+                android:orientation="vertical"
+                >
+
+                <ImageView
+                    android:layout_width="@dimen/no_device_found_image_width"
+                    android:layout_height="@dimen/no_device_found_image_height"
+                    android:src="@drawable/debug_not_found_phone"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/no_devices_found_label_top_margin"
+                    android:gravity="center"
+                    android:text="@string/no_devices_found_title_copy"
+                    android:textSize="@dimen/no_devices_found_title_label_textsize"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/no_devices_found_caption_margin_top"
+                    android:gravity="center"
+                    android:text="@string/no_devices_found_caption_copy"
+                    android:textSize="@dimen/no_devices_found_caption_copy_textsize"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/looking_for_devices_background"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/silicon_labs_device_list_background"
+                android:gravity="center"
+                android:orientation="vertical"
+                >
+
+                <ImageView
+                    android:layout_width="@dimen/no_device_found_image_width"
+                    android:layout_height="@dimen/no_device_found_image_height"
+                    android:src="@drawable/debug_scanning"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/device_scanning_bgnd_graphic_text_spacing"
+                    android:gravity="center"
+                    android:text="@string/device_scanning_background_message"
+                    android:textSize="@dimen/scanning_for_devices_title_label_textsize"
+                    />
+            </LinearLayout>
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/swipe_refresh_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent"
+                >
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerview_debug_devices"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/transparent"
+                    android:divider="@color/transparent"
+                    android:paddingLeft="@dimen/swipe_refresh_devices_horizontal_padding"
+                    android:paddingRight="@dimen/swipe_refresh_devices_horizontal_padding"
+                    android:scrollbarFadeDuration="0"
+                    android:scrollbarStyle="outsideOverlay"
+                    android:scrollbars="vertical"
+                    />
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+            <RelativeLayout
+                android:id="@+id/scanning_gradient_container"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/scanning_animation_bar_height"
+                android:layout_alignParentBottom="true"
+                android:visibility="gone"
+                tools:visibility="visible"
+                >
+
+                <TextView
+                    android:id="@+id/scanning_label_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/scanning_animation_bar_height"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/scanning_animation_bar_background"
+                    android:gravity="center"
+                    android:text="@string/scanning_animation_bar_text_label_copy"
+                    android:textColor="@color/scanning_animation_text_label"
+                    android:textSize="@dimen/scanning_animation_bar_textsize"
+                    android:visibility="visible"
+                    />
+
+                <Button
+                    android:id="@+id/cancel_scanning"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="13dp"
+                    android:layout_marginTop="13dp"
+                    android:background="@drawable/cancel_scanning"
+                    android:onClick="cancelScanning"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/scanning_animation_bar_height"
+                    android:layout_alignParentBottom="true"
+                    android:orientation="horizontal"
+                    android:visibility="visible"
+                    >
+
+                    <RelativeLayout
+                        android:id="@+id/scan_anim_gradient_left"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/scanning_animation_bar_height"
+                        android:layout_weight=".5"
+                        >
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/scanning_animation_bar_height"
+                            android:layout_alignParentRight="true"
+                            android:src="@drawable/debug_scanning_indicator_left"
+                            />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/scan_anim_gradient_right"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/scanning_animation_bar_height"
+                        android:layout_weight=".5"
+                        android:src="@drawable/debug_scanning_indicator_right"
+                        >
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/scanning_animation_bar_height"
+                            android:src="@drawable/debug_scanning_indicator_right"
+                            />
+                    </RelativeLayout>
+                </LinearLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/log_body"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@id/scanning_gradient_container"
+                android:animateLayoutChanges="true"
+                android:background="@color/background_material_dark"
+                android:visibility="gone"
+                >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_alignParentTop="true"
+                    android:background="@color/alizarin_crimson"
+                    />
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/connecting_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/debug_connecting_background"
+            android:visibility="gone"
+            >
+
+            <RelativeLayout
+                android:id="@+id/connecting_bar_container"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/scanning_animation_bar_height"
+                android:layout_alignParentBottom="true"
+                >
+
+                <TextView
+                    android:id="@+id/connecting_label_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/scanning_animation_bar_height"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/scanning_animation_bar_background"
+                    android:gravity="center"
+                    android:text="@string/debug_mode_device_selection_connecting_bar"
+                    android:textColor="@color/scanning_animation_text_label"
+                    android:textSize="@dimen/scanning_animation_bar_textsize"
+                    android:visibility="visible"
+                    />
+
+                <LinearLayout
+                    android:id="@+id/connecting_anim_gradient_right_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/scanning_animation_bar_height"
+                    android:layout_alignParentBottom="true"
+                    android:orientation="horizontal"
+                    >
+
+                    <ImageView
+                        android:id="@+id/connecting_scan_anim_gradient_right"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/scanning_animation_bar_height"
+                        android:src="@drawable/debug_scanning_indicator_right"
+                        />
+                </LinearLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_btn_refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="@dimen/fab_refresh_btn_padding"
+        android:layout_marginRight="@dimen/fab_refresh_btn_padding"
+        android:src="@drawable/debug_refresh"
+        app:backgroundTint="@color/alizarin_crimson"
+        app:borderWidth="0dp"
+        app:elevation="@dimen/fab_refresh_btn_elevation"
+        app:fabSize="normal"
+        />
+</android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,63 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/help_button_height"
+        android:background="@color/dialog_title_background"
+        android:gravity="left|center_vertical"
+        android:textSize="@dimen/help_dialog_title_text_size"
+        android:textStyle="bold"
+        android:layout_marginLeft="@dimen/help_text_padding"
+        android:text="@string/help"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/help_text_padding"
+            android:background="@color/fragment_help_dialog_container_background">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="@dimen/help_text_size"
+                android:text="@string/about_silicon_labs"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/help_text_v02"
+                android:layout_marginTop="@dimen/help_section_and_body_separation"
+                android:textSize="@dimen/help_text_size"/>
+
+            <TextView
+                android:id="@+id/dialog_help_version_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/help_body_and_version_separation"
+                android:textSize="@dimen/help_text_size"
+                />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/help_ok_button"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/help_button_height"
+        android:text="@string/ok"
+        android:textColor="@color/dialog_btn_text"
+        android:textSize="@dimen/help_dialog_ok_btn_text_size"
+        android:background="@drawable/ok_button_selector"/>
+
+</LinearLayout>

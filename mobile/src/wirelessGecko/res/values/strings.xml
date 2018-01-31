@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name_blue_gecko">Wireless Gecko</string>
+
+    <string name="title_activity_demo_screen">Bluetooth Applications</string>
+
+    <string name="select_device">Select a Wireless Gecko Device</string>
+    <string name="tab_blue_geckos">Wireless Gecko</string>
+
+    <!-- Light Demo -->
+    <string name="demo_item_light_title">Connected Lighting Demo</string>
+    <string name="demo_light_text">Dynamic multiprotocol application showcasing simultaneous operation of Bluetooth plus Zigbee or Proprietary Sub-GHz on the Wireless Gecko SoC.</string>
+</resources>

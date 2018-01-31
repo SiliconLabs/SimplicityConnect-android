@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="@dimen/thermo_graph_padding"
+        android:paddingLeft="@dimen/thermo_graph_padding"
+        android:paddingRight="@dimen/thermo_graph_padding"
+        android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <include
+                    android:id="@+id/bar1"
+                    layout="@layout/thermo_graph_bar"/>
+
+                <Space
+                    android:layout_width="@dimen/thermo_graph_spacing"
+                    android:layout_height="match_parent"/>
+
+                <include
+                    android:id="@+id/bar2"
+                    layout="@layout/thermo_graph_bar"/>
+
+                <Space
+                    android:layout_width="@dimen/thermo_graph_spacing"
+                    android:layout_height="match_parent"/>
+
+                <include
+                    android:id="@+id/bar3"
+                    layout="@layout/thermo_graph_bar"/>
+
+                <Space
+                    android:layout_width="@dimen/thermo_graph_spacing"
+                    android:layout_height="match_parent"/>
+
+                <include
+                    android:id="@+id/bar4"
+                    layout="@layout/thermo_graph_bar"/>
+
+                <Space
+                    android:layout_width="@dimen/thermo_graph_spacing"
+                    android:layout_height="match_parent"/>
+
+                <include
+                    android:id="@+id/bar5"
+                    layout="@layout/thermo_graph_bar"/>
+
+            </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/thermo_graph_line_margin"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/thermo_graph_time1"
+                style="@style/ThermoGraphTimeText"
+                android:text="12:40 PM"/>
+
+            <Space
+                android:layout_width="@dimen/thermo_graph_spacing"
+                android:layout_height="match_parent"/>
+
+            <TextView
+                android:id="@+id/thermo_graph_time2"
+                style="@style/ThermoGraphTimeText"
+                android:text="12:40 PM"/>
+
+            <Space
+                android:layout_width="@dimen/thermo_graph_spacing"
+                android:layout_height="match_parent"/>
+
+            <TextView
+                android:id="@+id/thermo_graph_time3"
+                style="@style/ThermoGraphTimeText"
+                android:text="12:40 PM"/>
+
+            <Space
+                android:layout_width="@dimen/thermo_graph_spacing"
+                android:layout_height="match_parent"/>
+
+            <TextView
+                android:id="@+id/thermo_graph_time4"
+                style="@style/ThermoGraphTimeText"
+                android:text="12:40 PM"/>
+
+            <Space
+                android:layout_width="@dimen/thermo_graph_spacing"
+                android:layout_height="match_parent"/>
+
+            <TextView
+                android:id="@+id/thermo_graph_time5"
+                style="@style/ThermoGraphTimeText"
+                android:text="12:40 PM"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <include
+        android:id="@+id/empty_placeholder"
+        layout="@layout/empty_thermo_placeholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+</FrameLayout>

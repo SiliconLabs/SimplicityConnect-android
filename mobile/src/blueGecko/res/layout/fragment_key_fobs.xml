@@ -1,0 +1,22 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/other_fobs_header_background"
+        android:orientation="vertical"
+        tools:context="com.siliconlabs.bledemo.activity.KeyFobsActivityFragment">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview_keyfobs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/other_fobs_header_background"
+            android:divider="@color/transparent"
+            android:scrollbarFadeDuration="0"
+            android:scrollbars="vertical"/>
+    </LinearLayout>
+</RelativeLayout>

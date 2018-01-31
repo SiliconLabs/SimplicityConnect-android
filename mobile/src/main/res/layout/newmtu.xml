@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/alizarin_crimson">
+        <TextView
+            android:text="Request MTU"
+            android:layout_margin="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/silicon_labs_white"
+            android:textStyle="bold"/>
+    </LinearLayout>
+    <View
+        android:id="@+id/buttons_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dialog_separator_dark_gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:text="MTU: "
+            android:layout_margin="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:maxLength="4"
+            android:layout_gravity="center"/>
+
+        <EditText
+            android:id="@+id/mtuvalue"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:maxLength="3"
+            android:inputType="number"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+            <Button
+            android:id="@+id/cancel_request"
+            android:text="CANCEL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/silicon_labs_white"
+            android:textStyle="bold"
+            android:background="@color/alizarin_crimson" />
+            <Button
+            android:id="@+id/request"
+            android:text="REQUEST"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/silicon_labs_white"
+            android:textStyle="bold"
+            android:background="@color/alizarin_crimson" />
+    </LinearLayout>
+
+
+</LinearLayout>

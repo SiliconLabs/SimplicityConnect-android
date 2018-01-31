@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:showDividers="none"
+    android:gravity="center_vertical"
+    android:layout_gravity="center_vertical"
+    android:divider="@drawable/demo_item_divider">
+
+        <LinearLayout
+            android:id="@android:id/list"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:showDividers="none"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
+            android:divider="@drawable/demo_item_divider">
+            <Space
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp" />
+            <include layout="@layout/demo_item"
+                android:id="@+id/demo_health_thermometer"/>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp" />
+            <include layout="@layout/demo_item"
+                android:id="@+id/demo_retail_beacon"/>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp" />
+            <include layout="@layout/demo_item"
+                android:visibility="gone"
+                android:id="@+id/demo_smart_watch"/>
+            <include layout="@layout/demo_item"
+                android:id="@+id/demo_key_fobs"/>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp" />
+            <include layout="@layout/demo_item"
+                android:visibility="gone"
+                android:id="@+id/demo_remote_keyboard"/>
+            <include layout="@layout/demo_item"
+                android:id="@+id/blue_giga_debug"/>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="0dp" />
+        </LinearLayout>
+
+    <include layout="@layout/demo_help_item"
+        android:visibility="gone"
+        android:id="@+id/demo_help"/>
+</LinearLayout>

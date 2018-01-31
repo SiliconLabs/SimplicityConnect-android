@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/alizarin_crimson">
+        <TextView
+            android:id="@+id/loading_header"
+            android:text="Preparing for OTA"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:textStyle="bold"
+            android:textColor="@color/silicon_labs_white"/>
+        
+    </LinearLayout>
+
+    <View
+        android:id="@+id/buttons_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dialog_separator_dark_gray" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp">
+
+        <ProgressBar
+            android:id="@+id/connecting_spinner"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_margin="5dp"
+            android:layout_gravity="center_vertical|right"
+            android:indeterminate="true"
+            android:indeterminateDrawable="@drawable/connecting_spinner_ring"
+            android:visibility="visible"
+            android:layout_weight="0.3" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/loadingLog"
+            android:elegantTextHeight="true"
+            android:textStyle="bold"
+            android:layout_margin="15dp"
+            android:layout_gravity="center"
+            android:maxLength="25"
+            android:gravity="center"
+            android:layout_weight="0.7" />
+    </LinearLayout>
+</LinearLayout>

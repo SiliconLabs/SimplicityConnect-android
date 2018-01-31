@@ -1,0 +1,349 @@
+<resources>
+
+    <string name="app_name">Silicon Labs Smart Applications</string>
+    <string name="app_name_blue_gecko">Blue Gecko</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_filter">Filter</string>
+    <string name="action_log">Log</string>
+
+    <string name="demo">Demo</string>
+    <string name="profiles_used">Profiles Used</string>
+
+    <string name="demo_thermometer_title">Health Thermometer</string>
+    <string name="demo_thermometer_text">View current and saved thermometer readings.</string>
+    <string name="demo_beacon_title">Bluetooth Beaconing</string> <!--JCS 11/23/16 Former Retail Beacon -->
+    <string name="demo_beacon_text">Identify and detect proximity beacons related to retail products.</string>
+    <string name="demo_fob_title">Key Fobs</string>
+    <string name="demo_fob_text">Detect and find Key Fobs via intelligent alerts.</string>
+    <string name="demo_help_title">Help</string>
+    <string name="demo_help_text">Learn more about Silicon Labs Bluetooth Smart Technology</string>
+
+    <string name="htp_title">Health Thermometer Profile</string>
+    <string name="htp_id">HTP</string>
+    <string name="fmp_title">Find Me Profile</string>
+    <string name="fmp_id">FMP</string>
+    <string name="pxp_title">Proximity</string>
+    <string name="pxp_id">PXP</string>
+
+    <string name="title_activity_demo_screen">Bluetooth Smart Applications</string>
+
+    <string name="select_device">Select a Bluetooth Smart Device</string>
+    <string name="tab_blue_geckos">Blue Gecko</string>
+    <string name="tab_other_devices">Other</string>
+    <string name="device_list">Device List</string>
+    <string name="title_activity_beacon_scan">Bluetooth Beaconing</string> <!--JCS 11/23/16 Former Retail Beacon -->
+
+    <string name="looking_for_beacons">Looking for Beacons…</string>
+    <string name="beacon_comment_message">Welcome to Silicon Labs Bluetooth Smart Beacon Demo. You are now connected to Blue Gecko Beacon #%d</string>
+    <string name="beacon_title">Blue Gecko Beacon #%d</string>
+    <string name="beacon_range">IN %s RANGE OF</string>
+    <string name="unknown">Unknown</string>
+    <string name="immediate">Immediate</string>
+    <string name="near">Near</string>
+    <string name="far">Far</string>
+
+    <string name="help_text_v01">Silicon Labs (NASDAQ: SLAB) is a leading provider of silicon, software and system solutions for the Internet of Things, Internet infrastructure, industrial control, consumer and automotive markets. We solve the electronics industry\'s toughest problems, providing customers with significant advantages in performance, energy savings, connectivity and design simplicity. Backed by our world-class engineering teams with unsurpassed software and mixed-signal design expertise, Silicon Labs empowers developers with the tools and technologies they need to advance quickly and easily from initial idea to final product.</string>
+    <string name="help_text_v02">Quickly deliver Bluetooth® Smart connectivity with Silicon Labs Blue Gecko energy-friendly wireless system-on-chip (SoC) devices. Take advantage of a Bluetooth Smart applications, software stack and BGScript based development that transitions your software from module-based to discrete circuit designs.</string>
+
+    <string name="help_text">Silicon Labs (NASDAQ: SLAB) is a leading provider of silicon, software and system solutions for the Internet of Things, Internet infrastructure, industrial control, consumer and automotive markets. We solve the electronics industry\'s toughest problems, providing customers with significant advantages in performance, energy savings, connectivity and design simplicity. Backed by our world-class engineering teams with unsurpassed software and mixed-signal design expertise, Silicon Labs empowers developers with the tools and technologies they need to advance quickly and easily from initial idea to final product.</string>
+    <string name="version_text">Version %s</string>
+    <string name="about_silicon_labs">About Silicon Labs Blue Gecko</string>
+    <string name="help">Help</string>
+    <string name="ok">OK</string>
+
+    <string name="change">CHANGE</string>
+    <string name="connected_to">CONNECTED TO</string>
+    <string name="type">Type</string>
+    <string name="temperature">TEMPERATURE</string>
+    <string name="f_symbol">°F</string>
+    <string name="c_symbol">°C</string>
+    <string name="just_f">f</string>
+    <string name="just_c">c</string>
+    <string name="add_to_graph">Add to graph</string>
+    <string name="clear">Clear</string>
+    <string name="time">Time</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_health_thermometer">Health Thermometer</string>
+
+    <!-- Key fobs screen -->
+    <string name="title_activity_key_fobs">Key Fobs</string>
+    <string name="signal_strength_default_label">SIGNAL STRENGTH</string>
+    <string name="device_id_default_label">Device ID</string>
+    <string name="key_fob_listview_item_find_btn_copy">FIND</string>
+    <string name="key_fob_listview_default_header_text">HEADER TEXT</string>
+    <string name="finding_device_default_device_name">DEFAULT DEVICE NAME</string>
+    <string name="finding_device_screen_current_action_label">FINDING</string>
+    <string name="finding_key_fob_blinking_notice">The Key FOB A light is now blinking.</string>
+    <string name="finding_key_fob_blinking_explanation">Its flicker frequency indicates\nthe proximity to this device.</string>
+
+    <!-- Key fob list item section header text-->
+    <string name="fob_list_header_text">FOB List</string>
+    <string name="fob_list_other_fobs_header_text">Other FOBs</string>
+
+    <!-- Key fob list item signal strength labels -->
+    <string name="fob_device_name_unknown">Unknown</string>
+    <string name="keyfob_signal_strength_weak">Weak Signal</string>
+    <string name="keyfob_signal_strength_average">Average Signal</string>
+    <string name="keyfob_signal_strength_good">Good Signal</string>
+    <string name="keyfob_signal_strength_unknown">Unknown Signal</string>
+    <string name="device_has_disconnected">DEVICE HAS DISCONNECTED</string>
+
+    <!-- DebugModeMainActivity -->
+    <string name="demo_item_debug_mode_title">Bluetooth Browser</string> <!-- JCS 11/22/16 - Former BLE Stack &amp Profile Test -->
+    <string name="demo_item_debug_mode_description">View info about nearby devices and their properties.</string>
+    <string name="developer_debug_mode_actionbar_title">Bluetooth Browser</string> <!-- JCS 11/22/16 - Former BLE Stack &amp Profile Test -->
+    <string name="about_blue_gecko_menu_label">About Blue Gecko</string>
+    <string name="about_menu_label">License</string>
+    <string name="ble_not_supported">Your device does not support Bluetooth Low Energy technology. Application will be closed! </string>
+    <string name="rssi">RSSI: </string>
+    <string name="tx">TX: </string>
+    <string name="mac_address">Mac Address: </string>
+    <string name="no_devices_found">No devices found.</string>
+    <string name="advertisement_details">Show advertisement details</string>
+    <string name="advertisement_details_title">Advertisement details</string>
+    <string name="connecting_title">Bluetooth manager</string>
+    <string name="connecting">Connecting to device.\nPlease wait&#8230;</string>
+    <string name="debug_mode_no_additional_ad_data_for_device">No Additional Advertisement Data</string>
+    <string name="cancel_scanning">Cancel</string> <!-- JCS 11/22/16 - Insert cancel scanning button -->
+
+    <!-- Debug Mode general -->
+    <string name="uuid">UUID: </string>
+    <string name="properties">Properties: </string>
+    <string name="devices">DEVICES</string>
+    <string name="scanning">SCANNING&#8230;</string>
+    <string name="not_scanning"></string>
+    <string name="services">SERVICES</string>
+    <string name="characteristics">CHARACTERISTICS</string>
+    <string name="connect">connect</string>
+    <string name="disconnect">disconnect</string>
+    <string name="values">VALUES</string>
+    <string name="properties_big_case">PROPERTIES: </string>
+    <string name="hex">Hex</string>
+    <string name="ascii">ASCII</string>
+    <string name="decimal">Decimal</string>
+    <string name="unknown_device">Unknown device</string>
+    <string name="unknown_service">Unknown service</string>
+    <string name="debug_mode_connection_failed_snackbar">"Failed connecting to %1$s"</string>
+
+    <!-- Debug Mode  DeviceServicesActivity-->
+    <string name="characteristic_write_success">Characteristic write success</string>
+    <string name="characteristic_write_fail">Characteristic write fail</string>
+    <string name="invalid_dec_value">Value is invalid. You have to input max 3 digits side by side and max value is 255.</string>
+    <string name="parse_problem">The problem occurred during characteristic parsing.</string>
+    <string name="bluetooth_not_supported">Your device does not support Bluetooth technology. Application will be closed! </string>
+    <string name="no_bluetooth_dialog_text">The Bluetooth adapter is currently turned off. You need Bluetooth to use this app. Switch on Bluetooth?</string>
+    <string name="no_bluetooth_dialog_title_text">Bluetooth is off</string>
+    <string name="debug_mode_advertising_details_dialog_device_name">Device Name</string>
+    <string name="ad_dialog_close_btn_default_text">OK</string>
+    <string name="title_activity_blue_giga_main">Devices</string>
+    <string name="title_activity_device_services">Services</string>
+    <string name="devices_list_list_item_default_device_name">Default Device</string>
+    <string name="services_list_service_name_default">Name of Service</string>
+
+    <!-- device selection, mainactivitybluegiga.java -->
+    <string name="debug_mode_device_selection_plus_btn_text">+</string>
+
+    <!-- silicon labs string arrays -->
+    <string-array name="properties_array">
+        <item>Broadcast</item>
+        <item>Read</item>
+        <item>Write no response</item>
+        <item>Write</item>
+        <item>Notify</item>
+        <item>Indicate</item>
+        <item>Signed write</item>
+        <item>Extended props</item>
+    </string-array>
+
+    <string-array name="connected_debug_actions">
+        <item>View</item>
+        <item>Disconnect</item>
+        <item>Advertisement Details</item>
+    </string-array>
+
+    <string-array name="disconnected_debug_actions">
+        <item>Connect</item>
+        <item>Advertisement Details</item>
+        <item>Unbond</item>
+    </string-array>
+
+    <!-- Thermometer types -->
+    <string name="therm_type_armpit">Armpit</string>
+    <string name="therm_type_body">Body</string>
+    <string name="therm_type_ear">Ear</string>
+    <string name="therm_type_finger">Finger</string>
+    <string name="therm_type_gi_tract">Gastrointestinal Tract</string>
+    <string name="therm_type_mouth">Mouth</string>
+    <string name="therm_type_rectum">Rectum</string>
+    <string name="therm_type_toe">Toe</string>
+    <string name="therm_type_tympanum">Tympanum</string>
+    <string name="therm_type_unknown">Unknown</string>
+    <string name="you_can_add_temp">You can add the current temperature to the graph by pressing the “+” button</string>
+    <string name="no_logged_temps">No Logged Temperatures</string>
+    <string name="loading_ellipsis">Loading…</string>
+    <string name="switch_device">Switch Device</string>
+    <string name="temp_large_placeholder">00.</string>
+    <string name="unknown_characteristic_label">Unknown Characteristic</string>
+    <string name="unknown_characteristic_uuid_label">Unknown</string>
+    <string name="services_header_label_text">Services</string>
+    <string name="default_uuid_of_service">uuid</string>
+    <string name="uuid_of_service_label">UUID</string>
+    <string name="characteristic_default_name">Name of Characteristic</string>
+    <string name="characteristic_default_uuid">uuid</string>
+    <string name="characteristic_uuid_label">UUID</string>
+    <string name="no_devices_found_title_copy">No devices found</string>
+    <string name="no_devices_found_caption_copy">Check the Bluetooth status of your\ndevice. You can scan again by\npressing the refresh button.</string>
+    <string name="scanning_animation_bar_text_label_copy">Scanning…</string>
+    <string name="device_scanning_background_message">Looking for nearby devices…</string>
+    <string name="device_loading_characteristic_details">Loading GATT information…</string>
+    <string name="characteristic_dialog_default_service_name">Service Name</string>
+    <string name="characteristic_dialog_default_charac_name">Characteristic Name</string>
+    <string name="characteristic_dialog_default_uuid">UUID</string>
+    <string name="characteristic_spinner_dialog_ok_btn_copy">OK</string>
+    <string name="demo_activity_actionbar_title">Silicon Smart Applications</string>
+    <string name="encoding_label">ENCODING</string>
+    <string name="dialog_raw_charac_save_btn_label">WRITE</string>
+    <string name="dialog_raw_charac_cancel_btn_label">CANCEL</string>
+    <string name="dialog_about_silicon_labs_title">About</string>
+    <string name="advertisement_details_dialog_title">Advertisement Details</string>
+    <string name="list_item_debug_mode_devices_label">DEVICES</string>
+    <string name="default_mac_address">##:##:##:##:##:##</string>
+    <string name="mac_address_label">Mac Address</string>
+    <string name="default_rssi_value">-##</string>
+    <string name="default_tx_value">NA</string>
+    <string name="rssi_label">RSSI</string>
+    <string name="tx_label">TX</string>
+
+    <!-- Beacon types -->
+    <string name="unspecified">Unspecified</string>
+    <string name="ibeacon">iBeacon</string>
+    <string name="blue_gecko">Blue Gecko</string>
+    <string name="eddystone">Eddystone</string>
+    <string name="scanning_for_beacons">Scanning for beacons…</string>
+    <string name="scanning_for_additional_beacon">Scanning for additional beacons…</string>
+    <string name="blue_gecko_details">Blue Gecko: %s</string>
+    <string name="beacon_id_details">Beacon Id: %s</string>
+    <string name="reference_rssi_details">Reference Rssi: %d</string>
+
+    <!-- Beacon app fragment -->
+    <string name="beacon_details_dialog_device_type_eddystone">(Eddystone)</string>
+    <string name="beacon_details_dialog_device_type_ibeacon">(iBeacon)</string>
+    <string name="beacon_details_dialog_device_type_blue_gecko">(Blue Gecko)</string>
+    <string name="beacon_details_dialog_device_type_alt_beacon">(AltBeacon)</string>
+    <string name="beacon_details_dialog_unknown_device_name">Unknown Name</string>
+    <string name="beacon_details_dialog_unknown_device_mac">Unknown MAC</string>
+    <string name="beacon_details_dialog_rssi_label">RSSI:  %1$d dBm</string>
+    <string name="beacon_details_dialog_min_tx_power">-100</string>
+    <string name="beacon_details_dialog_tx_power_label">TX:  %1$s dBm</string>
+    <string name="beacon_details_dialog_unknown_value">Unknown</string>
+    <string name="beacon_details_dialog_unit_volts">V</string>
+    <string name="beacon_details_dialog_unit_degrees_celsius">&#176;C</string>
+    <string name="beacon_details_dialog_unit_seconds_abbreviated">sec</string>
+    <string name="beacon_details_dialog_unit_days">days</string>
+    <string name="beacon_details_dialog_tlm_data">TLM Data</string>
+    <string name="beacon_details_dialog_tlm_version">Version</string>
+    <string name="beacon_details_dialog_tlm_voltage">Voltage</string>
+    <string name="beacon_details_dialog_tlm_temperature">Temperature</string>
+    <string name="beacon_details_dialog_tlm_advertisement_count">Advertisement Count</string>
+    <string name="beacon_details_dialog_tlm_uptime">Uptime</string>
+    <string name="beacon_details_dialog_uid_unknown">UID: Unknown</string>
+    <string name="beacon_details_dialog_instance_unknown">Instance: Unknown</string>
+    <string name="beacon_details_dialog_url_unknown">URL: Unknown</string>
+    <string name="beacon_details_dialog_tlm_data_unknown">TLM Data: Unknown</string>
+    <string name="beacon_details_dialog_url">URL</string>
+    <string name="beacon_details_dialog_uid">UID</string>
+    <string name="beacon_details_dialog_instance">Instance</string>
+    <string name="beacon_details_dialog_uuid">UUID</string>
+    <string name="beacon_details_dialog_major">Major</string>
+    <string name="beacon_details_dialog_minor">Minor</string>
+    <string name="beacon_details_dialog_beacon_id">Beacon ID</string>
+    <string name="beacon_details_dialog_manufacturer_id">Manufacturer ID</string>
+    <string name="beacon_details_dialog_reference_rssi">Reference RSSI</string>
+    <string name="beacon_details_dialog_major_number">Major Number</string>
+    <string name="beacon_details_dialog_minor_number">Minor Number</string>
+    <string name="beacon_details_no_additional_info">No Additional Beacon Details</string>
+    <string name="beacon_details_dialog_default_device_name">Device Name</string>
+    <string name="beacon_details_dialog_default_mac_addr">MAC ADDRESS</string>
+    <string name="toast_connection_timed_out">Connection Timed Out</string>
+    <string name="beacon_details_dialog_default_rssi">RSSI:</string>
+    <string name="beacon_details_dialog_default_tx_power">TX:</string>
+    <string name="beacon_details_dialog_no_additional_info_text">No Additional Beacon Details</string>
+    <string name="alt_beacon">AltBeacon</string>
+
+    <!-- Beacon list item -->
+    <string name="beacon_list_item_device_default_name">Name:</string>
+    <string name="beacon_list_item_device_default_type">Type:</string>
+    <string name="beacon_list_item_default_device_range">Range:</string>
+    <string name="beacon_list_item_default_rssi">RSSI:</string>
+    <string name="beacon_list_item_default_mac_address">Mac Address:</string>
+    <string name="beacon_list_item_default_uuid">UUID:</string>
+    <string name="beacon_list_item_default_major_number">Major:</string>
+    <string name="beacon_list_item_default_minor_number">Minor:</string>
+    <string name="beacon_list_item_default_uid">UID:</string>
+    <string name="beacon_list_item_default_url">URL:</string>
+    <string name="beacon_list_item_default_tlm">TLM (Eddystone):</string>
+    <string name="beacon_list_item_header_name">Beacons</string>
+    <string name="beacon_list_item_rssi_text_label">RSSI</string>
+
+    <!-- Bluetooth Permission Config Dialog -->
+    <string name="bluetooth_permission_dialog_title">Bluetooth Settings</string>
+    <string name="bluetooth_permission_dialog_subheader">Bluetooth Adapter Full Permission</string>
+    <string name="bluetooth_permission_dialog_instructions">Please allow the application to automatically restart the Bluetooth adapter if the adapter is turned off in the middle of a scan.</string>
+    <string name="bluetooth_permission_dialog_allow_radio_btn">Allow</string>
+    <string name="bluetooth_permission_dialog_dont_allow_radio_btn">Don\'t Allow</string>
+    <string name="bluetooth_permission_dialog_save_btn">SAVE</string>
+
+    <string name="menu_item_help">Help</string>
+    <string name="toast_debug_mode_device_disconnected">DEVICE DISCONNECTED</string>
+    <string name="toast_debug_connection_failed">CONNECTION FAILED</string>
+    <string name="toast_htm_gatt_conn_failed">GATT CONNECTION FAILED</string>
+    <string name="toast_debug_main_disconnected_from_device">Disconnected from Device</string>
+    <string name="debug_mode_device_selection_connecting_bar">Connecting…</string>
+    <string name="debug_mode_device_loading_gatt_info">Loading…</string>
+    <string name="list_item_alt_beacon_default_id">Beacon ID:</string>
+    <string name="list_item_alt_beacon_manufacturer_id">Manufacturer ID:</string>
+    <string name="list_item_alt_beacon_reference_rssi">Reference RSSI:</string>
+    <string name="toast_bluetooth_enabled">Bluetooth Enabled</string>
+    <string name="bluetooth_adapter_bar_disabled">Bluetooth adapter is disabled.</string>
+    <string name="toast_bluetooth_not_enabled">Bluetooth Not Enabled</string>
+    <string name="bluetooth_adapter_bar_turning_on">Turning on Bluetooth adapter…</string>
+    <string name="bluetooth_adapter_enable_bar_enable">ENABLE</string>
+    <string name="hidden_debug_calibrations_title">Calibrations</string>
+    <string name="hidden_debug_beacon_section_label">BEACONS</string>
+    <string name="hidden_debug_beacon_near_threshold">Near Threshold (m):</string>
+    <string name="hidden_debug_beacon_far_threshold">Far Threshold (m):</string>
+    <string name="hidden_debug_key_fobs_section_label">KEY FOBS</string>
+    <string name="hidden_debug_key_fob_delta_threshold">Delta Threshold (dBm):</string>
+    <string name="hidden_debug_key_fob_min_delta">Min Delta:</string>
+    <string name="hidden_debug_key_fob_max_delta">Max Delta:</string>
+    <string name="hidden_debug_display_debug_values">Display Debug Values:</string>
+    <string name="hidden_debug_save_btn">SAVE</string>
+
+    <!-- Device Filter Dialog -->
+    <string name="dialog_device_filter_reset_button">Reset</string>
+    <string name="dialog_device_filter_cancel_button">Cancel</string>
+    <string name="dialog_device_filter_apply_button">Apply</string>
+    <string name="dialog_device_filter_names_switch">Show Devices Without Names</string>
+    <string name="dialog_device_filter_rssi_not_set">Not Set</string>
+    <string name="dialog_device_filter_rssi_value">%d</string>
+    <string name="dialog_device_filter_rssi">RSSI</string>
+    <string name="dialog_device_filter_rssi_min">-100</string>
+    <string name="dialog_device_filter_rssi_max">0</string>
+
+    <!-- Light Demo -->
+    <string name="light_header">Light</string>
+    <string name="demo_item_light_title">Light Demo</string>
+    <string name="demo_light_text">Demo for light</string>
+    <string name="demo_light_on">Last Event: Light On</string>
+    <string name="demo_light_off">Last Event: Light Off</string>
+    <string name="demo_light_changed_source">Source: %s</string>
+    <string name="demo_light_changed_source_bluetooth">Bluetooth</string>
+    <string name="demo_light_changed_source_zigbee">Zigbee</string>
+    <string name="demo_light_changed_source_button">Button</string>
+    <string name="demo_light_toggle_instructions">Press the bulb icon to toggle light</string>
+    <string name="demo_light_changed_source_unknown">Unknown</string>
+</resources>

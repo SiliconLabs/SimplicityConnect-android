@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <gradient
+        android:centerColor="@color/dialog_loading_veil_gradient_center"
+        android:endColor="@color/dialog_loading_veil_gradient_end"
+        android:gradientRadius="@dimen/dialog_loading_veil_gradient_radius"
+        android:startColor="@color/dialog_loading_veil_gradient_start"
+        android:type="radial" />
+</shape>

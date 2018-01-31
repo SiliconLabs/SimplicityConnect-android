@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="silicon_labs_logo" type="drawable">@drawable/silicon_labs_logo_large</item>
+
+    <item name="home_help" type="drawable">@drawable/home_help_large</item>
+    <item name="home_key_fob" type="drawable">@drawable/home_key_fob_large</item>
+    <item name="home_retail_beacon" type="drawable">@drawable/home_retail_beacon_large</item>
+    <item name="home_thermometer" type="drawable">@drawable/home_thermometer_large</item>
+
+    <item name="bt_weak" type="drawable">@drawable/bt_weak_large</item>
+    <item name="bt_medium" type="drawable">@drawable/bt_medium_large</item>
+    <item name="bt_strong" type="drawable">@drawable/bt_strong_large</item>
+</resources>

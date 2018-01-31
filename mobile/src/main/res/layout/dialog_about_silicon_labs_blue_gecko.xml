@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/about_bluegiga_dialog_height"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/about_blue_giga_dialog_title_height"
+        android:background="@color/dialog_title_background"
+        android:gravity="left|center_vertical"
+        android:paddingLeft="@dimen/about_dialog_title_padding_left"
+        android:text="@string/about_menu_label"
+        android:textColor="@color/dialog_title_text"
+        android:textSize="@dimen/about_dialog_title_text_size"
+        android:textStyle="bold" />
+
+    <WebView
+        android:id="@+id/menu_item_license"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@android:color/white"
+        android:textColor="@android:color/black" />
+
+    <Button
+        android:id="@+id/close_about_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/about_blue_giga_dialog_close_btn_height"
+        android:background="@drawable/debug_mode_dialog_button_selector"
+        android:gravity="center"
+        android:text="@string/ad_dialog_close_btn_default_text"
+        android:textAllCaps="false"
+        android:textColor="@color/dialog_btn_text" />
+</LinearLayout>

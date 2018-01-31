@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.siliconlabs.bledemo"
+    >
+
+    <application>
+        <activity
+            android:name=".activity.HealthThermometerActivity"
+            android:label="@string/title_activity_health_thermometer"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            />
+        <activity
+            android:name=".activity.KeyFobsActivity"
+            android:label="@string/title_activity_key_fobs"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".activity.DemoScreenActivity"
+            android:theme="@style/AppTheme"
+            />
+    </application>
+</manifest>

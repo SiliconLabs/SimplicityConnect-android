@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/characteristic_background_color"
+    android:orientation="vertical">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_item_extra_vertical_padding" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/characteristic_background_color"
+        android:orientation="horizontal"
+        android:paddingRight="@dimen/characteristic_item_container_padding">
+
+        <RelativeLayout
+            android:layout_width="@dimen/characteristic_caret_container_width"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/characteristic_expansion_caret"
+                android:layout_width="@dimen/characteristic_caret_width"
+                android:layout_height="@dimen/characteristic_caret_height"
+                android:src="@drawable/debug_expand" />
+
+            <Button
+                android:id="@+id/btn_expand_to_show_characteristic_details"
+                android:layout_width="@dimen/characteristic_caret_btn_width"
+                android:layout_height="@dimen/characteristic_caret_btn_height"
+                android:background="?android:attr/selectableItemBackground" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/characteristic_info_text_margin_left"
+            android:layout_weight=".40"
+            android:gravity="left"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/characteristic_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:gravity="left|center_vertical"
+                android:text="@string/characteristic_default_name"
+                android:textColor="@color/characteristic_name"
+                android:textSize="@dimen/characteristic_name_text_size" />
+
+            <TextView
+                android:id="@+id/characteristic_uuid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/characteristic_default_uuid"
+                android:textColor="@color/characteristic_uuid"
+                android:textSize="@dimen/characteristic_uuid_text_size" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/characteristic_uuid_label"
+                android:textColor="@color/characteristic_uuid_label"
+                android:textSize="@dimen/characteristic_uuid_label_text_size" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/characteristic_props_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight=".60"
+            android:background="@color/debug_mode_characteristic_expansion_background"
+            android:gravity="right"
+            android:orientation="horizontal"
+            android:paddingRight="@dimen/characteristic_property_padding_right" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/characteristic_expansion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/debug_mode_characteristic_expansion_background"
+            android:orientation="vertical"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_item_extra_vertical_padding" />
+
+    <View
+        android:id="@+id/characteristics_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="@dimen/characteristics_separator_margin_left"
+        android:layout_marginRight="@dimen/characteristics_separator_margin_right"
+        android:background="@color/characteristic_separator" />
+</LinearLayout>

@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/silicon_labs_white">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/alizarin_crimson">
+
+                <TextView
+                    android:id="@+id/otaprogress_header"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="OTA Setup"
+                    android:textColor="@android:color/background_light"
+                    android:paddingLeft="@dimen/advertisement_details_title_padding_left"
+                    android:paddingTop="@dimen/advertisement_details_title_padding_top"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/advertisement_details_title_text_size" />
+
+                <TextView
+                    android:id="@+id/device_address"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/ad_details_header"
+                    android:paddingLeft="@dimen/advertisement_details_device_name_padding_left"
+                    android:paddingBottom="@dimen/advertisement_details_device_name_padding_bottom"
+                    android:paddingTop="@dimen/advertisement_details_device_name_padding_top"
+                    android:text="@string/debug_mode_advertising_details_dialog_device_name"
+                    android:textColor="@android:color/background_light"
+                    android:textSize="@dimen/advertisement_details_device_name_text_size" />
+            </LinearLayout>
+            <View
+                android:id="@+id/separator_title_ad_data"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/dialog_separator_dark_gray" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:text="PARTIAL OTA"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radio_ota"
+                    android:background="@color/alizarin_crimson_darker"
+                    android:textColor="@color/silicon_labs_white"
+                    android:layout_weight="0.5" />
+                <View
+                    android:id="@+id/separator_radio"
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/dialog_separator_dark_gray" />
+
+                <Button
+                    android:text="FULL OTA"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/silicon_labs_white"
+                    android:background="@color/alizarin_crimson"
+                    android:id="@+id/radio_ota_full"
+                    android:layout_weight="0.5" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/dialog_separator_dark_gray" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:text="Folder:"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:layout_margin="5dp"
+                    android:layout_weight="0.3"
+                    android:id="@+id/folderTextView" />
+
+                <Spinner
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:inputType="text"
+                    android:textSize="12sp"
+                    android:maxLines="1"
+                    android:maxLength="10"
+                    android:layout_margin="5dp"
+                    android:layout_weight="0.7"
+                    android:id="@+id/folderspinner" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_margin="5dp">
+
+                <TextView
+                    android:text="App:"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:id="@+id/appTextView"
+                    android:layout_weight="0.3"/>
+
+                <Spinner
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:maxLength="10"
+                    android:textSize="12sp"
+                    android:layout_margin="5dp"
+                    android:id="@+id/appspinner"
+                    android:clickable="false"
+                    android:layout_weight="0.7"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:id="@+id/stacklayout"
+                android:visibility="gone">
+
+                <TextView
+                    android:text="Stack:"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="63dp"
+                    android:layout_margin="5dp"
+                    android:id="@+id/stack"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:layout_weight="0.3" />
+
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textSize="12sp"
+                    android:maxLines="1"
+                    android:maxLength="10"
+                    android:layout_margin="5dp"
+                    android:id="@+id/stackspinner"
+                    android:clickable="false"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:layout_weight="0.7"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/dialog_separator_dark_gray" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:layout_margin="7dp">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <CheckBox
+                    android:text="WRITE WITH RESPONSE"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:checked="false"
+                    android:id="@+id/check_reliable"
+                    android:layout_weight="0.8" />
+                <TextView
+                    android:id="@+id/delay_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.2"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="0 ms"/>
+            </LinearLayout>
+
+            <SeekBar
+                android:id="@+id/delay_seekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.6"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"/>
+
+        </LinearLayout>
+
+            <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp">
+
+            <TextView
+                android:text="MTU:"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:id="@+id/mtu_label"
+                android:layout_weight="0.3"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"/>
+
+            <SeekBar
+                android:id="@+id/mtu_seekBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.6"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"/>
+
+            <EditText
+                android:text="512"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:id="@+id/mtu_value"
+                android:textSize="10sp"
+                android:inputType="number"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:maxLength="3"
+                android:background="@color/silicon_labs_white"
+                android:gravity="right"
+                android:layout_gravity="center"
+                android:layout_weight="0.1" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:text="PRIORITY:"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:id="@+id/connection_label"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_weight="0.3" />
+
+            <TextView
+                android:text="LOW"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:id="@+id/min_label"
+                android:textSize="10sp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_weight="0.1" />
+
+            <SeekBar
+                android:id="@+id/connection_seekBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"/>
+
+            <TextView
+                android:text="HIGH"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:id="@+id/max_label"
+                android:textSize="10sp"
+                android:layout_weight="0.1"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"/>
+
+        </LinearLayout>
+
+
+
+
+
+
+            </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/dialog_separator_dark_gray" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <Button
+                android:text="Cancel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/alizarin_crimson"
+                android:textColor="@color/silicon_labs_white"
+                android:id="@+id/ota_cancel"
+                android:layout_weight="1"/>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/dialog_separator_dark_gray" />
+
+            <Button
+                android:text="OTA"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/alizarin_crimson"
+                android:textColor="@color/silicon_labs_white"
+                android:id="@+id/ota_proceed"
+                android:clickable="false"
+                android:layout_weight="1"/>
+        </LinearLayout>
+    </LinearLayout>
+

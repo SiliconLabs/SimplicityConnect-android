@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.MainActivityDebugMode" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/log_buttons"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:background="@color/alizarin_crimson">
+
+                        <Button
+                            android:text="Save"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentStart="true"
+                            android:id="@+id/save_log"
+                            android:layout_weight="1"
+                            android:background="@color/alizarin_crimson"
+                            android:textColor="@color/silicon_labs_white"/>
+
+                        <Button
+                            android:text="Share"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/share_log"
+                            android:layout_weight="1"
+                            android:background="@color/alizarin_crimson"
+                            android:textColor="@color/silicon_labs_white"/>
+
+                        <Button
+                            android:text="Clear"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/clear_log"
+                            android:layout_weight="1"
+                            android:background="@color/alizarin_crimson"
+                            android:textColor="@color/silicon_labs_white"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/log_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:padding="5dp"
+                    android:layout_below="@id/log_buttons"
+                    android:fillViewport="true"
+                    android:gravity="bottom"
+                    android:textColor="@color/silicon_labs_white"
+                    android:scrollbars = "vertical"
+                    />
+
+        </RelativeLayout>
+</FrameLayout>

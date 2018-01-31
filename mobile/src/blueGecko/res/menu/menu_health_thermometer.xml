@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.siliconlabs.bledemo.activity.HealthThermometerActivity">
+    <item
+        android:id="@+id/action_change_bt"
+        android:orderInCategory="100"
+        android:title="@string/switch_device"
+        android:icon="@drawable/bluetooth_settings"
+        app:showAsAction="always" />
+</menu>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginLeft="@dimen/beacon_tablet_extra_temp_padding"
+    android:layout_marginRight="@dimen/beacon_tablet_extra_temp_padding">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/list_item_outermost_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- list item for section header -->
+        <LinearLayout
+            android:id="@+id/list_item_header_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/other_fobs_header_background"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/header_divider_above"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/key_fob_listview_large_divider_height"
+                android:background="@color/other_fobs_header_background" />
+
+            <TextView
+                android:id="@+id/header_text"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/key_fob_header_height"
+                android:gravity="left|center_vertical"
+                android:paddingLeft="@dimen/key_fob_header_text_horizontal_padding"
+                android:paddingRight="@dimen/key_fob_header_text_horizontal_padding"
+                android:text="@string/key_fob_listview_default_header_text"
+                android:textColor="@color/key_fob_listview_header_text"
+                android:textSize="@dimen/key_fob_listview_header_text_size" />
+        </LinearLayout>
+
+        <!-- list item for entry -->
+        <LinearLayout
+            android:id="@+id/list_item_entry_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/key_fob_item_height"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/key_fob_listview_item_padding"
+                android:layout_marginLeft="@dimen/key_fob_listview_item_padding"
+                android:layout_marginTop="@dimen/key_fob_listview_item_padding"
+                android:layout_weight=".2"
+                android:gravity="center"
+                android:minHeight="50dp"
+                android:minWidth="50dp"
+                android:orientation="vertical">
+
+                <com.siliconlabs.bledemo.views.KeyFobSignalStrength
+                    android:id="@+id/signal_strength_graphic"
+                    android:layout_width="@dimen/keyfob_signal_strength_edge_length"
+                    android:layout_height="@dimen/keyfob_signal_strength_edge_length"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/key_fob_listview_item_padding"
+                android:layout_weight=".60"
+                android:gravity="left|center_vertical"
+                android:minHeight="40dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/device_id_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="@string/device_id_default_label"
+                    android:textColor="@color/dark_gray_id_text"
+                    android:textSize="@dimen/key_fob_listview_device_id_textsize"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/signal_strength_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/signal_strength_default_label"
+                    android:textColor="@color/light_gray_signal_strength_text"
+                    android:textSize="@dimen/key_fob_listview_signal_strength_textsize" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="@dimen/key_fob_listview_item_padding"
+                android:layout_weight=".20"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:foregroundGravity="center"
+                    android:padding="@dimen/find_btn_cardview_padding"
+                    card_view:cardCornerRadius="@dimen/dialog_loading_card_corner_radius"
+                    card_view:cardElevation="@dimen/find_btn_cardview_elevation"
+                    card_view:cardUseCompatPadding="true">
+
+                    <TextView
+                        android:id="@+id/find_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:padding="@dimen/find_btn_autofit_padding"
+                        android:singleLine="true"
+                        android:text="@string/key_fob_listview_item_find_btn_copy"
+                        android:textColor="@color/find_btn_red"
+                        android:textSize="@dimen/find_btn_text_size" />
+                </android.support.v7.widget.CardView>
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/list_item_entry_dividers"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/key_fob_listview_small_divider_height"
+            android:layout_marginLeft="@dimen/key_fob_listview_small_divider_horizontal_padding"
+            android:layout_marginRight="@dimen/key_fob_listview_small_divider_horizontal_padding"
+            android:background="@color/key_fob_divider" />
+    </LinearLayout>
+</LinearLayout>

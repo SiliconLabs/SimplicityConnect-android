@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?><!--  --><!-- Bluegiga's Bluetooth Smart Android SW for Bluegiga BLE modules --><!-- Contact: support@bluegiga.com. --><!--  --><!-- This is free software distributed under the terms of the MIT license reproduced below. --><!--  --><!-- Copyright (c) 2013, Bluegiga Technologies --><!--  --><!-- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files ("Software") --><!-- to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, --><!-- and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: --><!--  --><!-- THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF --><!-- ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT --><!-- NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE. --><!--  -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/silicon_labs_device_list_background"
+    tools:context=".activity.DeviceServicesActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/actionbar_debug_services_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+    <RelativeLayout
+        android:id="@+id/servicesWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:background="@color/silicon_labs_device_list_background">
+        <RelativeLayout
+            android:id="@+id/scrollViewWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/services_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/swipe_refresh_devices_horizontal_padding"
+                android:paddingRight="@dimen/swipe_refresh_devices_horizontal_padding" />
+            </ScrollView>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/loading_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/debug_connecting_background"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/device_services_background"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/silicon_labs_device_list_background"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="@dimen/no_device_found_image_width"
+                    android:layout_height="@dimen/no_device_found_image_height"
+                    android:src="@drawable/debug_scanning" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/device_scanning_bgnd_graphic_text_spacing"
+                    android:gravity="center"
+                    android:text="@string/device_loading_characteristic_details"
+                    android:textSize="@dimen/scanning_for_devices_title_label_textsize" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/loading_bar_container"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/scanning_animation_bar_height"
+                android:layout_alignParentBottom="true">
+
+                <TextView
+                    android:id="@+id/loading_label_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/scanning_animation_bar_height"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/scanning_animation_bar_background"
+                    android:gravity="center"
+                    android:text="@string/debug_mode_device_loading_gatt_info"
+                    android:textColor="@color/scanning_animation_text_label"
+                    android:textSize="@dimen/scanning_animation_bar_textsize"
+                    android:visibility="visible" />
+
+                <LinearLayout
+                    android:id="@+id/loading_anim_gradient_right_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/scanning_animation_bar_height"
+                    android:layout_alignParentBottom="true"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/loading_scan_anim_gradient_right"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/scanning_animation_bar_height"
+                        android:src="@drawable/debug_scanning_indicator_right" />
+                </LinearLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/log_body_connected"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_below="@id/loading_container"
+            android:layout_alignParentBottom="true"
+            android:background="@color/background_material_dark"
+            android:animateLayoutChanges="true"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/alizarin_crimson"
+                android:layout_alignParentTop="true" />
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>

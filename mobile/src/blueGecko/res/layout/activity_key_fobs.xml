@@ -1,0 +1,66 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context="com.siliconlabs.bledemo.activity.KeyFobsActivity">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            style="@style/ToolbarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="0dp"
+            android:fitsSystemWindows="true"
+            app:title="@string/title_activity_key_fobs" />
+
+        <RelativeLayout
+            android:id="@+id/bluetooth_enable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/toolbar"
+            android:background="@color/alizarin_crimson_darker"
+            android:padding="@dimen/bluetooth_enable_bar_padding"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/bluetooth_enable_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="@string/bluetooth_adapter_bar_disabled"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/bluetooth_enable_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="?android:listChoiceBackgroundIndicator"
+                android:text="@string/bluetooth_adapter_enable_bar_enable"
+                android:textColor="@android:color/white" />
+
+        </RelativeLayout>
+
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/foreground_veil"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/radial_gray_rect"
+        android:visibility="gone" />
+</FrameLayout>
+
+
