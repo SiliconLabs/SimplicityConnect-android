@@ -18,8 +18,10 @@ Key Features:
 - Write and Read Characteristics and Services
 - Register Indications and Notifications 
 
-![alt text](images/bluegecko-main.png) ![alt text](images/bluegecko-scanner2.png)
-![alt text](images/bluegecko-thermometer.png) ![alt_text](images/bluegecko-advdata.png)
+<p align="center"><img src="images/bluegecko-main.png" width="200"/>
+<img src="images/bluegecko-scanner2.png" width="200"/>
+<img src="images/bluegecko-thermometer.png" width="200"/>
+<img src="images/bluegecko-advdata.png" width="200"/></p>
 
 Additional information on the supporting hardware and other projects may be found within the [silabs.com](http://silabs.com/).
 
