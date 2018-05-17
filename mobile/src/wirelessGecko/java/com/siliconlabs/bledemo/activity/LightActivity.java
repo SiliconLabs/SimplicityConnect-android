@@ -3,7 +3,6 @@ package com.siliconlabs.bledemo.activity;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
@@ -27,23 +26,26 @@ public class LightActivity extends BaseActivity implements LightPresenter.Blueto
     Toolbar toolbar;
     private BlueToothService service;
     private boolean serviceHasBeenSet;
-    private boolean notificationsHaveBeenSet = false;
     private boolean updateDelayed;
     private BlueToothService.Binding bluetoothBinding;
+    private GattService gattService;
     @Nullable
     private LightPresenter presenter;
 
+    private static final int SOURCE_ADDRESS_LENGTH = 8;
+
+    private boolean initSourceAddress = false;
 
     private final TimeoutGattCallback gattCallback = new TimeoutGattCallback() {
 
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
-            if (newState == BluetoothGatt.STATE_DISCONNECTED) {
+            if (newState == BluetoothGatt.STATE_DISCONNECTED || newState == BluetoothGatt.STATE_DISCONNECTING) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        onDeviceDisconnect();
+                        disconnectWithModal();
                     }
                 });
             }
@@ -57,7 +59,7 @@ public class LightActivity extends BaseActivity implements LightPresenter.Blueto
             if (characteristic != null) {
                 boolean success = service.getConnectedGatt().readCharacteristic(characteristic);
                 if (!success) {
-                    onDeviceDisconnect();
+                    disconnectWithModal();
                 }
             }
         }
@@ -72,17 +74,24 @@ public class LightActivity extends BaseActivity implements LightPresenter.Blueto
                 boolean success = gatt.readCharacteristic(characteristic.getService()
                                                                   .getCharacteristic(GattCharacteristic.TriggerSource.uuid));
                 if (!success) {
-                    onDeviceDisconnect();
+                    disconnectWithModal();
                 }
-            } else if (GattCharacteristic.TriggerSource.uuid.equals(characteristic.getUuid()) && !notificationsHaveBeenSet) {
-                boolean success = BLEUtils.SetIndicationForCharacteristic(gatt,
-                                                                          GattService.LightService,
+            } else if (GattCharacteristic.TriggerSource.uuid.equals(characteristic.getUuid())) {
+                if (!initSourceAddress) {
+                    initSourceAddress = true;
+                    boolean success = gatt.readCharacteristic(characteristic.getService()
+                                                                      .getCharacteristic(GattCharacteristic.SourceAddress.uuid));
+                    if (!success) {
+                        disconnectWithModal();
+                    }
+                }
+            } else if (GattCharacteristic.SourceAddress.uuid.equals(characteristic.getUuid())) {
+                boolean success = BLEUtils.SetNotificationForCharacteristic(gatt,
+                                                                          gattService,
                                                                           GattCharacteristic.Light,
-                                                                          BLEUtils.Indications.ENABLED);
+                                                                          BLEUtils.Notifications.INDICATE);
                 if (!success) {
-                    onDeviceDisconnect();
-                } else {
-                    notificationsHaveBeenSet = true;
+                    disconnectWithModal();
                 }
             }
         }
@@ -91,12 +100,20 @@ public class LightActivity extends BaseActivity implements LightPresenter.Blueto
         public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
             super.onDescriptorWrite(gatt, descriptor, status);
             if (GattCharacteristic.Light.uuid.equals(descriptor.getCharacteristic().getUuid())) {
-                boolean success = BLEUtils.SetIndicationForCharacteristic(gatt,
-                                                                          GattService.LightService,
+                boolean success = BLEUtils.SetNotificationForCharacteristic(gatt,
+                                                                          gattService,
                                                                           GattCharacteristic.TriggerSource,
-                                                                          BLEUtils.Indications.ENABLED);
+                                                                          BLEUtils.Notifications.INDICATE);
                 if (!success) {
-                    onDeviceDisconnect();
+                    disconnectWithModal();
+                }
+            } else if (GattCharacteristic.TriggerSource.uuid.equals(descriptor.getCharacteristic().getUuid())) {
+                boolean success = BLEUtils.SetNotificationForCharacteristic(gatt,
+                                                                          gattService,
+                                                                          GattCharacteristic.SourceAddress,
+                                                                          BLEUtils.Notifications.INDICATE);
+                if (!success) {
+                    disconnectWithModal();
                 }
             }
         }
@@ -152,6 +169,21 @@ public class LightActivity extends BaseActivity implements LightPresenter.Blueto
                         }
                     });
                     break;
+                case SourceAddress:
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String sourceAddress = "";
+                            for (int i = 0; i < SOURCE_ADDRESS_LENGTH; i++) {
+                                int value = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, i);
+                                sourceAddress = sourceAddress.concat(String.format((i < SOURCE_ADDRESS_LENGTH - 1) ? "%02x:" : "%02x", value));
+                            }
+                            if (presenter != null) {
+                                presenter.onSourceAddressUpdated(sourceAddress);
+                            }
+                        }
+                    });
+                    break;
             }
         }
     };
@@ -202,7 +234,7 @@ public class LightActivity extends BaseActivity implements LightPresenter.Blueto
         super.onResume();
         //get out if the service has stopped, or if the gatt connection is dead
         if ((serviceHasBeenSet && service == null) || (service != null && !service.isGattConnected())) {
-            onDeviceDisconnect();
+            disconnectWithModal();
         }
     }
 
@@ -217,10 +249,9 @@ public class LightActivity extends BaseActivity implements LightPresenter.Blueto
         return super.onOptionsItemSelected(item);
     }
 
-    private void onDeviceDisconnect() {
-        if (!isFinishing()) {
-            Toast.makeText(LightActivity.this, R.string.device_has_disconnected, Toast.LENGTH_SHORT).show();
-            finish();
+    private void disconnectWithModal() {
+        if (!isFinishing() && presenter != null) {
+            presenter.showDeviceDisconnectedDialog();
         }
     }
 
@@ -254,11 +285,28 @@ public class LightActivity extends BaseActivity implements LightPresenter.Blueto
             return null;
         }
         BluetoothGatt gatt = service.getConnectedGatt();
-        BluetoothGattService bluetoothGattService = gatt.getService(GattService.LightService.number);
-        if (bluetoothGattService == null) {
-            return null;
+        gattService = getGattService();
+        if (gattService != null) {
+            if (presenter != null) {
+                presenter.setGattService(gattService);
+            }
+            return gatt.getService(gattService.number).getCharacteristic(GattCharacteristic.Light.uuid);
         }
-        return bluetoothGattService.getCharacteristic(GattCharacteristic.Light.uuid);
+        return null;
     }
 
+    @Override
+    public void leaveDemo() {
+        finish();
+    }
+
+    private GattService getGattService() {
+        BluetoothGatt gatt = service.getConnectedGatt();
+        if (gatt.getService(GattService.ProprietaryLightService.number) != null) {
+            return GattService.ProprietaryLightService;
+        } else if (gatt.getService(GattService.ZigbeeLightService.number) != null) {
+            return GattService.ZigbeeLightService;
+        }
+        return null;
+    }
 }

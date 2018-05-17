@@ -11,26 +11,37 @@ import com.siliconlabs.bledemo.ble.GattService;
 import java.util.List;
 import java.util.UUID;
 
+import timber.log.Timber;
+
 public class BLEUtils {
     public static final UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
     /**
-     * Enumerated Indication State Handler
+     * Enumerated Notification State Handler
      */
-    public enum Indications {
-        /** Disable(d) Indications */
-        DISABLED (false),
-        /** Enable(d) Indications */
-        ENABLED (true);
+    public enum Notifications {
+        DISABLED (null, false),
+        NOTIFY (Types.NOTIFICATIONS, true),
+        INDICATE (Types.INDICATIONS, true);
+
+        private enum Types {
+            INDICATIONS,
+            NOTIFICATIONS
+        }
 
         /** Storage Field for Enabled bool passed from .CTor */
         private final boolean enabled;
         /** Storage Field for BluetoothGattDescriptor value based on Boolean */
         private final byte[] btValue;
 
-        Indications(boolean enabled) {
+        private final Types type;
+
+        Notifications(Types type, boolean enabled) {
             this.enabled = enabled;
-            this.btValue = this.enabled ? BluetoothGattDescriptor.ENABLE_INDICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE;
+            this.type = type;
+            this.btValue = this.enabled ?
+                    this.type == Types.NOTIFICATIONS ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.ENABLE_INDICATION_VALUE :
+                    BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE;
         }
 
         /**
@@ -48,10 +59,40 @@ public class BLEUtils {
         public byte[] getDescriptorValue() {
             return btValue;
         }
+
+        public String toString() {
+            if (!enabled) {
+                return "disabled";
+            } else if (type == Types.NOTIFICATIONS) {
+                return "notify";
+            } else {
+                return "indicate";
+            }
+        }
+    }
+
+    public static boolean SetNotificationForCharacteristic(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, UUID gattDescriptor, Notifications value) {
+        boolean written = false;
+        if (characteristic != null) {
+            gatt.setCharacteristicNotification(characteristic, value.isEnabled());
+            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(gattDescriptor);
+            if (descriptor != null) {
+                //writing this descriptor causes the device to send updates
+                descriptor.setValue(value.getDescriptorValue());
+                written = gatt.writeDescriptor(descriptor);
+            }
+            return written;
+        }
+
+        return false;
+    }
+
+    public static boolean SetNotificationForCharacteristic(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, Notifications value) {
+        return SetNotificationForCharacteristic(gatt, characteristic, CLIENT_CHARACTERISTIC_CONFIG_UUID, value);
     }
 
     /**
-     * Set an Indication Setting for The Matching Characteristic of a Service
+     * Set a Notification Setting for The Matching Characteristic of a Service
      * @param gatt The Bluetooth GATT
      * @param gattService the service we must find and match
      * @param gattCharacteristic the characteristic we must find and match
@@ -59,7 +100,7 @@ public class BLEUtils {
      * @param value The exact setting we are setting
      * @return Whether the instruction to write passed or failed.
      */
-    public static boolean SetIndicationForCharacteristic(BluetoothGatt gatt, GattService gattService, GattCharacteristic gattCharacteristic, UUID gattDescriptor, Indications value) {
+    public static boolean SetNotificationForCharacteristic(BluetoothGatt gatt, GattService gattService, GattCharacteristic gattCharacteristic, UUID gattDescriptor, Notifications value) {
         boolean written = false;
         List<BluetoothGattService> services = gatt.getServices();
         for (BluetoothGattService service : services) {
@@ -80,15 +121,15 @@ public class BLEUtils {
     }
 
     /**
-     * Set an Indication Setting for The Matching Characteristic of a Service
+     * Set a Notification Setting for The Matching Characteristic of a Service
      * @param gatt The Bluetooth GATT
      * @param service the service we must find and match
      * @param characteristic the characteristic we must find and match
      * @param value The exact setting we are setting
      * @return Whether the instruction to write passed or failed.
      */
-    public static boolean SetIndicationForCharacteristic(BluetoothGatt gatt, GattService service, GattCharacteristic characteristic, Indications value) {
-        return SetIndicationForCharacteristic(gatt, service, characteristic, CLIENT_CHARACTERISTIC_CONFIG_UUID, value);
+    public static boolean SetNotificationForCharacteristic(BluetoothGatt gatt, GattService service, GattCharacteristic characteristic, Notifications value) {
+        return SetNotificationForCharacteristic(gatt, service, characteristic, CLIENT_CHARACTERISTIC_CONFIG_UUID, value);
     }
 
     /**

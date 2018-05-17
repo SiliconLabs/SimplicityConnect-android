@@ -171,7 +171,7 @@
     <dimen name="device_selection_max_height">0dp</dimen>
     <integer name="device_selection_columns">1</integer>
     <dimen name="device_selection_item_padding">8dp</dimen>
-    <dimen name="device_selection_item_margin">24dp</dimen>
+    <dimen name="device_selection_item_margin">8dp</dimen>
 
     <!-- Dialog: advertisement details -->
     <dimen name="advertisement_details_title_padding_left">20dp</dimen>
@@ -279,9 +279,9 @@
     <dimen name="characteristic_caret_btn_width">30dp</dimen>
     <dimen name="characteristic_caret_btn_height">30dp</dimen>
     <dimen name="characteristic_info_text_margin_left">10dp</dimen>
-    <dimen name="characteristic_name_text_size">16sp</dimen>
-    <dimen name="characteristic_uuid_text_size">14sp</dimen>
-    <dimen name="characteristic_uuid_label_text_size">12sp</dimen>
+    <dimen name="characteristic_name_text_size">14sp</dimen>
+    <dimen name="characteristic_uuid_text_size">12sp</dimen>
+    <dimen name="characteristic_uuid_label_text_size">10sp</dimen>
     <dimen name="characteristic_property_padding_right">10dp</dimen>
     <dimen name="characteristics_separator_margin_left">15dp</dimen>
     <dimen name="characteristics_separator_margin_right">15dp</dimen>
@@ -298,7 +298,7 @@
     <dimen name="default_uuid_of_service_text_size">14sp</dimen>
     <dimen name="uuid_label_of_service_text_size">12sp</dimen>
     <dimen name="services_spacing">20dp</dimen>
-    <dimen name="prop_icon_edge_length">12dp</dimen>
+    <dimen name="prop_icon_edge_length">24dp</dimen>
 
     <!-- Scanning state help message-->
     <dimen name="scanning_for_devices_title_label_textsize">24sp</dimen>

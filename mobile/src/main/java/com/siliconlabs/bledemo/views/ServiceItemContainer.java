@@ -19,6 +19,10 @@ import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.activity.DeviceServicesActivity;
 import com.siliconlabs.bledemo.fragment.FragmentCharacteristicDetail;
 import com.siliconlabs.bledemo.fragment.LogFragment;
+import com.siliconlabs.bledemo.utils.BLEUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -42,6 +46,8 @@ public class ServiceItemContainer extends LinearLayout {
     public LinearLayout groupOfCharacteristicsForService;
     @InjectView(R.id.last_item_divider)
     public LinearLayout lastItemDivider;
+
+    private Map<String, BLEUtils.Notifications> characteristicNotificationStates;
 
     public ServiceItemContainer(Context context) {
         super(context);
@@ -76,6 +82,8 @@ public class ServiceItemContainer extends LinearLayout {
                 }
             }
         });
+
+        characteristicNotificationStates = new HashMap<>();
     }
 
     private void animateCharacteristicExpansion() {
@@ -187,5 +195,13 @@ public class ServiceItemContainer extends LinearLayout {
             }
         });
         imageView.startAnimation(animation);
+    }
+
+    public void setCharacteristicNotificationState(String characteristicName, BLEUtils.Notifications state) {
+        characteristicNotificationStates.put(characteristicName, state);
+    }
+
+    public BLEUtils.Notifications getCharacteristicNotificationState(String characteristicName) {
+        return characteristicNotificationStates.get(characteristicName);
     }
 }

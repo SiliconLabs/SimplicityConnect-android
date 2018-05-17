@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -16,7 +17,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -44,7 +44,6 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
 import butterknife.Optional;
 import timber.log.Timber;
 
@@ -306,7 +305,7 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
     }
 
     private void startDiscovery(Discovery discovery, boolean clearCachedDiscoveries){
-        discovery.startDiscovery(clearCachedDiscoveries, GattService.LightService);
+        discovery.startDiscovery(clearCachedDiscoveries, GattService.ZigbeeLightService, GattService.ProprietaryLightService);
     }
 
     @Override
@@ -380,6 +379,8 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
     }
 
     public static class ViewHolder extends DeviceInfoViewHolder {
+        @InjectView(android.R.id.icon2)
+        ImageView protocolIcon;
         @InjectView(android.R.id.icon)
         ImageView icon;
         @InjectView(android.R.id.title)
@@ -403,6 +404,12 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
 
             int rssi = Math.max(0, scanInfo.getRssi() + 80);
             icon.setImageLevel(rssi);
+
+            if (scanInfo.getScanRecord().getServiceUuids().contains(new ParcelUuid(GattService.ZigbeeLightService.number))) {
+                protocolIcon.setImageResource(R.drawable.icon_zigbee);
+            } else if (scanInfo.getScanRecord().getServiceUuids().contains(new ParcelUuid(GattService.ProprietaryLightService.number))) {
+                protocolIcon.setImageResource(R.drawable.icon_proprietary);
+            }
 
             itemView.setOnClickListener(this);
         }

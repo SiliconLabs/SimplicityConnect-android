@@ -32,13 +32,13 @@ android {
     productFlavors {
         blueGecko {
             applicationId "com.siliconlabs.bledemo"
-            versionCode 8
-            versionName "1.4.2"
+            versionCode 9
+            versionName "1.5.0"
         }
         wirelessGecko {
             applicationId "com.siliconlabs.wirelessgecko"
-            versionCode 1
-            versionName "1.0.64"
+            versionCode 3
+            versionName "1.1.80"
         }
     }
 }

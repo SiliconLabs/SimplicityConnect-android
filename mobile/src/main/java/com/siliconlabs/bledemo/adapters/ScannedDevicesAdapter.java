@@ -28,7 +28,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         implements Discovery.DeviceContainer {
 
     private final static long MAX_AGE = 16000; //Original 15000
-    private final static long PERIOD_UPDATE_REMOVE_OUTDATED_HTM = 7000;
+    private final static long PERIOD_UPDATE_REMOVE_OUTDATED_HTM = 3000;
     private final static long DISCOVERY_UPDATE_PERIOD = 2000; //10000
 
     private final List<T> mostRecentDevicesInfo = new ArrayList<>();
@@ -167,24 +167,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                final Iterator<Map.Entry<T, Long>> iter = mostRecentInfoAge.entrySet().iterator();
-                while (iter.hasNext()) {
-                    final Map.Entry<T, Long> ageEntry = iter.next();
-                    final Long now = System.currentTimeMillis();
-                    long age = now.longValue() - ageEntry.getValue().longValue();
-                    if (age > MAX_AGE) {
-                        Log.i("Time Diff", "Removed old " + ageEntry.getKey().scanInfo.getDisplayName(false));
-                        mostRecentDevicesInfo.remove(ageEntry.getKey());
-                        iter.remove();
-                    }
-                }
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateDevicesInfo();
-                    }
-                });
+                removeOldDevices();
             }
         }, 0, PERIOD_UPDATE_REMOVE_OUTDATED_HTM);
     }
@@ -194,10 +177,6 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     }
 
     public void updateWith(List<T> devicesInfo) {
-        updateWith(devicesInfo, true);
-    }
-
-    public void updateWith(List<T> devicesInfo, boolean removeOld) {
         Long now = System.currentTimeMillis(); //TODO Deleting here
         mostRecentDevicesInfoIsDirty = true;
 
@@ -224,11 +203,9 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
                 clone.isOfInterest = true;
                 clone.isNotOfInterest = false;
                 clone.serviceDiscoveryFailed = false;
-
                 int index = mostRecentDevicesInfo.indexOf(clone);
                 if (index >= 0) {
                     BluetoothDeviceInfo cachedInfo = mostRecentDevicesInfo.get(index);
-
                     long timestampDiff = clone.scanInfo.getTimestampNanos() - cachedInfo.scanInfo.getTimestampNanos();
                     if (timestampDiff != 0) {
                         //Log.i("Time Diff", "Updated " + cachedInfo.scanInfo.getDisplayName(false));
@@ -240,19 +217,6 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
                 } else {
                     mostRecentDevicesInfo.add(devInfo);
                     mostRecentInfoAge.put(devInfo, now);
-                }
-            }
-        }
-
-        if (removeOld) {
-            final Iterator<Map.Entry<T, Long>> iter = mostRecentInfoAge.entrySet().iterator();
-            while (iter.hasNext()) {
-                final Map.Entry<T, Long> ageEntry = iter.next();
-                long age = now.longValue() - ageEntry.getValue().longValue();
-                if (age > MAX_AGE) {
-                    Log.i("Time Diff", "Removed old " + ageEntry.getKey().scanInfo.getDisplayName(false));
-                    mostRecentDevicesInfo.remove(ageEntry.getKey());
-                    iter.remove();
                 }
             }
         }
@@ -269,6 +233,25 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
             handler.postDelayed(delayedUpdater, DISCOVERY_UPDATE_PERIOD);
 
         }
+    }
+
+    private void removeOldDevices() {
+        Long now = System.currentTimeMillis();
+        final Iterator<Map.Entry<T, Long>> iter = mostRecentInfoAge.entrySet().iterator();
+        while (iter.hasNext()) {
+            final Map.Entry<T, Long> ageEntry = iter.next();
+            long age = now.longValue() - ageEntry.getValue().longValue();
+            if (age > MAX_AGE) {
+                mostRecentDevicesInfo.remove(ageEntry.getKey());
+                iter.remove();
+            }
+        }
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                updateDevicesInfo();
+            }
+        });
     }
 
     public void updateWith(List<T> devicesInfo, String string) {
@@ -382,17 +365,14 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
                 }
             }
 
-            if (devicesInfo.size() > mostRecentDevicesInfo.size()) {
-                for (T device : devicesInfo) {
-                    T btinfo = devicesInfo.get(devicesInfo.indexOf(device));
-                    if (!devicesInfo.contains(btinfo)) {
-                        devicesInfo.remove(devicesInfo.indexOf(btinfo));
-                        Log.d("filter", "" + device.getAddress() + " removed");
-                    }
+            Iterator<T> iter = devicesInfo.iterator();
+            while (iter.hasNext()) {
+                T btinfo = iter.next();
+                if (!mostRecentDevicesInfo.contains(btinfo)) {
+                    iter.remove();
                 }
             }
         }
-
     }
 
     public void sortDevices(Comparator<T> comparator) {

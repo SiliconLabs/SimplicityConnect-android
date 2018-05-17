@@ -32,9 +32,14 @@ public enum GattService {
                GattCharacteristic.OtaData,
                GattCharacteristic.FwVersion,
                GattCharacteristic.OtaVersion),
-    LightService("bae55b96-7d19-458d-970c-50613d801bc9", "custom.type",
+    ZigbeeLightService("bae55b96-7d19-458d-970c-50613d801bc9", "custom.type",
                  GattCharacteristic.Light,
-                 GattCharacteristic.TriggerSource);
+                 GattCharacteristic.TriggerSource,
+                 GattCharacteristic.SourceAddress),
+    ProprietaryLightService("63f596e4-b583-4078-bfc3-b04225378713", "custom.type",
+                 GattCharacteristic.Light,
+                 GattCharacteristic.TriggerSource,
+                 GattCharacteristic.SourceAddress);
 
 
     private static final String FORMAT_STR = "%08x-0000-1000-8000-00805f9b34fb";

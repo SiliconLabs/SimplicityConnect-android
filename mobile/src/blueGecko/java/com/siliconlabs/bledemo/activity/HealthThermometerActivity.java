@@ -19,7 +19,6 @@ import com.siliconlabs.bledemo.ble.TimeoutGattCallback;
 import com.siliconlabs.bledemo.fragment.SelectDeviceDialog;
 import com.siliconlabs.bledemo.models.TemperatureReading;
 import com.siliconlabs.bledemo.utils.BLEUtils;
-import com.siliconlabs.bledemo.utils.BLEUtils.Indications;
 
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +54,7 @@ public class HealthThermometerActivity extends BaseActivity {
             super.onServicesDiscovered(gatt, status);
             List<BluetoothGattService> services = gatt.getServices();
 
-            BLEUtils.SetIndicationForCharacteristic(gatt, GattService.HealthThermometer, GattCharacteristic.Temperature, Indications.ENABLED);
+            BLEUtils.SetNotificationForCharacteristic(gatt, GattService.HealthThermometer, GattCharacteristic.Temperature, BLEUtils.Notifications.INDICATE);
         }
 
         @Override
@@ -157,7 +156,8 @@ public class HealthThermometerActivity extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 if (service != null && service.getConnectedGatt() != null)
-                    BLEUtils.SetIndicationForCharacteristic(service.getConnectedGatt(), GattService.HealthThermometer, GattCharacteristic.Temperature, Indications.DISABLED);
+                    BLEUtils.SetNotificationForCharacteristic(service.getConnectedGatt(), GattService.HealthThermometer, GattCharacteristic.Temperature,
+                                                              BLEUtils.Notifications.DISABLED);
                 
                 finish();
                 return true;

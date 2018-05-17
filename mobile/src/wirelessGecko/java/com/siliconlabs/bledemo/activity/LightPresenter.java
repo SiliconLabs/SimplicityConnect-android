@@ -1,5 +1,7 @@
 package com.siliconlabs.bledemo.activity;
 
+import com.siliconlabs.bledemo.ble.GattService;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -11,7 +13,11 @@ class LightPresenter {
 
         void showLightState(boolean lightOn);
 
-        void showTriggerSource(TriggerSource source);
+        void showTriggerSourceIcon(TriggerSource source);
+
+        void showTriggerSourceAddress(String sourceAddress, TriggerSource source);
+
+        void showDeviceDisconnectedDialog();
 
     }
 
@@ -23,21 +29,27 @@ class LightPresenter {
 
         boolean getLightValue();
 
+        void leaveDemo();
+
     }
 
     private boolean lightOn;
     private TriggerSource triggerSource = TriggerSource.UNKNOWN;
+    private String sourceAddress;
     private LightPresenter.View view;
     private final BluetoothController bluetoothController;
     private Timer periodicReadTimer;
+    private GattService gattService;
 
     LightPresenter(View view, BluetoothController bluetoothController) {
         this.view = view;
         this.bluetoothController = bluetoothController;
         //light_on will be set according to what we read from bluetooth, just hardcoding to start with off for now
         lightOn = false;
+        sourceAddress = "";
         view.showLightState(lightOn);
-        view.showTriggerSource(triggerSource);
+        view.showTriggerSourceIcon(triggerSource);
+        view.showTriggerSourceAddress(sourceAddress, triggerSource);
         bluetoothController.setPresenter(this);
         periodicReadTimer = new Timer();
     }
@@ -57,7 +69,15 @@ class LightPresenter {
 
     void onSourceUpdated(TriggerSource value) {
         triggerSource = value;
-        view.showTriggerSource(triggerSource);
+        if (gattService == GattService.ProprietaryLightService && value.equals(TriggerSource.ZIGBEE)) {
+            triggerSource = TriggerSource.PROPRIETARY;
+        }
+        view.showTriggerSourceIcon(triggerSource);
+    }
+
+    void onSourceAddressUpdated(String sourceAddress) {
+        this.sourceAddress = sourceAddress;
+        view.showTriggerSourceAddress(sourceAddress, triggerSource);
     }
 
     void cancelPeriodicReads() {
@@ -75,5 +95,21 @@ class LightPresenter {
                     updateLight();
                 }
             },FAST_TOGGLING_READ_DELAY);
+    }
+
+    void setGattService(GattService gattService) {
+        this.gattService = gattService;
+    }
+
+    GattService getGattService() {
+        return gattService;
+    }
+
+    void showDeviceDisconnectedDialog() {
+        view.showDeviceDisconnectedDialog();
+    }
+
+    void leaveDemo() {
+        bluetoothController.leaveDemo();
     }
 }

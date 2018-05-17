@@ -23,7 +23,7 @@
     <style name="Body" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textSize">@dimen/text_size_body</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
-        <item name="android:maxLines">2</item>
+        <item name="android:maxLines">4</item>
         <item name="android:ellipsize">end</item>
     </style>
 

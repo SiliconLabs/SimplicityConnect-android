@@ -30,7 +30,6 @@ import com.siliconlabs.bledemo.ble.GattService;
 import com.siliconlabs.bledemo.ble.TimeoutGattCallback;
 import com.siliconlabs.bledemo.interfaces.FindKeyFobCallback;
 import com.siliconlabs.bledemo.utils.BLEUtils;
-import com.siliconlabs.bledemo.utils.BLEUtils.Indications;
 
 import java.util.List;
 
@@ -137,7 +136,7 @@ public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback 
                     immediateAlertCharacteristic = BLEUtils.getCharacteristic(service, GattService.ImmediateAlert, GattCharacteristic.AlertLevel);
                     success = immediateAlertCharacteristic != null;
 
-                    boolean written = BLEUtils.SetIndicationForCharacteristic(gatt, GattService.HealthThermometer, GattCharacteristic.Temperature, Indications.DISABLED);
+                    boolean written = BLEUtils.SetNotificationForCharacteristic(gatt, GattService.HealthThermometer, GattCharacteristic.Temperature, BLEUtils.Notifications.DISABLED);
                 }
 
 

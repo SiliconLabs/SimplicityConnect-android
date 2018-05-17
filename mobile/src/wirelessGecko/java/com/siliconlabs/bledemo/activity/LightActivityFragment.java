@@ -1,7 +1,10 @@
 package com.siliconlabs.bledemo.activity;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.siliconlabs.bledemo.R;
+import com.siliconlabs.bledemo.ble.GattService;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -59,10 +63,38 @@ public class LightActivityFragment extends Fragment implements LightPresenter.Vi
     }
 
     @Override
-    public void showTriggerSource(TriggerSource source) {
+    public void showTriggerSourceIcon(TriggerSource source) {
         if (isAdded() && !isDetached() && !isRemoving()) {
-            lightSource.setText(getString(R.string.demo_light_changed_source, getString(source.labelId)));
             lightIcon.setImageResource(source.iconId);
         }
+    }
+
+    @Override
+    public void showTriggerSourceAddress(String sourceAddress, TriggerSource source) {
+        if (TriggerSource.UNKNOWN.equals(source)) {
+            lightSource.setText(getString(R.string.demo_light_changed_source, getString(R.string.demo_light_changed_source_unknown)));
+        } else {
+            lightSource.setText(getString(R.string.demo_light_changed_source, sourceAddress));
+        }
+    }
+
+    @Override
+    public void showDeviceDisconnectedDialog() {
+        new AlertDialog.Builder(getActivity())
+                .setMessage(R.string.light_demo_connection_lost)
+                .setPositiveButton(R.string.light_demo_connection_lost_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        presenter.leaveDemo();
+                    }
+                })
+                .create()
+        .show();
     }
 }

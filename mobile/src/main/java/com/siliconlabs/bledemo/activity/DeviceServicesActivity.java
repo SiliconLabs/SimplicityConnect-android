@@ -44,7 +44,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -68,11 +67,13 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Space;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -91,6 +92,8 @@ import com.siliconlabs.bledemo.bluetoothdatamodel.parsing.Converters;
 import com.siliconlabs.bledemo.bluetoothdatamodel.parsing.Engine;
 import com.siliconlabs.bledemo.fragment.FragmentCharacteristicDetail;
 import com.siliconlabs.bledemo.fragment.LogFragmentConnected;
+import com.siliconlabs.bledemo.utils.BLEUtils;
+import com.siliconlabs.bledemo.utils.BLEUtils.Notifications;
 import com.siliconlabs.bledemo.views.ServiceItemContainer;
 
 import java.io.BufferedReader;
@@ -105,7 +108,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -117,6 +122,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
     public static final String ABOUT_DIALOG_HTML_ASSET_FILE_PATH = "file:///android_asset/about.html";
     public static final String CHARACTERISTIC_ADD_FRAGMENT_TRANSACTION_ID = "characteristicdetail";
     public static final int UI_CREATION_DELAY = 500;
+    private static final String PROPERTY_ICON_TAG = "characteristicpropertyicon";
     Handler handler;
 
     /**Services UUIDs*/
@@ -228,8 +234,9 @@ public class DeviceServicesActivity extends AppCompatActivity {
     FragmentCharacteristicDetail previousCharacteristicFragment = null;
     LinearLayout previousFragmentContainer = null;
     ImageView previousCharacteristicCaret = null;
-    FloatingActionButton previousCharacteristicFabButton = null;
-    RelativeLayout previousCharacteristicFabButtonContainer = null;
+    LinearLayout previousCharacteristicContainer = null;
+
+    private Map<String, ServiceItemContainer> serviceItemContainers;
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -1209,10 +1216,11 @@ public class DeviceServicesActivity extends AppCompatActivity {
 
     /**INITIATES SERVICES VIEWS************************************************************/
     private void initServicesViews() {
+        serviceItemContainers = new HashMap<>();
         // iterate through all of the services for the device, inflate and add views to the scrollview
         ArrayList<BluetoothGattService> services = (ArrayList<BluetoothGattService>) bluetoothGatt.getServices(); //service.getConnectedGatt().getServices();
         for (int position = 0; position < services.size(); position++) {
-            ServiceItemContainer serviceItemContainer = new ServiceItemContainer(DeviceServicesActivity.this);
+            final ServiceItemContainer serviceItemContainer = new ServiceItemContainer(DeviceServicesActivity.this);
 
             // get information about service at index 'position'
             UUID uuid = services.get(position).getUuid();
@@ -1234,7 +1242,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
                 continue;
             }
             // iterate through the characteristics of this service
-            for (BluetoothGattCharacteristic bluetoothGattCharacteristic : characteristics) {
+            for (final BluetoothGattCharacteristic bluetoothGattCharacteristic : characteristics) {
                 // retrieve relevant bluetooth data for characteristic of service
                 final BluetoothGattCharacteristic thisCharacteristic = bluetoothGattCharacteristic;
                 // the engine parses through the data of the btgattcharac and returns a wrapper characteristic
@@ -1251,12 +1259,10 @@ public class DeviceServicesActivity extends AppCompatActivity {
 
                 // inflate/create ui elements
                 LayoutInflater layoutInflater = LayoutInflater.from(this);
-                LinearLayout characteristicContainer = (LinearLayout) layoutInflater.inflate(R.layout.list_item_debug_mode_characteristic_of_service, null);
-                final FloatingActionButton fabBtnShowCharacWriteDialog = (FloatingActionButton) characteristicContainer.findViewById(R.id.fab_btn_write_characteristic);
-                final RelativeLayout fabBtnShowCharacWriteDialogContainer = (RelativeLayout) characteristicContainer.findViewById(R.id.fab_btn_write_characteristic_container);
+                final LinearLayout characteristicContainer = (LinearLayout) layoutInflater.inflate(R.layout.list_item_debug_mode_characteristic_of_service, null);
                 final ImageView characteristicExpansionCaret = (ImageView) characteristicContainer.findViewById(R.id.characteristic_expansion_caret);
                 final LinearLayout characteristicExpansion = (LinearLayout) characteristicContainer.findViewById(R.id.characteristic_expansion);
-                LinearLayout propsContainer = (LinearLayout) characteristicContainer.findViewById(R.id.characteristic_props_container);
+                final LinearLayout propsContainer = (LinearLayout) characteristicContainer.findViewById(R.id.characteristic_props_container);
                 TextView characteristicNameTextView = (TextView) characteristicContainer.findViewById(R.id.characteristic_title);
                 TextView characteristicUuidTextView = (TextView) characteristicContainer.findViewById(R.id.characteristic_uuid);
                 final Button characteristicDetailsBtn = (Button) characteristicContainer.findViewById(R.id.btn_expand_to_show_characteristic_details);
@@ -1277,6 +1283,11 @@ public class DeviceServicesActivity extends AppCompatActivity {
                 // add properties to characteristic list item in expansion
                 addPropertiesToCharacteristic(bluetoothGattCharacteristic, propsContainer);
 
+                serviceItemContainer.setCharacteristicNotificationState(characteristicUuid, Notifications.DISABLED);
+
+                final String finalServiceName = serviceName;
+                final String finalCharacteristicName = characteristicName;
+
                 characteristicDetailsBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -1284,6 +1295,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
 
                         // check if characteristic of currently pressed caret is the same characteristic as previously selected caret
                         if (previousFragmentId == characteristicExpansion.getId()) {
+                            unsetPropertyClickListeners(propsContainer);
                             if (characteristicExpansion.getVisibility() == View.VISIBLE) {
                                 FragmentManager fragmentManager = getFragmentManager();
                                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -1296,12 +1308,10 @@ public class DeviceServicesActivity extends AppCompatActivity {
                                 fragmentTransaction.commit();
                                 previousFragmentContainer.setVisibility(View.GONE);
 
-                                fabBtnShowCharacWriteDialog.setVisibility(View.GONE);
-                                fabBtnShowCharacWriteDialogContainer.setVisibility(View.GONE);
-
                                 previousCharacteristicFragment = null;
                                 previousFragmentContainer = null;
                                 previousFragmentId = 0;
+                                previousCharacteristicContainer = null;
                             }
                             return;
                         }
@@ -1312,12 +1322,15 @@ public class DeviceServicesActivity extends AppCompatActivity {
 
                         if (previousFragmentContainer != null) {
                             // remove characteristic view/edit fragment of previously selected characteristic
-                            fabBtnShowCharacWriteDialog.setVisibility(View.GONE);
-                            fabBtnShowCharacWriteDialogContainer.setVisibility(View.GONE);
                             fragmentTransaction = fragmentManager.beginTransaction();
                             fragmentTransaction.remove(previousCharacteristicFragment);
                             fragmentTransaction.commit();
                             previousFragmentContainer.setVisibility(View.GONE);
+                        }
+
+                        // If expanding a new characteristic, unset the click listeners for the buttons on the old characteristic
+                        if (previousCharacteristicContainer != null) {
+                            unsetPropertyClickListeners((LinearLayout) previousCharacteristicContainer.findViewById(R.id.characteristic_props_container));
                         }
 
                         // init selected characteristic fragment
@@ -1325,8 +1338,6 @@ public class DeviceServicesActivity extends AppCompatActivity {
                         characteristicDetail.address = bluetoothGatt.getDevice().getAddress();
                         characteristicDetail.setmService(blueToothGattService);
                         characteristicDetail.setmBluetoothCharact(thisCharacteristic);
-                        characteristicDetail.setFabBtnShowWriteCharacDialog(fabBtnShowCharacWriteDialog);
-                        characteristicDetail.setFabBtnShowWriteCharacDialogContainer(fabBtnShowCharacWriteDialogContainer);
 
                         // animate carets
                         if (previousCharacteristicCaret != null) {
@@ -1340,22 +1351,19 @@ public class DeviceServicesActivity extends AppCompatActivity {
                         fragmentTransaction.add(characteristicExpansion.getId(), characteristicDetail, CHARACTERISTIC_ADD_FRAGMENT_TRANSACTION_ID);
                         fragmentTransaction.commit();
 
-                        if (previousCharacteristicFabButton != null) {
-                            previousCharacteristicFabButton.setVisibility(View.GONE);
-                            previousCharacteristicFabButtonContainer.setVisibility(View.GONE);
-                        }
-
                         previousCharacteristicCaret = characteristicExpansionCaret;
-                        previousCharacteristicFabButton = fabBtnShowCharacWriteDialog;
-                        previousCharacteristicFabButtonContainer = fabBtnShowCharacWriteDialogContainer;
 
                         previousCharacteristicFragment = characteristicDetail;
                         previousFragmentContainer = characteristicExpansion;
                         previousFragmentId = characteristicExpansion.getId();
+                        previousCharacteristicContainer = characteristicContainer;
+
+                        setPropertyClickListeners(propsContainer, bluetoothGattCharacteristic, finalServiceName);
                     }
                 });
             }
             servicesContainer.addView(serviceItemContainer, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            serviceItemContainers.put(serviceName, serviceItemContainer);
         }
     }
 
@@ -1392,38 +1400,39 @@ public class DeviceServicesActivity extends AppCompatActivity {
     }
 
     /**SHOW CHARACTERISTIC PROPERTIES IN UI: READ, WRITE************************************/
-    private void addPropertiesToCharacteristic(BluetoothGattCharacteristic bluetoothGattCharacteristic, LinearLayout propsContainer) {
+    private void addPropertiesToCharacteristic(BluetoothGattCharacteristic bluetoothGattCharacteristic,
+                                               LinearLayout propsContainer) {
         String propertiesString = Common.getProperties(DeviceServicesActivity.this, bluetoothGattCharacteristic.getProperties());
         String[] propsExploded = propertiesString.split(",");
         for (String propertyValue : propsExploded) {
             TextView propertyView = new TextView(this);
+
             String propertyValueTrimmed = propertyValue.trim();
             propertyValueTrimmed = propertyValue.length() > 13 ? propertyValue.substring(0, 13) : propertyValueTrimmed;
             propertyValueTrimmed.toUpperCase();
             propertyView.setText(propertyValueTrimmed);
-            propertyView.append("  ");
             propertyView.setBackgroundColor(getResources().getColor(R.color.debug_mode_characteristic_expansion_background));
             propertyView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_property_text_size));
             propertyView.setTextColor(getResources().getColor(R.color.debug_mode_characteristic_expansion_property_text_color));
             propertyView.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
 
             LinearLayout propertyContainer = new LinearLayout(DeviceServicesActivity.this);
-            propertyContainer.setOrientation(LinearLayout.HORIZONTAL);
+            propertyContainer.setOrientation(LinearLayout.VERTICAL);
 
             ImageView propertyIcon = new ImageView(DeviceServicesActivity.this);
             int iconId;
             if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_BROADCAST)) {
                 iconId = R.drawable.debug_prop_broadcast;
             } else if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_READ)) {
-                iconId = R.drawable.debug_prop_read;
+                iconId = R.drawable.debug_prop_read_disabled;
             } else if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_WRITE_NO_RESPONSE)) {
                 iconId = R.drawable.debug_prop_write_no_resp;
             } else if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_WRITE)) {
-                iconId = R.drawable.debug_prop_write;
+                iconId = R.drawable.debug_prop_write_disabled;
             } else if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_NOTIFY)) {
-                iconId = R.drawable.debug_prop_notify;
+                iconId = R.drawable.debug_prop_notify_disabled;
             } else if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_INDICATE)) {
-                iconId = R.drawable.debug_prop_indicate;
+                iconId = R.drawable.debug_prop_indicate_disabled;
             } else if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_SIGNED_WRITE)) {
                 iconId = R.drawable.debug_prop_signed_write;
             } else if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_EXTENDED_PROPS)) {
@@ -1432,21 +1441,203 @@ public class DeviceServicesActivity extends AppCompatActivity {
                 iconId = R.drawable.debug_prop_ext;
             }
             propertyIcon.setBackgroundResource(iconId);
+            propertyIcon.setTag(PROPERTY_ICON_TAG);
 
             LinearLayout.LayoutParams paramsText = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            paramsText.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+            paramsText.gravity = Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL;
 
             int propIconEdgeLength = getResources().getDimensionPixelSize(R.dimen.prop_icon_edge_length);
             LinearLayout.LayoutParams paramsIcon = new LinearLayout.LayoutParams(propIconEdgeLength, propIconEdgeLength);
-            paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+            paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL;
 
-            propertyContainer.addView(propertyView, paramsText);
             propertyContainer.addView(propertyIcon, paramsIcon);
+            propertyContainer.addView(propertyView, paramsText);
+
+            propertyContainer.setTag(propertyValue);
 
             LinearLayout.LayoutParams paramsTextAndIconContainer = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             paramsTextAndIconContainer.gravity = Gravity.RIGHT;
+
+            LayoutInflater.from(this).inflate(R.layout.empty_space_weighted, propsContainer);
+
             propsContainer.addView(propertyContainer, paramsTextAndIconContainer);
         }
+    }
+
+    private void setPropertyClickListeners(LinearLayout propsContainer, BluetoothGattCharacteristic bluetoothGattCharacteristic, String serviceName) {
+        ImageView notificationIcon = getIconWithValue(propsContainer, Common.PROPERTY_VALUE_NOTIFY);
+        ImageView indicationIcon = getIconWithValue(propsContainer, Common.PROPERTY_VALUE_INDICATE);
+        String characteristicUuid = getUuidFromBluetoothGattCharacteristic(bluetoothGattCharacteristic);
+        Notifications notificationState = serviceItemContainers.get(serviceName).getCharacteristicNotificationState(characteristicUuid);
+        previousCharacteristicFragment.setNotificationsEnabled(notificationState == Notifications.NOTIFY);
+        previousCharacteristicFragment.setIndicationsEnabled(notificationState == Notifications.INDICATE);
+        for (int i = 0; i < propsContainer.getChildCount(); i++) {
+            if (propsContainer.getChildAt(i).getTag() == null) {
+                continue;
+            }
+            LinearLayout propertyContainer = (LinearLayout) propsContainer.getChildAt(i);
+            ImageView propertyIcon = null;
+            for (int j = 0; j < propertyContainer.getChildCount(); j++) {
+                View view = propertyContainer.getChildAt(j);
+                if (view.getTag() != null && view.getTag().equals(PROPERTY_ICON_TAG)) {
+                    propertyIcon = (ImageView) view;
+                }
+            }
+            String propertyValueId = ((String) propertyContainer.getTag()).trim().toUpperCase();
+            switch (propertyValueId) {
+                case Common.PROPERTY_VALUE_READ:
+                    propertyContainer.setOnClickListener(getReadPropertyClickListener(bluetoothGattCharacteristic));
+                    if (propertyIcon != null) {
+                        propertyIcon.setBackgroundResource(R.drawable.debug_prop_read);
+                    }
+                    break;
+                case Common.PROPERTY_VALUE_WRITE:
+                    propertyContainer.setOnClickListener(getWritePropertyClickListener());
+                    if (propertyIcon != null) {
+                        propertyIcon.setBackgroundResource(R.drawable.debug_prop_write);
+                    }
+                    break;
+                case Common.PROPERTY_VALUE_NOTIFY:
+                    propertyContainer.setOnClickListener(getNotificationPropertyClickListener(bluetoothGattCharacteristic, propertyIcon, indicationIcon, serviceName));
+                    if (propertyIcon != null && notificationState == Notifications.NOTIFY) {
+                        propertyIcon.setBackgroundResource(R.drawable.debug_prop_notify);
+                    }
+                    break;
+                case Common.PROPERTY_VALUE_INDICATE:
+                    propertyContainer.setOnClickListener(getIndicationPropertyClickListener(bluetoothGattCharacteristic, propertyIcon, notificationIcon, serviceName));
+                    if (propertyIcon != null && notificationState == Notifications.INDICATE) {
+                        propertyIcon.setBackgroundResource(R.drawable.debug_prop_indicate);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private String getUuidFromBluetoothGattCharacteristic(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
+        Characteristic characteristic = Engine.getInstance().getCharacteristic(bluetoothGattCharacteristic.getUuid());
+        return (characteristic != null ? Common.getUuidText(characteristic.getUuid()) : bluetoothGattCharacteristic.getUuid().toString());
+    }
+
+    private ImageView getIconWithValue(LinearLayout propsContainer, String value) {
+        for (int i = 0; i < propsContainer.getChildCount(); i++) {
+            if (propsContainer.getChildAt(i).getTag() == null) {
+                continue;
+            }
+            LinearLayout propertyContainer = (LinearLayout) propsContainer.getChildAt(i);
+            for (int j = 0; j < propertyContainer.getChildCount(); j++) {
+                View view = propertyContainer.getChildAt(j);
+                if (view.getTag() != null && view.getTag().equals(PROPERTY_ICON_TAG)) {
+                    String propertyValue = ((String) propertyContainer.getTag()).trim().toUpperCase();
+                    if (propertyValue.equals(value)) {
+                        return (ImageView) view;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private void unsetPropertyClickListeners(LinearLayout propsContainer) {
+        for (int i = 0; i < propsContainer.getChildCount(); i++) {
+            if (propsContainer.getChildAt(i).getTag() == null) {
+                continue;
+            }
+            LinearLayout propertyContainer = (LinearLayout) propsContainer.getChildAt(i);
+            propertyContainer.setOnClickListener(null);
+            ImageView propertyIcon = null;
+            for (int j = 0; j < propertyContainer.getChildCount(); j++) {
+                View view = propertyContainer.getChildAt(j);
+                if (view.getTag() != null && view.getTag().equals(PROPERTY_ICON_TAG)) {
+                    propertyIcon = (ImageView) view;
+                }
+            }
+            if (propertyIcon == null) {
+                return;
+            }
+            String propertyValueId = ((String) propertyContainer.getTag()).trim().toUpperCase();
+            switch (propertyValueId) {
+                case Common.PROPERTY_VALUE_READ:
+                    propertyIcon.setBackgroundResource(R.drawable.debug_prop_read_disabled);
+                    break;
+                case Common.PROPERTY_VALUE_WRITE:
+                    propertyIcon.setBackgroundResource(R.drawable.debug_prop_write_disabled);
+                    break;
+                case Common.PROPERTY_VALUE_NOTIFY:
+                    propertyIcon.setBackgroundResource(R.drawable.debug_prop_notify_disabled);
+                    break;
+                case Common.PROPERTY_VALUE_INDICATE:
+                    propertyIcon.setBackgroundResource(R.drawable.debug_prop_indicate_disabled);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private View.OnClickListener getReadPropertyClickListener(final BluetoothGattCharacteristic characteristic) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bluetoothGatt.readCharacteristic(characteristic);
+            }
+        };
+    }
+
+    private View.OnClickListener getNotificationPropertyClickListener(final BluetoothGattCharacteristic bluetoothGattCharacteristic, final ImageView propertyIcon, final ImageView otherIcon, final String serviceName) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean notificationsEnabled = previousCharacteristicFragment.getNotificationsEnabled();
+                boolean submitted = BLEUtils.SetNotificationForCharacteristic(bluetoothGatt, bluetoothGattCharacteristic, notificationsEnabled ? Notifications.DISABLED : Notifications.NOTIFY);
+                if (submitted) {
+                    notificationsEnabled = !notificationsEnabled;
+                }
+                previousCharacteristicFragment.setNotificationsEnabled(notificationsEnabled);
+                propertyIcon.setBackgroundResource(notificationsEnabled ? R.drawable.debug_prop_notify : R.drawable.debug_prop_notify_disabled);
+
+                String characteristicUuid = getUuidFromBluetoothGattCharacteristic(bluetoothGattCharacteristic);
+                serviceItemContainers.get(serviceName).setCharacteristicNotificationState(characteristicUuid, notificationsEnabled ? Notifications.NOTIFY : Notifications.DISABLED);
+
+                previousCharacteristicFragment.setIndicationsEnabled(false);
+                if (otherIcon != null) {
+                    otherIcon.setBackgroundResource(R.drawable.debug_prop_indicate_disabled);
+                }
+            }
+        };
+    }
+
+    private View.OnClickListener getIndicationPropertyClickListener(final BluetoothGattCharacteristic bluetoothGattCharacteristic, final ImageView propertyIcon, final ImageView otherIcon, final String serviceName) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean indicationsEnabled = previousCharacteristicFragment.getIndicationsEnabled();
+                boolean submitted = BLEUtils.SetNotificationForCharacteristic(bluetoothGatt, bluetoothGattCharacteristic, indicationsEnabled ? Notifications.DISABLED : Notifications.INDICATE);
+                if (submitted) {
+                    indicationsEnabled = !indicationsEnabled;
+                }
+                previousCharacteristicFragment.setIndicationsEnabled(indicationsEnabled);
+                propertyIcon.setBackgroundResource(indicationsEnabled ? R.drawable.debug_prop_indicate : R.drawable.debug_prop_indicate_disabled);
+
+                String characteristicUuid = getUuidFromBluetoothGattCharacteristic(bluetoothGattCharacteristic);
+                serviceItemContainers.get(serviceName).setCharacteristicNotificationState(characteristicUuid, indicationsEnabled ? Notifications.INDICATE : Notifications.DISABLED);
+
+                previousCharacteristicFragment.setNotificationsEnabled(false);
+                if (otherIcon != null) {
+                    otherIcon.setBackgroundResource(R.drawable.debug_prop_notify_disabled);
+                }
+            }
+        };
+    }
+
+    private View.OnClickListener getWritePropertyClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                previousCharacteristicFragment.showCharacteristicWriteDialog();
+            }
+        };
     }
 
     /**INITIALIZES ABOUT DIALOG*******************************************************/

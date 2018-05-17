@@ -33,7 +33,8 @@ public enum GattCharacteristic {
     FwVersion(0x4f4a2368, "com.silabs.characteristic.fw_version", BluetoothGattCharacteristic.FORMAT_UINT8),
     OtaVersion(0x4cc07bcf, "com.silabs.characteristic.ota_version", BluetoothGattCharacteristic.FORMAT_UINT8),
     Light("76e137ac-b15f-49d7-9c4c-e278e6492ad9", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT8),
-    TriggerSource("2f16ee52-0bfd-4597-85d4-a5141fdbae15", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT8);
+    TriggerSource("2f16ee52-0bfd-4597-85d4-a5141fdbae15", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT8),
+    SourceAddress("82a1cb54-3921-4c9c-ba34-34f78bab9a1b", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT32);
 
     private static final String FORMAT_STR = "%08x-0000-1000-8000-00805f9b34fb";
     /**

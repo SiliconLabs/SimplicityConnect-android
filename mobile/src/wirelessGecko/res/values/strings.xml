@@ -9,5 +9,5 @@
 
     <!-- Light Demo -->
     <string name="demo_item_light_title">Connected Lighting Demo</string>
-    <string name="demo_light_text">Powered by Silicon Labs\' dynamic multiprotocol (Bluetooth + Zigbee).</string>
+    <string name="demo_light_text">Dynamic multiprotocol application showcasing simultaneous operation of Bluetooth plus Zigbee or Proprietary Sub-GHz on the Wireless Gecko SoC.</string>
 </resources>

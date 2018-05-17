@@ -63,6 +63,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
+import timber.log.Timber;
+
 public class FragmentCharacteristicDetail extends Fragment {
     //padding
     public static final int FIELD_CONTAINER_PADDING_LEFT = 10;
@@ -109,6 +111,8 @@ public class FragmentCharacteristicDetail extends Fragment {
     private boolean readable = false;
     private boolean writeable = false;
     private boolean notify = false;
+    private boolean notificationsEnabled = false;
+    private boolean indicationsEnabled = false;
     private boolean isRawValue = false;
     private boolean parseProblem = false;
     private int offset = 0; // in bytes
@@ -134,8 +138,6 @@ public class FragmentCharacteristicDetail extends Fragment {
     private TextView hex;
     private TextView ascii;
     private TextView decimal;
-    FloatingActionButton fabBtnShowCharacWriteDialog;
-    RelativeLayout fabBtnShowCharacWriteDialogContainer;
     Dialog editableFieldsDialog;
     LinearLayout writableFieldsContainer;
     Button saveValueBtn;
@@ -180,11 +182,6 @@ public class FragmentCharacteristicDetail extends Fragment {
             }
             loadValueViews();
         }
-        // If characteristic is notify, set notification on it
-        if (notify) {
-            setNotification();
-        }
-
         return view;
     }
 
@@ -202,9 +199,6 @@ public class FragmentCharacteristicDetail extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (notify) {
-            mDevice.setCharacteristicNotification(mBluetoothCharact, false);
-        }
         mBluetoothLeService = null;
     }
 
@@ -223,16 +217,8 @@ public class FragmentCharacteristicDetail extends Fragment {
     // Configures characteristic if it is writeable
     private void configureWriteable() {
         if (writeable) {
-            initFabBtn();
+            initCharacteristicWriteDialog();
         }
-    }
-
-    public void setFabBtnShowWriteCharacDialog(FloatingActionButton fab) {
-        fabBtnShowCharacWriteDialog = fab;
-    }
-
-    public void setFabBtnShowWriteCharacDialogContainer(RelativeLayout fabContainer) {
-        fabBtnShowCharacWriteDialogContainer = fabContainer;
     }
 
     public void onDescriptorWrite(UUID descriptorUuid) {
@@ -358,26 +344,20 @@ public class FragmentCharacteristicDetail extends Fragment {
         timer.scheduleAtFixedRate(updateBall, 0, REFRESH_INTERVAL);
     }
 
-    // Sets notification on characteristic data changes
-    protected void setNotification() {
-        //mBluetoothLeService.setCharacteristicNotification(mDevice, mBluetoothCharact, true);
-        mDevice.setCharacteristicNotification(mBluetoothCharact, true);
+    public boolean getNotificationsEnabled() {
+        return notificationsEnabled;
+    }
 
-        ArrayList<Descriptor> descriptors = getCharacteristicDescriptors();
+    public void setNotificationsEnabled(boolean enabled) {
+        notificationsEnabled = enabled;
+    }
 
-        if (descriptors != null) {
-            for (BluetoothGattDescriptor blDescriptor : mBluetoothCharact.getDescriptors()) {
-                if (isDescriptorAvailable(descriptors, blDescriptor)) {
-                    mDescriptors.add(blDescriptor);
-                    Log.e("mDescriptors", blDescriptor.toString());
-                }
-            }
-        } else {
-            mDescriptors = new ArrayList<BluetoothGattDescriptor>(mBluetoothCharact.getDescriptors());
-        }
+    public boolean getIndicationsEnabled() {
+        return indicationsEnabled;
+    }
 
-        iterDescriptor = mDescriptors.iterator();
-        writeNextDescriptor();
+    public void setIndicationsEnabled(boolean enabled) {
+        indicationsEnabled = enabled;
     }
 
     // Gets all characteristic descriptors
@@ -816,9 +796,6 @@ public class FragmentCharacteristicDetail extends Fragment {
             hexEdit.setText(Converters.getHexValue(value));
             asciiEdit.setText(Converters.getAsciiValue(value));
             decimalEdit.setText(Converters.getDecimalValue(value));
-
-            fabBtnShowCharacWriteDialog.setVisibility(View.VISIBLE);
-            fabBtnShowCharacWriteDialogContainer.setVisibility(View.VISIBLE);
         } else {
             hexEdit.setVisibility(View.GONE);
             asciiEdit.setVisibility(View.GONE);
@@ -827,9 +804,6 @@ public class FragmentCharacteristicDetail extends Fragment {
             hex.setText(Converters.getHexValue(value));
             ascii.setText(Converters.getAsciiValue(value));
             decimal.setText(Converters.getDecimalValue(value));
-
-            fabBtnShowCharacWriteDialog.setVisibility(View.GONE);
-            fabBtnShowCharacWriteDialogContainer.setVisibility(View.GONE);
         }
         valuesLayout.addView(readableFieldsForInline);
 
@@ -890,58 +864,50 @@ public class FragmentCharacteristicDetail extends Fragment {
         }
     }
 
-    private void initFabBtn() {
-        fabBtnShowCharacWriteDialog.setVisibility(View.GONE);
-        fabBtnShowCharacWriteDialogContainer.setVisibility(View.GONE);
-
+    private void initCharacteristicWriteDialog() {
         editableFieldsDialog = new Dialog(getActivity());
         editableFieldsDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         editableFieldsDialog.setContentView(R.layout.dialog_characteristic_write);
         writableFieldsContainer = (LinearLayout) editableFieldsDialog.findViewById(R.id.characteristic_writable_fields_container);
 
         saveValueBtn = (Button) editableFieldsDialog.findViewById(R.id.save_btn);
+    }
 
-        fabBtnShowCharacWriteDialog.setOnClickListener(new View.OnClickListener() {
+    public void showCharacteristicWriteDialog() {
+        // if any textfields are empty, save button will be initialized to be disabled
+        updateSaveButtonState();
+
+        saveValueBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // if any textfields are empty, save button will be initialized to be disabled
-                updateSaveButtonState();
-
-                saveValueBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        writeValueToCharacteristic();
-                    }
-                });
-
-                Button cancelBtn = (Button) editableFieldsDialog.findViewById(R.id.cancel_btn);
-                cancelBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        editableFieldsDialog.dismiss();
-                    }
-                });
-
-                String serviceName = mService != null ? mService.getName().trim() : getString(R.string.unknown_service);
-                String characteristicName = mCharact != null ? mCharact.getName().trim() : getString(R.string.unknown_characteristic_label);
-                String characteristicUuid = (mCharact != null ? Common.getUuidText(mCharact.getUuid()) : mBluetoothCharact.getUuid().toString());
-
-                TextView serviceNameTextView = (TextView) editableFieldsDialog.findViewById(R.id.picker_dialog_service_name);
-                TextView characteristicTextView = (TextView) editableFieldsDialog.findViewById(R.id.characteristic_dialog_characteristic_name);
-                TextView uuidTextView = (TextView) editableFieldsDialog.findViewById(R.id.picker_dialog_characteristic_uuid);
-                serviceNameTextView.setText(serviceName);
-                characteristicTextView.setText(characteristicName);
-                uuidTextView.setText(characteristicUuid);
-
-                LinearLayout propertiesContainer = (LinearLayout) editableFieldsDialog.findViewById(R.id.picker_dialog_properties_container);
-                initPropertiesForEditableFieldsDialog(propertiesContainer);
-
-                editableFieldsDialog.show();
-                updateSaveButtonState();
+                writeValueToCharacteristic();
             }
         });
 
+        Button cancelBtn = (Button) editableFieldsDialog.findViewById(R.id.cancel_btn);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editableFieldsDialog.dismiss();
+            }
+        });
 
+        String serviceName = mService != null ? mService.getName().trim() : getString(R.string.unknown_service);
+        String characteristicName = mCharact != null ? mCharact.getName().trim() : getString(R.string.unknown_characteristic_label);
+        String characteristicUuid = mCharact != null ? Common.getUuidText(mCharact.getUuid()) : mBluetoothCharact.getUuid().toString();
+
+        TextView serviceNameTextView = (TextView) editableFieldsDialog.findViewById(R.id.picker_dialog_service_name);
+        TextView characteristicTextView = (TextView) editableFieldsDialog.findViewById(R.id.characteristic_dialog_characteristic_name);
+        TextView uuidTextView = (TextView) editableFieldsDialog.findViewById(R.id.picker_dialog_characteristic_uuid);
+        serviceNameTextView.setText(serviceName);
+        characteristicTextView.setText(characteristicName);
+        uuidTextView.setText(characteristicUuid);
+
+        LinearLayout propertiesContainer = (LinearLayout) editableFieldsDialog.findViewById(R.id.picker_dialog_properties_container);
+        initPropertiesForEditableFieldsDialog(propertiesContainer);
+
+        editableFieldsDialog.show();
+        updateSaveButtonState();
     }
 
     private void initPropertiesForEditableFieldsDialog(LinearLayout propertiesContainer) {
@@ -1230,8 +1196,6 @@ public class FragmentCharacteristicDetail extends Fragment {
 
     // Adds value edit view
     private EditText addValueEdit(final Field field, String value) {
-        fabBtnShowCharacWriteDialog.setVisibility(View.VISIBLE);
-        fabBtnShowCharacWriteDialogContainer.setVisibility(View.VISIBLE);
 
         final EditText fieldValueEdit = new EditText(context);
         fieldValueEdit.setBackgroundResource(R.drawable.edittext_custom_color);

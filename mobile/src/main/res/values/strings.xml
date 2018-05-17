@@ -346,4 +346,6 @@
     <string name="demo_light_changed_source_button">Button</string>
     <string name="demo_light_toggle_instructions">Press the bulb icon to toggle light</string>
     <string name="demo_light_changed_source_unknown">Unknown</string>
+    <string name="light_demo_connection_lost">Lost connection to remote device, leaving demo.</string>
+    <string name="light_demo_connection_lost_button">OK</string>
 </resources>
