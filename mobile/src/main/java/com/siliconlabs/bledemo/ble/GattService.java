@@ -28,18 +28,43 @@ public enum GattService {
     BatteryService(0x0000180f, "org.bluetooth.service.battery_service", GattCharacteristic.BatteryLevel),
     HudDocking(0xdc03900d, "com.sensedriver.service.hud_docking", GattCharacteristic.DockStatus),
     OtaService(0x1d14d6ee, "com.silabs.service.ota",
-               GattCharacteristic.OtaControl,
-               GattCharacteristic.OtaData,
-               GattCharacteristic.FwVersion,
-               GattCharacteristic.OtaVersion),
+            GattCharacteristic.OtaControl,
+            GattCharacteristic.OtaData,
+            GattCharacteristic.FwVersion,
+            GattCharacteristic.OtaVersion),
+    ThreadLightService("dd1c077d-d306-4b30-846a-4f55cc35767a", "custom.type",
+            GattCharacteristic.Light,
+            GattCharacteristic.TriggerSource,
+            GattCharacteristic.SourceAddress),
+    ConnectLightService("62792313-adf2-4fc9-974d-fab9ddf2622c", "custom.type",
+            GattCharacteristic.Light,
+            GattCharacteristic.TriggerSource,
+            GattCharacteristic.SourceAddress),
     ZigbeeLightService("bae55b96-7d19-458d-970c-50613d801bc9", "custom.type",
-                 GattCharacteristic.Light,
-                 GattCharacteristic.TriggerSource,
-                 GattCharacteristic.SourceAddress),
+            GattCharacteristic.Light,
+            GattCharacteristic.TriggerSource,
+            GattCharacteristic.SourceAddress),
     ProprietaryLightService("63f596e4-b583-4078-bfc3-b04225378713", "custom.type",
-                 GattCharacteristic.Light,
-                 GattCharacteristic.TriggerSource,
-                 GattCharacteristic.SourceAddress);
+            GattCharacteristic.Light,
+            GattCharacteristic.TriggerSource,
+            GattCharacteristic.SourceAddress),
+    RangeTestService("530aa649-17e6-4d62-9f20-9e393b177e63", "custom.type",
+            GattCharacteristic.RangeTestDestinationId,
+            GattCharacteristic.RangeTestSourceId,
+            GattCharacteristic.RangeTestPacketsReceived,
+            GattCharacteristic.RangeTestPacketsSend,
+            GattCharacteristic.RangeTestPacketsCount,
+            GattCharacteristic.RangeTestPacketsRequired,
+            GattCharacteristic.RangeTestPER,
+            GattCharacteristic.RangeTestMA,
+            GattCharacteristic.RangeTestChannel,
+            GattCharacteristic.RangeTestRadioMode,
+            GattCharacteristic.RangeTestFrequency,
+            GattCharacteristic.RangeTestTxPower,
+            GattCharacteristic.RangeTestPayload,
+            GattCharacteristic.RangeTestMaSize,
+            GattCharacteristic.RangeTestLog,
+            GattCharacteristic.RangeTestIsRunning);
 
 
     private static final String FORMAT_STR = "%08x-0000-1000-8000-00805f9b34fb";
@@ -47,7 +72,6 @@ public enum GattService {
 
     /**
      * The so-called "Assigned Number" of this service.
-     *
      */
     public final UUID number;
 

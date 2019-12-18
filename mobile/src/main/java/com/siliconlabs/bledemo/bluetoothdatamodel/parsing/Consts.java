@@ -52,6 +52,7 @@ public class Consts {
     public static final String TAG_MAXIMUM = "Maximum";
     public static final String TAG_P = "p";
     public static final String TAG_REFERENCE = "Reference";
+    public static final String TAG_DECIMAL_EXPONENT = "DecimalExponent";
     public static final String TAG_REQUIREMENT = "Requirement";
     public static final String TAG_CHARACTERISTICS = "Characteristics";
     public static final String TAG_DESCRIPTORS = "Descriptors";

@@ -74,7 +74,7 @@ public class LightActivityFragment extends Fragment implements LightPresenter.Vi
         if (TriggerSource.UNKNOWN.equals(source)) {
             lightSource.setText(getString(R.string.demo_light_changed_source, getString(R.string.demo_light_changed_source_unknown)));
         } else {
-            lightSource.setText(getString(R.string.demo_light_changed_source, sourceAddress));
+            lightSource.setText(getString(R.string.demo_light_changed_source, new StringBuffer(sourceAddress).reverse().toString()));
         }
     }
 

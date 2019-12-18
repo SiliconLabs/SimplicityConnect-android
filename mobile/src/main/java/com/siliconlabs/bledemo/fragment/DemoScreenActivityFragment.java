@@ -1,16 +1,16 @@
 package com.siliconlabs.bledemo.fragment;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.*;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,30 +20,27 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Optional;
+
+import com.siliconlabs.bledemo.BuildConfig;
 import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.dialogs.Dialogs;
 import com.siliconlabs.bledemo.interfaces.DemoPageLauncher;
 
 import java.util.List;
 
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Optional;
-
-import static com.siliconlabs.bledemo.fragment.DemoItemProvider.ICONS;
-import static com.siliconlabs.bledemo.fragment.DemoItemProvider.LAUNCHERS;
-import static com.siliconlabs.bledemo.fragment.DemoItemProvider.PROFILES;
-import static com.siliconlabs.bledemo.fragment.DemoItemProvider.TEXTS;
-import static com.siliconlabs.bledemo.fragment.DemoItemProvider.TITLES;
+import static com.siliconlabs.bledemo.fragment.DemoItemProvider.*;
 
 public class DemoScreenActivityFragment extends Fragment {
+
     DemoItemProvider demoItemProvider = new DemoItemProvider();
 
     private Dialog bluetoothNotSupportedDialog;
     Dialog helpDialog;
     private boolean bleIsSupported = true;
     public static final int BlUETOOTH_SETTINGS_REQUEST_CODE = 100;
-
 
     private final BroadcastReceiver bluetoothAdapterStateChangeListener = new BroadcastReceiver() {
         @Override
@@ -110,8 +107,18 @@ public class DemoScreenActivityFragment extends Fragment {
                         return;
                     }
 
-                    DemoPageLauncher launcher = LAUNCHERS.get(viewId);
-                    startApplicationMode(launcher, itemView);
+                    Activity activity = getActivity();
+                    if (activity == null) {
+                        return;
+                    }
+
+                    if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(getContext(), R.string.permissions_not_granted, Toast.LENGTH_LONG).show();
+                        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                    } else {
+                        DemoPageLauncher launcher = LAUNCHERS.get(viewId);
+                        startApplicationMode(launcher, itemView);
+                    }
                 }
             });
         }
@@ -151,6 +158,8 @@ public class DemoScreenActivityFragment extends Fragment {
         helpDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         helpDialog.setContentView(R.layout.dialog_help_demo_item);
         View okButton = helpDialog.findViewById(R.id.help_ok_button);
+        ((TextView) helpDialog.findViewById(R.id.dialog_help_version_text)).setText(getString(R.string.version_text,
+                BuildConfig.VERSION_NAME));
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,17 +181,17 @@ public class DemoScreenActivityFragment extends Fragment {
         if (!getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             bleIsSupported = false;
             bluetoothNotSupportedDialog = Dialogs.showAlert(this.getText(R.string.app_name),
-                                                            this.getText(R.string.ble_not_supported),
-                                                            getActivity(),
-                                                            getText(android.R.string.ok),
-                                                            null,
-                                                            new DialogInterface.OnClickListener() {
-                                                                public void onClick(final DialogInterface dialog,
-                                                                                    final int id) {
-                                                                    bluetoothNotSupportedDialog.dismiss();
-                                                                }
-                                                            },
-                                                            null);
+                    this.getText(R.string.ble_not_supported),
+                    getActivity(),
+                    getText(android.R.string.ok),
+                    null,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog,
+                                            final int id) {
+                            bluetoothNotSupportedDialog.dismiss();
+                        }
+                    },
+                    null);
             return true;
         }
         return false;
@@ -238,5 +247,4 @@ public class DemoScreenActivityFragment extends Fragment {
                     }
                 });
     }
-
 }

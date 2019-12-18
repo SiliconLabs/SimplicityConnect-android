@@ -124,15 +124,6 @@
                     android:textSize="@dimen/advertisement_details_device_name_text_size"
                     android:elegantTextHeight="true"/>
             </LinearLayout>
-            <CheckBox
-                android:text="OTA BEGIN"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="5dp"
-                android:id="@+id/otabegin"
-                android:gravity="center_vertical|fill"
-                android:elegantTextHeight="true"/>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -140,13 +131,13 @@
                 android:layout_height="match_parent"
                 >
 
-                <CheckBox
-                    android:text="OTA UPLOAD"
+                <TextView
+                    android:text=""
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:layout_weight="0.5"
-                    android:id="@+id/otaupload"
+                    android:id="@+id/otasteps"
                     android:elegantTextHeight="true"/>
 
                 <TextView
@@ -202,16 +193,6 @@
                     android:textStyle="bold"
                     android:elegantTextHeight="true"/>
             </LinearLayout>
-
-            <CheckBox
-                android:text="OTA END"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:shadowColor="@color/alizarin_crimson"
-                android:id="@+id/otaend"
-                android:elegantTextHeight="true"/>
 
             <Chronometer
                 android:layout_width="match_parent"

@@ -36,15 +36,22 @@
                     android:layout_height="wrap_content">
 
                     <include layout="@layout/demo_header"/>
+
+                    <include layout="@layout/demo_item"
+                            android:id="@+id/demo_range_test" />
+
                     <include layout="@layout/demo_item"
                              android:id="@+id/demo_lightbulb"/>
 
                     <include
-                        layout="@layout/demo_item"
-                        android:id="@+id/demo_retail_beacon"
-                        />
-                    <include layout="@layout/demo_item"
-                        android:id="@+id/blue_giga_debug"/>
+                            layout="@layout/demo_item"
+                            android:id="@+id/demo_retail_beacon"
+                            />
+
+                    <include
+                            layout="@layout/demo_item"
+                            android:id="@+id/blue_giga_debug"
+                            />
                 </LinearLayout>
 
                 <LinearLayout

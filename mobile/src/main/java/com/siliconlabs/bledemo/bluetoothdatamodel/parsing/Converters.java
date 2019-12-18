@@ -16,6 +16,7 @@
  */
 package com.siliconlabs.bledemo.bluetoothdatamodel.parsing;
 
+import android.support.v4.util.Pair;
 import android.text.TextUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -144,12 +145,12 @@ public class Converters {
         return result;
     }
 
-    public static byte[] convertStringTo(String input, String format) {
+    public static Pair<byte[], Boolean> convertStringTo(String input, String format) {
         if (TextUtils.isEmpty(input)) {
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), true);
         }
 
-        byte[] returnVal = null;
+        byte[] returnVal;
 
         // note that java uses big endian
         switch (format) {
@@ -160,71 +161,59 @@ public class Converters {
                 returnVal = convertToUTF16(input);
                 break;
             case "uint8":
-                returnVal = convertToUint8(input);
-                break;
+                return convertToUint8(input);
             case "uint16":
-                returnVal = convertToUint16(input);
-                break;
+                return convertToUint16(input);
             case "uint24":
-                returnVal = convertToUint24(input);
-                break;
+                return convertToUint24(input);
             case "uint32":
-                returnVal = convertToUint32(input);
-                break;
+                return convertToUint32(input);
             case "uint40":
-                returnVal = convertToUint40(input);
-                break;
+                return convertToUint40(input);
             case "uint48":
-                returnVal = convertToUint48(input);
-                break;
+                return convertToUint48(input);
             case "sint8":
-                returnVal = convertToSint8(input);
-                break;
+                return convertToSint8(input);
             case "sint16":
-                returnVal = convertToSint16(input);
-                break;
+                return convertToSint16(input);
             case "sint24":
-                returnVal = convertToSint24(input);
-                break;
+                return convertToSint24(input);
             case "sint32":
-                returnVal = convertToSint32(input);
-                break;
+                return convertToSint32(input);
             case "sint40":
-                returnVal = convertToSint40(input);
-                break;
+                return convertToSint40(input);
             case "sint48":
-                returnVal = convertToSint48(input);
-                break;
+                return convertToSint48(input);
             case "float32":
-                returnVal = convertToFloat32(input);
-                break;
+                return convertToFloat32(input);
             case "float64":
-                returnVal = convertToFloat64(input);
-                break;
+                return convertToFloat64(input);
             default:
-                returnVal = input.getBytes();
+                return new Pair<>(input.getBytes(), true);
         }
 
-        return returnVal;
+        return new Pair<>(returnVal, true);
     }
 
-    public static byte[] convertToFloat32(String input) {
+    public static Pair<byte[], Boolean> convertToFloat32(String input) {
         try {
             float floatVal = Float.parseFloat(input);
+
             int intBits = Float.floatToIntBits(floatVal);
             byte[] returnVal = new byte[4];
             returnVal[0] = (byte) (intBits & 0xff);
             returnVal[1] = (byte) ((intBits >>> 8) & 0xff);
             returnVal[2] = (byte) ((intBits >>> 16) & 0xff);
             returnVal[3] = (byte) ((intBits >>> 24) & 0xff);
-            return returnVal;
+
+            return new Pair<>(returnVal, true);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToFloat64(String input) {
+    public static Pair<byte[], Boolean> convertToFloat64(String input) {
         try {
             double floatVal = Double.parseDouble(input);
             long longBits = Double.doubleToLongBits(floatVal);
@@ -237,28 +226,33 @@ public class Converters {
             returnVal[5] = (byte) ((longBits >>> 40) & 0xff);
             returnVal[6] = (byte) ((longBits >>> 48) & 0xff);
             returnVal[7] = (byte) ((longBits >>> 56) & 0xff);
-            return returnVal;
+
+            return new Pair<>(returnVal, true);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToSint8(String input) {
+
+
+    public static Pair<byte[], Boolean> convertToSint8(String input) {
         try {
             int val = Integer.parseInt(input);
 
             byte[] returnVal = new byte[1];
             returnVal[0] = (byte) (val & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(-128, 127, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToSint16(String input) {
+    public static Pair<byte[], Boolean> convertToSint16(String input) {
         try {
             int val = Integer.parseInt(input);
 
@@ -266,14 +260,16 @@ public class Converters {
             returnVal[0] = (byte) (val & 0xFF);
             returnVal[1] = (byte) ((val >>> 8) & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(-32768, 32767, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToSint24(String input) {
+    public static Pair<byte[], Boolean> convertToSint24(String input) {
         try {
             int val = Integer.parseInt(input);
 
@@ -282,14 +278,16 @@ public class Converters {
             returnVal[1] = (byte) ((val >>> 8) & 0xFF);
             returnVal[2] = (byte) ((val >>> 16) & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(-8388608, 8388607, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToSint32(String input) {
+    public static Pair<byte[], Boolean> convertToSint32(String input) {
         try {
             long val = Long.parseLong(input);
 
@@ -299,14 +297,16 @@ public class Converters {
             returnVal[2] = (byte) ((val >>> 16) & 0xFF);
             returnVal[3] = (byte) ((val >>> 24) & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(-2147483648L, 2147483647L, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToSint40(String input) {
+    public static Pair<byte[], Boolean> convertToSint40(String input) {
         try {
             long val = Long.parseLong(input);
 
@@ -317,14 +317,16 @@ public class Converters {
             returnVal[3] = (byte) ((val >>> 24) & 0xFF);
             returnVal[4] = (byte) ((val >>> 32) & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(-140737488355328L, 140737488355327L, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToSint48(String input) {
+    public static Pair<byte[], Boolean> convertToSint48(String input) {
         try {
             long val = Long.parseLong(input);
 
@@ -336,28 +338,32 @@ public class Converters {
             returnVal[4] = (byte) ((val >>> 32) & 0xFF);
             returnVal[5] = (byte) ((val >>> 40) & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(-140737488355328L, 140737488355327L, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToUint8(String input) {
+    public static Pair<byte[], Boolean> convertToUint8(String input) {
         try {
             int val = Integer.parseInt(input);
 
             byte[] returnVal = new byte[1];
             returnVal[0] = (byte) (val & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(0, 255, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToUint16(String input) {
+    public static Pair<byte[], Boolean> convertToUint16(String input) {
         try {
             int val = Integer.parseInt(input);
 
@@ -365,14 +371,16 @@ public class Converters {
             returnVal[0] = (byte) (val & 0xFF);
             returnVal[1] = (byte) ((val >>> 8) & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(0, 65535, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToUint24(String input) {
+    public static Pair<byte[], Boolean> convertToUint24(String input) {
         try {
             int val = Integer.parseInt(input);
 
@@ -381,14 +389,16 @@ public class Converters {
             returnVal[1] = (byte) ((val >>> 8) & 0xFF);
             returnVal[2] = (byte) ((val >>> 16) & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(0, 16777215L, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToUint32(String input) {
+    public static Pair<byte[], Boolean> convertToUint32(String input) {
         try {
             long val = Long.parseLong(input);
 
@@ -398,14 +408,16 @@ public class Converters {
             returnVal[2] = (byte) ((val >>> 16) & 0xFF);
             returnVal[3] = (byte) ((val >>> 24) & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(0, 4294967295L, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToUint40(String input) {
+    public static Pair<byte[], Boolean> convertToUint40(String input) {
         try {
             long val = Long.parseLong(input);
 
@@ -416,14 +428,16 @@ public class Converters {
             returnVal[3] = (byte) ((val >>> 24) & 0xFF);
             returnVal[4] = (byte) ((val >>> 32) & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(0, 281474976710655L, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
-    public static byte[] convertToUint48(String input) {
+    public static Pair<byte[], Boolean> convertToUint48(String input) {
         try {
             long val = Long.parseLong(input);
 
@@ -435,10 +449,12 @@ public class Converters {
             returnVal[4] = (byte) ((val >>> 32) & 0xFF);
             returnVal[5] = (byte) ((val >>> 40) & 0xFF);
 
-            return returnVal;
+            Boolean inRage = isValueInRange(0, 281474976710655L, val);
+
+            return new Pair<>(returnVal, inRage);
         } catch (Exception e) {
             e.printStackTrace();
-            return input.getBytes();
+            return new Pair<>(input.getBytes(), false);
         }
     }
 
@@ -462,5 +478,13 @@ public class Converters {
             e.printStackTrace();
         }
         return returnVal;
+    }
+
+    private static boolean isValueInRange(int min, int max, int val) {
+        return max > min ? val >= min && val <= max : val >= max && val <= min;
+    }
+
+    private static boolean isValueInRange(long min, long max, long val) {
+        return max > min ? val >= min && val <= max : val >= max && val <= min;
     }
 }

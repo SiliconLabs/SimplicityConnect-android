@@ -10,7 +10,7 @@
         android:gravity="left|center_vertical"
         android:textSize="@dimen/help_dialog_title_text_size"
         android:textStyle="bold"
-        android:layout_marginLeft="@dimen/help_text_padding"
+        android:paddingStart="@dimen/help_text_padding"
         android:text="@string/help"/>
 
     <ScrollView
@@ -35,8 +35,22 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/help_text_v02"
+                android:text="@string/help_text_v03"
                 android:layout_marginTop="@dimen/help_section_and_body_separation"
+                android:textSize="@dimen/help_text_size"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/help_text_v03_1"
+                android:layout_marginTop="@dimen/help_section_and_body_separation"
+                android:textSize="@dimen/help_text_size"/>
+
+            <TextView
+                android:autoLink="web"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/help_text_v03_2"
                 android:textSize="@dimen/help_text_size"/>
 
             <TextView

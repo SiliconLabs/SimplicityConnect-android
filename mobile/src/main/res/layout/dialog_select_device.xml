@@ -8,6 +8,15 @@
 
     <include layout="@layout/include_device_list_header"/>
 
+    <ImageView
+        android:id="@+id/progress_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/item_margin"
+        android:layout_marginBottom="@dimen/item_margin"
+        android:src="@drawable/progress_spinner_ring" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@android:id/list"
         android:layout_width="match_parent"

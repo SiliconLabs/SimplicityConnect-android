@@ -60,7 +60,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
             case R.id.rssi_radio:
                 //...
                 if(!Bonded.isChecked()) {
-                    ((MainActivityDebugMode) getActivity()).sortlist(2);
+                    ((MainActivityDebugMode) getActivity()).sortlist(4);
                     //Log.d("SearchFragment","rssi_radio depressed");
                 } else {
                     ((MainActivityDebugMode) getActivity()).sortlist(0);

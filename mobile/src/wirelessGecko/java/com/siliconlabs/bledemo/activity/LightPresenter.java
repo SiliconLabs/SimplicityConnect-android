@@ -72,6 +72,12 @@ class LightPresenter {
         if (gattService == GattService.ProprietaryLightService && value.equals(TriggerSource.ZIGBEE)) {
             triggerSource = TriggerSource.PROPRIETARY;
         }
+        else if(gattService == GattService.ConnectLightService){
+            triggerSource = TriggerSource.CONNECT;
+        }
+        else if(gattService == GattService.ThreadLightService){
+            triggerSource = TriggerSource.THREAD;
+        }
         view.showTriggerSourceIcon(triggerSource);
     }
 

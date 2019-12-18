@@ -12,8 +12,10 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.util.Pair;
 import android.text.Editable;
 import android.text.Html;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -57,13 +59,16 @@ import com.siliconlabs.bledemo.services.BluetoothLeService;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
 import timber.log.Timber;
+import static java.lang.StrictMath.abs;
 
 public class FragmentCharacteristicDetail extends Fragment {
     //padding
@@ -141,7 +146,8 @@ public class FragmentCharacteristicDetail extends Fragment {
     Dialog editableFieldsDialog;
     LinearLayout writableFieldsContainer;
     Button saveValueBtn;
-
+    HashMap<Field, Boolean> fieldsInRangeMap;
+    HashMap<Field, Boolean> fieldsValidMap;
 
     public FragmentCharacteristicDetail() {
 
@@ -204,6 +210,9 @@ public class FragmentCharacteristicDetail extends Fragment {
 
     // Builds activity UI based on characteristic content
     private void loadValueViews() {
+        fieldsInRangeMap = new HashMap<>();
+        fieldsValidMap = new HashMap<>();
+
         valuesLayout.removeAllViews();
         if (!isRawValue) {
             if (parseProblem || !addNormalValue()) {
@@ -302,32 +311,61 @@ public class FragmentCharacteristicDetail extends Fragment {
             String hex = hexEdit.getText().toString().replaceAll("\\s+", "");
             byte[] newValue = hexToByteArray(hex);
             try{
-                BluetoothGattCharacteristic charac = mDevice.getService(mGattService.getUuid()).getCharacteristic(mBluetoothCharact.getUuid());
-                if (Common.isSetProperty(Common.PropertyType.WRITE, charac.getProperties()))
+                if (Common.isSetProperty(Common.PropertyType.WRITE, mBluetoothCharact.getProperties()))
                 {
-                    charac.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                    mBluetoothCharact.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
                 }
-                else if (Common.isSetProperty(Common.PropertyType.WRITE_NO_RESPONSE, charac.getProperties()))
+                else if (Common.isSetProperty(Common.PropertyType.WRITE_NO_RESPONSE, mBluetoothCharact.getProperties()))
                 {
-                    charac.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+                    mBluetoothCharact.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
                 }
 
                 Log.d("Name", "" +mDevice.getDevice().getName());
                 Log.d("Address", "" +mDevice.getDevice().getAddress());
-                Log.d("Service", "" + charac.getService().getUuid());
-                Log.d("Charac", "" + charac.getUuid());
-                charac.setValue(newValue);
-                Log.d("hex", "" + Converters.getHexValue(charac.getValue()));
-                mDevice.writeCharacteristic(charac);
+                Log.d("Service", "" + mBluetoothCharact.getService().getUuid());
+                Log.d("Charac", "" + mBluetoothCharact.getUuid());
+                mBluetoothCharact.setValue(newValue);
+                Log.d("hex", "" + Converters.getHexValue(mBluetoothCharact.getValue()));
+                mDevice.writeCharacteristic(mBluetoothCharact);
                 editableFieldsDialog.dismiss();
 
             } catch (Exception e){
                 Log.e("Service", "null" + e);
             }
         } else {
-            mBluetoothCharact.setValue(value);
-            mDevice.writeCharacteristic(mBluetoothCharact);
-            Log.d("write_val", "Standard Value to write (hex): " + Converters.getHexValue(value));
+            if(possibleToSave()){
+                mBluetoothCharact.setValue(value);
+                mDevice.writeCharacteristic(mBluetoothCharact);
+                Log.d("write_val", "Standard Value to write (hex): " + Converters.getHexValue(value));
+            }
+        }
+    }
+
+    private boolean possibleToSave() {
+        boolean validField = true;
+        for (Map.Entry<Field, Boolean> entry : fieldsValidMap.entrySet()) {
+            validField = entry.getValue();
+            if (!validField) {
+                break;
+            }
+        }
+
+        boolean entryInRange = true;
+        for (Map.Entry<Field, Boolean> entry : fieldsInRangeMap.entrySet()) {
+            entryInRange = entry.getValue();
+            if (!entryInRange) {
+                break;
+            }
+        }
+
+        if (!validField) {
+            Toast.makeText(context, context.getString(R.string.characteristic_dialog_invalid_input), Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (!entryInRange) {
+            Toast.makeText(context, context.getString(R.string.characteristic_dialog_invalid_out_of_range), Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
         }
     }
 
@@ -894,7 +932,7 @@ public class FragmentCharacteristicDetail extends Fragment {
 
         String serviceName = mService != null ? mService.getName().trim() : getString(R.string.unknown_service);
         String characteristicName = mCharact != null ? mCharact.getName().trim() : getString(R.string.unknown_characteristic_label);
-        String characteristicUuid = mCharact != null ? Common.getUuidText(mCharact.getUuid()) : mBluetoothCharact.getUuid().toString();
+        String characteristicUuid = mCharact != null ? Common.getUuidText(mCharact.getUuid()) : Common.getUuidText(mBluetoothCharact.getUuid());
 
         TextView serviceNameTextView = (TextView) editableFieldsDialog.findViewById(R.id.picker_dialog_service_name);
         TextView characteristicTextView = (TextView) editableFieldsDialog.findViewById(R.id.characteristic_dialog_characteristic_name);
@@ -1114,6 +1152,12 @@ public class FragmentCharacteristicDetail extends Fragment {
             String format = field.getFormat();
             String val = readNextValue(format);
 
+            int decimalExponentAbs = (int) abs(field.getDecimalExponent());
+            double divider = Math.pow(10, decimalExponentAbs);
+            double valDouble = Double.valueOf(val);
+            double valTmp = valDouble / divider;
+            val = Double.toString(valTmp);
+
             if (writeable) {
                 // inline field value
                 EditText fieldValueEdit = addValueEdit(field, val);
@@ -1194,6 +1238,31 @@ public class FragmentCharacteristicDetail extends Fragment {
         return fieldUnitView;
     }
 
+
+    private boolean isNumberFormat(String format){
+        switch (format) {
+            case "uint8":
+            case "uint16":
+            case "uint24":
+            case "uint32":
+            case "uint40":
+            case "uint48":
+            case "sint8":
+            case "sint16":
+            case "sint24":
+            case "sint32":
+            case "sint40":
+            case "sint48":
+            case "float32":
+            case "float64":
+                return true;
+            case "utf8s":
+            case "utf16s":
+            default:
+                return false;
+        }
+    }
+
     // Adds value edit view
     private EditText addValueEdit(final Field field, String value) {
 
@@ -1217,6 +1286,11 @@ public class FragmentCharacteristicDetail extends Fragment {
         }
         final byte[] valArr = new byte[formatLength];
 
+
+        if(isNumberFormat(field.getFormat())){
+            fieldValueEdit.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
+        }
+
         fieldValueEdit.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -1224,7 +1298,34 @@ public class FragmentCharacteristicDetail extends Fragment {
                 Arrays.fill(valArr, (byte) 0);
                 String inputVal = fieldValueEdit.getText().toString();
 
-                byte[] newVal = Converters.convertStringTo(inputVal, field.getFormat());
+                int decimalExponentAbs = (int) abs(field.getDecimalExponent());
+                String inputValMoved = inputVal;
+                if (decimalExponentAbs != 0) {
+                    int index = inputValMoved.indexOf(".");
+                    if (index != -1) {
+                        if (inputValMoved.length() - 1 - index > decimalExponentAbs) {
+                            inputValMoved = inputValMoved.replace(".", "");
+                            inputValMoved = inputValMoved.substring(0, index + decimalExponentAbs) + "." + inputValMoved.substring(index + decimalExponentAbs);
+                        } else if (inputValMoved.length() - 1 - index == decimalExponentAbs) {
+                            inputValMoved = inputValMoved.replace(".", "");
+                        } else {
+                            inputValMoved = inputValMoved.replace(".", "");
+                            for (int i = inputValMoved.length() - index; i < decimalExponentAbs; i++) {
+                                inputValMoved = inputValMoved + "0";
+                            }
+                        }
+                    } else {
+                        for (int i = 0; i < decimalExponentAbs; i++) {
+                            inputValMoved = inputValMoved + "0";
+                        }
+                    }
+                }
+
+                Pair<byte[], Boolean> pair = Converters.convertStringTo(inputValMoved, field.getFormat());
+                byte[] newVal = pair.first;
+                Boolean inRange = pair.second;
+
+
                 Log.d("write_val", "Value to write from edittext conversion (hex): " + Converters.getHexValue(newVal));
 
                 for (int i = 0; i < valArr.length; i++) {
@@ -1234,7 +1335,23 @@ public class FragmentCharacteristicDetail extends Fragment {
                 }
 
                 int off = getFieldOffset(field);
-                setValue(off, valArr);
+
+                byte[] valArrReversed = valArr.clone();
+                for (int i = 0; i < valArrReversed.length / 2; i++) {
+                    byte temp = valArrReversed[i];
+                    valArrReversed[i] = valArrReversed[valArrReversed.length - i - 1];
+                    valArrReversed[valArrReversed.length - i - 1] = temp;
+                }
+
+                fieldsInRangeMap.put(field, inRange);
+                if(isNumberFormat(field.getFormat())){
+                    fieldsValidMap.put(field, isNumeric(inputVal));
+                }
+                else {
+                    fieldsValidMap.put(field, true);
+                }
+
+                setValue(off, valArrReversed);
                 updateSaveButtonState();
             }
 
@@ -1652,6 +1769,15 @@ public class FragmentCharacteristicDetail extends Fragment {
                 writeValueToCharacteristic();
                 return true;
             }
+            return false;
+        }
+    }
+
+    private boolean isNumeric(String string) {
+        try {
+            Double.parseDouble(string);
+            return true;
+        } catch(NumberFormatException e){
             return false;
         }
     }

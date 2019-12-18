@@ -18,7 +18,7 @@
     <string name="demo_fob_title">Key Fobs</string>
     <string name="demo_fob_text">Detect and find Key Fobs via intelligent alerts.</string>
     <string name="demo_help_title">Help</string>
-    <string name="demo_help_text">Learn more about Silicon Labs Bluetooth Smart Technology</string>
+    <string name="demo_help_text">Learn more about Silicon Labs Wireless Gecko dynamic multiprotocol applications</string>
 
     <string name="htp_title">Health Thermometer Profile</string>
     <string name="htp_id">HTP</string>
@@ -47,9 +47,13 @@
     <string name="help_text_v01">Silicon Labs (NASDAQ: SLAB) is a leading provider of silicon, software and system solutions for the Internet of Things, Internet infrastructure, industrial control, consumer and automotive markets. We solve the electronics industry\'s toughest problems, providing customers with significant advantages in performance, energy savings, connectivity and design simplicity. Backed by our world-class engineering teams with unsurpassed software and mixed-signal design expertise, Silicon Labs empowers developers with the tools and technologies they need to advance quickly and easily from initial idea to final product.</string>
     <string name="help_text_v02">Quickly deliver Bluetooth® Smart connectivity with Silicon Labs Blue Gecko energy-friendly wireless system-on-chip (SoC) devices. Take advantage of a Bluetooth Smart applications, software stack and BGScript based development that transitions your software from module-based to discrete circuit designs.</string>
 
+    <string name="help_text_v03">Quickly deliver multiprotocol applications using Silicon Labs Wireless Gecko energy-friendly system-on-chip (SoC) devices and modules running the Silicon Labs’ wireless protocols software stacks</string>
+    <string name="help_text_v03_1">For more information visit:</string>
+    <string name="help_text_v03_2">www.silabs.com/products/wireless</string>
+
     <string name="help_text">Silicon Labs (NASDAQ: SLAB) is a leading provider of silicon, software and system solutions for the Internet of Things, Internet infrastructure, industrial control, consumer and automotive markets. We solve the electronics industry\'s toughest problems, providing customers with significant advantages in performance, energy savings, connectivity and design simplicity. Backed by our world-class engineering teams with unsurpassed software and mixed-signal design expertise, Silicon Labs empowers developers with the tools and technologies they need to advance quickly and easily from initial idea to final product.</string>
     <string name="version_text">Version %s</string>
-    <string name="about_silicon_labs">About Silicon Labs Blue Gecko</string>
+    <string name="about_silicon_labs">ABOUT SILICON LABS</string>
     <string name="help">Help</string>
     <string name="ok">OK</string>
 
@@ -143,6 +147,7 @@
     <string name="title_activity_device_services">Services</string>
     <string name="devices_list_list_item_default_device_name">Default Device</string>
     <string name="services_list_service_name_default">Name of Service</string>
+    <string name="permissions_not_granted">Required permissions were not granted. Please accept permissions or set them using application settings within the system settings.</string>
 
     <!-- device selection, mainactivitybluegiga.java -->
     <string name="debug_mode_device_selection_plus_btn_text">+</string>
@@ -217,6 +222,8 @@
     <string name="default_tx_value">NA</string>
     <string name="rssi_label">RSSI</string>
     <string name="tx_label">TX</string>
+    <string name="characteristic_dialog_invalid_input">Invalid input</string>
+    <string name="characteristic_dialog_invalid_out_of_range">Value out of range</string>
 
     <!-- Beacon types -->
     <string name="unspecified">Unspecified</string>

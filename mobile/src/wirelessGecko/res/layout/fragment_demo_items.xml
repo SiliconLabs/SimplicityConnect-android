@@ -25,6 +25,12 @@
             android:layout_weight="1"
             android:layout_height="0dp"/>
         <include layout="@layout/demo_item"
+            android:id="@+id/demo_range_test"/>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp"/>
+        <include layout="@layout/demo_item"
                  android:id="@+id/demo_lightbulb"
             />
         <Space

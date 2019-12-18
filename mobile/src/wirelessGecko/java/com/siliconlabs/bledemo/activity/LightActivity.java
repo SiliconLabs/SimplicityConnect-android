@@ -223,8 +223,8 @@ public class LightActivity extends BaseActivity implements LightPresenter.Blueto
             presenter.cancelPeriodicReads();
         }
         if (service != null) {
-            service.clearGatt();
             service.getConnectedGatt().close();
+            service.clearGatt();
         }
         bluetoothBinding.unbind();
     }
@@ -306,6 +306,10 @@ public class LightActivity extends BaseActivity implements LightPresenter.Blueto
             return GattService.ProprietaryLightService;
         } else if (gatt.getService(GattService.ZigbeeLightService.number) != null) {
             return GattService.ZigbeeLightService;
+        } else if (gatt.getService(GattService.ConnectLightService.number) != null) {
+            return GattService.ConnectLightService;
+        } else if (gatt.getService(GattService.ThreadLightService.number) != null) {
+            return GattService.ThreadLightService;
         }
         return null;
     }

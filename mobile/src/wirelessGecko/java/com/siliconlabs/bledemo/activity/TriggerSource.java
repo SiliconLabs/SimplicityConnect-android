@@ -11,7 +11,9 @@ public enum TriggerSource {
     BLUETOOTH(0, R.drawable.icon_bluetooth),
     ZIGBEE(1, R.drawable.icon_zigbee),
     BUTTON(2, android.R.color.transparent),
-    PROPRIETARY(5, R.drawable.icon_proprietary);
+    PROPRIETARY(5, R.drawable.icon_proprietary),
+    CONNECT(6, R.drawable.icon_connect),
+    THREAD(7, R.drawable.icon_thread);
 
     @DrawableRes
     public final int iconId;

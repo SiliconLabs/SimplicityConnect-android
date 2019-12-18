@@ -6,11 +6,10 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.os.Build;
 import android.os.Handler;
-import android.util.Log;
+import android.os.Looper;
+import timber.log.Timber;
 
 import java.util.List;
-
-import timber.log.Timber;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 class BLEScanCallbackLollipop extends ScanCallback {
@@ -19,7 +18,7 @@ class BLEScanCallbackLollipop extends ScanCallback {
 
     BLEScanCallbackLollipop(BlueToothService service) {
         this.service = service;
-        this.handler = new Handler();
+        this.handler = new Handler(Looper.getMainLooper());
     }
 
     @Override

@@ -376,6 +376,8 @@ public class BluetoothXmlParser {
                 field.setRequirement(readRequirement(parser));
             } else if (name.equals(Consts.TAG_REFERENCE)) {
                 field.setReference(readReference(parser));
+            } else if (name.equals(Consts.TAG_DECIMAL_EXPONENT)) {
+                field.setDecimalExponent(readDecimalExponent(parser));
             } else {
                 skip(parser);
             }
@@ -464,6 +466,14 @@ public class BluetoothXmlParser {
         String unit = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, Consts.TAG_REFERENCE);
         return unit;
+    }
+
+    // Reads field decimal exponent
+    private long readDecimalExponent(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, Consts.TAG_DECIMAL_EXPONENT);
+        long decimalExponent = readLong(parser);
+        parser.require(XmlPullParser.END_TAG, ns, Consts.TAG_DECIMAL_EXPONENT);
+        return decimalExponent;
     }
 
     // Reads bit field

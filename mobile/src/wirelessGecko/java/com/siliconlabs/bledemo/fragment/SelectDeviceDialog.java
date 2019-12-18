@@ -18,36 +18,28 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Pair;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.view.*;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.Optional;
 import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.activity.BaseActivity;
 import com.siliconlabs.bledemo.activity.LightActivity;
+import com.siliconlabs.bledemo.activity.RangeTestActivity;
 import com.siliconlabs.bledemo.adapters.DeviceInfoViewHolder;
 import com.siliconlabs.bledemo.adapters.ScannedDevicesAdapter;
-import com.siliconlabs.bledemo.ble.BlueToothService;
-import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
-import com.siliconlabs.bledemo.ble.Discovery;
-import com.siliconlabs.bledemo.ble.GattService;
-import com.siliconlabs.bledemo.ble.ScanResultCompat;
-import com.siliconlabs.bledemo.ble.TimeoutGattCallback;
+import com.siliconlabs.bledemo.ble.*;
+import timber.log.Timber;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.Optional;
-import timber.log.Timber;
-
-public class SelectDeviceDialog extends DialogFragment implements Discovery.BluetoothDiscoveryHost {
+public class SelectDeviceDialog extends DialogFragment implements Discovery.BluetoothDiscoveryHost, ScannedDevicesAdapter.ListItemListener {
 
     private static final String TITLE_INFO = "_title_info_";
     private static final String DESC_INFO = "_desc_info_";
@@ -88,6 +80,9 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
     @InjectView(android.R.id.list)
     RecyclerView listView;
 
+    @InjectView(R.id.progress_spinner)
+    ImageView spinnerView;
+
     @Optional
     @InjectView(android.R.id.text1)
     TextView descriptionView;
@@ -101,6 +96,8 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
     private int titleInfo;
     private int descriptionInfo;
     private List<Integer> profilesInfo;
+
+    private Animation rotateIconAnimation;
 
     TimeoutGattCallback timeoutGattCallback = new TimeoutGattCallback() {
         @Override
@@ -120,7 +117,7 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
             if (newState == BluetoothGatt.STATE_CONNECTED) {
                 ((BaseActivity) getActivity()).dismissModalDialog();
                 Intent intent = getIntent(connectType, getActivity());
-                if(intent != null) {
+                if (intent != null) {
                     bluetoothBinding.unbind();
                     startActivity(intent);
                 }
@@ -147,6 +144,7 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
             holder.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    adapter.setListItemListener(null);
                     int adapterPos = holder.getAdapterPosition();
                     if (adapterPos != RecyclerView.NO_POSITION) {
                         BluetoothDeviceInfo devInfo = (BluetoothDeviceInfo) adapter.getDevicesInfo().get(adapterPos);
@@ -156,7 +154,6 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
             });
             return holder;
         }
-
     });
 
     final Discovery discovery = new Discovery(adapter, this);
@@ -219,8 +216,9 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
         profilesInfo = arguments.getIntegerArrayList(PROFILES_INFO);
         connectType = BlueToothService.GattConnectType.values()[arguments.getInt(CONN_TYPE_INFO, 0)];
         adapter.setHasStableIds(true);
-    }
 
+        rotateIconAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_progress_dialog_spinner);
+    }
 
     @Nullable
     @Override
@@ -273,6 +271,8 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
     @Override
     public void onResume() {
         super.onResume();
+        
+        adapter.setListItemListener(this);
 
         if (BluetoothAdapter.getDefaultAdapter() != null && BluetoothAdapter.getDefaultAdapter().isEnabled() && getDialog() != null && getDialog().getWindow() != null) {
             int maxWidth = getResources().getDimensionPixelSize(R.dimen.device_selection_max_width);
@@ -297,6 +297,18 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
         }
     }
 
+    @Override
+    public void emptyItemList(boolean empty) {
+        if (empty) {
+            spinnerView.setVisibility(View.VISIBLE);
+            spinnerView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            spinnerView.startAnimation(rotateIconAnimation);
+        } else {
+            spinnerView.setVisibility(View.GONE);
+            spinnerView.clearAnimation();
+        }
+    }
+
     private void reDiscover(boolean clearCachedDiscoveries) {
         if (BluetoothAdapter.getDefaultAdapter() != null && !BluetoothAdapter.getDefaultAdapter().isEnabled()) {
             return;
@@ -304,8 +316,20 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
         startDiscovery(discovery, clearCachedDiscoveries);
     }
 
-    private void startDiscovery(Discovery discovery, boolean clearCachedDiscoveries){
-        discovery.startDiscovery(clearCachedDiscoveries, GattService.ZigbeeLightService, GattService.ProprietaryLightService);
+    private void startDiscovery(Discovery discovery, boolean clearCachedDiscoveries) {
+        switch (connectType) {
+            case RANGE_TEST:
+                discovery.clearFilters();
+                discovery.addFilter(GattService.RangeTestService);
+                discovery.startDiscovery(clearCachedDiscoveries);
+                break;
+            default:
+                discovery.clearFilters();
+                discovery.addFilter(
+                        GattService.ZigbeeLightService, GattService.ProprietaryLightService,
+                        GattService.ConnectLightService, GattService.ThreadLightService);
+                discovery.startDiscovery(clearCachedDiscoveries);
+        }
     }
 
     @Override
@@ -315,6 +339,8 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
     }
 
     private void connect(final BluetoothDeviceInfo deviceInfo) {
+        discovery.stopDiscovery(true);
+
         this.deviceInfo = deviceInfo;
         retryAttempts = 0;
         bluetoothBinding = new BlueToothService.Binding(getActivity()) {
@@ -346,14 +372,13 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
                 }, RETRY_DELAY);
             }
         });
-
-
-
     }
 
     private Intent getIntent(BlueToothService.GattConnectType connectType, FragmentActivity activity) {
         if (connectType == BlueToothService.GattConnectType.LIGHT) {
             return (new Intent(activity, LightActivity.class));
+        } else if (connectType == BlueToothService.GattConnectType.RANGE_TEST) {
+            return new Intent(activity, RangeTestActivity.class);
         }
         return null;
     }
@@ -379,6 +404,7 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
     }
 
     public static class ViewHolder extends DeviceInfoViewHolder {
+
         @InjectView(android.R.id.icon2)
         ImageView protocolIcon;
         @InjectView(android.R.id.icon)
@@ -405,14 +431,19 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
             int rssi = Math.max(0, scanInfo.getRssi() + 80);
             icon.setImageLevel(rssi);
 
-            if (scanInfo.getScanRecord().getServiceUuids().contains(new ParcelUuid(GattService.ZigbeeLightService.number))) {
-                protocolIcon.setImageResource(R.drawable.icon_zigbee);
-            } else if (scanInfo.getScanRecord().getServiceUuids().contains(new ParcelUuid(GattService.ProprietaryLightService.number))) {
-                protocolIcon.setImageResource(R.drawable.icon_proprietary);
+            if (scanInfo.getScanRecord().getServiceUuids() != null) {
+                if (scanInfo.getScanRecord().getServiceUuids().contains(new ParcelUuid(GattService.ZigbeeLightService.number))) {
+                    protocolIcon.setImageResource(R.drawable.icon_zigbee);
+                } else if (scanInfo.getScanRecord().getServiceUuids().contains(new ParcelUuid(GattService.ProprietaryLightService.number))) {
+                    protocolIcon.setImageResource(R.drawable.icon_proprietary);
+                } else if (scanInfo.getScanRecord().getServiceUuids().contains(new ParcelUuid(GattService.ConnectLightService.number))) {
+                    protocolIcon.setImageResource(R.drawable.icon_connect);
+                } else if (scanInfo.getScanRecord().getServiceUuids().contains(new ParcelUuid(GattService.ThreadLightService.number))) {
+                    protocolIcon.setImageResource(R.drawable.icon_thread);
+                }
             }
 
             itemView.setOnClickListener(this);
         }
     }
-
 }

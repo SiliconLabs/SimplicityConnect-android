@@ -34,6 +34,7 @@ public class Discovery implements BlueToothService.Listener {
     final DeviceContainer container;
 
     final List<GattService> SERVICES = new ArrayList<>();
+    final List<String> NAMES = new ArrayList<>();
 
     private BlueToothService.Binding bluetoothBinding;
     private BlueToothService blueToothService;
@@ -85,16 +86,30 @@ public class Discovery implements BlueToothService.Listener {
         blueToothService = null;
     }
 
-    public void startDiscovery(boolean clearCachedDiscoveries, GattService... services) {
-        if (clearCachedDiscoveries) {
-            container.flushContainer();
-        }
-
+    public void clearFilters() {
         SERVICES.clear();
+        NAMES.clear();
+    }
+
+    public void addFilter(GattService... services) {
         if (services != null) {
             for (GattService service : services) {
                 SERVICES.add(service);
             }
+        }
+    }
+
+    public void addFilter(String... names) {
+        if (names != null) {
+            for (String name : names) {
+                NAMES.add(name);
+            }
+        }
+    }
+
+    public void startDiscovery(boolean clearCachedDiscoveries) {
+        if (clearCachedDiscoveries) {
+            container.flushContainer();
         }
 
         if (blueToothService != null) {
@@ -148,6 +163,11 @@ public class Discovery implements BlueToothService.Listener {
             ScanFilterCompat filter = new ScanFilterCompat();
             filter.setServiceUuid(new ParcelUuid(service.number));
             filter.setServiceUuidMask(new ParcelUuid(GattService.UUID_MASK));
+            filters.add(filter);
+        }
+        for (String name : NAMES) {
+            ScanFilterCompat filter = new ScanFilterCompat();
+            filter.setDeviceName(name);
             filters.add(filter);
         }
         return filters;

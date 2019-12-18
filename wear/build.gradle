@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
-        minSdkVersion 20
-        targetSdkVersion 21
+        minSdkVersion 23
+        targetSdkVersion 28
         versionCode 3
         versionName "0.2"
     }
@@ -17,19 +17,26 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "version"
+
     productFlavors {
         blueGecko {
+            dimension "version"
             applicationId "com.siliconlabs.bledemo"
         }
         wirelessGecko {
+            dimension "version"
             applicationId "com.siliconlabs.wirelessgecko"
         }
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.android.support:wearable:1.4.0'
-    compile 'com.google.android.gms:play-services-wearable:10.0.1'
-    compile project(':libraries:materialdesign')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    compileOnly 'com.google.android.wearable:wearable:2.3.0'
+    implementation 'com.google.android.support:wearable:2.3.0'
+    implementation 'com.google.android.gms:play-services-wearable:16.0.1'
+    implementation project(':libraries:materialdesign')
 }

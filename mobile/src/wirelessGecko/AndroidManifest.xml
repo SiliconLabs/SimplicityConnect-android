@@ -5,10 +5,16 @@
 
     <application>
         <activity
-            android:name=".activity.LightActivity"
-            android:label="@string/demo_item_light_title"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTop"
-            />
+                android:name=".activity.LightActivity"
+                android:label="@string/demo_item_light_title"
+                android:screenOrientation="portrait"
+                android:launchMode="singleTop"
+                />
+        <activity
+                android:name=".activity.RangeTestActivity"
+                android:label="@string/demo_item_range_title"
+                android:screenOrientation="portrait"
+                android:launchMode="singleTop"
+                />
     </application>
 </manifest>

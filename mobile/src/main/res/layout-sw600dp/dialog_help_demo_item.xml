@@ -36,7 +36,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/help_section_and_body_separation"
-                android:text="@string/help_text_v02"
+                android:text="@string/help_text_v03"
+                android:textSize="@dimen/help_text_size" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/help_section_and_body_separation"
+                android:text="@string/help_text_v03_1"
+                android:textSize="@dimen/help_text_size" />
+
+            <TextView
+                android:autoLink="web"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/help_text_v03_2"
                 android:textSize="@dimen/help_text_size" />
 
             <TextView

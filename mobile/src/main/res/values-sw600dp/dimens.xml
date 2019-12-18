@@ -4,6 +4,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!-- Styles -->
+    <dimen name="text_size_increased_twice">24sp</dimen>
     <dimen name="text_size_headline">24sp</dimen>
     <dimen name="text_size_subhead">16sp</dimen>
     <dimen name="text_size_tab">16sp</dimen>
@@ -159,7 +160,7 @@
     <dimen name="demo_item_home_icon_height">144dp</dimen>
     <dimen name="demo_item_cardview_horizontal_margin">24dp</dimen>
     <dimen name="demo_item_cardview_margin_bottom">20dp</dimen>
-    <dimen name="demo_item_text_label_container_padding">24dp</dimen>
+    <dimen name="demo_item_text_label_container_padding">18dp</dimen>
     <dimen name="help_item_icon_width">112dp</dimen>
     <dimen name="help_item_icon_height">112dp</dimen>
     <dimen name="item_padding">16dp</dimen>
@@ -258,47 +259,47 @@
     <dimen name="debug_mode_device_selection_snackbar_padding">25dp</dimen>
 
     <!-- Services list/Service item-->
-    <dimen name="service_header_label_margin_top">24dp</dimen>
-    <dimen name="service_header_label_margin_left">10dp</dimen>
-    <dimen name="service_header_label_margin_bottom">24dp</dimen>
+    <dimen name="service_header_label_margin_top">12dp</dimen>
+    <dimen name="service_header_label_margin_left">5dp</dimen>
+    <dimen name="service_header_label_margin_bottom">12dp</dimen>
     <dimen name="list_item_service_card_corner_radius">5dp</dimen>
-    <dimen name="list_item_service_card_margin">10dp</dimen>
+    <dimen name="list_item_service_card_margin">5dp</dimen>
     <dimen name="service_selection_cardview_margin">5dp</dimen>
-    <dimen name="service_selection_cardview_margin_left">10dp</dimen>
-    <dimen name="service_selection_cardview_margin_right">10dp</dimen>
-    <dimen name="service_selection_cardview_elevation">15dp</dimen>
+    <dimen name="service_selection_cardview_margin_left">5dp</dimen>
+    <dimen name="service_selection_cardview_margin_right">5dp</dimen>
+    <dimen name="service_selection_cardview_elevation">8dp</dimen>
     <dimen name="service_selection_cardview_corner_radius">3dp</dimen>
-    <dimen name="service_selection_service_info_textview_padding">10dp</dimen>
+    <dimen name="service_selection_service_info_textview_padding">5dp</dimen>
 
     <!-- Characteristic item -->
     <dimen name="writable_characteristic_fab_btn_container_width">60dp</dimen>
     <dimen name="writable_characteristic_fab_btn_container_height">60dp</dimen>
-    <dimen name="characteristic_item_container_padding">10dp</dimen>
+    <dimen name="characteristic_item_container_padding">5dp</dimen>
     <dimen name="characteristic_caret_container_width">50dp</dimen>
-    <dimen name="characteristic_caret_width">30dp</dimen>
-    <dimen name="characteristic_caret_height">30dp</dimen>
-    <dimen name="characteristic_caret_btn_width">30dp</dimen>
-    <dimen name="characteristic_caret_btn_height">30dp</dimen>
-    <dimen name="characteristic_info_text_margin_left">10dp</dimen>
-    <dimen name="characteristic_name_text_size">14sp</dimen>
-    <dimen name="characteristic_uuid_text_size">12sp</dimen>
-    <dimen name="characteristic_uuid_label_text_size">10sp</dimen>
-    <dimen name="characteristic_property_padding_right">10dp</dimen>
-    <dimen name="characteristics_separator_margin_left">15dp</dimen>
-    <dimen name="characteristics_separator_margin_right">15dp</dimen>
-    <dimen name="submenu_spinner_item_text_size">16sp</dimen>
-    <dimen name="services_header_label_text_size">16sp</dimen>
-    <dimen name="services_header_label_padding">16dp</dimen>
+    <dimen name="characteristic_caret_width">25dp</dimen>
+    <dimen name="characteristic_caret_height">25dp</dimen>
+    <dimen name="characteristic_caret_btn_width">25dp</dimen>
+    <dimen name="characteristic_caret_btn_height">25dp</dimen>
+    <dimen name="characteristic_info_text_margin_left">8dp</dimen>
+    <dimen name="characteristic_name_text_size">12sp</dimen>
+    <dimen name="characteristic_uuid_text_size">10sp</dimen>
+    <dimen name="characteristic_uuid_label_text_size">8sp</dimen>
+    <dimen name="characteristic_property_padding_right">8dp</dimen>
+    <dimen name="characteristics_separator_margin_left">12dp</dimen>
+    <dimen name="characteristics_separator_margin_right">12dp</dimen>
+    <dimen name="submenu_spinner_item_text_size">14sp</dimen>
+    <dimen name="services_header_label_text_size">14sp</dimen>
+    <dimen name="services_header_label_padding">14dp</dimen>
     <dimen name="service_caret_container_width">50dp</dimen>
-    <dimen name="service_caret_width">30dp</dimen>
-    <dimen name="service_caret_height">30dp</dimen>
-    <dimen name="service_caret_btn_width">30dp</dimen>
-    <dimen name="service_caret_btn_height">30dp</dimen>
+    <dimen name="service_caret_width">25dp</dimen>
+    <dimen name="service_caret_height">25dp</dimen>
+    <dimen name="service_caret_btn_width">25dp</dimen>
+    <dimen name="service_caret_btn_height">25dp</dimen>>
     <dimen name="service_info_container_margin_left">10dp</dimen>
-    <dimen name="name_of_service_text_size">16sp</dimen>
-    <dimen name="default_uuid_of_service_text_size">14sp</dimen>
-    <dimen name="uuid_label_of_service_text_size">12sp</dimen>
-    <dimen name="services_spacing">20dp</dimen>
+    <dimen name="name_of_service_text_size">12sp</dimen>
+    <dimen name="default_uuid_of_service_text_size">12sp</dimen>
+    <dimen name="uuid_label_of_service_text_size">10sp</dimen>
+    <dimen name="services_spacing">10dp</dimen>
     <dimen name="prop_icon_edge_length">24dp</dimen>
 
     <!-- Scanning state help message-->
@@ -315,7 +316,7 @@
     <dimen name="debug_mode_main_no_devices_text_size">22sp</dimen>
 
     <!-- General list item devices/services/characteristics -->
-    <dimen name="list_item_extra_vertical_padding">24dp</dimen>
+    <dimen name="list_item_extra_vertical_padding">12dp</dimen>
 
     <!-- General-->
     <dimen name="item_margin">24dp</dimen>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_margin"
+            android:background="@color/gallery">
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Body"
+                android:textSize="@dimen/text_size_caption"
+                android:lines="1"
+                android:textAllCaps="true"
+                android:text="@string/demo_item_range_title"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:layout_gravity="center_vertical"
+                android:paddingEnd="24dp"
+                style="@style/HeadLine"
+                android:textSize="@dimen/text_size_subhead"
+                android:text="@string/demo_range_select_mode"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+        <TextView
+                android:text="@string/range_device_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+        <TextView
+                android:text="---"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:id="@+id/range_mode_device_name"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+        <TextView
+                android:text="---dBm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/range_mode_tx_power"/>
+
+        <TextView
+                android:text="---"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textAllCaps="true"
+                android:id="@+id/range_mode_device_number"/>
+    </LinearLayout>
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@drawable/range_item_separator"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/range_mode_tx"
+            android:paddingEnd="24dp"
+            android:paddingStart="24dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+        <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                >
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    >
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/range_test_demo"
+                        android:background="@drawable/range_mode_bg_red"
+                        android:layout_gravity="center_vertical"
+                        android:adjustViewBounds="true"
+                        android:padding="16dp"/>
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/red_arrow"
+                        android:layout_gravity="center_vertical"
+                        android:layout_margin="8dp"/>
+            </LinearLayout>
+        </FrameLayout>
+
+        <TextView
+                android:text="@string/demo_range_mode_tx"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                />
+
+    </LinearLayout>
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@drawable/range_item_separator"
+            android:layout_weight="2"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/range_mode_rx"
+            android:paddingEnd="24dp"
+            android:paddingStart="24dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+        <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                >
+
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    >
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/range_test_demo"
+                        android:background="@drawable/range_mode_bg_blue"
+                        android:layout_gravity="center_vertical"
+                        android:adjustViewBounds="true"
+                        android:padding="16dp"/>
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/blue_arrow"
+                        android:scaleY="-1"
+                        android:layout_gravity="center_vertical"
+                        android:layout_margin="8dp"/>
+            </LinearLayout>
+        </FrameLayout>
+
+        <TextView
+                android:text="@string/demo_range_mode_rx"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                />
+    </LinearLayout>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+    </LinearLayout>
+
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@drawable/range_item_separator"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/debug_mode_dialog_button_selector"
+            android:gravity="center"
+            android:text="@string/dialog_device_filter_cancel_button"
+            android:textAllCaps="true"
+            android:textColor="@color/dialog_btn_text"
+            android:id="@+id/range_mode_cancel"/>
+</LinearLayout>

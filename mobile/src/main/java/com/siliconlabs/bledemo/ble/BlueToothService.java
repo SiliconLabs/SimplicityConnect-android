@@ -1,22 +1,10 @@
 package com.siliconlabs.bledemo.ble;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
+import android.bluetooth.*;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanSettings;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
@@ -25,29 +13,19 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.siliconlabs.bledemo.utils.LocalService;
+import timber.log.Timber;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
-import timber.log.Timber;
 
 /**
  * Service handling Bluetooth (regular and BLE) communcations.
  */
 public class BlueToothService extends LocalService<BlueToothService> {
+
     // Discovery (of all devices) is cancelled after DISCOVERY_MAX_TIMEOUT milliseconds.
     private static final int DISCOVERY_MAX_TIMEOUT = 10000;
     // If connection is not successfully established or error message received after CONNECTION_TIMEOUT milliseconds.
@@ -61,6 +39,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
     private static final String TAG = BlueToothService.class.getSimpleName();
 
     public static abstract class Binding extends LocalService.Binding<BlueToothService> {
+
         public Binding(Context context) {
             super(context);
         }
@@ -72,10 +51,11 @@ public class BlueToothService extends LocalService<BlueToothService> {
     }
 
     public enum GattConnectType {
-        THERMOMETER, LIGHT
+        THERMOMETER, LIGHT, RANGE_TEST
     }
 
     public static class Receiver extends BroadcastReceiver {
+
         static final AtomicInteger currentState = new AtomicInteger(0);
         static final List<BlueToothService> registeredServices = new ArrayList<>();
 
@@ -109,6 +89,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
     }
 
     public interface Listener {
+
         /**
          * If this returns a non-empty list, scanned devices will be matched by the
          * return filters. A device will be scanned and recognized if it advertisement matches
@@ -237,7 +218,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
         @Override
         public void run() {
             if (bluetoothGatt != null) {
-                Log.d("timeout","called");
+                Log.d("timeout", "called");
                 bluetoothGatt.disconnect();
                 bluetoothGatt.close();
                 if (extraCallback != null) {
@@ -377,6 +358,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
      * {@link BlueToothService.Listener}.
      *
      * @param clearCache True if the cache/list of the currently discovered devices should be cleared.
+     *
      * @return True if discovery started.
      */
     public boolean discoverDevicesOfInterest(boolean clearCache) {
@@ -404,13 +386,12 @@ public class BlueToothService extends LocalService<BlueToothService> {
         return true;
     }
 
-    public void clearCache(){ //TODO Created to clean services cache
+    public void clearCache() { //TODO Created to clean services cache
 
         synchronized (discoveredDevices) {
             discoveredDevices.clear();
             interestingDevices.clear();
         }
-
     }
 
     /**
@@ -422,6 +403,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
      * {@link BlueToothService.Listener}.
      *
      * @param clearCache True if the cache/list of the currently discovered devices should be cleared.
+     *
      * @return True if device is known and is starting. False if it is not known and discovery is started.
      */
     public boolean startOrDiscoverDeviceOfInterest(boolean clearCache) {
@@ -465,7 +447,6 @@ public class BlueToothService extends LocalService<BlueToothService> {
             discoveryTimeout.run();
         }
     }
-
 
     /**
      * If the call {@link #startOrDiscoverDeviceOfInterest(boolean)} returned true, a device is currently connected or about to be connected.
@@ -771,6 +752,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
      * Returns false when not sure.
      *
      * @param device The device
+     *
      * @return True if device is a of interest.
      */
     private boolean isDeviceInteresting(BluetoothDevice device) {
@@ -790,6 +772,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
      * Returns false when not sure.
      *
      * @param device The device
+     *
      * @return True if the device is not interesting.
      */
     private boolean isDeviceNotInteresting(BluetoothDevice device) {
@@ -841,7 +824,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
         }
 
         Timber.d("scanDiscoveredDevices called: Next up is " + devInfo.device.getAddress());
-        Log.d("scanDiscoveredDevices"," called: Next up is " + devInfo.device.getAddress());
+        Log.d("scanDiscoveredDevices", " called: Next up is " + devInfo.device.getAddress());
         return true;
     }
 
@@ -970,9 +953,10 @@ public class BlueToothService extends LocalService<BlueToothService> {
         handler.removeCallbacks(rssiUpdate);
         handler.removeCallbacks(connectionTimeout);
         if (bluetoothGatt != null) {
-            Log.d("clearGatt","called");
+            Log.d("clearGatt", "called");
             bluetoothGatt.disconnect();
-            // You must call close in the state callback so we will do so there.
+            bluetoothGatt.close();
+            bluetoothGatt = null;
         }
     }
 
@@ -997,17 +981,15 @@ public class BlueToothService extends LocalService<BlueToothService> {
         }
     }
 
-    private void refreshGattDB(final BluetoothGatt gatt)
-    {
-        while(!refreshDeviceCache(gatt));
+    private void refreshGattDB(final BluetoothGatt gatt) {
+        while (!refreshDeviceCache(gatt)) ;
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 gatt.discoverServices();
             }
-        },500);
-
+        }, 500);
     }
 
     private boolean refreshDeviceCache(BluetoothGatt gatt) {
@@ -1042,11 +1024,12 @@ public class BlueToothService extends LocalService<BlueToothService> {
 
     public boolean connectGatt(BluetoothDevice device, boolean requestRssiUpdates, @Nullable TimeoutGattCallback callback) {
         stopDiscovery();
+
         List<BluetoothDevice> devices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
         if (callback != null) {
             extraCallback = callback;
         }
-        if (devices.contains(device)){
+        if (devices.contains(device)) {
             if (bluetoothGatt != null) {
                 if (bluetoothGatt.getDevice().equals(device)) {
                     if (requestRssiUpdates) {
@@ -1060,7 +1043,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
         }
         clearGatt();
 
-        bluetoothGatt = device.connectGatt(this, false, new BluetoothGattCallback() {
+        BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
             @Override
             public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
                 super.onConnectionStateChange(gatt, status, newState);
@@ -1072,7 +1055,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
                 if (newState == BluetoothProfile.STATE_DISCONNECTED) {
 
                     try {
-                        bluetoothGatt.close();
+                        gatt.close();
                     } catch (Exception e) {
                         Log.d(TAG, "close ignoring: " + e);
                     }
@@ -1150,7 +1133,13 @@ public class BlueToothService extends LocalService<BlueToothService> {
                     extraCallback.onCharacteristicChanged(gatt, characteristic);
                 }
             }
-        });
+        };
+
+        if (useBLE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            bluetoothGatt = device.connectGatt(this, false, gattCallback, BluetoothDevice.TRANSPORT_LE);
+        } else {
+            bluetoothGatt = device.connectGatt(this, false, gattCallback);
+        }
 
         handler.postDelayed(connectionTimeout, CONNECTION_TIMEOUT);
 
@@ -1164,6 +1153,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
     }
 
     private static class Listeners extends ArrayList<Listener> implements Listener {
+
         List<?> getScanFilterL() {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 return null;

@@ -32,13 +32,14 @@ public class Field {
     private ArrayList<Enumeration> enumerations;
     private BitField bitfield;
     private ArrayList<Field> referenceFields;
+    private long decimalExponent = 0;
 
     public Field() {
         referenceFields = new ArrayList<Field>();
     }
 
     public Field(String name, String unit, String format, String type, String requirement, String reference,
-            int minimum, int maximum, ArrayList<Enumeration> enumerations, BitField bitfield) {
+            int minimum, int maximum, ArrayList<Enumeration> enumerations, BitField bitfield, int decimalExponent) {
         this.name = name;
         this.unit = unit;
         this.format = format;
@@ -49,6 +50,7 @@ public class Field {
         this.bitfield = bitfield;
         this.requirement = requirement;
         this.reference = reference;
+        this.decimalExponent = decimalExponent;
     }
 
     public String getName() {
@@ -129,6 +131,14 @@ public class Field {
 
     public String getReference() {
         return reference;
+    }
+
+    public long getDecimalExponent() {
+        return decimalExponent;
+    }
+
+    public void setDecimalExponent(long decimalExponent) {
+        this.decimalExponent = decimalExponent;
     }
 
     public void setReferenceFields(ArrayList<Field> referenceFields) {

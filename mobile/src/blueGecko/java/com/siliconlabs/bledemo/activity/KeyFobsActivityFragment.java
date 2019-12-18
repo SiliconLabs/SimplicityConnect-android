@@ -137,6 +137,8 @@ public class KeyFobsActivityFragment extends Fragment implements Discovery.Bluet
 
     private void reDiscover(boolean clearCachedDiscoveries) {
         GattService[] gattServicesForKeyFobs = {/*GattService.LinkLoss,*/ GattService.ImmediateAlert/*, GattService.TxPower*/};
-        discovery.startDiscovery(clearCachedDiscoveries, gattServicesForKeyFobs);
+        discovery.clearFilters();
+        discovery.addFilter(gattServicesForKeyFobs);
+        discovery.startDiscovery(clearCachedDiscoveries);
     }
 }

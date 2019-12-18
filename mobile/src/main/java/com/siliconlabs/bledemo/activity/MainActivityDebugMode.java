@@ -100,7 +100,6 @@ public class MainActivityDebugMode extends BaseActivity implements DebugModeCall
     // static vars
     public static final String ABOUT_DIALOG_HTML_ASSET_FILE_PATH = "file:///android_asset/about.html";
     public static final int BlUETOOTH_SETTINGS_REQUEST_CODE = 100;
-    public static int SCAN_PERIOD = 8000;
     // member vars
     private boolean bleIsSupported = true;
     private boolean isBluetoothAdapterEnabled = false;
@@ -140,6 +139,7 @@ public class MainActivityDebugMode extends BaseActivity implements DebugModeCall
                         swipeRefreshLayout.setRefreshing(false);
                         stopScanningAnimation();
                         showEnableBluetoothAdapterBar();
+                        finish();
                         //flushContainer();
                         //noDevicesFound.setVisibility(View.VISIBLE);
                         break;
@@ -1041,12 +1041,6 @@ public class MainActivityDebugMode extends BaseActivity implements DebugModeCall
         devicesAdapter.setRunUpdater(true);
         // Connected devices are not deleted from list
         reDiscover(false);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                onScanningStopped();
-            }
-        }, SCAN_PERIOD);
     }
 
     private void onScanningStopped() {

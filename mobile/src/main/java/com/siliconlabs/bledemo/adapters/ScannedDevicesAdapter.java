@@ -48,7 +48,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     };
     boolean isThermometerMode = false;
     boolean isBlueGeckoTabSelected = true;
-    private int comp = 2;
+    private int comp = 4;
     private String search = null;
     private final Comparator<T> rssiComparator = new Comparator<T>() {
         @Override
@@ -80,6 +80,15 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
             return lName.compareTo(rName);
         }
     };
+
+    private final Comparator<T> timeComparator = new Comparator<T>() {
+        @Override
+        public int compare(T lhs, T rhs) {
+            final Long lTimestampNanos= lhs.scanInfo.getTimestampNanos();
+            final Long rTimestampNanos= rhs.scanInfo.getTimestampNanos();
+            return lTimestampNanos.compareTo(rTimestampNanos);
+        }
+    };
     private final Runnable delayedUpdater = new Runnable() {
         @Override
         public void run() {
@@ -88,6 +97,8 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     };
     private boolean isDebugMode = false;
     private Timer timer = new Timer();
+
+    private ListItemListener listItemListener;
 
     public void sort(int comparator) {
         comp = comparator;
@@ -103,6 +114,9 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
                 break;
             case 3:
                 sortDevices(reverseRssiComparator);
+                break;
+            case 4:
+                sortDevices(timeComparator);
                 break;
             default:
                 break;
@@ -346,6 +360,10 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
 
         sort(comp);
 
+        if (listItemListener != null) {
+            listItemListener.emptyItemList(devicesInfo.isEmpty());
+        }
+
         notifyDataSetChanged();
     }
 
@@ -402,10 +420,9 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         mostRecentInfoAge.clear();
 
         if (!devicesInfo.isEmpty()) {
-            int size = devicesInfo.size();
             Log.d("clear_devicesInfo", "Called");
             devicesInfo.clear();
-            notifyItemRangeRemoved(0, size);
+            notifyDataSetChanged();
         }
     }
 
@@ -421,5 +438,13 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
 
     public List<T> getDevicesInfo() {
         return devicesInfo;
+    }
+
+    public void setListItemListener(ListItemListener listener) {
+        this.listItemListener = listener;
+    }
+
+    public interface ListItemListener {
+        void emptyItemList(boolean empty);
     }
 }

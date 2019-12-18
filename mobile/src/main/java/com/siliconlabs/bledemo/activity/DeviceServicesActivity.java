@@ -17,6 +17,7 @@
 package com.siliconlabs.bledemo.activity;
 
 
+import android.Manifest;
 import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -36,6 +37,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -44,6 +46,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -71,6 +75,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Space;
@@ -160,20 +165,20 @@ public class DeviceServicesActivity extends AppCompatActivity {
 
     /**OTA Progress*/
     private Dialog otaProgress;
-    CheckBox otaBegin;
-    CheckBox otaupload;
-    CheckBox otaEnd;
     ProgressBar progressBar;
     Chronometer chrono;
     TextView dataRate;
     TextView datasize;
     TextView filename;
+    TextView steps;
     ProgressBar uploadimage;
     Button OTAStart;
 
 
     /**OTA Setup*/
     private Dialog otaSetup;
+    RadioButton reliabilityRB;
+    RadioButton speedRB;
     Spinner folderSpinner;
     Spinner appSpinner;
     Spinner stackSpinner;
@@ -228,6 +233,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
     boolean disconnect_gatt = false;
     boolean disconnectionTimeout = false;
     boolean homekit = false;
+    boolean doubleStepUpload = false;
 
     BluetoothGattDescriptor kit_descriptor;
 
@@ -250,7 +256,6 @@ public class DeviceServicesActivity extends AppCompatActivity {
     public LinearLayout loadingGradientContainer;
     @InjectView(R.id.loading_bar_container)
     public RelativeLayout loadingBarContainer;
-
 
     /**BLUETOOTH GATT CALLBACKS*********************************************************/
     private TimeoutGattCallback gattCallback = new TimeoutGattCallback() {
@@ -350,7 +355,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
                                                 });
                                             }
                                         }
-                                    },15000);
+                                    },25000);
                                 }
                             }; new Thread(timeout).start();
                        }
@@ -531,7 +536,6 @@ public class DeviceServicesActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         OTAStart.setBackgroundColor(getResources().getColor(R.color.alizarin_crimson));
-                                        otaEnd.setChecked(true);
                                         OTAStart.setClickable(true);
 
                                     }
@@ -583,7 +587,6 @@ public class DeviceServicesActivity extends AppCompatActivity {
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                otaupload.setChecked(true);
                                                 chrono.stop();
                                                 uploadimage.clearAnimation();
                                                 uploadimage.setVisibility(View.INVISIBLE);
@@ -803,6 +806,19 @@ public class DeviceServicesActivity extends AppCompatActivity {
             logtransaction.commit();
         }
 
+        if (Build.VERSION.SDK_INT >= 21) {
+            reScanCallback = new ScanCallback() {
+                @Override
+                public void onScanResult(int callbackType, ScanResult result) {
+                    final BluetoothDevice btDevice = result.getDevice();
+                    onScanCallback++;
+                    loadingLog.setText("Waiting to connect");
+                    reconnectGatt(btDevice);
+                    onScanCallback = 0;
+                }
+            };
+        }
+
         handler = new Handler();
         bluetoothBinding = new BlueToothService.Binding(this) {
             @Override
@@ -902,7 +918,12 @@ public class DeviceServicesActivity extends AppCompatActivity {
                 break;
             case R.id.OTA_button: //OTA MENU BUTTON
                 if (Build.VERSION.SDK_INT >= 21) {
-                    if (UICreated) OTAonClick();
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(this, R.string.permissions_not_granted, Toast.LENGTH_LONG).show();
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    } else if (UICreated) {
+                        OTAonClick();
+                    }
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -1029,9 +1050,6 @@ public class DeviceServicesActivity extends AppCompatActivity {
                 filename.setText("");
                 loadingimage.setVisibility(View.GONE);
                 loadingdialog.dismiss();
-                otaBegin.setChecked(false);
-                otaupload.setChecked(false);
-                otaEnd.setChecked(false);
                 progressBar.setProgress(0);
                 datasize.setText("0 %");
                 dataRate.setText("");
@@ -1226,7 +1244,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
             UUID uuid = services.get(position).getUuid();
             Service service = Engine.getInstance().getService(uuid);
             String serviceName = service != null ? service.getName().trim() : getString(R.string.unknown_service);
-            String serviceUuid = service != null ? Common.getUuidText(uuid) : uuid.toString();
+            String serviceUuid = Common.getUuidText(uuid);
 
             if (serviceUuid.equals(ota_service.toString())) serviceName = "OTA Service";
 
@@ -1249,7 +1267,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
                 // the wrapper characteristic is matched with accepted bt gatt profiles, provides field types/values/units
                 Characteristic charact = Engine.getInstance().getCharacteristic(bluetoothGattCharacteristic.getUuid());
                 String characteristicName = charact != null ? charact.getName().trim() : getString(R.string.unknown_characteristic_label);
-                String characteristicUuid = (charact != null ? Common.getUuidText(charact.getUuid()) : bluetoothGattCharacteristic.getUuid().toString());
+                String characteristicUuid = (charact != null ? Common.getUuidText(charact.getUuid()) : Common.getUuidText(bluetoothGattCharacteristic.getUuid()));
 
                 //TODO: They are in GattCharacteristic, but their names are not appearing
                 if (characteristicUuid.equals(ota_control.toString())) characteristicName = "OTA Control";
@@ -1426,7 +1444,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
             } else if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_READ)) {
                 iconId = R.drawable.debug_prop_read_disabled;
             } else if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_WRITE_NO_RESPONSE)) {
-                iconId = R.drawable.debug_prop_write_no_resp;
+                iconId = R.drawable.debug_prop_write_no_resp_disabled;
             } else if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_WRITE)) {
                 iconId = R.drawable.debug_prop_write_disabled;
             } else if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_NOTIFY)) {
@@ -1497,6 +1515,12 @@ public class DeviceServicesActivity extends AppCompatActivity {
                         propertyIcon.setBackgroundResource(R.drawable.debug_prop_write);
                     }
                     break;
+                case Common.PROPERTY_VALUE_WRITE_NO_RESPONSE:
+                    propertyContainer.setOnClickListener(getWritePropertyClickListener());
+                    if (propertyIcon != null) {
+                        propertyIcon.setBackgroundResource(R.drawable.debug_prop_write_no_resp);
+                    }
+                    break;
                 case Common.PROPERTY_VALUE_NOTIFY:
                     propertyContainer.setOnClickListener(getNotificationPropertyClickListener(bluetoothGattCharacteristic, propertyIcon, indicationIcon, serviceName));
                     if (propertyIcon != null && notificationState == Notifications.NOTIFY) {
@@ -1517,7 +1541,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
 
     private String getUuidFromBluetoothGattCharacteristic(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
         Characteristic characteristic = Engine.getInstance().getCharacteristic(bluetoothGattCharacteristic.getUuid());
-        return (characteristic != null ? Common.getUuidText(characteristic.getUuid()) : bluetoothGattCharacteristic.getUuid().toString());
+        return (characteristic != null ? Common.getUuidText(characteristic.getUuid()) : Common.getUuidText(bluetoothGattCharacteristic.getUuid()));
     }
 
     private ImageView getIconWithValue(LinearLayout propsContainer, String value) {
@@ -1563,6 +1587,9 @@ public class DeviceServicesActivity extends AppCompatActivity {
                     break;
                 case Common.PROPERTY_VALUE_WRITE:
                     propertyIcon.setBackgroundResource(R.drawable.debug_prop_write_disabled);
+                    break;
+                case Common.PROPERTY_VALUE_WRITE_NO_RESPONSE:
+                    propertyIcon.setBackgroundResource(R.drawable.debug_prop_write_no_resp_disabled);
                     break;
                 case Common.PROPERTY_VALUE_NOTIFY:
                     propertyIcon.setBackgroundResource(R.drawable.debug_prop_notify_disabled);
@@ -1663,16 +1690,11 @@ public class DeviceServicesActivity extends AppCompatActivity {
         otaProgress.setContentView(R.layout.ota_progress);
         TextView address = (TextView) otaProgress.findViewById(R.id.device_address);
         address.setText(bluetoothGatt.getDevice().getAddress());
-        otaBegin = (CheckBox) otaProgress.findViewById(R.id.otabegin);
-        otaBegin.setClickable(false);
-        otaupload = (CheckBox) otaProgress.findViewById(R.id.otaupload);
-        otaupload.setClickable(false);
-        otaEnd = (CheckBox) otaProgress.findViewById(R.id.otaend);
-        otaEnd.setClickable(false);
         progressBar = (ProgressBar) otaProgress.findViewById(R.id.otaprogress);
         dataRate = (TextView) otaProgress.findViewById(R.id.datarate);
         datasize = (TextView) otaProgress.findViewById(R.id.datasize);
         filename = (TextView) otaProgress.findViewById(R.id.filename);
+        steps = (TextView) otaProgress.findViewById(R.id.otasteps);
         chrono = (Chronometer) otaProgress.findViewById(R.id.chrono);
         OTAStart = (Button) otaProgress.findViewById(R.id.otabutton);
         sizename = (TextView) otaProgress.findViewById(R.id.sizename);
@@ -1708,6 +1730,8 @@ public class DeviceServicesActivity extends AppCompatActivity {
         delayText.setVisibility(View.INVISIBLE);
         delaySeekBar.setVisibility(View.GONE);
         requestMTU = (SeekBar) otaSetup.findViewById(R.id.mtu_seekBar);
+        reliabilityRB = (RadioButton) otaSetup.findViewById(R.id.reliability_radio_button);
+        speedRB = (RadioButton) otaSetup.findViewById(R.id.speed_radio_button);
 
 
         final EditText mtu_value = (EditText) otaSetup.findViewById(R.id.mtu_value);
@@ -1718,7 +1742,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
                 if (mtu_value.getText() != null) {
                     int test = Integer.valueOf(mtu_value.getText().toString());
                     if (test < 23) test = 23;
-                    else if (test > 512) test = 512;
+                    else if (test > 250) test = 250;
                     requestMTU.setProgress(test-23);
                     MTU = test;
                 }
@@ -1728,8 +1752,8 @@ public class DeviceServicesActivity extends AppCompatActivity {
         });
 
 
-        requestMTU.setMax(512-23);
-        requestMTU.setProgress(512-23);
+        requestMTU.setMax(250-23);
+        requestMTU.setProgress(250-23);
         requestMTU.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -1846,6 +1870,20 @@ public class DeviceServicesActivity extends AppCompatActivity {
             }
         });
 
+        reliabilityRB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reliable = true;
+            }
+        });
+
+        speedRB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reliable = false;
+            }
+        });
+
 
 
     }
@@ -1863,7 +1901,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(!mtuvalue.getText().toString().equals("")) {
                     int possibleMTU = Integer.parseInt(mtuvalue.getText().toString());
-                    if (possibleMTU > 513) possibleMTU = 512;
+                    if (possibleMTU > 250) possibleMTU = 250;
                     if (possibleMTU < 23) possibleMTU = 23;
                     Log.i("MTU", "Trying new value: " + possibleMTU);
 
@@ -2184,23 +2222,38 @@ public class DeviceServicesActivity extends AppCompatActivity {
                         end[k] = value[k];
                     }
                     Log.d("Progress", "sent " + (i + 1) + " / " + datathread.length + " - " + String.format("%.1f", progress) + " % - " + String.format("%.2fkbit/s", bitrate) + " - " + Converters.getHexValue(end));
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            datasize.setText(Integer.toString((int) progress) + " %");
+                            progressBar.setProgress((int) progress);
+                        }
+                    });
+
                     charac.setValue(end);
                 } else {
                     j = 0;
                     Log.d("Progress", "sent " + (i + 1) + " / " + datathread.length + " - " + String.format("%.1f", progress) + " % - " + String.format("%.2fkbit/s", bitrate) + " - " + Converters.getHexValue(value));
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            datasize.setText(Integer.toString((int) progress) + " %");
+                            progressBar.setProgress((int) progress);
+                        }
+                    });
+
                     charac.setValue(value);
                 }
 
                 if(bluetoothGatt.writeCharacteristic(charac)) {
-
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             String datarate = String.format("%.2fkbit/s", bitrate);
                             dataRate.setText(datarate);
                             //String dataSize = String.format("%.2fkbit/s", (float) datathread.length/1000);
-                            datasize.setText(Integer.toString((int) progress) + " %");
-                            progressBar.setProgress((int) progress);
                         }
                     });
 
@@ -2221,7 +2274,6 @@ public class DeviceServicesActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                otaupload.setChecked(true);
                 chrono.stop();
                 uploadimage.clearAnimation();
                 uploadimage.setVisibility(View.INVISIBLE);
@@ -2417,7 +2469,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
                 }
             });
         } else {
-            Toast.makeText(getBaseContext(), "No ebl files in this directory", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getBaseContext(), "No gbl files in this directory", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -2427,7 +2479,6 @@ public class DeviceServicesActivity extends AppCompatActivity {
         public void run() {
             chrono.setBase(SystemClock.elapsedRealtime());
             chrono.start();
-            otaBegin.setChecked(true);
         }
     };
 
@@ -2489,6 +2540,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
                             if (!stackPath.equals("")) {
                                 file = new File(stackPath);
                                 boolFullOTA = true;
+                                doubleStepUpload = true;
                             } else {
                                 file = new File(appPath);
                                 boolFullOTA = false;
@@ -2512,17 +2564,33 @@ public class DeviceServicesActivity extends AppCompatActivity {
                         if(!stackPath.equals("")) {
                             int last = stackPath.lastIndexOf(File.separator);
                             fn = stackPath.substring(last, stackPath.length());
+                            Log.d("CurrentlyUpdating","apploader");
                         } else {
                             int last = appPath.lastIndexOf(File.separator);
                             fn = appPath.substring(last, appPath.length());
+                            Log.d("CurrentlyUpdating","appliaction");
                         }
                         pack = 0;
+
+                        /**Prepare information about current upload step*/
+
+                        final String stepInfo;
+                        if(doubleStepUpload) {
+                            if(!stackPath.equals("")) {
+                                stepInfo = "1 OF 2";
+                            } else {
+                                stepInfo = "2 OF 2";
+                            }
+                        } else {
+                            stepInfo = "1 OF 1";
+                        }
 
                         /**Set info into UI OTA Progress*/
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 filename.setText(fn);
+                                steps.setText(stepInfo);
                                 sizename.setText(Integer.toString(datathread.length) + " bytes");
                                 mtuname.setText(Integer.toString(MTU));
                                 uploadimage.setVisibility(View.VISIBLE);
@@ -2657,16 +2725,8 @@ public class DeviceServicesActivity extends AppCompatActivity {
     }
 
     //Not Used - resetconnection
-    private ScanCallback reScanCallback = new ScanCallback() {
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-            final BluetoothDevice btDevice = result.getDevice();
-            onScanCallback++;
-            loadingLog.setText("Waiting to connect");
-            reconnectGatt(btDevice);
-            onScanCallback=0;
-        }
-    };
+    private ScanCallback reScanCallback;
+
     //Not Used - resetconnection
     BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
@@ -2680,17 +2740,19 @@ public class DeviceServicesActivity extends AppCompatActivity {
     };
     //Not Used - resetconnection
     private void startScanLeDevice() {
-        ScanFilter macaddress = new ScanFilter.Builder().setDeviceAddress(reconnectaddress).build();
-        ArrayList<ScanFilter> filters = new ArrayList<>();
-        filters.add(macaddress);
+        if (Build.VERSION.SDK_INT >= 21){
+            ScanFilter macaddress = new ScanFilter.Builder().setDeviceAddress(reconnectaddress).build();
+            ArrayList<ScanFilter> filters = new ArrayList<>();
+            filters.add(macaddress);
 
-        ScanSettings settings = new ScanSettings.Builder().build();
-
-        if (Build.VERSION.SDK_INT >= 21)bluetoothLeScanner.startScan(filters, settings, reScanCallback);
-        else bluetoothAdapter.startLeScan(leScanCallback);
+            ScanSettings settings = new ScanSettings.Builder().build();
+            bluetoothLeScanner.startScan(filters, settings, reScanCallback);
+        }
+        else {
+            bluetoothAdapter.startLeScan(leScanCallback);
+        }
 
         Log.d("startScanLeDevice", "Scan Started");
-
     }
 
     //Not Used - resetconnection
@@ -2793,7 +2855,9 @@ public class DeviceServicesActivity extends AppCompatActivity {
     /**CLEANS USER INTERFACE AND FINISH ACTIVITY*********************************************************/
     public void exit(BluetoothGatt gatt){
         gatt.close();
-        service.getConnectedGatt().close();
+        if (service.getConnectedGatt() != null) {
+            service.getConnectedGatt().close();
+        }
         service.clearCache();
         bluetoothBinding.unbind();
         disconnect_gatt=false;

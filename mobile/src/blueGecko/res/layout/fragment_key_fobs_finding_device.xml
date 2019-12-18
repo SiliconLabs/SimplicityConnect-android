@@ -64,7 +64,7 @@
                     android:layout_height="@dimen/finding_key_fob_rays_height"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="@dimen/finding_key_fob_rays_margin_top"
-                    android:src="@drawable/blinking_image_phone"/>
+                    android:src="@drawable/blinking_image"/>
 
                 <ImageView
                     android:id="@+id/led_bulb"
