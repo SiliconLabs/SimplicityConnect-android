@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
 import com.siliconlabs.bledemo.ble.Discovery;
+import com.siliconlabs.bledemo.utils.FilterDeviceParams;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +35,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     private final List<T> mostRecentDevicesInfo = new ArrayList<>();
     private final Map<T, Long> mostRecentInfoAge = new HashMap<>();
     private final List<T> devicesInfo = new ArrayList<>();
+    private List<T> currentDevicesInfo;
     HashMap<String, String> deviceMacAddressToName = new HashMap<>();
 
     private boolean runUpdater = true;
@@ -99,24 +101,25 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     private Timer timer = new Timer();
 
     private ListItemListener listItemListener;
+    private FilterDeviceParams filterDeviceParams;
 
-    public void sort(int comparator) {
+    public void sort(int comparator, boolean resetDeviceList) {
         comp = comparator;
         switch (comparator) {
             case 0:
-                sortDevices(itemsComparator);
+                sortDevices(itemsComparator, resetDeviceList);
                 break;
             case 1:
-                sortDevices(reverseItemsComparator);
+                sortDevices(reverseItemsComparator, resetDeviceList);
                 break;
             case 2:
-                sortDevices(rssiComparator);
+                sortDevices(rssiComparator, resetDeviceList);
                 break;
             case 3:
-                sortDevices(reverseRssiComparator);
+                sortDevices(reverseRssiComparator, resetDeviceList);
                 break;
             case 4:
-                sortDevices(timeComparator);
+                sortDevices(timeComparator, resetDeviceList);
                 break;
             default:
                 break;
@@ -191,57 +194,15 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     }
 
     public void updateWith(List<T> devicesInfo) {
-        Long now = System.currentTimeMillis(); //TODO Deleting here
-        mostRecentDevicesInfoIsDirty = true;
-
-        if ((devicesInfo != null) && !devicesInfo.isEmpty()) {
-            for (T devInfo : devicesInfo) {
-                // ignore/show blue gecko thermometer based on selected tab and thermo mode
-                /*
-                if (isThermometerMode) {
-                    String deviceAddress = devInfo.getAddress();
-                    String deviceName = deviceMacAddressToName.get(deviceAddress);
-                    deviceName = devInfo.getName();
-                    deviceMacAddressToName.put(deviceAddress, deviceName);
-
-                    boolean isBlueGecko = (!TextUtils.isEmpty(deviceName)) && (deviceName.toUpperCase().contains("BLUE GECKO") || deviceName.toUpperCase().startsWith("BG"));
-                    boolean ignoreBlueGecko = (!isBlueGeckoTabSelected) && isBlueGecko;
-                    boolean ignoreOtherThermometers = isBlueGeckoTabSelected && (!isBlueGecko);
-                    if (ignoreBlueGecko || ignoreOtherThermometers) {
-                        continue;
-                    }
-                }
-                */
-
-                T clone = (T) devInfo.clone();
-                clone.isOfInterest = true;
-                clone.isNotOfInterest = false;
-                clone.serviceDiscoveryFailed = false;
-                int index = mostRecentDevicesInfo.indexOf(clone);
-                if (index >= 0) {
-                    BluetoothDeviceInfo cachedInfo = mostRecentDevicesInfo.get(index);
-                    long timestampDiff = clone.scanInfo.getTimestampNanos() - cachedInfo.scanInfo.getTimestampNanos();
-                    if (timestampDiff != 0) {
-                        //Log.i("Time Diff", "Updated " + cachedInfo.scanInfo.getDisplayName(false));
-                        //Log.d("Timediff","" + timestampDiff);
-                        cachedInfo.scanInfo.getDisplayName(false);
-                        mostRecentDevicesInfo.set(index, clone);
-                        mostRecentInfoAge.put(devInfo, now);
-                    }
-                } else {
-                    mostRecentDevicesInfo.add(devInfo);
-                    mostRecentInfoAge.put(devInfo, now);
-                }
-            }
-        }
-
-        //Cleaning duplicated items ----------------------------------------------------------------------
-        Set<T> dedupedDeviceInfo = new HashSet<>(mostRecentDevicesInfo);
-        mostRecentDevicesInfo.clear();
-        mostRecentDevicesInfo.addAll(dedupedDeviceInfo);
-        //-----------------------------------------------------------------------------------------------------
+        this.currentDevicesInfo = devicesInfo;
         if (this.devicesInfo.isEmpty()) {
-            updateDevicesInfo();
+            if (filterDeviceParams == null || filterDeviceParams.isEmptyFilter()) {
+                updateDevicesInfo();
+            }
+            else if (!updatePending) {
+                updatePending = true;
+                handler.postDelayed(delayedUpdater, 1000);
+            }
         } else if (!updatePending && runUpdater) {
             updatePending = true;
             handler.postDelayed(delayedUpdater, DISCOVERY_UPDATE_PERIOD);
@@ -355,16 +316,71 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     }
 
     private void updateDevicesInfo() {
+        preapareDevicesInfo(this.currentDevicesInfo);
         updatePending = false;
         mostRecentDevicesInfoIsDirty = true;
-
-        sort(comp);
-
+        resetDeviceList();
+        sort(comp, false);
+        if(filterDeviceParams != null) {
+            filterDevices(filterDeviceParams, false);
+        }
         if (listItemListener != null) {
-            listItemListener.emptyItemList(devicesInfo.isEmpty());
+            listItemListener.emptyItemList(this.devicesInfo.isEmpty());
         }
 
         notifyDataSetChanged();
+    }
+
+    private void preapareDevicesInfo(List<T> devicesInfo){
+        Long now = System.currentTimeMillis(); //TODO Deleting here
+        mostRecentDevicesInfoIsDirty = true;
+
+        if ((devicesInfo != null) && !devicesInfo.isEmpty()) {
+            for (T devInfo : devicesInfo) {
+                // ignore/show blue gecko thermometer based on selected tab and thermo mode
+                /*
+                if (isThermometerMode) {
+                    String deviceAddress = devInfo.getAddress();
+                    String deviceName = deviceMacAddressToName.get(deviceAddress);
+                    deviceName = devInfo.getName();
+                    deviceMacAddressToName.put(deviceAddress, deviceName);
+
+                    boolean isBlueGecko = (!TextUtils.isEmpty(deviceName)) && (deviceName.toUpperCase().contains("BLUE GECKO") || deviceName.toUpperCase().startsWith("BG"));
+                    boolean ignoreBlueGecko = (!isBlueGeckoTabSelected) && isBlueGecko;
+                    boolean ignoreOtherThermometers = isBlueGeckoTabSelected && (!isBlueGecko);
+                    if (ignoreBlueGecko || ignoreOtherThermometers) {
+                        continue;
+                    }
+                }
+                */
+
+                T clone = (T) devInfo.clone();
+                clone.isOfInterest = true;
+                clone.isNotOfInterest = false;
+                clone.serviceDiscoveryFailed = false;
+                int index = mostRecentDevicesInfo.indexOf(clone);
+                if (index >= 0) {
+                    BluetoothDeviceInfo cachedInfo = mostRecentDevicesInfo.get(index);
+                    long timestampDiff = clone.scanInfo.getTimestampNanos() - cachedInfo.scanInfo.getTimestampNanos();
+                    if (timestampDiff != 0) {
+                        //Log.i("Time Diff", "Updated " + cachedInfo.scanInfo.getDisplayName(false));
+                        //Log.d("Timediff","" + timestampDiff);
+                        cachedInfo.scanInfo.getDisplayName(false);
+                        mostRecentDevicesInfo.set(index, clone);
+                        mostRecentInfoAge.put(devInfo, now);
+                    }
+                } else {
+                    mostRecentDevicesInfo.add(devInfo);
+                    mostRecentInfoAge.put(devInfo, now);
+                }
+            }
+        }
+
+        //Cleaning duplicated items ----------------------------------------------------------------------
+        Set<T> dedupedDeviceInfo = new HashSet<>(mostRecentDevicesInfo);
+        mostRecentDevicesInfo.clear();
+        mostRecentDevicesInfo.addAll(dedupedDeviceInfo);
+        //-----------------------------------------------------------------------------------------------------
     }
 
     private void resetDeviceList() {
@@ -393,23 +409,26 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         }
     }
 
-    public void sortDevices(Comparator<T> comparator) {
-        resetDeviceList();
+    public void sortDevices(Comparator<T> comparator, boolean resetDeviceList) {
+        if(resetDeviceList){
+            resetDeviceList();
+        }
         if (this.devicesInfo.size() > 0) {
             Collections.sort(this.devicesInfo, comparator);
         }
     }
 
-    public void filterDevices(String name,
-                              boolean filterName,
-                              int rssi,
-                              boolean filterRssi) {
-        resetDeviceList();
+    public void filterDevices(FilterDeviceParams filterDeviceParams, boolean resetDeviceList) {
+        this.filterDeviceParams = filterDeviceParams;
+        if(resetDeviceList){
+            resetDeviceList();
+        }
+        if(this.filterDeviceParams.isEmptyFilter()) return;
         for (Iterator<T> deviceIterator = devicesInfo.iterator(); deviceIterator.hasNext(); ){
             T device = deviceIterator.next();
-            if (filterName && (device.getName() == null || !device.getName().toLowerCase().contains((name.toLowerCase())))) {
+            if (filterDeviceParams.isFilterName() && (device.getName() == null || !device.getName().toLowerCase().contains((filterDeviceParams.getName().toLowerCase())))) {
                 deviceIterator.remove();
-            } else if (filterRssi && device.getRssi() < rssi) {
+            } else if (filterDeviceParams.isFilterRssi() && device.getRssi() < filterDeviceParams.getRssi()) {
                 deviceIterator.remove();
             }
         }

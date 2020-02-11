@@ -79,6 +79,7 @@ import com.siliconlabs.bledemo.dialogs.Dialogs;
 import com.siliconlabs.bledemo.fragment.LogFragment;
 import com.siliconlabs.bledemo.fragment.SearchFragment;
 import com.siliconlabs.bledemo.interfaces.DebugModeCallback;
+import com.siliconlabs.bledemo.utils.FilterDeviceParams;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -369,12 +370,6 @@ public class MainActivityDebugMode extends BaseActivity implements DebugModeCall
                 showAbout();
                 break;
 
-            case R.id.bluetooth_modules_website:
-                Intent intentBlueGigaWebsite = new Intent(Intent.ACTION_VIEW);
-                intentBlueGigaWebsite.setData(Uri.parse(Common.BLUEGIGA_URL_SILICON_LABS_OCT_2015));
-                startActivity(intentBlueGigaWebsite);
-                break;
-
             case R.id.menu_filter:
                 displayFilterDialog();
                 break;
@@ -398,19 +393,16 @@ public class MainActivityDebugMode extends BaseActivity implements DebugModeCall
         if (filterDialog == null) {
             filterDialog = new DeviceFilterDialog(this, new DeviceFilterDialog.OnSubmitListener() {
                 @Override
-                public void onSubmit(String name,
-                                     boolean filterName,
-                                     int rssi,
-                                     boolean filterRssi) {
-                    filterDevices(name, filterName, rssi, filterRssi);
+                public void onSubmit(FilterDeviceParams filterDeviceParams) {
+                    filterDevices(filterDeviceParams);
                 }
             });
         }
         filterDialog.show();
     }
 
-    void filterDevices(String name, boolean filterName, int rssi, boolean filterRssi) {
-        devicesAdapter.filterDevices(name, filterName, rssi, filterRssi);
+    void filterDevices(FilterDeviceParams filterDeviceParams) {
+        devicesAdapter.filterDevices(filterDeviceParams, true);
         devicesAdapter.setDebugMode();
         devicesRecyclerView.setAdapter(devicesAdapter);
         devicesRecyclerView.setHasFixedSize(true);
@@ -575,7 +567,7 @@ public class MainActivityDebugMode extends BaseActivity implements DebugModeCall
 
     public void sortlist(int comparator) {
         //Log.i("MADM","sortlist");
-        devicesAdapter.sort(comparator);
+        devicesAdapter.sort(comparator, true);
         devicesAdapter.setDebugMode();
         devicesRecyclerView.setAdapter(devicesAdapter);
         devicesRecyclerView.setHasFixedSize(true);

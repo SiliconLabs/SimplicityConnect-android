@@ -100,7 +100,6 @@
     <string name="demo_item_debug_mode_title">Bluetooth Browser</string> <!-- JCS 11/22/16 - Former BLE Stack &amp Profile Test -->
     <string name="demo_item_debug_mode_description">View info about nearby devices and their properties.</string>
     <string name="developer_debug_mode_actionbar_title">Bluetooth Browser</string> <!-- JCS 11/22/16 - Former BLE Stack &amp Profile Test -->
-    <string name="about_blue_gecko_menu_label">About Blue Gecko</string>
     <string name="about_menu_label">License</string>
     <string name="ble_not_supported">Your device does not support Bluetooth Low Energy technology. Application will be closed! </string>
     <string name="rssi">RSSI: </string>

@@ -38,13 +38,8 @@
         android:visible="false"
         app:showAsAction="never" />
     <item
-        android:id="@+id/bluetooth_modules_website"
-        android:orderInCategory="101"
-        android:title="@string/about_blue_gecko_menu_label"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/menu_item_license"
-        android:orderInCategory="102"
+        android:orderInCategory="101"
         android:title="@string/about_menu_label"
         app:showAsAction="never" />
 </menu>

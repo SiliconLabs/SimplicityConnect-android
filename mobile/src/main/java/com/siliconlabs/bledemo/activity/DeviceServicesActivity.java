@@ -99,6 +99,7 @@ import com.siliconlabs.bledemo.fragment.FragmentCharacteristicDetail;
 import com.siliconlabs.bledemo.fragment.LogFragmentConnected;
 import com.siliconlabs.bledemo.utils.BLEUtils;
 import com.siliconlabs.bledemo.utils.BLEUtils.Notifications;
+import com.siliconlabs.bledemo.utils.Constants;
 import com.siliconlabs.bledemo.views.ServiceItemContainer;
 
 import java.io.BufferedReader;
@@ -908,11 +909,6 @@ public class DeviceServicesActivity extends AppCompatActivity {
             case R.id.menu_item_license:
                 showAboutDialog();
                 break;
-            case R.id.bluetooth_modules_website:
-                Intent intentBlueGigaWebsite = new Intent(Intent.ACTION_VIEW);
-                intentBlueGigaWebsite.setData(Uri.parse(Common.BLUEGIGA_URL_SILICON_LABS_OCT_2015));
-                startActivity(intentBlueGigaWebsite);
-                break;
             case R.id.menu_log: //LOG MENU BUTTON
                 adjustLayout();
                 break;
@@ -1246,7 +1242,7 @@ public class DeviceServicesActivity extends AppCompatActivity {
             String serviceName = service != null ? service.getName().trim() : getString(R.string.unknown_service);
             String serviceUuid = Common.getUuidText(uuid);
 
-            if (serviceUuid.equals(ota_service.toString())) serviceName = "OTA Service";
+            if (serviceUuid.toLowerCase().equals(ota_service.toString().toLowerCase())) serviceName = Constants.OTA_SERVICE;
 
             // initialize information about services in service item container
             initServiceItemContainer(serviceItemContainer, position, serviceName, serviceUuid);

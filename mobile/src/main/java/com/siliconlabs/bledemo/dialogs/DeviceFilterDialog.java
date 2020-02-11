@@ -16,6 +16,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.siliconlabs.bledemo.R;
+import com.siliconlabs.bledemo.utils.FilterDeviceParams;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -134,13 +135,10 @@ public class DeviceFilterDialog extends Dialog {
     private void submit() {
         String name = nameSearchView.getQuery().toString();
         int rssi = getRssiValue(rssiSeekBar.getProgress());
-        listener.onSubmit(name, !name.isEmpty(), rssi, filterRssi);
+        listener.onSubmit(new FilterDeviceParams(name, !name.isEmpty(), rssi, filterRssi));
     }
 
     public interface OnSubmitListener {
-        void onSubmit(String name,
-                      boolean filterName,
-                      int rssi,
-                      boolean filterRssi);
+        void onSubmit(FilterDeviceParams filterDeviceParams);
     }
 }

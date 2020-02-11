@@ -28,7 +28,6 @@ import java.util.UUID;
 
 // Common - contains common members and methods for whole application
 public class Common {
-    public static final String BLUEGIGA_URL_SILICON_LABS_OCT_2015 = "http://www.silabs.com/products/wireless/bluetooth/Pages/bluetooth.aspx";
     public static final String BLUEGIGA_URL_ORIGINAL = "http://www.bluegiga.com/en-US/products/bluetooth-4.0-modules/";
 
     public static final String PROPERTY_VALUE_WRITE = "WRITE";
