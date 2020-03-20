@@ -1,14 +1,13 @@
 package com.siliconlabs.bledemo.views;
 
 import android.content.Context;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.CardView;
+
+import androidx.cardview.widget.CardView;
+
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,9 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.activity.DeviceServicesActivity;
-import com.siliconlabs.bledemo.fragment.FragmentCharacteristicDetail;
-import com.siliconlabs.bledemo.fragment.LogFragment;
 import com.siliconlabs.bledemo.utils.BLEUtils;
 
 import java.util.HashMap;
@@ -28,18 +24,18 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 public class ServiceItemContainer extends LinearLayout {
-    public int ANIMATION_DURATION_FOR_EXPAND_AND_COLLAPSE = 333;
+    private int ANIMATION_DURATION_FOR_EXPAND_AND_COLLAPSE = 333;
 
     @InjectView(R.id.service_info_card_view)
     public CardView serviceInfoCardView;
-    @InjectView(R.id.services_header_label)
-    public TextView serviceHeaderLabel;
     @InjectView(R.id.btn_expand_to_show_characteristics)
     public Button btnExpandToShowCharacteristics;
-    @InjectView(R.id.service_expansion_caret)
-    public ImageView serviceExpansionCaret;
     @InjectView(R.id.service_title)
     public TextView serviceTitleTextView;
+    @InjectView(R.id.image_view_edit_service)
+    public ImageView serviceEditNameImageView;
+    @InjectView(R.id.linear_layout_edit_service_name)
+    public LinearLayout serviceEditNameLinearLayout;
     @InjectView(R.id.sevice_uuid)
     public TextView serviceUuidTextView;
     @InjectView(R.id.container_of_characteristics_for_service)
@@ -74,11 +70,26 @@ public class ServiceItemContainer extends LinearLayout {
             @Override
             public void onClick(View v) {
                 if (groupOfCharacteristicsForService.getVisibility() == View.VISIBLE) {
-                    animateCharacteristicCollapse();
-                    animateCaretCollapse(context, serviceExpansionCaret);
+                    btnExpandToShowCharacteristics.setText(getResources().getString(R.string.More_Info));
+//                    animateCaretCollapse(context, serviceExpansionCaret);\
+                    groupOfCharacteristicsForService.setVisibility(GONE);
                 } else {
+                    btnExpandToShowCharacteristics.setText(getResources().getString(R.string.Less_Info));
                     animateCharacteristicExpansion();
-                    animateCaretExpansion(context, serviceExpansionCaret);
+                }
+            }
+        });
+
+        serviceInfoCardView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (groupOfCharacteristicsForService.getVisibility() == View.VISIBLE) {
+                    btnExpandToShowCharacteristics.setText(getResources().getString(R.string.More_Info));
+//                    animateCaretCollapse(context, serviceExpansionCaret);\
+                    groupOfCharacteristicsForService.setVisibility(GONE);
+                } else {
+                    btnExpandToShowCharacteristics.setText(getResources().getString(R.string.Less_Info));
+                    animateCharacteristicExpansion();
                 }
             }
         });
@@ -110,91 +121,6 @@ public class ServiceItemContainer extends LinearLayout {
 
         animation.setDuration(ANIMATION_DURATION_FOR_EXPAND_AND_COLLAPSE);
         characteristicsExpansion.startAnimation(animation);
-    }
-
-    private void animateCharacteristicCollapse() {
-        final View characteristicsExpansion = this.groupOfCharacteristicsForService;
-
-        final int initialHeight = characteristicsExpansion.getMeasuredHeight();
-
-        Animation animation = new Animation() {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if (interpolatedTime == 1) {
-                    characteristicsExpansion.setVisibility(View.GONE);
-                } else {
-                    characteristicsExpansion.getLayoutParams().height = initialHeight - (int) (initialHeight * interpolatedTime);
-                    characteristicsExpansion.requestLayout();
-                }
-            }
-
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                characteristicsExpansion.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-        animation.setDuration(ANIMATION_DURATION_FOR_EXPAND_AND_COLLAPSE);
-        characteristicsExpansion.startAnimation(animation);
-    }
-
-    public static void animateCaretExpansion(Context context, final ImageView imageView) {
-        Animation animation = AnimationUtils.loadAnimation(context, R.anim.rotate_caret_to_opp_dir);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                imageView.setImageResource(R.drawable.debug_collapse);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        imageView.startAnimation(animation);
-    }
-
-    public static void animateCaretCollapse(Context context, final ImageView imageView) {
-        Animation animation = AnimationUtils.loadAnimation(context, R.anim.rotate_caret_to_opp_dir);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                imageView.setImageResource(R.drawable.debug_expand);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        imageView.startAnimation(animation);
     }
 
     public void setCharacteristicNotificationState(String characteristicName, BLEUtils.Notifications state) {

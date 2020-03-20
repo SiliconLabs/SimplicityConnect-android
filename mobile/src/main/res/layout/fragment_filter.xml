@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".toolbars.FilterFragment">
+
+    <ScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/view_separator">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/search_packet_name_container"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_margin="8dp"
+                android:background="@drawable/search_box_background"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:src="@drawable/ic_icon_search_off"
+                    android:tint="#333333" />
+
+                <EditText
+                    android:id="@+id/search_device_name_edit_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:fontFamily="sans-serif"
+                    android:gravity="center_vertical"
+                    android:hint="@string/Search_by_device_name_or_address"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingStart="2dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="0dp"
+                    android:paddingBottom="8dp"
+                    android:singleLine="true"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textColorHint="@color/silabs_primary_text"
+                    android:textSize="@dimen/filter_edit_search_text_size" />
+
+                <ImageView
+                    android:id="@+id/search_clear_packet_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:src="@drawable/ic_icon_small_x"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/search_packet_content_container"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_below="@id/search_packet_name_container"
+                android:layout_margin="8dp"
+                android:background="@drawable/search_box_background"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:src="@drawable/ic_icon_search_off"
+                    android:tint="#333333" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="0x"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/search_packet_content_edit_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:digits="0123456789abcdefABCDEF"
+                    android:fontFamily="sans-serif"
+                    android:gravity="center_vertical"
+                    android:hint="@string/Search_by_raw_advertising_data"
+                    android:imeOptions="actionSearch"
+                    android:maxLines="1"
+                    android:paddingStart="2dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="0dp"
+                    android:paddingBottom="8dp"
+                    android:singleLine="true"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textColorHint="@color/silabs_primary_text"
+                    android:textSize="@dimen/filter_edit_search_text_size" />
+
+                <ImageView
+                    android:id="@+id/search_clear_packet_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:src="@drawable/ic_icon_small_x"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/relativelayout_rssi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/search_packet_content_container"
+                android:layout_margin="8dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/imageview_rssi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_icon_wifi_dark" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@id/imageview_rssi"
+                    android:fontFamily="sans-serif-medium"
+                    android:padding="8dp"
+                    android:text="@string/RSSI"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/filter_header_bold_text_size" />
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/textview_rssi_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/relativelayout_rssi"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/min_dBm"
+                android:textColor="@color/silabs_blue"
+                android:textSize="@dimen/filter_rssi_value_text_size" />
+
+            <SeekBar
+                android:id="@+id/seekbar_rssi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textview_rssi_value"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:progressTint="@color/silabs_blue"
+                android:thumbTint="@color/silabs_blue" />
+
+
+            <TextView
+                android:id="@+id/textview_seekbar_min"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/seekbar_rssi"
+                android:layout_marginStart="16dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif"
+                android:text="-100"
+                android:textSize="@dimen/filter_rssi_min_max_text_size" />
+
+            <TextView
+                android:id="@+id/textview_seekbar_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/seekbar_rssi"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/zero"
+                android:textSize="@dimen/filter_rssi_min_max_text_size" />
+
+
+            <RelativeLayout
+                android:id="@+id/relativelayout_beacon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textview_seekbar_max"
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:id="@+id/imageview_beacon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_icon_beacon_dark" />
+
+                <TextView
+                    android:id="@+id/textview_beacon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@id/imageview_beacon"
+                    android:fontFamily="sans-serif-medium"
+                    android:padding="8dp"
+                    android:text="@string/Beacon_Type"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/filter_header_bold_text_size" />
+
+                <ImageView
+                    android:id="@+id/imageview_beacon_arrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_arrow_up_on"
+                    android:tag="ARROW_UP" />
+
+            </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_beacon_type"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_below="@id/relativelayout_beacon"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:scrollbars="vertical" />
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/only_favourites"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_below="@id/recyclerview_beacon_type"
+                android:layout_margin="8dp"
+                android:layout_marginStart="10dp"
+                android:fontFamily="sans-serif"
+                android:gravity="start|center_vertical"
+                android:paddingStart="@dimen/dialog_device_filter_title_padding_horizontal"
+                android:paddingEnd="@dimen/dialog_device_filter_title_padding_horizontal"
+                android:text="@string/Only_Favourites"
+                android:textColor="@color/silabs_subtle_text"
+                android:textSize="@dimen/filter_checkbox_text_size" />
+
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/only_connectable"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_below="@id/only_favourites"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif"
+                android:gravity="start|center_vertical"
+                android:paddingStart="@dimen/dialog_device_filter_title_padding_horizontal"
+                android:paddingEnd="@dimen/dialog_device_filter_title_padding_horizontal"
+                android:text="@string/Only_Connectable"
+                android:textColor="@color/silabs_subtle_text"
+                android:textSize="@dimen/filter_checkbox_text_size" />
+
+            <RelativeLayout
+                android:id="@+id/relativelayout_saved_searches"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/only_connectable"
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:id="@+id/imageview_save"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerInParent="true"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_icon_save" />
+
+                <TextView
+                    android:id="@+id/textview_save"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@id/imageview_save"
+                    android:fontFamily="sans-serif-medium"
+                    android:padding="8dp"
+                    android:text="@string/Saved_Searches"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/filter_header_bold_text_size" />
+
+                <ImageView
+                    android:id="@+id/imageview_save_arrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_arrow_up_on"
+                    android:tag="ARROW_UP" />
+
+            </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_saved_searches"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_below="@id/relativelayout_saved_searches"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:scrollbars="vertical" />
+
+        </RelativeLayout>
+
+
+    </ScrollView>
+
+    <View
+        android:id="@+id/view_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@id/relativelayout_bottom"
+        android:background="@color/silabs_secondary_background" />
+
+    <RelativeLayout
+        android:id="@+id/relativelayout_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp">
+
+        <Button
+            android:id="@+id/button_search"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="4dp"
+            android:background="@drawable/rounded_button_blue"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/Search"
+            android:textAllCaps="false"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/browser_button_text_size" />
+
+
+        <Button
+            android:id="@+id/button_save"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/button_search"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/Save"
+            android:textAllCaps="false"
+            android:textColor="@color/silabs_clickable_text"
+            android:textSize="@dimen/browser_button_text_size" />
+
+        <Button
+            android:id="@+id/button_reset"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/button_save"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/Reset"
+            android:textAllCaps="false"
+            android:textColor="@color/silabs_clickable_text"
+            android:textSize="@dimen/browser_button_text_size" />
+
+        <ImageView
+            android:id="@+id/imageview_close"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_icon_small_x" />
+    </RelativeLayout>
+</RelativeLayout>

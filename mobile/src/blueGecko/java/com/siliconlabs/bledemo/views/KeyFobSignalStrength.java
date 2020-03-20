@@ -7,6 +7,8 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+import androidx.core.content.ContextCompat;
+
 import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.utils.SignalStrength;
 
@@ -30,23 +32,23 @@ public class KeyFobSignalStrength extends ImageView {
 
     private void init() {
         paintLightGrayStroke = new Paint();
-        paintLightGrayStroke.setColor(getResources().getColor(R.color.key_fob_signal_strength_indicator_light_gray));
+        paintLightGrayStroke.setColor(ContextCompat.getColor(getContext(), R.color.key_fob_signal_strength_indicator_light_gray));
         paintLightGrayStroke.setStyle(Paint.Style.STROKE);
         paintLightGrayStroke.setStrokeCap(Paint.Cap.ROUND);
         paintLightGrayStroke.setAntiAlias(true);
 
 
         paintMediumGrayStroke = new Paint();
-        paintMediumGrayStroke.setColor(getResources().getColor(R.color.key_fob_signal_strength_indicator_medium_gray));
+        paintMediumGrayStroke.setColor(ContextCompat.getColor(getContext(), R.color.key_fob_signal_strength_indicator_medium_gray));
         paintMediumGrayStroke.setStyle(Paint.Style.STROKE);
         paintMediumGrayStroke.setAntiAlias(true);
 
         paintMediumGrayFilled = new Paint();
-        paintMediumGrayFilled.setColor(getResources().getColor(R.color.key_fob_signal_strength_indicator_medium_gray));
+        paintMediumGrayFilled.setColor(ContextCompat.getColor(getContext(), R.color.key_fob_signal_strength_indicator_medium_gray));
         paintMediumGrayFilled.setStyle(Paint.Style.FILL);
 
         paintDarkGrayStroke = new Paint();
-        paintDarkGrayStroke.setColor(getResources().getColor(R.color.key_fob_signal_strength_indicator_dark_gray));
+        paintDarkGrayStroke.setColor(ContextCompat.getColor(getContext(), R.color.key_fob_signal_strength_indicator_dark_gray));
         paintDarkGrayStroke.setStyle(Paint.Style.STROKE);
         paintDarkGrayStroke.setStrokeCap(Paint.Cap.ROUND);
         paintDarkGrayStroke.setAntiAlias(true);

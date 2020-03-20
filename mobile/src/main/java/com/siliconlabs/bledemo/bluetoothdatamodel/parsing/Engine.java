@@ -21,6 +21,7 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
 
+import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Characteristic;
 import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Descriptor;
 import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Service;
 
@@ -37,8 +38,6 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Characteristic;
-
 // Engine - contains data accessible by each part of application
 // It links data models from xml resources with real Bluetooth classes  
 public class Engine {
@@ -53,7 +52,7 @@ public class Engine {
     private boolean characteristicsLoaded = false;
     private BluetoothGattCharacteristic lastCharacteristic;
     private Vector<Device> devices;
-    private static Object locker = new Object();
+    private static final Object locker = new Object();
 
     final Comparator<Device> itemsComparator = new Comparator<Device>() {
         @Override
@@ -109,8 +108,8 @@ public class Engine {
 
     // Initializes class members, it must be first called
     public void init(Context context) {
-        observers = new ArrayList<EngineObserver>();
-        devices = new Vector<Device>();
+        observers = new ArrayList<>();
+        devices = new Vector<>();
         BluetoothXmlParser.getInstance().init(context);
         loadUnits();
         loadFormats();
@@ -123,9 +122,7 @@ public class Engine {
     private void loadDescriptors() {
         try {
             descriptors = BluetoothXmlParser.getInstance().parseDescriptors();
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (XmlPullParserException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -134,9 +131,7 @@ public class Engine {
     private void loadServices() {
         try {
             services = BluetoothXmlParser.getInstance().parseServices();
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (XmlPullParserException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -153,9 +148,7 @@ public class Engine {
                     for (EngineObserver observer : observers) {
                         observer.onCharacteristicsLoaded();
                     }
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
+                } catch (XmlPullParserException | IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -166,7 +159,7 @@ public class Engine {
     // List of variables formats from Bluetooth.org
     // https://developer.bluetooth.org/gatt/Pages/FormatTypes.aspx
     private void loadFormats() {
-        formats = new HashMap<String, Integer>();
+        formats = new HashMap<>();
         formats.put("boolean", 1);
         formats.put("2bit", 1);
         formats.put("nibble", 2);
@@ -175,6 +168,7 @@ public class Engine {
         formats.put("24bit", 3);
         formats.put("32bit", 4);
         formats.put("uint8", 1);
+        formats.put("uint12",2);
         formats.put("uint16", 2);
         formats.put("uint24", 3);
         formats.put("uint32", 4);
@@ -194,10 +188,9 @@ public class Engine {
         formats.put("float64", 8);
         formats.put("SFLOAT", 2);
         formats.put("FLOAT", 4);
-        formats.put("dunit16", 2);
+        formats.put("duint16", 2);
         formats.put("utf8s", 0);
         formats.put("utf16s", 0);
-        formats.put("dunit16", 2);
         formats.put("reg-cert-data-list", 0);
         formats.put("variable", 0);
     }
@@ -205,7 +198,7 @@ public class Engine {
     // List of units from Bluetooth.org
     // https://developer.bluetooth.org/gatt/units/Pages/default.aspx
     private void loadUnits() {
-        units = new HashMap<String, Unit>();
+        units = new HashMap<>();
         units.put("org.bluetooth.unit.unitless", new Unit("", ""));
         units.put("org.bluetooth.unit.length.metre", new Unit("m", "metre"));
         units.put("org.bluetooth.unit.mass.kilogram", new Unit("kg", "kilogram"));
@@ -428,6 +421,10 @@ public class Engine {
         return null;
     }
 
+    public Descriptor getDescriptorByUUID(UUID uuid) {
+        return descriptors.get(uuid);
+    }
+
     // Clears device list
     // It can clear whole list or only disconnected devices
     public void clearDeviceList(boolean clearOnlyDisconnected) {
@@ -468,9 +465,7 @@ public class Engine {
 
     // Removes observer
     public void removeObserver(EngineObserver observer) {
-        if (observers.contains(observer)) {
-            observers.remove(observer);
-        }
+        observers.remove(observer);
     }
 
     // Clears all data lists

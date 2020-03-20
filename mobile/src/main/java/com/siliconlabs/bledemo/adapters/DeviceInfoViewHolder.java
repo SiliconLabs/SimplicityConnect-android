@@ -1,6 +1,7 @@
 package com.siliconlabs.bledemo.adapters;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,7 @@ import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
 
 public abstract class DeviceInfoViewHolder<T extends BluetoothDeviceInfo> extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    View.OnClickListener onClickListener;
+    private View.OnClickListener onClickListener;
 
     public abstract void setData(T info, int position);
 

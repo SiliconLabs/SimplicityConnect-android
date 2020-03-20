@@ -1,23 +1,26 @@
-<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar"
     style="@style/ToolbarStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:elevation="0dp"
     android:fitsSystemWindows="true"
-    android:gravity="right">
+    android:gravity="end"
+    app:titleTextAppearance="@style/TextAppearance.ToolbarTitle">
 
     <RelativeLayout
         android:layout_width="@dimen/actionbar_main_help_btn_container_width"
         android:layout_height="@dimen/actionbar_main_help_btn_container_height"
-        android:visibility="gone"
-        android:layout_gravity="right|center_vertical"
-        android:gravity="center">
+        android:layout_gravity="end|center_vertical"
+        android:gravity="center"
+        android:visibility="visible">
 
         <ImageView
             android:layout_width="@dimen/actionbar_main_help_icon_width"
             android:layout_height="@dimen/actionbar_main_help_icon_height"
             android:layout_centerInParent="true"
+            android:contentDescription="@string/help"
             android:src="@drawable/home_help_phone" />
 
         <Button
@@ -27,4 +30,4 @@
             android:layout_centerInParent="true"
             android:background="?android:attr/selectableItemBackground" />
     </RelativeLayout>
-</android.support.v7.widget.Toolbar>
+</androidx.appcompat.widget.Toolbar>

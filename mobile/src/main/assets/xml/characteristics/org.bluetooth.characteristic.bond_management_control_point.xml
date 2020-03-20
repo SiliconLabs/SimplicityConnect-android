@@ -19,7 +19,7 @@
         <Requirement>Mandatory</Requirement>
         <Format>uint8</Format>
         <Enumerations>
-            <Enumeration key="0" value="Reserved for futire use" />
+            <Enumeration key="0" value="Reserved for future use" />
             <Enumeration key="1" value="Delete bond of requesting device (BR/EDR and LE)" description="Initiates the procedure to delete bonds of requesting device on BR/EDR and LE transports. The optional Authorization Code is sent as parameter to this op code."/>
             <Enumeration key="2" value="Delete bond of requesting device (BR/EDR transport only)" description="Initiates the procedure to delete bond of requesting device on BR/EDR transport. The optional Authorization Code is sent as parameter to this op code."/>
             <Enumeration key="3" value="Delete bond of requesting device (LE transport only)" description="Initiates the procedure to delete bond of requesting device on LE transport. The optional Authorization Code for that is sent as parameter to this op code."/>

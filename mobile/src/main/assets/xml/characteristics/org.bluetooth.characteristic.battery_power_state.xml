@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?><!--
+Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Battery Power State"
+    type="org.bluetooth.characteristic.battery_power_state" uuid="2A1A" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd">
+    <InformativeText></InformativeText>
+    <Value>
+        <Field name="State">
+            <Requirement>Mandatory</Requirement>
+            <Format>8bit</Format>
+            <BitField>
+                <Bit index="0" size="2">
+                    <Enumerations>
+                        <Enumeration key="0" value="Unknown" />
+                        <Enumeration key="1" value="Not Supported" />
+                        <Enumeration key="2" value="Not Present" />
+                        <Enumeration key="3" value="Present" />
+                    </Enumerations>
+                </Bit>
+                <Bit index="2" size="2">
+                    <Enumerations>
+                        <Enumeration key="0" value="Unknown" />
+                        <Enumeration key="1" value="Not Supported" />
+                        <Enumeration key="2" value="Not Discharging" />
+                        <Enumeration key="3" value="Discharging" />
+                    </Enumerations>
+                </Bit>
+                <Bit index="4" size="2">
+                    <Enumerations>
+                        <Enumeration key="0" value="Unknown" />
+                        <Enumeration key="1" value="Not Chargeable" />
+                        <Enumeration key="2" value="Not Charging (Chargeable)" />
+                        <Enumeration key="3" value="Charging (Chargeable)" />
+                    </Enumerations>
+                </Bit>
+                <Bit index="6" size="2">
+                    <Enumerations>
+                        <Enumeration key="0" value="Unknown" />
+                        <Enumeration key="1" value="Not Supported" />
+                        <Enumeration key="2" value="Good Level" />
+                        <Enumeration key="3" value="Critically Low Level" />
+                    </Enumerations>
+                </Bit>
+            </BitField>
+        </Field>
+    </Value>
+</Characteristic>

@@ -13,6 +13,6 @@ public class MyNotificationActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
-        mTextView = (TextView) findViewById(R.id.text);
+        mTextView = findViewById(R.id.text);
     }
 }

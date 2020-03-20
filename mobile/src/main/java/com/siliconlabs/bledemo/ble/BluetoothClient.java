@@ -5,12 +5,13 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
+import com.siliconlabs.bledemo.utils.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import com.siliconlabs.bledemo.utils.IOUtils;
 import timber.log.Timber;
 
 class BluetoothClient extends Thread {

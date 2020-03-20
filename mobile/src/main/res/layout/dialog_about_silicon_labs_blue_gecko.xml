@@ -7,13 +7,14 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="@dimen/about_blue_giga_dialog_title_height"
-        android:background="@color/dialog_title_background"
-        android:gravity="left|center_vertical"
-        android:paddingLeft="@dimen/about_dialog_title_padding_left"
+        android:background="@color/silabs_dialog_title_background"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/about_dialog_title_padding_left"
+        android:paddingEnd="0dp"
         android:text="@string/about_menu_label"
-        android:textColor="@color/dialog_title_text"
-        android:textSize="@dimen/about_dialog_title_text_size"
-        android:textStyle="bold" />
+        android:textColor="@color/silabs_primary_text"
+        android:textSize="@dimen/dialog_about_title_text_size" />
 
     <WebView
         android:id="@+id/menu_item_license"
@@ -28,8 +29,10 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/about_blue_giga_dialog_close_btn_height"
         android:background="@drawable/debug_mode_dialog_button_selector"
+        android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:text="@string/ad_dialog_close_btn_default_text"
         android:textAllCaps="false"
-        android:textColor="@color/dialog_btn_text" />
+        android:textColor="@color/silabs_white"
+        android:textSize="@dimen/dialog_about_button_text_size" />
 </LinearLayout>

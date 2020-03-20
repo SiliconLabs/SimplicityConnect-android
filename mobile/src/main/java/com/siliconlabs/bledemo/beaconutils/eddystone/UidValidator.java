@@ -15,6 +15,7 @@ package com.siliconlabs.bledemo.beaconutils.eddystone;
 // see https://github.com/google/eddystone
 
 import android.util.Log;
+
 import java.util.Arrays;
 
 

@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/transparent"
+        android:background="@color/silabs_transparent"
         android:paddingBottom="30dp"
         android:paddingTop="30dp"
         android:src="@drawable/light_off"

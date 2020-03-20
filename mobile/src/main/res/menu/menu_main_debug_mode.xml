@@ -2,18 +2,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/menu_mappings"
+        android:icon="@drawable/ic_dictionary_book"
+        android:title="@string/title_Mappings_dictionary"
+        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/menu_log"
         android:orderInCategory="98"
-        android:text="LOG"
-        android:title="@string/action_log"
+        android:text="@string/Log"
+        android:title="@string/Log"
         android:visible="false"
         app:showAsAction="always" /><!--TODO Hide LOG -->
-    <item
-        android:id="@+id/menu_filter"
-        android:orderInCategory="99"
-        android:icon="@drawable/filter_icon"
-        android:title="@string/action_filter"
-        android:visible="true"
-        app:showAsAction="always" /><!--TODO Hide Filter -->
+    <!--    <item-->
+    <!--        android:id="@+id/menu_filter"-->
+    <!--        android:orderInCategory="99"-->
+    <!--        android:icon="@drawable/filter_icon"-->
+    <!--        android:title="@string/action_filter"-->
+    <!--        android:visible="true"-->
+    <!--        app:showAsAction="always" />&lt;!&ndash;TODO Hide Filter &ndash;&gt;-->
 </menu>

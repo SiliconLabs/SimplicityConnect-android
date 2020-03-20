@@ -136,7 +136,7 @@ public class ScanFilterCompat {
             return false;
         }
 
-        final ScanFilterCompat other = (ScanFilterCompat)obj;
+        final ScanFilterCompat other = (ScanFilterCompat) obj;
         return Objects.equals(deviceName, other.deviceName) &&
                 Objects.equals(deviceAddress, other.deviceAddress) &&
                 manufacturerId == other.manufacturerId &&

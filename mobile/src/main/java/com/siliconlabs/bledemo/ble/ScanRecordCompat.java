@@ -40,7 +40,7 @@ public class ScanRecordCompat {
     private static ScanRecord sr;
     private String deviceName;
     private SparseArray<byte[]> manufacturerSpecificData;
-    private Map<ParcelUuid,byte[]> serviceData;
+    private Map<ParcelUuid, byte[]> serviceData;
     private List<ParcelUuid> serviceUuids;
     private int txPowerLevel;
 
@@ -50,22 +50,17 @@ public class ScanRecordCompat {
             return null;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            sr = (ScanRecord)lollipopScanRecord;
-            ScanRecordCompat retVal = new ScanRecordCompat();
-            retVal.advertiseFlags = sr.getAdvertiseFlags();
-            retVal.bytes = sr.getBytes();
-            retVal.deviceName = sr.getDeviceName();
-            retVal.manufacturerSpecificData = sr.getManufacturerSpecificData();
-            retVal.serviceData = sr.getServiceData();
-            retVal.serviceUuids = sr.getServiceUuids();
-            retVal.txPowerLevel = sr.getTxPowerLevel();
-            return retVal;
+        sr = (ScanRecord) lollipopScanRecord;
+        ScanRecordCompat retVal = new ScanRecordCompat();
+        retVal.advertiseFlags = sr.getAdvertiseFlags();
+        retVal.bytes = sr.getBytes();
+        retVal.deviceName = sr.getDeviceName();
+        retVal.manufacturerSpecificData = sr.getManufacturerSpecificData();
+        retVal.serviceData = sr.getServiceData();
+        retVal.serviceUuids = sr.getServiceUuids();
+        retVal.txPowerLevel = sr.getTxPowerLevel();
+        return retVal;
 
-        }
-        else {
-            throw new IllegalStateException("Current OS is not lollipop or higher.");
-        }
     }
 
     public static ScanRecordCompat parseFromBytes(byte[] scanRecord) {
@@ -145,7 +140,7 @@ public class ScanRecordCompat {
             return new ScanRecordCompat(serviceUuids, manufacturerData, serviceData, advertiseFlag, txPowerLevel, localName, scanRecord);
         } catch (Exception e) {
             Timber.e("unable to parse scan record: " + Arrays.toString(scanRecord), e);
-            Log.e("parseFromBytes","unable to parse scan record: " + Arrays.toString(scanRecord) + e);
+            Log.e("parseFromBytes", "unable to parse scan record: " + Arrays.toString(scanRecord) + e);
             // As the record is invalid, ignore all the parsed results for this packet
             // and return an empty record with raw scanRecord bytes in results
             return new ScanRecordCompat(null, null, null, -1, Integer.MIN_VALUE, null, scanRecord);
@@ -157,7 +152,7 @@ public class ScanRecordCompat {
 
     private ScanRecordCompat(List<ParcelUuid> serviceUuids,
                              SparseArray<byte[]> manufacturerData,
-                             Map<ParcelUuid,byte[]> serviceData,
+                             Map<ParcelUuid, byte[]> serviceData,
                              int advertiseFlag, int txPowerLevel,
                              String deviceName, byte[] bytes) {
         this.serviceUuids = serviceUuids;
@@ -198,11 +193,7 @@ public class ScanRecordCompat {
     }
 
     public byte[] getManufacturerSpecificData(int manufacturer) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return sr.getManufacturerSpecificData(manufacturer);
-        } else {
-            return new byte[0];
-        }
+        return sr.getManufacturerSpecificData(manufacturer);
     }
 
     void setManufacturerSpecificData(SparseArray<byte[]> manufacturerSpecificData) {

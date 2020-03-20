@@ -7,6 +7,7 @@ import android.os.ParcelUuid;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import timber.log.Timber;
@@ -31,10 +32,10 @@ public class Discovery implements BlueToothService.Listener {
 
     private BluetoothDiscoveryHost host;
 
-    final DeviceContainer container;
+    private final DeviceContainer container;
 
-    final List<GattService> SERVICES = new ArrayList<>();
-    final List<String> NAMES = new ArrayList<>();
+    private final List<GattService> SERVICES = new ArrayList<>();
+    private final List<String> NAMES = new ArrayList<>();
 
     private BlueToothService.Binding bluetoothBinding;
     private BlueToothService blueToothService;
@@ -93,17 +94,13 @@ public class Discovery implements BlueToothService.Listener {
 
     public void addFilter(GattService... services) {
         if (services != null) {
-            for (GattService service : services) {
-                SERVICES.add(service);
-            }
+            SERVICES.addAll(Arrays.asList(services));
         }
     }
 
     public void addFilter(String... names) {
         if (names != null) {
-            for (String name : names) {
-                NAMES.add(name);
-            }
+            NAMES.addAll(Arrays.asList(names));
         }
     }
 
@@ -115,7 +112,8 @@ public class Discovery implements BlueToothService.Listener {
         if (blueToothService != null) {
             executeDiscovery = false;
 
-            discoverDevices(true);
+            //discoverDevices(true);
+            discoverDevices(false); // Don't clear devices container every time
             handleScanResults();
         } else {
             executeDiscovery = true;

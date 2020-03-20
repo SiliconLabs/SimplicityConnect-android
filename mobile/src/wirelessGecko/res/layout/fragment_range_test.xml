@@ -137,7 +137,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textSize="10sp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/silabs_black"
                     android:gravity="center"
                     android:id="@+id/range_rx_chart_label"/>
 

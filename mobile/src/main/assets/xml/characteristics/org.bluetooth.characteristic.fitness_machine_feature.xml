@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?><!--
+Copyright 2017 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Fitness Machine Feature"
+    approved="Yes" last-modified="2017-02-14"
+    type="org.bluetooth.characteristic.fitness_machine_feature" uuid="2ACC" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd">
+    <InformativeText>
+        <Summary>
+            The Fitness Machine Feature characteristic is defined in the Fitness Machine Service
+            Specification.
+        </Summary>
+    </InformativeText>
+</Characteristic>

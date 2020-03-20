@@ -1,43 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/service_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/service_container_background"
+    android:background="@color/silabs_background"
     android:orientation="vertical">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/services_header_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/service_header_label_margin_bottom"
-        android:layout_marginLeft="@dimen/service_header_label_margin_left"
-        android:layout_marginTop="@dimen/service_header_label_margin_top"
-        android:gravity="center_vertical"
-        android:text="@string/services_header_label_text"
-        android:textSize="@dimen/services_header_label_text_size"
-        android:visibility="visible" />
 
-
-    </RelativeLayout>
-
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/service_info_card_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/list_item_service_card_margin"
-        android:background="@android:color/white"
-        android:elevation="@dimen/service_selection_cardview_elevation"
-        android:foreground="?android:attr/selectableItemBackground"
-        card_view:cardCornerRadius="@dimen/list_item_service_card_corner_radius">
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardCornerRadius="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="0dp"
             android:orientation="vertical">
 
             <View
@@ -48,60 +31,70 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:background="@android:color/white"
                 android:orientation="horizontal">
 
-                <RelativeLayout
-                    android:layout_width="@dimen/service_caret_container_width"
-                    android:layout_height="match_parent"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:id="@+id/service_expansion_caret"
-                        android:layout_width="@dimen/service_caret_width"
-                        android:layout_height="@dimen/service_caret_height"
-                        android:src="@drawable/debug_expand" />
-
-                    <Button
-                        android:id="@+id/btn_expand_to_show_characteristics"
-                        android:layout_width="@dimen/service_caret_btn_width"
-                        android:layout_height="@dimen/service_caret_btn_height"
-                        android:background="?android:attr/selectableItemBackground" />
-                </RelativeLayout>
-
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/service_info_container_margin_left"
-                    android:gravity="left"
+                    android:layout_marginStart="@dimen/service_info_container_margin_left"
+                    android:gravity="start"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/service_title"
-                        android:layout_width="match_parent"
+                    <LinearLayout
+                        android:id="@+id/linear_layout_edit_service_name"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:gravity="left|center_vertical"
-                        android:text="@string/services_list_service_name_default"
-                        android:textColor="@color/name_of_service_text_color"
-                        android:textSize="@dimen/name_of_service_text_size"
-                        android:textStyle="bold" />
+                        android:layout_marginEnd="4dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/service_title"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:paddingStart="0dp"
+                            android:paddingEnd="4dp"
+                            android:text="@string/services_list_service_name_default"
+                            android:textColor="@color/silabs_primary_text"
+                            android:textSize="@dimen/service_name_text_size" />
+
+                        <ImageView
+                            android:id="@+id/image_view_edit_service"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/ic_edit_grey_24dp"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/sevice_uuid"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
                         android:text="@string/default_uuid_of_service"
-                        android:textColor="@color/uuid_of_service_text_color"
-                        android:textSize="@dimen/default_uuid_of_service_text_size" />
+                        android:textColor="@color/silabs_primary_text"
+                        android:textSize="@dimen/service_uuid_text_size" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/uuid_of_service_label"
-                        android:textColor="@color/uuid_label_of_service_text_color"
-                        android:textSize="@dimen/uuid_label_of_service_text_size" />
+                    <Button
+                        android:id="@+id/btn_expand_to_show_characteristics"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:background="@color/silabs_transparent"
+                        android:fontFamily="sans-serif-medium"
+                        android:gravity="start|center"
+                        android:maxLines="1"
+                        android:text="@string/More_Info"
+                        android:textAllCaps="false"
+                        android:textColor="@color/silabs_blue"
+                        android:textSize="@dimen/browser_button_text_size" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -110,15 +103,19 @@
                 android:layout_height="@dimen/list_item_extra_vertical_padding"
                 android:background="@android:color/white" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/silabs_secondary_background" />
+
             <LinearLayout
                 android:id="@+id/container_of_characteristics_for_service"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/container_of_characteristics_for_service_background"
                 android:orientation="vertical"
                 android:visibility="gone" />
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:id="@+id/last_item_divider"
@@ -126,16 +123,10 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <View
-            android:id="@+id/services_separator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/services_separator"
-            android:visibility="gone" />
-
         <android.widget.Space
             android:id="@+id/last_item_space"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/services_spacing" />
+            android:layout_height="@dimen/services_spacing"
+            android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

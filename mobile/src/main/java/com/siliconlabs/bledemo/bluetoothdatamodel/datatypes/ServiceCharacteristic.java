@@ -10,7 +10,7 @@ public class ServiceCharacteristic {
     private ArrayList<Descriptor> descriptors;
 
     public ServiceCharacteristic() {
-        descriptors = new ArrayList<Descriptor>();
+        descriptors = new ArrayList<>();
     }
 
     public ServiceCharacteristic(String name, String type, ArrayList<Descriptor> descriptors) {

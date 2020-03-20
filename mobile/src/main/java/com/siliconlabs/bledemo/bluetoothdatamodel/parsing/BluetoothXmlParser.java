@@ -19,7 +19,12 @@ package com.siliconlabs.bledemo.bluetoothdatamodel.parsing;
 import android.content.Context;
 import android.util.Xml;
 
+import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Bit;
 import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.BitField;
+import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Characteristic;
+import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Descriptor;
+import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Enumeration;
+import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Field;
 import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Service;
 import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.ServiceCharacteristic;
 
@@ -34,17 +39,11 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Bit;
-import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Characteristic;
-import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Descriptor;
-import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Enumeration;
-import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Field;
-
 // BluetoothXmlParser - parses Bluetooth xml resources from /assets/xml/ directory
 // It is used only once when application is starting
 public class BluetoothXmlParser {
     private static final String ns = null;
-    private static Object locker = new Object();
+    private static final Object locker = new Object();
     private static BluetoothXmlParser instance = null;
 
     private Context appContext;
@@ -67,11 +66,11 @@ public class BluetoothXmlParser {
 
     // Parses service files
     public HashMap<UUID, Service> parseServices() throws XmlPullParserException, IOException {
-        String serviceFiles[] = appContext.getAssets().list(Consts.DIR_SERVICE);
+        String[] serviceFiles = appContext.getAssets().list(Consts.DIR_SERVICE);
         InputStream in = null;
         XmlPullParser parser = Xml.newPullParser();
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-        HashMap<UUID, Service> services = new HashMap<UUID, Service>();
+        HashMap<UUID, Service> services = new HashMap<>();
         for (String fileName : serviceFiles) {
             try {
                 in = appContext.getAssets().open(Consts.DIR_SERVICE + File.separator + fileName);
@@ -82,9 +81,7 @@ public class BluetoothXmlParser {
                 service.setUuid(uuid);
                 services.put(uuid, service);
                 in.close();
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (XmlPullParserException | IOException e) {
                 e.printStackTrace();
             } finally {
                 if (in != null) {
@@ -125,7 +122,7 @@ public class BluetoothXmlParser {
             IOException {
         parser.require(XmlPullParser.START_TAG, ns, Consts.TAG_CHARACTERISTICS);
 
-        ArrayList<ServiceCharacteristic> characteristics = new ArrayList<ServiceCharacteristic>();
+        ArrayList<ServiceCharacteristic> characteristics = new ArrayList<>();
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -168,7 +165,7 @@ public class BluetoothXmlParser {
     private ArrayList<Descriptor> readDescriptors(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, Consts.TAG_DESCRIPTORS);
 
-        ArrayList<Descriptor> descriptors = new ArrayList<Descriptor>();
+        ArrayList<Descriptor> descriptors = new ArrayList<>();
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -207,19 +204,19 @@ public class BluetoothXmlParser {
     // Reads summary
     private String readSummary(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, Consts.TAG_INFORMATIVE_TEXT);
-        String summary = Consts.EMPTY_STRING;
+        StringBuilder summary = new StringBuilder(Consts.EMPTY_STRING);
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             String name = parser.getName();
             if (name.equals(Consts.TAG_SUMMARY)) {
-                summary += readText(parser);
+                summary.append(readText(parser));
                 if (parser.getName().equals(Consts.TAG_P)) {
-                    summary += readText(parser);
+                    summary.append(readText(parser));
                 }
             } else if (name.equals(Consts.TAG_P)) {
-                summary += readText(parser);
+                summary.append(readText(parser));
             } else {
                 skip(parser);
             }
@@ -227,7 +224,7 @@ public class BluetoothXmlParser {
         while (parser.getName() == null || !parser.getName().equals(Consts.TAG_INFORMATIVE_TEXT)) {
             parser.next();
         }
-        return summary;
+        return summary.toString();
     }
 
     // Reads service name
@@ -253,18 +250,16 @@ public class BluetoothXmlParser {
 
     // Parses characteristic files
     public ConcurrentHashMap<UUID, Characteristic> parseCharacteristics() throws XmlPullParserException, IOException {
-        String characteristicFiles[] = appContext.getAssets().list(Consts.DIR_CHARACTERISTIC);
+        String[] characteristicFiles = appContext.getAssets().list(Consts.DIR_CHARACTERISTIC);
         XmlPullParser parser = Xml.newPullParser();
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-        characteristics = new ConcurrentHashMap<UUID, Characteristic>();
+        characteristics = new ConcurrentHashMap<>();
         for (String fileName : characteristicFiles) {
             try {
                 Characteristic charact = parseCharacteristic(parser, Consts.DIR_CHARACTERISTIC + File.separator
                         + fileName);
                 characteristics.put(charact.getUuid(), charact);
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (XmlPullParserException | IOException e) {
                 e.printStackTrace();
             }
         }
@@ -323,7 +318,7 @@ public class BluetoothXmlParser {
             throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, Consts.TAG_VALUE);
 
-        ArrayList<Field> fields = new ArrayList<Field>();
+        ArrayList<Field> fields = new ArrayList<>();
         characteristic.setFields(fields);
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -360,26 +355,37 @@ public class BluetoothXmlParser {
             }
 
             String name = parser.getName();
-            if (name.equals(Consts.TAG_FORMAT)) {
-                field.setFormat(readFormat(parser));
-            } else if (name.equals(Consts.TAG_MINIMUM)) {
-                field.setMinimum(readMinimum(parser));
-            } else if (name.equals(Consts.TAG_MAXIMUM)) {
-                field.setMaximum(readMaximum(parser));
-            } else if (name.equals(Consts.TAG_UNIT)) {
-                field.setUnit(readUnit(parser));
-            } else if (name.equals(Consts.TAG_BITFIELD)) {
-                field.setBitfield(readBitField(parser));
-            } else if (name.equals(Consts.TAG_ENUMERATIONS)) {
-                field.setEnumerations(readEnumerations(parser));
-            } else if (name.equals(Consts.TAG_REQUIREMENT)) {
-                field.setRequirement(readRequirement(parser));
-            } else if (name.equals(Consts.TAG_REFERENCE)) {
-                field.setReference(readReference(parser));
-            } else if (name.equals(Consts.TAG_DECIMAL_EXPONENT)) {
-                field.setDecimalExponent(readDecimalExponent(parser));
-            } else {
-                skip(parser);
+            switch (name) {
+                case Consts.TAG_FORMAT:
+                    field.setFormat(readFormat(parser));
+                    break;
+                case Consts.TAG_MINIMUM:
+                    field.setMinimum(readMinimum(parser));
+                    break;
+                case Consts.TAG_MAXIMUM:
+                    field.setMaximum(readMaximum(parser));
+                    break;
+                case Consts.TAG_UNIT:
+                    field.setUnit(readUnit(parser));
+                    break;
+                case Consts.TAG_BITFIELD:
+                    field.setBitfield(readBitField(parser));
+                    break;
+                case Consts.TAG_ENUMERATIONS:
+                    field.setEnumerations(readEnumerations(parser));
+                    break;
+                case Consts.TAG_REQUIREMENT:
+                    field.setRequirement(readRequirement(parser));
+                    break;
+                case Consts.TAG_REFERENCE:
+                    field.setReference(readReference(parser));
+                    break;
+                case Consts.TAG_DECIMAL_EXPONENT:
+                    field.setDecimalExponent(readDecimalExponent(parser));
+                    break;
+                default:
+                    skip(parser);
+                    break;
             }
         }
         return field;
@@ -525,7 +531,7 @@ public class BluetoothXmlParser {
     private ArrayList<Enumeration> readEnumerations(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, Consts.TAG_ENUMERATIONS);
 
-        ArrayList<Enumeration> enumerations = new ArrayList<Enumeration>();
+        ArrayList<Enumeration> enumerations = new ArrayList<>();
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -559,11 +565,11 @@ public class BluetoothXmlParser {
     // Parse descriptors
     public HashMap<UUID, Descriptor> parseDescriptors() throws IOException, XmlPullParserException {
 
-        String descriptorsFiles[] = appContext.getAssets().list(Consts.DIR_DESCRIPTOR);
+        String[] descriptorsFiles = appContext.getAssets().list(Consts.DIR_DESCRIPTOR);
         InputStream in = null;
         XmlPullParser parser = Xml.newPullParser();
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-        HashMap<UUID, Descriptor> descriptors = new HashMap<UUID, Descriptor>();
+        HashMap<UUID, Descriptor> descriptors = new HashMap<>();
 
         for (String fileName : descriptorsFiles) {
             try {
@@ -575,9 +581,7 @@ public class BluetoothXmlParser {
                 descriptor.setUuid(uuid);
                 descriptors.put(uuid, descriptor);
                 in.close();
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (XmlPullParserException | IOException e) {
                 e.printStackTrace();
             } finally {
                 if (in != null) {

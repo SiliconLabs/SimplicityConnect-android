@@ -16,11 +16,11 @@
  */
 package com.siliconlabs.bledemo.bluetoothdatamodel.parsing;
 
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 import android.text.TextUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 
 // Converters - converts value between different numeral system
 public class Converters {
@@ -28,7 +28,7 @@ public class Converters {
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     // Gets value in hexadecimal system
-    public static String getHexValue(byte value[]) {
+    public static String getHexValue(byte[] value) {
         if (value == null) {
             return "";
         }
@@ -55,7 +55,7 @@ public class Converters {
     }
 
     // Gets value in ascii system
-    public static String getAsciiValue(byte value[]) {
+    public static String getAsciiValue(byte[] value) {
         if (value == null) {
             return "";
         }
@@ -64,16 +64,16 @@ public class Converters {
     }
 
     // Gets value in decimal system
-    public static String getDecimalValue(byte value[]) {
+    public static String getDecimalValue(byte[] value) {
         if (value == null) {
             return "";
         }
 
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (byte b : value) {
-            result += ((int) b & 0xff) + " ";
+            result.append((int) b & 0xff).append(" ");
         }
-        return result;
+        return result.toString();
     }
 
     // Gets value in decimal system for single byte
@@ -113,20 +113,20 @@ public class Converters {
 
         // prepend the sign up to 64 bits
         String result = "";
-        String stringPrependExtendSign = binaryString;
+        StringBuilder stringPrependExtendSign = new StringBuilder(binaryString);
         for (int i = 0; i < 64 - binaryString.length(); i++) {
-            stringPrependExtendSign = binaryString.substring(0, 1) + stringPrependExtendSign;
+            stringPrependExtendSign.insert(0, binaryString.substring(0, 1));
         }
 
         // flip the bits (needed for negative numbers)
-        String flippedBits = "";
+        StringBuilder flippedBits = new StringBuilder();
         for (int i = 0; i < 64; i++) {
             if (binaryString.subSequence(0, 1).equals("1")) {
                 // flip bits if negative twos complement negative
                 if (stringPrependExtendSign.substring(i, i + 1).equals("1")) {
-                    flippedBits += 0;
+                    flippedBits.append(0);
                 } else {
-                    flippedBits += 1;
+                    flippedBits.append(1);
                 }
             }
         }
@@ -134,12 +134,12 @@ public class Converters {
         // if prepended sign extension is negative, add one to flipped bits and make long neg.
         if (binaryString.subSequence(0, 1).equals("1")) {
             // finish twos complement calculation if negative twos complement number
-            long flippedBitsAsLong = Long.parseLong(flippedBits, 2);
+            long flippedBitsAsLong = Long.parseLong(flippedBits.toString(), 2);
             flippedBitsAsLong += 1;
             flippedBitsAsLong = -1 * flippedBitsAsLong;
             result = "" + flippedBitsAsLong;
         } else {
-            result = "" + Long.parseLong(stringPrependExtendSign, 2);
+            result = "" + Long.parseLong(stringPrependExtendSign.toString(), 2);
         }
 
         return result;
@@ -460,23 +460,13 @@ public class Converters {
 
     public static byte[] convertToUTF8(String input) {
         byte[] returnVal = null;
-        try {
-            returnVal = input.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            returnVal = input.getBytes();
-            e.printStackTrace();
-        }
+        returnVal = input.getBytes(StandardCharsets.UTF_8);
         return returnVal;
     }
 
     public static byte[] convertToUTF16(String input) {
         byte[] returnVal = null;
-        try {
-            returnVal = input.getBytes("UTF-16");
-        } catch (UnsupportedEncodingException e) {
-            returnVal = input.getBytes();
-            e.printStackTrace();
-        }
+        returnVal = input.getBytes(StandardCharsets.UTF_16);
         return returnVal;
     }
 

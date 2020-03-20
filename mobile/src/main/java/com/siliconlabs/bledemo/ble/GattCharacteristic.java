@@ -21,7 +21,7 @@ public enum GattCharacteristic {
     AlertLevel(0x00002a06, "org.bluetooth.characteristic.alert_level", BluetoothGattCharacteristic.FORMAT_UINT8),
     TxPowerLevel(0x00002a07, "org.bluetooth.characteristic.tx_power_level", BluetoothGattCharacteristic.FORMAT_SINT8),
     Temperature(0x00002a1c, "org.bluetooth.characteristic.temperature_measurement", new TemperatureValue.Factory()),
-    TemperatureType(0x00002a1d, " org.bluetooth.characteristic.temperature_type", BluetoothGattCharacteristic.FORMAT_UINT8),
+    TemperatureType(0x00002a1d, "org.bluetooth.characteristic.temperature_type", BluetoothGattCharacteristic.FORMAT_UINT8),
     IntermediateTemperature(0x00002a1e, " org.bluetooth.characteristic.intermediate_temperature", new TemperatureValue.Factory()),
     ManufacturerName(0x00002a29, "org.bluetooth.characteristic.manufacturer_name_string"),
     ModelNumberString(0x00002a24, "org.bluetooth.characteristic.model_number_string"),

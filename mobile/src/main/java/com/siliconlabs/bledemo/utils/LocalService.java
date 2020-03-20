@@ -14,12 +14,13 @@ import timber.log.Timber;
 /**
  * This class can be the base-class of any service that runs locally, i.e. runs in the
  * same process as the code that uses the service.
-*/
+ */
 public class LocalService<S extends LocalService> extends Service {
 
     /**
      * Implement this class to properly define the implementing class of a LocalService
      * and to receive an instance of the LocalService when it is created and connected/bound.
+     *
      * @param <S>
      */
     public static abstract class Binding<S extends LocalService> {
@@ -29,7 +30,7 @@ public class LocalService<S extends LocalService> extends Service {
         final ServiceConnection connection = new ServiceConnection() {
             @Override
             public final void onServiceConnected(ComponentName className, IBinder serviceBinder) {
-                final LocalService<S>.LocalBinder binder = (LocalService<S>.LocalBinder)serviceBinder;
+                final LocalService<S>.LocalBinder binder = (LocalService<S>.LocalBinder) serviceBinder;
                 onBound(binder.getService());
             }
 
@@ -74,6 +75,7 @@ public class LocalService<S extends LocalService> extends Service {
 
         /**
          * Returns the specific sub-class of the LocalService that needs to be created.
+         *
          * @return The LocalService's sub-class.
          */
         protected abstract Class<S> getServiceClass();
@@ -81,6 +83,7 @@ public class LocalService<S extends LocalService> extends Service {
         /**
          * Is called when the LocalService is bound to the caller after a call to {@link LocalService#bind(LocalService.Binding)}.
          * To unbind, call {@link LocalService.Binding#unbind()}.
+         *
          * @param service The service that is now bound. If it is null, the service could not be bound.
          * @return True if binding was successful.
          */
@@ -88,12 +91,13 @@ public class LocalService<S extends LocalService> extends Service {
 
         @Override
         public String toString() {
-            return "Binding["+getServiceClass().toString()+"]";
+            return "Binding[" + getServiceClass().toString() + "]";
         }
     }
 
     /**
      * Binds a service to the given binding (and its context).
+     *
      * @param binding
      * @param <T>
      */
@@ -118,7 +122,7 @@ public class LocalService<S extends LocalService> extends Service {
 
     public class LocalBinder extends Binder {
         final S getService() {
-            return (S)LocalService.this;
+            return (S) LocalService.this;
         }
     }
 }

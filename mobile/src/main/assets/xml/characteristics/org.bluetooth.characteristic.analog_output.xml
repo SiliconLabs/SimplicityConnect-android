@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?><!--Copyright 2015 Bluetooth SIG, Inc. All rights reserved.-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Analog Output"
+    approved="NO" last-modified="2012-03-13" type="org.bluetooth.characteristic.analog_output"
+    uuid="2A59" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd">
+    <InformativeText>
+        <Summary>
+            The Analog Output characteristic represents the value of an analog output as a 16-bit
+            integer (uint16). The format of the analog value depends on the implementation.
+        </Summary>
+    </InformativeText>
+    <Value>
+        <Field name="Analog Value">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint16</Format>
+        </Field>
+    </Value>
+    <Note>
+        The Octet Order in the above table is in the order of LSO to MSO, where LSO = Least
+        Significant Octet and MSO = Most Significant Octet.
+    </Note>
+</Characteristic>

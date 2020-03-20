@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2016 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" name="Resolvable Private Address Only" type="org.bluetooth.characteristic.resolvable_private_address_only" uuid="2AC9" last-modified="2016-12-06" approved="Yes">
+  <InformativeText>
+    <Abstract>
+      The Resolvable Private Address Only characteristic defines whether the device will only use Resolvable Private Addresses (RPAs) as local addresses.
+    </Abstract>
+  </InformativeText>
+  <Value>
+    <Field name="Resolvable Private Address">
+      <Requirement>Mandatory</Requirement>
+      <Format>uint8</Format>
+      <Unit>org.bluetooth.unit.unitless</Unit>
+      <Enumerations>
+        <Enumeration key="0" value="Only Resolvable Private Addresses will be used as local addresses after bonding"/>
+        <ReservedForFutureUse start="1" end="255"/>
+      </Enumerations>
+    </Field>
+  </Value>
+  <Note>
+    A device shall have only one instance of the Resolvable Private Address Only characteristic. If the Resolvable Private Address Only characteristic is not present, then it cannot be assumed that only Resolvable Private Addresses will be used over the air.
+  </Note>
+</Characteristic>

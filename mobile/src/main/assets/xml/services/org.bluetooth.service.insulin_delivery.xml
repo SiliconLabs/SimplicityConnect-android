@@ -1,0 +1,298 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2018 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Service xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/service.xsd" type="org.bluetooth.service.insulin_delivery" uuid="183A" name="Insulin Delivery" last-modified="2018-07-24" approved="Yes">
+	<InformativeText>
+		<Abstract>
+			This service exposes the control capability, the status of an Insulin Delivery Device (IDD) running an insulin infusion therapy, and historical therapy data to be used in the personal and professional healthcare industry.
+		</Abstract>
+		<Summary>
+			The Insulin Delivery service is instantiated as a Primary Service.
+		</Summary>
+	</InformativeText>
+	<Dependencies>
+		<Dependency>
+			This service is not dependent upon any other services.
+		</Dependency>
+	</Dependencies>
+	<GATTRequirements>
+		<Requirement subProcedure="Write Characteristic Values">Mandatory</Requirement>
+		<Requirement subProcedure="Notifications">Mandatory</Requirement>
+		<Requirement subProcedure="Indications">Mandatory</Requirement>
+		<Requirement subProcedure="Read Characteristic Descriptors">Mandatory</Requirement>
+		<Requirement subProcedure="Write Characteristic Descriptors">Mandatory</Requirement>
+	</GATTRequirements>
+	<Transports>
+		<Classic>false</Classic>
+		<LowEnergy>true</LowEnergy>
+	</Transports>
+	<ErrorCodes>
+		<ErrorCode name="Invalid CRC" code="0x81" Description="If E2E-Protection is supported and a Write procedure is processed with wrong Cyclic Redundancy Check (CRC) value attached."/>
+		<ErrorCode name="Counter Error" code="0x82" Description="If E2E-Protection is supported and a Write procedure is processed with an invalid Counter (invalid if missing or equal or less than the last value)."/>
+	</ErrorCodes>
+	<Characteristics>
+		<Characteristic name="IDD Status Changed" type="org.bluetooth.characteristic.idd_status_changed">
+			<InformativeText>
+				The IDD Status Changed characteristic is comprised of status changes of the insulin therapy and the insulin delivery device.
+			</InformativeText>
+			<Requirement>Mandatory</Requirement>
+			<Properties>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Mandatory</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<SecuritySettings>
+				<Security>Authorization</Security>
+			</SecuritySettings>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic name="IDD Status" type="org.bluetooth.characteristic.idd_status">
+			<InformativeText>
+				The IDD Status characteristic is comprised of status values of the insulin delivery device and the insulin therapy.
+			</InformativeText>
+			<Requirement>Mandatory</Requirement>
+			<Properties>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Mandatory</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<SecuritySettings>
+				<Security>Authorization</Security>
+			</SecuritySettings>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic name="IDD Annunciation Status" type="org.bluetooth.characteristic.idd_annunciation_status">
+			<InformativeText>
+				The IDD Annunciation Status characteristic is a variable length structure comprising of messages that describe state changes of the insulin delivery device and in the therapy relevant functions.
+			</InformativeText>
+			<Requirement>Mandatory</Requirement>
+			<Properties>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Mandatory</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<SecuritySettings>
+				<Security>Authorization</Security>
+			</SecuritySettings>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic name="IDD Features" type="org.bluetooth.characteristic.idd_features">
+			<InformativeText>
+				The IDD Features characteristic shall be used to describe the supported features of the Server.
+			</InformativeText>
+			<Requirement>Mandatory</Requirement>
+			<Properties>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<SecuritySettings>
+				<Security>Authorization</Security>
+			</SecuritySettings>
+		</Characteristic>
+		<Characteristic name="IDD Status Reader Control Point" type="org.bluetooth.characteristic.idd_status_reader_control_point">
+			<InformativeText>
+				The IDD Status Reader Control Point provides insulin therapy relevant status information (e.g., currently running boluses or current basal rate).
+			</InformativeText>
+			<Requirement>Mandatory</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Mandatory</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Mandatory</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<SecuritySettings>
+				<Security>Authorization</Security>
+			</SecuritySettings>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic name="IDD Command Control Point" type="org.bluetooth.characteristic.idd_command_control_point">
+			<InformativeText>
+				The IDD Command Control Point provides procedures to support the insulin therapy by adapting therapy parameters to operate the insulin therapy remotely and to perform a remote operation of the device maintenance.
+			</InformativeText>
+			<Requirement>Optional</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Mandatory</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Mandatory</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<SecuritySettings>
+				<Security>Authorization</Security>
+			</SecuritySettings>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic name="IDD Command Data" type="org.bluetooth.characteristic.idd_command_data">
+			<InformativeText>
+				The IDD Command Data characteristic is comprised of response records from executed procedures of the IDD Command Control Point.
+			</InformativeText>
+			<Requirement>Conditional</Requirement>
+			<Properties>
+				<InformativeText>
+					Mandatory if the optional IDD Command Control Point is included, otherwise excluded.
+				</InformativeText>
+				<Read>Excluded</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Mandatory</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<SecuritySettings>
+				<Security>Authorization</Security>
+			</SecuritySettings>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic name="IDD Record Access Control Point" type="org.bluetooth.characteristic.idd_record_access_control_point">
+			<InformativeText>
+				The IDD Record Access Control Point (IDD RACP) is based on the Record Access Control Point (RACP). The IDD RACP is used for basic management and access of the history database of the Server including historical data of the insulin therapy, device state changes, and annunciations.
+			</InformativeText>
+			<Requirement>Optional</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Mandatory</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Mandatory</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+				<ExtendedProperties>Excluded</ExtendedProperties>
+			</Properties>
+			<SecuritySettings>
+				<Security>Authorization</Security>
+			</SecuritySettings>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<InformativeText>
+						Read Property: Readable with no authentication or authorization already defined in Bluetooth Core Specification v4.0 as amended by CSA3 and CSS v2 or later
+					</InformativeText>
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic name="IDD History Data" type="org.bluetooth.characteristic.idd_history_data">
+			<InformativeText>
+				The IDD History Data characteristic is comprised of response records from executed procedures of the Record Access Control Point.
+			</InformativeText>
+			<Requirement>Conditional</Requirement>
+			<Properties>
+				<InformativeText>
+					Mandatory if the optional IDD Record Access Control Point is included, otherwise excluded.
+				</InformativeText>
+				<Read>Excluded</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Mandatory</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<SecuritySettings>
+				<Security>Authorization</Security>
+			</SecuritySettings>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+	</Characteristics>
+</Service>

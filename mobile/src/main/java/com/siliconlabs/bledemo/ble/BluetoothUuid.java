@@ -18,6 +18,7 @@ package com.siliconlabs.bledemo.ble;
 
 // THIS IS MODIFIED COPY OF THE "L" PLATFORM CLASS. BE CAREFUL ABOUT EDITS.
 // THIS CODE SHOULD FOLLOW ANDROID STYLE.
+
 import android.os.ParcelUuid;
 
 import java.nio.ByteBuffer;
@@ -74,15 +75,21 @@ public final class BluetoothUuid {
             ParcelUuid.fromString("00001132-0000-1000-8000-00805F9B34FB");
     public static final ParcelUuid BASE_UUID =
             ParcelUuid.fromString("00000000-0000-1000-8000-00805F9B34FB");
-    /** Length of bytes for 16 bit UUID */
+    /**
+     * Length of bytes for 16 bit UUID
+     */
     public static final int UUID_BYTES_16_BIT = 2;
-    /** Length of bytes for 32 bit UUID */
+    /**
+     * Length of bytes for 32 bit UUID
+     */
     public static final int UUID_BYTES_32_BIT = 4;
-    /** Length of bytes for 128 bit UUID */
+    /**
+     * Length of bytes for 128 bit UUID
+     */
     public static final int UUID_BYTES_128_BIT = 16;
     public static final ParcelUuid[] RESERVED_UUIDS = {
             AudioSink, AudioSource, AdvAudioDist, HSP, Handsfree, AvrcpController, AvrcpTarget,
-            ObexObjectPush, PANU, NAP, MAP, MNS, MAS };
+            ObexObjectPush, PANU, NAP, MAP, MNS, MAS};
 
     public static boolean isAudioSource(ParcelUuid uuid) {
         return uuid.equals(AudioSource);
@@ -172,12 +179,12 @@ public final class BluetoothUuid {
             return true;
         }
         if (uuidA == null) {
-            return uuidB.length == 0 ? true : false;
+            return uuidB.length == 0;
         }
         if (uuidB == null) {
-            return uuidA.length == 0 ? true : false;
+            return uuidA.length == 0;
         }
-        HashSet<ParcelUuid> uuidSet = new HashSet<ParcelUuid>(Arrays.asList(uuidA));
+        HashSet<ParcelUuid> uuidSet = new HashSet<>(Arrays.asList(uuidA));
         for (ParcelUuid uuid : uuidB) {
             if (uuidSet.contains(uuid)) {
                 return true;
@@ -197,12 +204,12 @@ public final class BluetoothUuid {
             return true;
         }
         if (uuidA == null) {
-            return uuidB.length == 0 ? true : false;
+            return uuidB.length == 0;
         }
         if (uuidB == null) {
             return true;
         }
-        HashSet<ParcelUuid> uuidSet = new HashSet<ParcelUuid>(Arrays.asList(uuidA));
+        HashSet<ParcelUuid> uuidSet = new HashSet<>(Arrays.asList(uuidA));
         for (ParcelUuid uuid : uuidB) {
             if (!uuidSet.contains(uuid)) {
                 return false;

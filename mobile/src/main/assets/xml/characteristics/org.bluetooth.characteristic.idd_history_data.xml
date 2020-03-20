@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2018 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" name="IDD History Data" type="org.bluetooth.characteristic.idd_history_data" uuid="2B28" last-modified="2018-07-24" approved="Yes">
+    <InformativeText>
+        <Summary>
+            The IDD History Data characteristic is defined in the Insulin Delivery Service Specification.
+        </Summary>
+    </InformativeText>
+</Characteristic>

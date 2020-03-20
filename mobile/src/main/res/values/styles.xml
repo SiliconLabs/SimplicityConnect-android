@@ -42,10 +42,6 @@
         <item name="android:background">?attr/listChoiceBackgroundIndicator</item>
     </style>
 
-    <style name="TabRed" parent="Tab">
-        <item name="android:textColor">@color/device_tab_red_text</item>
-    </style>
-
     <style name="ThermoLabelText" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">@dimen/thermo_label_text_size</item>
@@ -65,15 +61,6 @@
         <item name="android:color">@color/masala</item>
     </style>
 
-    <style name="ThermoTextButton" parent="TextAppearance.AppCompat">
-        <item name="android:textSize">@dimen/thermo_label_text_size</item>
-        <item name="android:textColor">@color/outline_button_text_color</item>
-        <item name="android:layout_marginTop">10dp</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:drawablePadding">10dp</item>
-        <item name="android:textAllCaps">true</item>
-    </style>
-
     <style name="ThermoGraphTimeText">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -82,27 +69,34 @@
         <item name="android:textSize">@dimen/thermo_graph_time_text_size</item>
     </style>
 
-    <style name="DemoItemStyle" parent="Base.Widget.AppCompat.ListView">
-        <item name="android:layout_marginTop">@dimen/item_padding</item>
-        <item name="android:layout_marginBottom">@dimen/item_padding</item>
-        <item name="android:layout_marginEnd">@dimen/demo_item_padding_hor</item>
-        <item name="android:layout_marginStart">@dimen/demo_item_padding_hor</item>
-        <item name="android:background">?attr/listChoiceBackgroundIndicator</item>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+
+    <!-- Bottom navigation styles -->
+    <style name="Widget.BottomNavigationViewInactive" parent="Widget.Design.BottomNavigationView">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/silabs_subtle_text</item>
+        <item name="android:textSize">@dimen/bottom_navigation_text_size</item>
     </style>
 
-    <style name="UnitSelectorText" parent="TextAppearance.AppCompat">
-        <item name="android:background">@drawable/unit_circle_selector</item>
-        <item name="android:textSize">@dimen/thermo_value_text_size</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:gravity">center</item>
+    <style name="Widget.BottomNavigationViewActive" parent="Widget.Design.BottomNavigationView">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/silabs_blue</item>
+        <item name="android:textSize">@dimen/bottom_navigation_text_size</item>
+    </style>
+    <!-- =========== -->
+
+    <style name="TextAppearance.ToolbarTitle" parent="">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/toolbar_title_size</item>
+        <item name="android:textColor">@color/silabs_white</item>
     </style>
 
-    <style name="SliderBarAppearance" parent="Widget.AppCompat.ProgressBar.Horizontal">
-        <item name="android:progressDrawable">@drawable/seekbar_drawable</item>
-        <item name="android:maxHeight">3dp</item>
-        <item name="android:thumb">@drawable/seekbar_thumb</item>
-        <item name="android:thumbOffset">8dp</item>
+    <style name="TextAppearance.TabText" parent="">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/tab_text_size</item>
+        <item name="android:textColor">@color/silabs_white</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
 </resources>

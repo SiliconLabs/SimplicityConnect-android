@@ -34,8 +34,9 @@ public class Utils {
             // the iBeacon minor number
             int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
 
-            IBeaconInfo iBeaconInfo = new IBeaconInfo(uuid, major, minor);
-            return iBeaconInfo;
+            int power = scanRecord[startByte + 24];
+
+            return new IBeaconInfo(uuid, major, minor, power);
         }
 
         return null;

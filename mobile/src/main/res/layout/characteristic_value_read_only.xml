@@ -2,157 +2,104 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="@dimen/debug_mode_characteristic_encoding_read_only_container_padding">
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/encoding_header_label_readonly"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/encoded_values_vertical_margin"
-        android:text="@string/encoding_label"
-        android:textSize="@dimen/encoded_value_text_size" />
-
-    <HorizontalScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:scrollbars="none"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/hex_text_readonly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/hex"
+            android:textColor="@color/silabs_subtle_text"
+            android:textSize="@dimen/encoded_label_text_size" />
+
+        <EditText
+            android:id="@+id/hex_edit_readonly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:fontFamily="sans-serif"
+            android:singleLine="true"
+            android:textSize="@dimen/encoded_value_text_size" />
 
-            <EditText
-                android:id="@+id/hex_edit_readonly"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/encoded_values_horizontal_margin"
-                android:clickable="false"
-                android:digits="0123456789ABCDEFabcdef"
-                android:editable="false"
-                android:enabled="false"
-                android:imeOptions="actionDone"
-                android:inputType="text|textNoSuggestions"
-                android:singleLine="true"
-                android:textSize="@dimen/encoded_value_text_size"
-                android:visibility="visible" />
-
-            <EditText
-                android:id="@+id/hex_readonly"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/encoded_values_horizontal_margin"
-                android:clickable="false"
-                android:editable="false"
-                android:enabled="false"
-                android:imeOptions="actionDone"
-                android:inputType="text|textNoSuggestions"
-                android:singleLine="true"
-                android:textSize="@dimen/encoded_value_text_size"
-                android:visibility="visible" />
-        </LinearLayout>
-    </HorizontalScrollView>
-
-    <TextView
-        android:id="@+id/hex_text_readonly"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
-        android:text="@string/hex"
-        android:textColor="@color/silicon_labs_dark_gray"
-        android:textSize="@dimen/encoded_label_text_size" />
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:scrollbars="none"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
+        <EditText
+            android:id="@+id/hex_readonly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:fontFamily="sans-serif"
+            android:singleLine="true"
+            android:textSize="@dimen/encoded_value_text_size" />
+    </LinearLayout>
 
-            <EditText
-                android:id="@+id/ascii_edit_readonly"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/encoded_value_margin_top"
-                android:clickable="false"
-                android:editable="false"
-                android:enabled="false"
-                android:imeOptions="actionDone"
-                android:singleLine="true"
-                android:textSize="@dimen/encoded_value_text_size" />
 
-            <EditText
-                android:id="@+id/ascii_readonly"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/encoded_value_margin_top"
-                android:clickable="false"
-                android:editable="false"
-                android:enabled="false"
-                android:imeOptions="actionDone"
-                android:singleLine="true"
-                android:textSize="@dimen/encoded_value_text_size" />
-        </LinearLayout>
-    </HorizontalScrollView>
-
-    <TextView
-        android:id="@+id/ascii_text_readonly"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
-        android:text="@string/ascii"
-        android:textColor="@color/silicon_labs_dark_gray"
-        android:textSize="@dimen/encoded_label_text_size" />
-
-    <HorizontalScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:scrollbars="none"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/ascii_text_readonly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/ascii"
+            android:textColor="@color/silabs_subtle_text"
+            android:textSize="@dimen/encoded_label_text_size" />
+
+        <EditText
+            android:id="@+id/ascii_edit_readonly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:fontFamily="sans-serif"
+            android:singleLine="true"
+            android:textSize="@dimen/encoded_value_text_size" />
 
-            <EditText
-                android:id="@+id/decimalEdit_readonly"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/encoded_value_margin_top"
-                android:clickable="false"
-                android:digits="1234567890 "
-                android:editable="false"
-                android:enabled="false"
-                android:imeOptions="actionDone"
-                android:inputType="number"
-                android:singleLine="true"
-                android:textSize="@dimen/encoded_value_text_size" />
+        <EditText
+            android:id="@+id/ascii_readonly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:singleLine="true"
+            android:textSize="@dimen/encoded_value_text_size" />
+    </LinearLayout>
 
-            <EditText
-                android:id="@+id/decimal_readonly"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/encoded_value_margin_top"
-                android:clickable="false"
-                android:editable="false"
-                android:enabled="false"
-                android:imeOptions="actionDone"
-                android:inputType="number"
-                android:singleLine="true"
-                android:textSize="@dimen/encoded_value_text_size" />
-        </LinearLayout>
-    </HorizontalScrollView>
 
-    <TextView
-        android:id="@+id/decimal_text_readonly"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/encoded_values_horizontal_margin"
-        android:text="@string/decimal"
-        android:textColor="@color/silicon_labs_dark_gray"
-        android:textSize="@dimen/encoded_label_text_size" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/decimal_text_readonly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/decimal"
+            android:textColor="@color/silabs_subtle_text"
+            android:textSize="@dimen/encoded_label_text_size" />
+
+        <EditText
+            android:id="@+id/decimalEdit_readonly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:singleLine="true"
+            android:textSize="@dimen/encoded_value_text_size" />
+
+        <EditText
+            android:id="@+id/decimal_readonly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:singleLine="true"
+            android:textSize="@dimen/encoded_value_text_size" />
+    </LinearLayout>
+
 </LinearLayout>

@@ -48,17 +48,20 @@ public class TemperatureReading {
         }
     }
 
-    Type type;
-    HtmType htmType;
-    double temperature;
-    double normalizedTemperature;
-    long readingTime;
+    private Type type;
+    private HtmType htmType;
+    private double temperature;
+    private double normalizedTemperature;
+    private long readingTime;
 
-    public TemperatureReading(Type type, double temperature, long readingTime, HtmType htmType) {
+    public void setHtmType(HtmType htmType) {
+        this.htmType = htmType;
+    }
+
+    public TemperatureReading(Type type, double temperature, long readingTime) {
         this.type = type;
         this.temperature = temperature;
         this.readingTime = readingTime;
-        this.htmType = htmType;
         if (temperature > type.normalizedMax) {
             normalizedTemperature = type.normalizedMax;
         } else if (temperature < type.normalizedMin) {
@@ -75,7 +78,7 @@ public class TemperatureReading {
         int tempData = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, 1); //ByteBuffer.wrap(data, 1, 4).getInt();
         int exponent = tempData >> 24;
         int mantissa = tempData & 0x00FFFFFF;
-        double actualTemp = (double)mantissa * (double)Math.pow(10, exponent);
+        double actualTemp = (double) mantissa * Math.pow(10, exponent);
         long time;
         if ((flags & 0x02) > 0) {
             int year = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 5);
@@ -97,11 +100,7 @@ public class TemperatureReading {
         } else {
             time = System.currentTimeMillis();
         }
-        HtmType readHtmType = HtmType.UNKNOWN;
-        if((flags & 0x04) > 0) {
-            readHtmType = HtmType.values()[characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 12)];
-        }
-        return new TemperatureReading(type, actualTemp, time, readHtmType);
+        return new TemperatureReading(type, actualTemp, time);
     }
 
     public String getFormattedTime() {
@@ -139,12 +138,12 @@ public class TemperatureReading {
 
     //Dummy data
     public static TemperatureReading getSampleReading() {
-        long time = System.currentTimeMillis() - (long)(Math.random() * 6000000);
-        float temp = (float)(Math.random() * Type.FAHRENHEIT.getRange()) + Type.FAHRENHEIT.normalizedMin;
+        long time = System.currentTimeMillis() - (long) (Math.random() * 6000000);
+        float temp = (float) (Math.random() * Type.FAHRENHEIT.getRange()) + Type.FAHRENHEIT.normalizedMin;
         if (time % 3 == 0) {
-            temp = Type.FAHRENHEIT.normalizedMax - 15 + (float)(Math.random() * 50);
+            temp = Type.FAHRENHEIT.normalizedMax - 15 + (float) (Math.random() * 50);
         }
-        return new TemperatureReading(Type.FAHRENHEIT, temp, time, HtmType.UNKNOWN);
+        return new TemperatureReading(Type.FAHRENHEIT, temp, time);
     }
 
     public static double fahrenheitToCelsius(double fTemp) {

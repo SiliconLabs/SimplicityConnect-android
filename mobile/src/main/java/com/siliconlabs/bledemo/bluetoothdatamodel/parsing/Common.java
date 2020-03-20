@@ -7,10 +7,10 @@
  * Copyright (c) 2013, Bluegiga Technologies
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files ("Software")
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+ * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
- * THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF 
+ * THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
@@ -19,6 +19,9 @@ package com.siliconlabs.bledemo.bluetoothdatamodel.parsing;
 import android.content.Context;
 
 import com.siliconlabs.bledemo.R;
+import com.siliconlabs.bledemo.activity.DeviceServicesActivity;
+import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Service;
+import com.siliconlabs.bledemo.utils.Constants;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -85,7 +88,7 @@ public class Common {
 
         private final int value;
 
-        private PropertyType(int value) {
+        PropertyType(int value) {
             this.value = value;
         }
 
@@ -106,23 +109,23 @@ public class Common {
 
     // Compares two uuid objects
     public static boolean equalsUUID(UUID uuida, UUID uuidb) {
-        return (uuida.compareTo(uuidb) == 0 ? true : false);
+        return (uuida.compareTo(uuidb) == 0);
     }
 
     // Gets properties as human readable text
     public static String getProperties(Context context, int properties) {
-        String props = new String();
+        StringBuilder props = new StringBuilder();
         String[] propertyNames = context.getResources().getStringArray(R.array.properties_array);
         for (int i = 0; i < 8; i++) {
             if (((properties >> i) & 1) != 0) {
-                props += propertyNames[i] + ", ";
+                props.append(propertyNames[i]).append(", ");
             }
         }
         // remove last comma
         if (props.length() > 0) {
-            props = props.substring(0, props.length() - 2);
+            props = new StringBuilder(props.substring(0, props.length() - 2));
         }
-        return props;
+        return props.toString();
     }
 
     // Checks if given property is set
@@ -218,4 +221,17 @@ public class Common {
             return strUuid;
         }
     }
+
+    public static String getServiceName(UUID uuid, Context context) {
+        Service service = Engine.getInstance().getService(uuid);
+        return service != null ? service.getName().trim() : context.getString(R.string.unknown_service);
+    }
+
+    public static String checkOTAService(String serviceUuid, String serviceName){
+        if (serviceUuid.toLowerCase().equals(DeviceServicesActivity.ota_service.toString().toLowerCase())){
+            return Constants.OTA_SERVICE;
+        }
+        return serviceName;
+    }
+
 }

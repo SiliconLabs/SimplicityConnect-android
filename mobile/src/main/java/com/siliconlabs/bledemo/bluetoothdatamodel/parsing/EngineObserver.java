@@ -19,5 +19,5 @@ package com.siliconlabs.bledemo.bluetoothdatamodel.parsing;
 // EnigneObserver - callback interface
 public interface EngineObserver {
     // Called when all characteristic are parsed
-    public void onCharacteristicsLoaded();
+    void onCharacteristicsLoaded();
 }

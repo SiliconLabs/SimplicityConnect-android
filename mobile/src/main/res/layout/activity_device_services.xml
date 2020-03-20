@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/silicon_labs_device_list_background"
+    android:background="@color/silabs_background"
     tools:context=".activity.DeviceServicesActivity">
 
     <include
@@ -12,26 +12,93 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true" />
+
+    <LinearLayout
+        android:id="@+id/header_services"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:background="@color/silabs_red"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="5dp">
+
+        <ImageView
+            android:id="@+id/rssi_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_wifi_24px"
+            android:tint="@android:color/white" />
+
+        <TextView
+            android:id="@+id/rssi_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="4dp"
+            android:fontFamily="sans-serif"
+            android:maxLines="1"
+            android:text="- dBm"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/rssi_indicator_text_size" />
+    </LinearLayout>
+
+
+    <include
+        android:id="@+id/services_toolbar"
+        layout="@layout/services_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_below="@id/header_services" />
+
+    <RelativeLayout
+        android:id="@+id/framelayout_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/services_toolbar"
+        android:background="@drawable/browser_card_bg">
+
+        <FrameLayout
+            android:id="@+id/frame_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/bluetooth_browser_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/services_toolbar"
+        android:layout_alignParentBottom="true"
+        android:clickable="true"
+        android:visibility="gone" />
+
     <RelativeLayout
         android:id="@+id/servicesWrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-        android:background="@color/silicon_labs_device_list_background">
+        android:layout_below="@id/services_toolbar"
+        android:background="@color/silabs_transparent">
+
         <RelativeLayout
             android:id="@+id/scrollViewWrapper"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-            <LinearLayout
-                android:id="@+id/services_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingLeft="@dimen/swipe_refresh_devices_horizontal_padding"
-                android:paddingRight="@dimen/swipe_refresh_devices_horizontal_padding" />
+
+                <LinearLayout
+                    android:id="@+id/services_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:paddingLeft="@dimen/swipe_refresh_devices_horizontal_padding"
+                    android:paddingRight="@dimen/swipe_refresh_devices_horizontal_padding" />
             </ScrollView>
         </RelativeLayout>
 
@@ -39,30 +106,16 @@
             android:id="@+id/loading_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/debug_connecting_background"
+            android:background="@color/silabs_connecting_background"
             android:visibility="gone">
 
             <LinearLayout
                 android:id="@+id/device_services_background"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/silicon_labs_device_list_background"
+                android:background="@color/silabs_background"
                 android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="@dimen/no_device_found_image_width"
-                    android:layout_height="@dimen/no_device_found_image_height"
-                    android:src="@drawable/debug_scanning" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/device_scanning_bgnd_graphic_text_spacing"
-                    android:gravity="center"
-                    android:text="@string/device_loading_characteristic_details"
-                    android:textSize="@dimen/scanning_for_devices_title_label_textsize" />
-            </LinearLayout>
+                android:orientation="vertical" />
 
             <RelativeLayout
                 android:id="@+id/loading_bar_container"
@@ -75,10 +128,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/scanning_animation_bar_height"
                     android:layout_alignParentBottom="true"
-                    android:background="@color/scanning_animation_bar_background"
+                    android:background="@color/silabs_red"
                     android:gravity="center"
                     android:text="@string/debug_mode_device_loading_gatt_info"
-                    android:textColor="@color/scanning_animation_text_label"
+                    android:textColor="@color/silabs_white"
                     android:textSize="@dimen/scanning_animation_bar_textsize"
                     android:visibility="visible" />
 
@@ -104,15 +157,15 @@
             android:layout_height="300dp"
             android:layout_below="@id/loading_container"
             android:layout_alignParentBottom="true"
-            android:background="@color/background_material_dark"
             android:animateLayoutChanges="true"
+            android:background="@color/background_material_dark"
             android:visibility="gone">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:background="@color/alizarin_crimson"
-                android:layout_alignParentTop="true" />
+                android:layout_alignParentTop="true"
+                android:background="@color/silabs_red" />
         </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

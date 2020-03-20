@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?><!--
+ Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Date UTC"
+    approved="Yes" type="org.bluetooth.characteristic.date_utc" uuid="2AED" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd">
+    <InformativeText>
+        <Abstract>
+            Date as days elapsed since the Epoch (Jan 1, 1970) in the Coordinated Universal Time
+            (UTC) time zone.
+        </Abstract>
+    </InformativeText>
+    <Value>
+        <Field name="Date">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint24</Format>
+            <Unit>org.bluetooth.unit.time.day</Unit>
+            <Minimum>1</Minimum>
+            <Maximum>16777214</Maximum>
+            <AdditionalValues>
+                <Enumeration key="0" value="value is not known" />
+            </AdditionalValues>
+        </Field>
+    </Value>
+</Characteristic>

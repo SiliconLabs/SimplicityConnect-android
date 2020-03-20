@@ -1,69 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/alizarin_crimson">
+        android:background="@color/silabs_red">
+
         <TextView
-            android:text="Request MTU"
-            android:layout_margin="15dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/silicon_labs_white"
-            android:textStyle="bold"/>
+            android:layout_margin="15dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/Request_MTU"
+            android:textColor="@color/silabs_white" />
     </LinearLayout>
+
     <View
         android:id="@+id/buttons_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/dialog_separator_dark_gray" />
+        android:background="@color/silabs_divider" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingTop="20dp"
+        android:paddingBottom="10dp">
 
         <TextView
-            android:text="MTU: "
-            android:layout_margin="15dp"
+            android:id="@+id/request_mtu_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:inputType="number"
+            android:text="@string/mtu_max"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingBottom="20dp"
+        android:weightSum="1">
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="left"
-            android:maxLength="4"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:layout_weight="0.1"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:inputType="number"
+            android:text="@string/mtu_min"
+            android:textSize="12sp" />
 
-        <EditText
-            android:id="@+id/mtuvalue"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:maxLength="3"
-            android:inputType="number"/>
+        <SeekBar
+            android:id="@+id/request_mtu_seekBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.8" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.1"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:inputType="number"
+            android:text="@string/mtu_max"
+            android:textSize="12sp" />
     </LinearLayout>
+
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-            <Button
-            android:id="@+id/cancel_request"
-            android:text="CANCEL"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="@color/silicon_labs_white"
-            android:textStyle="bold"
-            android:background="@color/alizarin_crimson" />
-            <Button
-            android:id="@+id/request"
-            android:text="REQUEST"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="@color/silicon_labs_white"
-            android:textStyle="bold"
-            android:background="@color/alizarin_crimson" />
-    </LinearLayout>
+        android:orientation="horizontal"
+        android:weightSum="2">
 
+        <Button
+            android:id="@+id/cancel_request"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/silabs_red"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/Cancel"
+            android:textColor="@color/silabs_white"
+            android:textSize="@dimen/browser_button_text_size" />
+
+        <Button
+            android:id="@+id/request"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/silabs_red"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/Request"
+            android:textColor="@color/silabs_white"
+            android:textSize="@dimen/browser_button_text_size" />
+    </LinearLayout>
 
 </LinearLayout>

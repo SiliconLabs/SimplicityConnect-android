@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2017 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" name="RC Settings" type="org.bluetooth.characteristic.rc_settings" uuid="2B1E" last-modified="2017-12-05" approved="Yes">
+    <InformativeText>
+        <Summary>
+            The RC Settings characteristic shall be used to both read and notify supported features on the Reconnection Configuration server.
+        </Summary>
+    </InformativeText>
+</Characteristic>

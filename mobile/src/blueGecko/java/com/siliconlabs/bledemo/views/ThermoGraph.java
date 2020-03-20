@@ -17,16 +17,16 @@ import java.util.ArrayList;
 public class ThermoGraph extends LinearLayout {
     private static final int NUM_BARS = 5;
 
-    final int[] barIds = {R.id.bar1, R.id.bar2, R.id.bar3, R.id.bar4, R.id.bar5};
-    final int[] timeIds = {R.id.thermo_graph_time1, R.id.thermo_graph_time2,
+    private final int[] barIds = {R.id.bar1, R.id.bar2, R.id.bar3, R.id.bar4, R.id.bar5};
+    private final int[] timeIds = {R.id.thermo_graph_time1, R.id.thermo_graph_time2,
             R.id.thermo_graph_time3, R.id.thermo_graph_time4, R.id.thermo_graph_time5};
-    View[] barViews = new View[NUM_BARS];
-    TemperatureDisplay[] tempViews = new TemperatureDisplay[NUM_BARS];
-    TextView[] timeViews = new TextView[NUM_BARS];
-    ArrayList<TemperatureReading> readings = new ArrayList<>();
-    LinearLayout placeholder;
+    private View[] barViews = new View[NUM_BARS];
+    private TemperatureDisplay[] tempViews = new TemperatureDisplay[NUM_BARS];
+    private TextView[] timeViews = new TextView[NUM_BARS];
+    private ArrayList<TemperatureReading> readings = new ArrayList<>();
+    private LinearLayout placeholder;
 
-    TemperatureReading.Type displayMode = TemperatureReading.Type.FAHRENHEIT;
+    private TemperatureReading.Type displayMode = TemperatureReading.Type.FAHRENHEIT;
 
 
     public ThermoGraph(Context context) {
@@ -59,15 +59,15 @@ public class ThermoGraph extends LinearLayout {
         super.onFinishInflate();
         //find all views in graph and add them to arrays
         for (int i = 0; i < NUM_BARS; i++) {
-            LinearLayout currentBar = (LinearLayout) findViewById(barIds[i]);
+            LinearLayout currentBar = findViewById(barIds[i]);
             barViews[i] = currentBar.findViewById(R.id.thermo_graph_bar_view);
             //left to right gradient
-            barViews[i].setAlpha((float)1.0 - (float)(0.10 * (NUM_BARS - 1 - i)));
-            tempViews[i] = (TemperatureDisplay) currentBar.findViewById(R.id.thermo_graph_temp);
+            barViews[i].setAlpha((float) 1.0 - (float) (0.10 * (NUM_BARS - 1 - i)));
+            tempViews[i] = currentBar.findViewById(R.id.thermo_graph_temp);
             //TODO: temporary
-            tempViews[i].setTemperature(new TemperatureReading(TemperatureReading.Type.FAHRENHEIT, 80d, System.currentTimeMillis(), TemperatureReading.HtmType.UNKNOWN));
-            timeViews[i] = (TextView) findViewById(timeIds[i]);
-            placeholder = (LinearLayout) findViewById(R.id.empty_placeholder);
+            tempViews[i].setTemperature(new TemperatureReading(TemperatureReading.Type.FAHRENHEIT, 80d, System.currentTimeMillis()));
+            timeViews[i] = findViewById(timeIds[i]);
+            placeholder = findViewById(R.id.empty_placeholder);
         }
     }
 
@@ -84,7 +84,7 @@ public class ThermoGraph extends LinearLayout {
             TemperatureReading currentReading = readings.get((size - 1) - i);
             double currentTemp = currentReading.getNormalizedTemperature();
             TemperatureReading.Type type = currentReading.getType();
-            float scaledValue = (float)((currentTemp - type.normalizedMin) / (type.getRange())) * 100;
+            float scaledValue = (float) ((currentTemp - type.normalizedMin) / (type.getRange())) * 100;
             int index = NUM_BARS - 1 - i;
             barViews[index].setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, scaledValue));
             toggleViews(true, index);
@@ -93,7 +93,7 @@ public class ThermoGraph extends LinearLayout {
 
         //make all unfilled views invisible
         for (; i < NUM_BARS; i++) {
-            toggleViews(false, NUM_BARS - 1 -i);
+            toggleViews(false, NUM_BARS - 1 - i);
         }
 
         placeholder.setVisibility(size > 0 ? GONE : VISIBLE);

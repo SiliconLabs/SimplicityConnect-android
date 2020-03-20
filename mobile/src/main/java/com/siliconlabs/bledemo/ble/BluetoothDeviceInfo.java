@@ -16,6 +16,12 @@ public class BluetoothDeviceInfo implements Cloneable {
     protected boolean hasAdvertDetails;
     public static int MAX_EXTRA_DATA = 3;
     private boolean connected;
+    public boolean isConnectable;
+    public String rawData;
+
+    public long intervalNanos = 0L;
+    public int count = 0;
+    public long timestampLast = 0;
 
     Object gattHandle;
     public boolean areServicesBeingDiscovered;
@@ -25,6 +31,7 @@ public class BluetoothDeviceInfo implements Cloneable {
     public BluetoothDeviceInfo() {
 
     }
+
     public boolean hasUnknownStatus() {
         return (!serviceDiscoveryFailed && !isNotOfInterest && !isOfInterest);
     }
@@ -39,10 +46,10 @@ public class BluetoothDeviceInfo implements Cloneable {
     }
 
     @Override
-    public BluetoothDeviceInfo clone()  {
+    public BluetoothDeviceInfo clone() {
         final BluetoothDeviceInfo retVal;
         try {
-            retVal = (BluetoothDeviceInfo)super.clone();
+            retVal = (BluetoothDeviceInfo) super.clone();
             retVal.device = device;
             retVal.scanInfo = scanInfo;
             retVal.isOfInterest = isOfInterest;
@@ -51,11 +58,13 @@ public class BluetoothDeviceInfo implements Cloneable {
             retVal.bleFormat = bleFormat;
             retVal.gattHandle = null;
             retVal.connected = connected;
+            retVal.isConnectable = isConnectable;
+            retVal.rawData = rawData;
             retVal.hasAdvertDetails = hasAdvertDetails;
             retVal.areServicesBeingDiscovered = areServicesBeingDiscovered;
             return retVal;
         } catch (CloneNotSupportedException e) {
-            Log.e("clone","Could not clone" + e);
+            Log.e("clone", "Could not clone" + e);
         }
         return null;
     }
@@ -87,6 +96,22 @@ public class BluetoothDeviceInfo implements Cloneable {
         return bleFormat;
     }
 
+    public void setIntervalIfLower(final long intervalNanos) {
+        if (intervalNanos <= 0L)
+            return;
+
+        if (this.intervalNanos == 0L)
+            this.intervalNanos = intervalNanos;
+        else if (intervalNanos < this.intervalNanos * 0.7 && count < 10)
+            this.intervalNanos = intervalNanos;
+        else if (intervalNanos < this.intervalNanos + 3000000) {
+            final int limitedCount = Math.min(count, 10);
+            this.intervalNanos = (((this.intervalNanos * (limitedCount - 1) + intervalNanos)) / limitedCount);
+        } else if (intervalNanos < this.intervalNanos * 1.4) {
+            this.intervalNanos = (((this.intervalNanos * (29) + intervalNanos)) / 30);
+        }
+    }
+
     public void setBleFormat(BleFormat bleFormat) {
         this.bleFormat = bleFormat;
     }
@@ -107,6 +132,7 @@ public class BluetoothDeviceInfo implements Cloneable {
     public boolean hasAdvertDetails() {
         return hasAdvertDetails || getAdvertData().size() > MAX_EXTRA_DATA;
     }
+
     public boolean isConnected() {
         return connected;
     }
@@ -130,4 +156,5 @@ public class BluetoothDeviceInfo implements Cloneable {
     public String getAddress() {
         return device.getAddress();
     }
+
 }

@@ -7,14 +7,15 @@ import android.bluetooth.le.ScanResult;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import timber.log.Timber;
 
 import java.util.List;
 
+import timber.log.Timber;
+
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 class BLEScanCallbackLollipop extends ScanCallback {
-    final BlueToothService service;
-    final Handler handler;
+    private final BlueToothService service;
+    private final Handler handler;
 
     BLEScanCallbackLollipop(BlueToothService service) {
         this.service = service;
@@ -23,7 +24,7 @@ class BLEScanCallbackLollipop extends ScanCallback {
 
     @Override
     public void onScanResult(int callbackType, ScanResult result) {
-        final BluetoothDevice device = result.getDevice();
+//        final BluetoothDevice device = result.getDevice();
 
         Timber.d("Discovered bluetoothLE +" + result.toString());
         //Log.d("onScanResult","Discovered bluetoothLE +" + result.toString());

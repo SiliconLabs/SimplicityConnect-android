@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2017 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" name="Supported Heart Rate Range" type="org.bluetooth.characteristic.supported_heart_rate_range" uuid="2AD7" last-modified="2017-02-14" approved="Yes">
+    <InformativeText>
+        <Summary>
+            The Supported Heart Rate Range characteristic is used to send the supported Heart Rate range as well as the minimum Heart Rate increment supported by the Server.
+        </Summary>
+    </InformativeText>
+    <Value>
+        <Field name="Minimum Heart Rate">
+            <InformativeText>Beats per minute with a resolution of 1</InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Unit>org.bluetooth.unit.period.beats_per_minute</Unit>
+        </Field>
+        <Field name="Maximum Heart Rate">
+            <InformativeText>Beats per minute with a resolution of 1</InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Unit>org.bluetooth.unit.period.beats_per_minute</Unit>
+        </Field>
+        <Field name="Minimum Increment">
+            <InformativeText>Beats per minute with a resolution of 1</InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Unit>org.bluetooth.unit.period.beats_per_minute</Unit>
+        </Field>
+    </Value>
+</Characteristic>

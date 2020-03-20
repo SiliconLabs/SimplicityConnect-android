@@ -3,17 +3,17 @@
     <!-- Border -->
     <item>
         <shape>
-            <solid android:color="@color/alizarin_crimson"></solid>
+            <solid android:color="@color/silabs_red" />
         </shape>
     </item>
     <!-- Body -->
     <item
         android:bottom="1dp"
-        android:right="0dp"
         android:left="0dp"
+        android:right="0dp"
         android:top="0dp">
         <shape>
-            <solid android:color="@color/dialog_title_background"></solid>
+            <solid android:color="@android:color/white" />
         </shape>
     </item>
 </layer-list>

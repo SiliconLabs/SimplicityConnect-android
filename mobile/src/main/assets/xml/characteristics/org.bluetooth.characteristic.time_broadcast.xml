@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" type="org.bluetooth.characteristic.time_broadcast" uuid="2A15" name="Time Broadcast">
+	<InformativeText> </InformativeText>
+	<Value>
+		<Field name="Time">
+			<Requirement>Mandatory</Requirement>
+			<Reference> org.bluetooth.characteristic.exact_time_256 </Reference>
+		</Field>
+		<Field name="Local Time">
+			<Requirement>Mandatory</Requirement>
+			<Reference>
+				org.bluetooth.characteristic.local_time_information
+			</Reference>
+		</Field>
+		<Field name="Reference Time">
+			<Requirement>Mandatory</Requirement>
+			<Reference>
+				org.bluetooth.characteristic.reference_time_information
+			</Reference>
+		</Field>
+	</Value>
+</Characteristic>

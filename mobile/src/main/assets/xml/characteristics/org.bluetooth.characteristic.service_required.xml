@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" type="org.bluetooth.characteristic.service_required" name="Service Required" uuid="2A3B">
+    <Value>
+        <Field name="Service Required">
+            <Requirement>Mandatory</Requirement>
+            <Format>8bit</Format>
+            <BitField>
+                <Bit index="0" size="2">
+                    <Enumerations>
+                        <Enumeration key="0" value="Unknown"/>
+                        <Enumeration key="1" value="No Service Required"/>
+                        <Enumeration key="2" value="Service Required"/>
+                        <Reserved start="3" end="255"/>
+                    </Enumerations>
+                </Bit>
+            </BitField>
+        </Field>
+    </Value>
+</Characteristic>

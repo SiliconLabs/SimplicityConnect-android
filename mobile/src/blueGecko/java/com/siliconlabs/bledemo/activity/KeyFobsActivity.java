@@ -11,8 +11,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,7 +33,9 @@ import com.siliconlabs.bledemo.ble.GattCharacteristic;
 import com.siliconlabs.bledemo.ble.GattService;
 import com.siliconlabs.bledemo.ble.TimeoutGattCallback;
 import com.siliconlabs.bledemo.interfaces.FindKeyFobCallback;
+import com.siliconlabs.bledemo.log.TimeoutLog;
 import com.siliconlabs.bledemo.utils.BLEUtils;
+import com.siliconlabs.bledemo.utils.Constants;
 
 import java.util.List;
 
@@ -37,13 +43,13 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback {
-    public static final int MAX_EXPECTED_FOB_DELTA = 18;
-    public static final int MIN_EXPECTED_FOB_DELTA = -22;
-    public static final int ALERT_TRANSITION_SMOOTHING = 4;
-    public static final int PROXIMIT_DELTA_THRESHOLD = -1;
+    private static final int MAX_EXPECTED_FOB_DELTA = 18;
+    private static final int MIN_EXPECTED_FOB_DELTA = -22;
+    private static final int ALERT_TRANSITION_SMOOTHING = 4;
+    private static final int PROXIMIT_DELTA_THRESHOLD = -1;
     private static int MODE_SHOWING_KEYFOBS_LIST = 0;
     private static int MODE_SHOWING_KEYFOB_BLINKING = 1;
-    public static final String BLINKING_FRAGMENT_ID = "BLINKING_FRAGMENT_ID";
+    private static final String BLINKING_FRAGMENT_ID = "BLINKING_FRAGMENT_ID";
 
     private int keyfobMode = MODE_SHOWING_KEYFOBS_LIST;
 
@@ -67,7 +73,7 @@ public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback 
     }
 
     @InjectView(R.id.toolbar)
-    android.support.v7.widget.Toolbar toolbar;
+    androidx.appcompat.widget.Toolbar toolbar;
     @InjectView(R.id.fragment_container)
     FrameLayout fragmentContainer;
     @InjectView(R.id.foreground_veil)
@@ -80,12 +86,13 @@ public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback 
     @InjectView(R.id.bluetooth_enable_btn)
     TextView bluetoothEnableBtn;
 
-    boolean isBluetoothAdapterEnabled = false;
+    private boolean isBluetoothAdapterEnabled = false;
     BluetoothGatt mostRecentConnectedGatt = null;
 
     private final TimeoutGattCallback gattCallback = new TimeoutGattCallback() {
         @Override
         public void onTimeout() {
+            Constants.LOGS.add(new TimeoutLog());
             dismissModalDialog();
             Toast.makeText(KeyFobsActivity.this, "Connection Timed Out", Toast.LENGTH_SHORT).show();
         }
@@ -138,7 +145,6 @@ public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback 
 
                     boolean written = BLEUtils.SetNotificationForCharacteristic(gatt, GattService.HealthThermometer, GattCharacteristic.Temperature, BLEUtils.Notifications.DISABLED);
                 }
-
 
 
 //                if (txPowerLevelCharacteristic == null && !success) {
@@ -246,10 +252,7 @@ public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback 
         if (currentAlertLevel == AlertLevelType.MILD && thresholdData <= -ALERT_TRANSITION_SMOOTHING) {
             return true;
         }
-        if (currentAlertLevel == AlertLevelType.HIGH && thresholdData >= ALERT_TRANSITION_SMOOTHING) {
-            return true;
-        }
-        return false;
+        return currentAlertLevel == AlertLevelType.HIGH && thresholdData >= ALERT_TRANSITION_SMOOTHING;
     }
 
     private AlertLevelType findAlertLevel() {
@@ -280,8 +283,8 @@ public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         keyFobActivityFragment = new KeyFobsActivityFragment();
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, keyFobActivityFragment);
         fragmentTransaction.commit();
         keyfobMode = MODE_SHOWING_KEYFOBS_LIST;
@@ -352,7 +355,7 @@ public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
+        // automatically handle clicks on the Home/Up rounded_button_red, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
@@ -426,8 +429,8 @@ public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback 
     }
 
     private void swapFragment(Fragment fragment) {
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
@@ -435,7 +438,7 @@ public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback 
 
     public void showEnableBluetoothAdapterBar() {
         bluetoothEnableMsg.setText(R.string.bluetooth_adapter_bar_disabled);
-        bluetoothEnableBar.setBackgroundColor(getResources().getColor(R.color.alizarin_crimson_darker));
+        bluetoothEnableBar.setBackgroundColor(ContextCompat.getColor(KeyFobsActivity.this, R.color.silabs_red_dark));
         bluetoothEnableBtn.setVisibility(View.VISIBLE);
         bluetoothEnableBar.setVisibility(View.VISIBLE);
         Toast.makeText(KeyFobsActivity.this, R.string.toast_bluetooth_not_enabled, Toast.LENGTH_SHORT).show();
@@ -445,7 +448,7 @@ public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback 
         BluetoothAdapter.getDefaultAdapter().enable();
         bluetoothEnableBtn.setVisibility(View.GONE);
         bluetoothEnableMsg.setText(R.string.bluetooth_adapter_bar_turning_on);
-        bluetoothEnableBar.setBackgroundColor(getResources().getColor(R.color.cerulean));
+        bluetoothEnableBar.setBackgroundColor(ContextCompat.getColor(KeyFobsActivity.this, R.color.silabs_blue));
     }
 }
 

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Copyright 2015 Bluetooth SIG, Inc. All rights reserved.-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Registered User Characteristic"
+    type="registered_user_characteristic"
+    uuid="2B37" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd">
+</Characteristic>

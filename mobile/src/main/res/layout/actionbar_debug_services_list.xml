@@ -1,4 +1,4 @@
-<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar"
     style="@style/ToolbarStyle"
@@ -6,6 +6,5 @@
     android:layout_height="wrap_content"
     android:elevation="0dp"
     android:fitsSystemWindows="true"
-    app:title="@string/developer_debug_mode_actionbar_title">
-
-</android.support.v7.widget.Toolbar>
+    app:title="@string/title_Browser"
+    app:titleTextAppearance="@style/TextAppearance.ToolbarTitle" />

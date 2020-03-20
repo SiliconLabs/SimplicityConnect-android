@@ -97,7 +97,7 @@ public class ProgressDialogWithSpinner extends android.app.ProgressDialog {
         clearAnimation();
     }
 
-    public void clearAnimation(){
+    public void clearAnimation() {
         icon.clearAnimation();
     }
 }

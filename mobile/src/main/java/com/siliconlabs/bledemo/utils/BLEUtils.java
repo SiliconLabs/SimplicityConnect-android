@@ -11,8 +11,6 @@ import com.siliconlabs.bledemo.ble.GattService;
 import java.util.List;
 import java.util.UUID;
 
-import timber.log.Timber;
-
 public class BLEUtils {
     public static final UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
@@ -20,18 +18,22 @@ public class BLEUtils {
      * Enumerated Notification State Handler
      */
     public enum Notifications {
-        DISABLED (null, false),
-        NOTIFY (Types.NOTIFICATIONS, true),
-        INDICATE (Types.INDICATIONS, true);
+        DISABLED(null, false),
+        NOTIFY(Types.NOTIFICATIONS, true),
+        INDICATE(Types.INDICATIONS, true);
 
         private enum Types {
             INDICATIONS,
             NOTIFICATIONS
         }
 
-        /** Storage Field for Enabled bool passed from .CTor */
+        /**
+         * Storage Field for Enabled bool passed from .CTor
+         */
         private final boolean enabled;
-        /** Storage Field for BluetoothGattDescriptor value based on Boolean */
+        /**
+         * Storage Field for BluetoothGattDescriptor value based on Boolean
+         */
         private final byte[] btValue;
 
         private final Types type;
@@ -46,6 +48,7 @@ public class BLEUtils {
 
         /**
          * Does this Value represent an Indications in an Enabled State?
+         *
          * @return Boolean, True = Enabled, False = Disabled
          */
         public boolean isEnabled() {
@@ -54,6 +57,7 @@ public class BLEUtils {
 
         /**
          * Get the BluetoothGattDescriptor Value for This State.
+         *
          * @return BluetoothGattDescriptor value as Byte Array
          */
         public byte[] getDescriptorValue() {
@@ -93,11 +97,12 @@ public class BLEUtils {
 
     /**
      * Set a Notification Setting for The Matching Characteristic of a Service
-     * @param gatt The Bluetooth GATT
-     * @param gattService the service we must find and match
+     *
+     * @param gatt               The Bluetooth GATT
+     * @param gattService        the service we must find and match
      * @param gattCharacteristic the characteristic we must find and match
-     * @param gattDescriptor the descriptor we must write to we must find and match
-     * @param value The exact setting we are setting
+     * @param gattDescriptor     the descriptor we must write to we must find and match
+     * @param value              The exact setting we are setting
      * @return Whether the instruction to write passed or failed.
      */
     public static boolean SetNotificationForCharacteristic(BluetoothGatt gatt, GattService gattService, GattCharacteristic gattCharacteristic, UUID gattDescriptor, Notifications value) {
@@ -122,10 +127,11 @@ public class BLEUtils {
 
     /**
      * Set a Notification Setting for The Matching Characteristic of a Service
-     * @param gatt The Bluetooth GATT
-     * @param service the service we must find and match
+     *
+     * @param gatt           The Bluetooth GATT
+     * @param service        the service we must find and match
      * @param characteristic the characteristic we must find and match
-     * @param value The exact setting we are setting
+     * @param value          The exact setting we are setting
      * @return Whether the instruction to write passed or failed.
      */
     public static boolean SetNotificationForCharacteristic(BluetoothGatt gatt, GattService service, GattCharacteristic characteristic, Notifications value) {
@@ -134,8 +140,9 @@ public class BLEUtils {
 
     /**
      * Search for a specific characteristic given a BluetoothGattService
-     * @param service the service to search through
-     * @param targetService the service that you're looking for
+     *
+     * @param service              the service to search through
+     * @param targetService        the service that you're looking for
      * @param targetCharacteristic the characteristic you're looking for
      * @return the characteristic, if it's found - null otherwise
      */

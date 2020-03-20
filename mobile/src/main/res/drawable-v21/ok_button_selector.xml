@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/alizarin_crimson_darker">
+    android:color="@color/silabs_red_selected">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@color/alizarin_crimson" />
+            <solid android:color="@color/silabs_red" />
         </shape>
     </item>
 </ripple>

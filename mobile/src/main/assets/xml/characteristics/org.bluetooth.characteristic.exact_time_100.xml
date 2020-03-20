@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8"?><!--
+ Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Exact Time 100"
+    type="org.bluetooth.characteristic.exact_time_100" uuid="2A0B" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd">
+    <InformativeText></InformativeText>
+    <Value>
+        <Field name="Exact Time">
+            <Requirement>Mandatory</Requirement>
+            <Reference>org.bluetooth.characteristic.day_date_time</Reference>
+        </Field>
+        <Field name="Fractions100">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Unit>org.bluetooth.unit.time.second</Unit>
+            <Minimum>0</Minimum>
+            <Maximum>99</Maximum>
+        </Field>
+    </Value>
+</Characteristic>

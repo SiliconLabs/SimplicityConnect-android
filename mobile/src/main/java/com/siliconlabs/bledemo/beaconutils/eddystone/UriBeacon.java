@@ -30,7 +30,7 @@ import java.util.UUID;
 
 /**
  * Copied from https://github.com/google/uribeacon/android-uribeacon/uribeacon-library/
- *             src/main/java/org/uribeacon/beacon/UriBeacon.java
+ * src/main/java/org/uribeacon/beacon/UriBeacon.java
  */
 public class UriBeacon {
 
@@ -50,7 +50,7 @@ public class UriBeacon {
     //TODO: Add comments
     public static final ParcelUuid TEST_SERVICE_UUID =
             ParcelUuid.fromString("0000FEAA-0000-1000-8000-00805F9B34FB");
-    private static final byte[] TEST_SERVICE_16_BIT_UUID_BYTES = { (byte) 0xaa, (byte) 0xfe};
+    private static final byte[] TEST_SERVICE_16_BIT_UUID_BYTES = {(byte) 0xaa, (byte) 0xfe};
     private static final byte TEST_URL_FRAME_TYPE = 0x10;
 
     /**
@@ -224,7 +224,6 @@ public class UriBeacon {
     }
 
     /**
-     *
      * @param uriString
      * @return
      */
@@ -377,7 +376,7 @@ public class UriBeacon {
      * Finds the longest expansion from the uri at the current position.
      *
      * @param uriString the Uri
-     * @param pos start position
+     * @param pos       start position
      * @return an index in URI_MAP or 0 if none.
      */
     private static byte findLongestExpansion(String uriString, int pos) {
@@ -422,7 +421,7 @@ public class UriBeacon {
     }
 
     private static byte[] encodeUrnUuid(String urn, int position, ByteBuffer bb) {
-        String uuidString = urn.substring(position, urn.length());
+        String uuidString = urn.substring(position);
         UUID uuid;
         try {
             uuid = UUID.fromString(uuidString);
@@ -502,6 +501,7 @@ public class UriBeacon {
         }
         return null;
     }
+
     private static byte[] parseTestServiceDataFromBytes(byte[] scanRecord) {
         //TODO: Add comments
         int currentPos = 0;

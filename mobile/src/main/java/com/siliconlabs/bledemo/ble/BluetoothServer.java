@@ -34,7 +34,7 @@ class BluetoothServer extends Thread {
                 socket = serverSocket.accept();
             } catch (IOException e) {
                 if (!closing) {
-                    Log.e("BluetoothServer","Error in Bluetooth Server Thread" + e);
+                    Log.e("BluetoothServer", "Error in Bluetooth Server Thread" + e);
                     Timber.e(e, "Error in Bluetooth Server Thread");
                 }
                 break;

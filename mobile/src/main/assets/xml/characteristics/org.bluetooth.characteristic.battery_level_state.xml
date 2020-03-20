@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?><!--
+Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Battery Level State"
+    type="org.bluetooth.characteristic.battery_level_state" uuid="2A1B" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd">
+    <InformativeText></InformativeText>
+    <Value>
+        <Field name="Level">
+            <Requirement>Mandatory</Requirement>
+            <Reference>org.bluetooth.characteristic.battery_level</Reference>
+        </Field>
+        <Field name="State">
+            <Requirement>Optional</Requirement>
+            <Reference>org.bluetooth.characteristic.battery_power_state</Reference>
+        </Field>
+    </Value>
+</Characteristic>

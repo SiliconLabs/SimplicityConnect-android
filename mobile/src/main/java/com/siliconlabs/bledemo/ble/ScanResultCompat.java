@@ -1,6 +1,5 @@
 package com.siliconlabs.bledemo.ble;
 
-import android.annotation.TargetApi;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanResult;
 import android.os.Build;
@@ -11,6 +10,8 @@ import com.siliconlabs.bledemo.utils.Objects;
 
 import java.util.ArrayList;
 
+import static com.siliconlabs.bledemo.utils.Constants.UNKNOWN;
+
 /**
  * Represents a compatible version of {@link ScanResult} from Lollipop or higher.
  */
@@ -20,26 +21,29 @@ public class ScanResultCompat {
     private ScanRecordCompat scanRecord;
     private long timestampNanos;
     private ArrayList<String> advertData;
+    private boolean isConnectable;
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static ScanResultCompat from(Object lollipopScanResult) {
         if (lollipopScanResult == null) {
             return null;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            ScanResult sr = (ScanResult)lollipopScanResult;
-            ScanResultCompat retVal = new ScanResultCompat();
-            retVal.device = sr.getDevice();
-            retVal.rssi = sr.getRssi();
-            retVal.scanRecord = ScanRecordCompat.from(sr.getScanRecord());
-            retVal.advertData = ScanRecordParser.getAdvertisements(sr.getScanRecord().getBytes());
-            retVal.timestampNanos = sr.getTimestampNanos();
-            return retVal;
+        ScanResult sr = (ScanResult) lollipopScanResult;
+
+        ScanResultCompat retVal = new ScanResultCompat();
+        retVal.device = sr.getDevice();
+        retVal.rssi = sr.getRssi();
+        retVal.scanRecord = ScanRecordCompat.from(sr.getScanRecord());
+        retVal.advertData = ScanRecordParser.getAdvertisements(sr.getScanRecord().getBytes());
+        retVal.timestampNanos = sr.getTimestampNanos();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            retVal.isConnectable = sr.isConnectable();
+        } else {
+            retVal.isConnectable = true;
         }
-        else {
-            throw new IllegalStateException("Current OS is not lollipop or higher.");
-        }
+
+        return retVal;
+
     }
 
     public ScanResultCompat() {
@@ -79,7 +83,7 @@ public class ScanResultCompat {
 
     public String getDisplayName(boolean forSorting) {
         final String name = device.getName(); //it was - final String name = getScanRecord().getDeviceName();
-        return !TextUtils.isEmpty(name) ? " " + name : "Unknown"; //TODO It was getDevice().getAddress()
+        return !TextUtils.isEmpty(name) ? " " + name : UNKNOWN; //TODO It was getDevice().getAddress()
     }
 
     public ArrayList<String> getAdvertData() {
@@ -88,6 +92,10 @@ public class ScanResultCompat {
 
     public void setAdvertData(ArrayList<String> advertData) {
         this.advertData = advertData;
+    }
+
+    public boolean isConnectable() {
+        return this.isConnectable;
     }
 
     @Override

@@ -1,11 +1,11 @@
 package com.siliconlabs.bledemo.activity;
 
 import android.content.DialogInterface;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.siliconlabs.bledemo.R;
-
 import com.siliconlabs.bledemo.dialogs.ProgressDialogWithSpinner;
 
 public abstract class BaseActivity extends AppCompatActivity {

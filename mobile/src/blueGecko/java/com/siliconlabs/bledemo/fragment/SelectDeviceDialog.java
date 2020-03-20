@@ -1,20 +1,22 @@
 package com.siliconlabs.bledemo.fragment;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -36,6 +38,8 @@ import com.siliconlabs.bledemo.ble.Discovery;
 import com.siliconlabs.bledemo.ble.GattService;
 import com.siliconlabs.bledemo.ble.ScanResultCompat;
 import com.siliconlabs.bledemo.ble.TimeoutGattCallback;
+import com.siliconlabs.bledemo.log.TimeoutLog;
+import com.siliconlabs.bledemo.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,40 +103,44 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
     private int descriptionInfo;
     private List<Integer> profilesInfo;
 
-    final ScannedDevicesAdapter adapter = new ScannedDevicesAdapter(new DeviceInfoViewHolder.Generator(R.layout.device_item) {
-        @Override
-        public DeviceInfoViewHolder generate(View itemView) {
-            final ViewHolder holder = new ViewHolder(itemView);
-            holder.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int adapterPos = holder.getAdapterPosition();
-                    if (adapterPos != RecyclerView.NO_POSITION) {
-                        BluetoothDeviceInfo devInfo = (BluetoothDeviceInfo) adapter.getDevicesInfo().get(adapterPos);
-                        connect(devInfo);
-                    }
-                }
-            });
-            return holder;
-        }
+    private ScannedDevicesAdapter adapter;
 
-    });
-
-    final Discovery discovery = new Discovery(adapter, this);
+    private Discovery discovery;
     BluetoothGatt bluetoothGatt;
     private BlueToothService.GattConnectType connectType;
     private BlueToothService.Binding bluetoothBinding;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        adapter = new ScannedDevicesAdapter(new DeviceInfoViewHolder.Generator(R.layout.device_item) {
+            @Override
+            public DeviceInfoViewHolder generate(View itemView) {
+                final ViewHolder holder = new ViewHolder(itemView);
+                holder.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int adapterPos = holder.getAdapterPosition();
+                        if (adapterPos != RecyclerView.NO_POSITION) {
+                            BluetoothDeviceInfo devInfo = (BluetoothDeviceInfo) adapter.getDevicesInfo().get(adapterPos);
+                            connect(devInfo);
+                        }
+                    }
+                });
+                return holder;
+            }
+
+        }, context);
+
+        discovery = new Discovery(adapter, this);
 
         adapter.setThermometerMode();
         adapter.setBlueGeckoTabSelected(true);
 
-        discovery.connect(activity);
+        discovery.connect(context);
 
-        layout = new GridLayoutManager(activity, activity.getResources().getInteger(R.integer.device_selection_columns), LinearLayoutManager.VERTICAL, false);
+        layout = new GridLayoutManager(context, context.getResources().getInteger(R.integer.device_selection_columns), LinearLayoutManager.VERTICAL, false);
         itemDecoration = new RecyclerView.ItemDecoration() {
             final int horizontalMargin = getResources().getDimensionPixelSize(R.dimen.item_margin);
 
@@ -212,7 +220,7 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
             }
         }
 
-        blueGeckoTab.setText(R.string.tab_blue_geckos);
+        blueGeckoTab.setText(R.string.tab_EFR);
         otherTab.setText(R.string.tab_other_devices);
 
         return view;
@@ -267,7 +275,7 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
         }
     }
 
-    private void startDiscovery(Discovery discovery, boolean clearCachedDiscoveries){
+    private void startDiscovery(Discovery discovery, boolean clearCachedDiscoveries) {
         discovery.clearFilters();
         discovery.addFilter(GattService.HealthThermometer);
         discovery.startDiscovery(clearCachedDiscoveries);
@@ -324,6 +332,7 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
 
                     @Override
                     public void onTimeout() {
+                        Constants.LOGS.add(new TimeoutLog(deviceInfo.device));
                         ((BaseActivity) getActivity()).dismissModalDialog();
                         Toast.makeText(getActivity(), "Connection Timed Out", Toast.LENGTH_SHORT).show();
                     }
@@ -334,8 +343,8 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
                         ((BaseActivity) getActivity()).dismissModalDialog();
                         if (newState == BluetoothGatt.STATE_CONNECTED) {
                             Intent intent = getIntent(connectType, getActivity());
-                            if(intent !=null){
-                                startActivity(intent);
+                            if (intent != null) {
+                                getActivity().startActivity(intent);
                             }
                         }
                     }

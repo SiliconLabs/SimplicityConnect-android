@@ -1,6 +1,6 @@
 package com.siliconlabs.bledemo.rangetest;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * @author Comarch S.A.

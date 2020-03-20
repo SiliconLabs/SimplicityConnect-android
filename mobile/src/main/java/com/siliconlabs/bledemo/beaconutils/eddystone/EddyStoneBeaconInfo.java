@@ -2,7 +2,7 @@ package com.siliconlabs.bledemo.beaconutils.eddystone;
 // see https://github.com/google/eddystone
 
 public class EddyStoneBeaconInfo {
-    final String deviceAddress;
+    private final String deviceAddress;
     int rssi;
     long timestamp = System.currentTimeMillis();
 

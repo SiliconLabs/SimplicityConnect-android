@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?><!--
+Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Digital Output"
+    approved="NO" last-modified="2012-03-14" type="org.bluetooth.characteristic.digital_output"
+    uuid="2A57" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd">
+    <InformativeText>
+        <Summary>
+            The Digital Output characteristic is an array of n 2-bit values in a bit field.
+        </Summary>
+    </InformativeText>
+    <Value>
+        <Field name="Output Bits">
+            <InformativeText>
+                This field is an array of n 2-bit values in a bit field
+            </InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <!--
+            <Enumerations>
+                            <Enumeration key="0" value="Inactive" />
+                            <Enumeration key="1" value="Active" />
+                            <Enumeration key="2" value="tri-state (if available in the server)" />
+                            <Enumeration key="3" value="Output not Updated during write operation" />
+                            <ReservedForFutureUse start="4" end="255" />
+                        </Enumerations>
+            -->
+            <Repeated>true</Repeated>
+        </Field>
+    </Value>
+    <Note>
+        The Octet Order in the above table is in the order of LSO to MSO, where LSO = Least
+        Significant Octet and MSO = Most Significant Octet.
+    </Note>
+</Characteristic>

@@ -218,6 +218,6 @@
             android:gravity="center"
             android:text="@string/dialog_device_filter_cancel_button"
             android:textAllCaps="true"
-            android:textColor="@color/dialog_btn_text"
+            android:textColor="@color/silabs_white"
             android:id="@+id/range_mode_cancel"/>
 </LinearLayout>

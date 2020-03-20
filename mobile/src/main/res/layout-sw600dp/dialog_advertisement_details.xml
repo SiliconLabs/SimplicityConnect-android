@@ -8,25 +8,27 @@
         android:id="@+id/ad_details_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/dialog_title_background"
+        android:background="@color/silabs_dialog_title_background"
+        android:paddingStart="@dimen/advertisement_details_title_padding_left"
+        android:paddingTop="@dimen/advertisement_details_title_padding_top"
+        android:paddingEnd="0dp"
         android:text="@string/advertisement_details_dialog_title"
         android:textColor="@android:color/black"
-        android:paddingLeft="@dimen/advertisement_details_title_padding_left"
-        android:paddingTop="@dimen/advertisement_details_title_padding_top"
-        android:textStyle="bold"
-        android:textSize="@dimen/advertisement_details_title_text_size" />
+        android:textSize="@dimen/advertisement_details_title_text_size"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/device_name_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/ad_details_header"
-        android:background="@color/dialog_title_background"
-        android:paddingLeft="@dimen/advertisement_details_device_name_padding_left"
-        android:paddingBottom="@dimen/advertisement_details_device_name_padding_bottom"
+        android:background="@color/silabs_dialog_title_background"
+        android:paddingStart="@dimen/advertisement_details_device_name_padding_left"
         android:paddingTop="@dimen/advertisement_details_device_name_padding_top"
+        android:paddingEnd="0dp"
+        android:paddingBottom="@dimen/advertisement_details_device_name_padding_bottom"
         android:text="@string/debug_mode_advertising_details_dialog_device_name"
-        android:textColor="@color/dialog_title_text"
+        android:textColor="@color/silabs_primary_text"
         android:textSize="@dimen/advertisement_details_device_name_text_size" />
 
     <View
@@ -34,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/device_name_title"
-        android:background="@color/dialog_separator_dark_gray" />
+        android:background="@color/silabs_divider" />
 
     <ScrollView
         android:id="@+id/advertisement_scrollview"
@@ -70,16 +72,16 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/advertisement_scrollview"
-        android:background="@color/dialog_separator_dark_red" />
+        android:background="@color/silabs_divider" />
 
     <Button
-        android:layout_below="@id/separator_ad_and_btns"
         android:id="@+id/close_btn"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_below="@id/separator_ad_and_btns"
         android:background="@drawable/debug_mode_dialog_button_selector"
         android:gravity="center"
         android:text="@string/ad_dialog_close_btn_default_text"
         android:textAllCaps="false"
-        android:textColor="@color/dialog_btn_text" />
+        android:textColor="@color/silabs_white" />
 </RelativeLayout>

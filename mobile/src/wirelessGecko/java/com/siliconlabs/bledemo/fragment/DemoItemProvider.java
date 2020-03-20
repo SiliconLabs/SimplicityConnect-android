@@ -1,8 +1,8 @@
 package com.siliconlabs.bledemo.fragment;
 
 import android.content.Intent;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import android.util.Pair;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
@@ -33,12 +33,12 @@ public class DemoItemProvider {
         TITLES.put(R.id.demo_retail_beacon, R.string.demo_beacon_title);
         TITLES.put(R.id.demo_lightbulb, R.string.demo_item_light_title);
         TITLES.put(R.id.demo_range_test, R.string.demo_item_range_title);
-        TITLES.put(R.id.blue_giga_debug, R.string.demo_item_debug_mode_title);
+        TITLES.put(R.id.blue_giga_debug, R.string.title_Browser);
 
         TEXTS.put(R.id.demo_retail_beacon, R.string.demo_beacon_text);
         TEXTS.put(R.id.demo_lightbulb, R.string.demo_light_text);
         TEXTS.put(R.id.demo_range_test, R.string.demo_range_text);
-        TEXTS.put(R.id.blue_giga_debug, R.string.demo_item_debug_mode_description);
+        TEXTS.put(R.id.blue_giga_debug, R.string.description_Browser);
 
         LAUNCHERS.put(R.id.demo_retail_beacon, new DemoPageLauncher() {
             @Override

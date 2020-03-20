@@ -16,11 +16,12 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import timber.log.Timber;
 
 public final class IOUtils {
-    static final String TAG = "IOUtils";
+    private static final String TAG = "IOUtils";
 
     private static final ThreadLocal<ByteArrayOutputStream> sByteArrayStreamBuffer = new ThreadLocal<ByteArrayOutputStream>() {
         @Override
@@ -67,6 +68,7 @@ public final class IOUtils {
     /**
      * If the file doesn't exist, it creates the specified file.
      * If the file does exists, it updates its last-modified time.
+     *
      * @param filePath
      */
     public static void touchFile(String filePath) {
@@ -83,8 +85,6 @@ public final class IOUtils {
                 long length = raf.length();
                 raf.setLength(length + 1);
                 raf.setLength(length);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -119,7 +119,7 @@ public final class IOUtils {
         final Writer writer = new StringWriter();
 
         try {
-            final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            final Reader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 
             int n;
             while ((n = reader.read(buffer)) != -1) {

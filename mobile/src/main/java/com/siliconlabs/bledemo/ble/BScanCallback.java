@@ -4,12 +4,11 @@ import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import timber.log.Timber;
 
 class BScanCallback extends BroadcastReceiver {
-    final BlueToothService service;
+    private final BlueToothService service;
 
     BScanCallback(BlueToothService service) {
         this.service = service;

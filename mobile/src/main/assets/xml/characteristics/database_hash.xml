@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Copyright 2015 Bluetooth SIG, Inc. All rights reserved.-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Database Hash"
+    type="database_hash"
+    uuid="2B2A" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd">
+</Characteristic>

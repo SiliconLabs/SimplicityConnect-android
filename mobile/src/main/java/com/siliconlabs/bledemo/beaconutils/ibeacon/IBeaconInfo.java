@@ -1,14 +1,16 @@
 package com.siliconlabs.bledemo.beaconutils.ibeacon;
 
 public class IBeaconInfo {
-    public String uuid = "unknown";
-    public int major = Integer.MAX_VALUE;
-    public int minor = Integer.MIN_VALUE;
+    private String uuid = "unknown";
+    private int major = Integer.MAX_VALUE;
+    private int minor = Integer.MIN_VALUE;
+    private int power;
 
-    public IBeaconInfo(String uuid, int major, int minor) {
+    public IBeaconInfo(String uuid, int major, int minor, int power) {
         this.uuid = uuid;
         this.major = major;
         this.minor = minor;
+        this.power = power;
     }
 
     public int getMinor() {
@@ -21,5 +23,9 @@ public class IBeaconInfo {
 
     public String getUuid() {
         return uuid;
+    }
+
+    public int getPower() {
+        return power;
     }
 }

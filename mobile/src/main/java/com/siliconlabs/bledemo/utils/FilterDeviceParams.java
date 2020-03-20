@@ -1,20 +1,39 @@
 package com.siliconlabs.bledemo.utils;
 
-public class FilterDeviceParams {
-    private String name;
-    private boolean filterName;
-    private int rssi;
-    private boolean filterRssi;
+import com.siliconlabs.bledemo.beaconutils.BleFormat;
 
-    public FilterDeviceParams(String name, boolean filterName, int rssi, boolean filterRssi) {
-        this.name = name;
+import java.util.List;
+
+public class FilterDeviceParams {
+    private String filterName;
+    private String name;
+    private String advertising;
+    private int rssiValue;
+    private boolean rssiFlag;
+    private boolean onlyFavourite;
+    private boolean onlyConnectable;
+    private List<BleFormat> bleFormats;
+
+
+    public FilterDeviceParams(String filterName, String name, String advertising, int rssiValue, boolean rssiFlag,
+                              List<BleFormat> bleFormats, boolean onlyFavourite, boolean onlyConnectable) {
         this.filterName = filterName;
-        this.rssi = rssi;
-        this.filterRssi = filterRssi;
+        this.name = name;
+        this.advertising = advertising;
+        this.rssiValue = rssiValue;
+        this.rssiFlag = rssiFlag;
+        this.bleFormats = bleFormats;
+        this.onlyFavourite = onlyFavourite;
+        this.onlyConnectable = onlyConnectable;
     }
 
-    public boolean isEmptyFilter(){
-        return !(this.filterName || this.filterRssi);
+    public boolean isEmptyFilter() {
+        return (name == null || name.equals(""))
+                && (advertising == null || advertising.equals(""))
+                && !rssiFlag
+                && !onlyFavourite
+                && !onlyConnectable
+                && (bleFormats == null || bleFormats.isEmpty());
     }
 
     public String getName() {
@@ -25,28 +44,59 @@ public class FilterDeviceParams {
         this.name = name;
     }
 
-    public boolean isFilterName() {
+    public String getAdvertising() {
+        return advertising;
+    }
+
+    public void setAdvertising(String advertising) {
+        this.advertising = advertising;
+    }
+
+    public int getRssiValue() {
+        return rssiValue;
+    }
+
+    public void setRssiValue(int rssiValue) {
+        this.rssiValue = rssiValue;
+    }
+
+    public boolean isRssiFlag() {
+        return rssiFlag;
+    }
+
+    public void setRssiFlag(boolean rssiFlag) {
+        this.rssiFlag = rssiFlag;
+    }
+
+    public boolean isOnlyFavourite() {
+        return onlyFavourite;
+    }
+
+    public void setOnlyFavourite(boolean onlyFavourite) {
+        this.onlyFavourite = onlyFavourite;
+    }
+
+    public List<BleFormat> getBleFormats() {
+        return bleFormats;
+    }
+
+    public void setBleFormats(List<BleFormat> bleFormats) {
+        this.bleFormats = bleFormats;
+    }
+
+    public String getFilterName() {
         return filterName;
     }
 
-    public void setFilterName(boolean filterName) {
+    public void setFilterName(String filterName) {
         this.filterName = filterName;
     }
 
-    public int getRssi() {
-        return rssi;
+    public boolean isOnlyConnectable() {
+        return onlyConnectable;
     }
 
-    public void setRssi(int rssi) {
-        this.rssi = rssi;
+    public void setOnlyConnectable(boolean onlyConnectable) {
+        this.onlyConnectable = onlyConnectable;
     }
-
-    public boolean isFilterRssi() {
-        return filterRssi;
-    }
-
-    public void setFilterRssi(boolean filterRssi) {
-        this.filterRssi = filterRssi;
-    }
-
 }

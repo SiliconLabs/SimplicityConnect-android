@@ -1,0 +1,344 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2017 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Service xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/service.xsd" type="org.bluetooth.service.fitness_machine" last-modified="2017-02-14" uuid="1826" name="Fitness Machine">
+	<InformativeText>
+		<Abstract>
+			This service exposes training-related data in the sports and fitness environment, which allows a Server (e.g., a fitness machine) to send training-related data to a Client.
+		</Abstract>
+		<Summary>
+			The Fitness Machine Service (FTMS) exposes training-related data in the sports and fitness environment, which allows a Client to collect training data while a user is exercising with a fitness machine (Server).
+		</Summary>
+	</InformativeText>
+	<Dependencies>
+		<Dependency>
+			This service has no dependencies on other GATT-based services.
+		</Dependency>
+	</Dependencies>
+	<GATTRequirements>
+		<Requirement subProcedure="Write Characteristic Value">Mandatory</Requirement>
+		<Requirement subProcedure="Notifications">Mandatory</Requirement>
+		<Requirement subProcedure="Indications">C.1</Requirement>
+		<Requirement subProcedure="Read Long">Optional</Requirement>
+	</GATTRequirements>
+	<Note>
+		C1: Mandatory if the Fitness Machine Control Point is supported, otherwise Optional.
+	</Note>
+	<Transports>
+		<Classic>true</Classic>
+		<LowEnergy>true</LowEnergy>
+		<HighSpeed>true</HighSpeed>
+	</Transports>
+	<Characteristics>
+		<Characteristic type="org.bluetooth.characteristic.fitness_machine_feature" name="Fitness Machine Feature">
+			<Requirement>Mandatory</Requirement>
+			<Properties>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.treadmill_data" name="Treadmill Data">
+			<Requirement>Optional</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Mandatory</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.cross_trainer_data" name="Cross Trainer Data">
+			<Requirement>Optional</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Mandatory</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.step_climber_data" name="Step Climber Data">
+			<Requirement>Optional</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Mandatory</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.stair_climber_data" name="Stair Climber Data">
+			<Requirement>Optional</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Mandatory</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.rower_data" name="Rower Data">
+			<Requirement>Optional</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Mandatory</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.indoor_bike_data" name="Indoor Bike Data">
+			<Requirement>Optional</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Mandatory</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.training_status" name="Training Status">
+			<Requirement>Optional</Requirement>
+			<Properties>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Mandatory</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.supported_speed_range" name="Supported Speed Range">
+			<Requirement>C1</Requirement>
+			<Properties>
+				<InformationText>
+					C1: Mandatory if the Speed Target Setting feature is supported; otherwise Optional.
+				</InformationText>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.supported_inclination_range" name="Supported Inclination Range">
+			<Requirement>C2</Requirement>
+			<Properties>
+				<InformationText>
+					C2: Mandatory if the Inclination Target Setting feature is supported; otherwise Optional.
+				</InformationText>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.supported_resistance_level_range" name="Supported Resistance Level Range">
+			<Requirement>C3</Requirement>
+			<Properties>
+				<InformationText>
+					C3: Mandatory if the Resistance Target Setting feature is supported; otherwise Optional.
+				</InformationText>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.supported_power_range" name="Supported Power Range">
+			<Requirement>C4</Requirement>
+			<Properties>
+				<InformationText>
+					C4: Mandatory if the Power Target Setting feature is supported; otherwise Optional.
+				</InformationText>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.supported_heart_rate_range" name="Supported Heart Rate Range">
+			<Requirement>C5</Requirement>
+			<Properties>
+				<InformationText>
+					C5: Mandatory if the Heart Rate Target Setting feature is supported; otherwise Optional.
+				</InformationText>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.fitness_machine_control_point" name="Fitness Machine Control Point">
+			<Requirement>Optional</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Mandatory</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Mandatory</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic type="org.bluetooth.characteristic.fitness_machine_status" name="Fitness Machine Status">
+			<Requirement>C6</Requirement>
+			<Properties>
+				<InformationText>
+					C6: Mandatory if the Fitness Machine Control Point is supported; otherwise Optional.
+				</InformationText>
+				<Read>Excluded</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Mandatory</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+	</Characteristics>
+</Service>

@@ -1,15 +1,11 @@
 package com.siliconlabs.bledemo.fragment;
 
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.Fragment;
-import android.text.TextUtils;
-import android.text.method.MovementMethod;
-import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
+
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewDebug;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,19 +13,8 @@ import android.widget.Toast;
 
 import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.activity.DeviceServicesActivity;
-import com.siliconlabs.bledemo.activity.MainActivityDebugMode;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 public class LogFragmentConnected extends Fragment implements View.OnClickListener {
 
@@ -37,10 +22,10 @@ public class LogFragmentConnected extends Fragment implements View.OnClickListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.log_fragment, container, false);
-        TextView tv = (TextView) view.findViewById(R.id.log_view);
-        Button save_log = (Button) view.findViewById(R.id.save_log);
-        Button share_log = (Button) view.findViewById(R.id.share_log);
-        Button clear_log = (Button) view.findViewById(R.id.clear_log);
+        TextView tv = view.findViewById(R.id.log_view);
+        Button save_log = view.findViewById(R.id.save_log);
+        Button share_log = view.findViewById(R.id.share_log);
+        Button clear_log = view.findViewById(R.id.clear_log);
         save_log.setOnClickListener(this);
         share_log.setOnClickListener(this);
         clear_log.setOnClickListener(this);
@@ -51,7 +36,7 @@ public class LogFragmentConnected extends Fragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.save_log:
-                File f = ((DeviceServicesActivity)getActivity()).save_log();
+                File f = ((DeviceServicesActivity) getActivity()).save_log();
                 String msg = f.toString() + " is saved";
                 Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
                 //Log.i("save_log", "clicked");

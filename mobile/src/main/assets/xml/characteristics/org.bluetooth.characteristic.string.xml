@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Created with Liquid XML Studio Developer Edition 8.1.7.2743 (http://www.liquid-technologies.com)
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" type="org.bluetooth.characteristic.string" uuid="2A3D" name="String">
+    <InformativeText>
+        <Abstract>
+            A generic UTF8 string which may be used in Services requiring strings.
+        </Abstract>
+    </InformativeText>
+    <Value>
+        <Field name="String">
+            <Requirement>Mandatory</Requirement>
+            <Format>utf8s</Format>
+        </Field>
+    </Value>
+</Characteristic>

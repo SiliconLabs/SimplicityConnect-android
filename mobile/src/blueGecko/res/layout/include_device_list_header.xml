@@ -1,82 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:showDividers="middle"
-    android:divider="@drawable/item_divider">
+    android:divider="@drawable/item_divider"
+    android:orientation="vertical"
+    android:showDividers="middle">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/gallery"
+        android:orientation="horizontal"
         android:padding="@dimen/item_margin"
-        android:background="@color/gallery">
+        android:weightSum="5">
 
-        <TextView
-            android:id="@android:id/title"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Body"
-            android:textSize="@dimen/text_size_caption"
-            android:lines="1"
-            android:textAllCaps="true"
-            tools:text="RetailBeacon" />
+            android:layout_weight="4"
+            android:orientation="vertical">
 
-        <TextView
+            <TextView
+                android:id="@android:id/title"
+                style="@style/Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:lines="1"
+                android:textAllCaps="true"
+                android:textSize="@dimen/text_size_caption"
+                tools:text="RetailBeacon" />
+
+            <TextView
+                style="@style/HeadLine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginTop="3dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="24dp"
+                android:text="@string/select_device"
+                android:textSize="@dimen/text_size_subhead" />
+
+        </LinearLayout>
+
+        <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:layout_gravity="center_vertical"
-            android:paddingEnd="24dp"
-            style="@style/HeadLine"
-            android:textSize="@dimen/text_size_subhead"
-            android:text="@string/select_device" />
+            android:layout_weight="0" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:showDividers="end"
-        android:paddingStart="@dimen/item_margin"
-        android:paddingEnd="@dimen/item_margin"
-        android:paddingTop="@dimen/item_margin"
-        android:divider="@drawable/item_divider"
         android:background="@android:color/white"
-        >
+        android:divider="@drawable/item_divider"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/item_margin"
+        android:paddingTop="@dimen/item_margin"
+        android:paddingEnd="@dimen/item_margin"
+        android:showDividers="end">
+
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            >
+            android:orientation="horizontal">
+
             <TextView
+                style="@style/Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:paddingStart="0dp"
                 android:paddingEnd="24dp"
                 android:paddingBottom="14dp"
-                style="@style/Body"
-                android:textSize="@dimen/text_size_tab"
+                android:text="@string/device_list"
                 android:textAllCaps="true"
-                android:text="@string/device_list" />
+                android:textSize="@dimen/text_size_tab" />
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="2"
-                android:layout_gravity="center_vertical">
-                <include layout="@layout/include_device_list_tab"
-                    android:id="@+id/blue_gecko_tab"/>
+                android:orientation="horizontal">
+
+                <include
+                    android:id="@+id/blue_gecko_tab"
+                    layout="@layout/include_device_list_tab" />
+
                 <View
                     android:layout_width="24dp"
-                    android:layout_height="1dp"/>
-                <include layout="@layout/include_device_list_tab"
-                    android:id="@+id/other_tab"/>
+                    android:layout_height="1dp" />
+
+                <include
+                    android:id="@+id/other_tab"
+                    layout="@layout/include_device_list_tab" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

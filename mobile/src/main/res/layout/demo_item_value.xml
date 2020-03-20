@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginRight="@dimen/demo_item_value_margin_right">
+    android:layout_marginRight="@dimen/demo_item_value_margin_right"
+    android:orientation="horizontal">
 
     <TextView
         android:id="@android:id/text1"
+        style="@style/Caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Caption"
-        android:textColor="?android:attr/textColorSecondary"
         android:lines="1"
-        tools:text="Profile Name"/>
+        android:textColor="?android:attr/textColorSecondary"
+        tools:text="Profile Name" />
 
     <TextView
         android:id="@android:id/text2"
+        style="@style/Caption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
-        style="@style/Caption"
-        tools:text="XMGT"/>
+        tools:text="XMGT" />
 </LinearLayout>

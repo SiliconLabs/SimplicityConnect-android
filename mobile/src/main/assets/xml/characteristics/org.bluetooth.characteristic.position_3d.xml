@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" type="org.bluetooth.characteristic.position_3d" uuid="2A30" name="Position 3D">
+    <InformativeText> </InformativeText>
+    <Value>
+        <Field name="Position">
+            <Requirement>Mandatory</Requirement>
+            <Reference> org.bluetooth.characteristic.position_2d </Reference>
+        </Field>
+        <Field name="Elevation">
+            <Requirement>Mandatory</Requirement>
+            <Reference> org.bluetooth.characteristic.elevation </Reference>
+        </Field>
+    </Value>
+</Characteristic>

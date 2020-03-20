@@ -31,10 +31,6 @@
         <item name="android:textColorHint">@color/text_dark_hint</item>
     </style>
 
-    <style name="BaseAppThemeOverride.Dark" parent="BaseAppThemeCommon.Dark">
-        <!-- Empty here, but can be filled in config-specific values folder -->
-    </style>
-
 
     <!-- Override this one in your own app and choose appropriate BaseAppTheme -->
     <style name="AppTheme" parent="BaseAppThemeOverride.Light"/>

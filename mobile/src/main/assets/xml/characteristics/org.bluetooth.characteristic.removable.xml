@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" type="org.bluetooth.characteristic.removable" name="Removable" uuid="2A3A">
+  <Value>
+    <Field name="Removable">
+      <Requirement>Mandatory</Requirement>
+      <Format>8bit</Format>
+      <BitField>
+        <Bit index="0" size="2">
+          <Enumerations>
+            <Enumeration key="0" value="Unknown"/>
+            <Enumeration key="1" value="Not Removable"/>
+            <Enumeration key="2" value="Removable"/>
+            <Reserved start="3" end="3"/>
+          </Enumerations>
+        </Bit>
+        <Reserved index="2" size="6"/>
+      </BitField>
+    </Field>
+  </Value>
+</Characteristic>

@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,17 +14,17 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/alizarin_crimson"
+            android:background="@color/silabs_red"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/find_key_fob_sub_header_left_offset">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/alizarin_crimson"
+                android:background="@color/silabs_red"
                 android:orientation="vertical"
-                android:paddingBottom="@dimen/find_key_fob_sub_header_padding_bottom"
-                android:paddingTop="@dimen/find_key_fob_sub_header_padding_top">
+                android:paddingTop="@dimen/find_key_fob_sub_header_padding_top"
+                android:paddingBottom="@dimen/find_key_fob_sub_header_padding_bottom">
 
                 <TextView
                     android:id="@+id/finding_keyfob_label"
@@ -32,21 +32,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/finding_device_screen_current_action_label"
-                    android:textColor="@android:color/white"/>
+                    android:textColor="@android:color/white" />
 
                 <TextView
                     android:id="@+id/finding_keyfob_device_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/finding_device_default_device_name"
-                    android:textColor="@android:color/white"/>
+                    android:textColor="@android:color/white" />
             </LinearLayout>
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/finding_key_fobs_divider_height"
-            android:background="@color/key_fob_divider"/>
+            android:background="@color/silabs_divider" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -64,7 +64,7 @@
                     android:layout_height="@dimen/finding_key_fob_rays_height"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="@dimen/finding_key_fob_rays_margin_top"
-                    android:src="@drawable/blinking_image"/>
+                    android:src="@drawable/blinking_image" />
 
                 <ImageView
                     android:id="@+id/led_bulb"
@@ -72,7 +72,7 @@
                     android:layout_height="@dimen/finding_key_fob_bulb_height"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="@dimen/finding_key_fob_bulb_margin_top"
-                    android:src="@drawable/led_phone"/>
+                    android:src="@drawable/led_phone" />
 
                 <TextView
                     android:id="@+id/blinking_notice"
@@ -82,7 +82,7 @@
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="@dimen/finding_key_fob_blinking_notice_margin_top"
                     android:text="@string/finding_key_fob_blinking_notice"
-                    android:textSize="@dimen/finding_key_fob_blinking_notice_text_size"/>
+                    android:textSize="@dimen/finding_key_fob_blinking_notice_text_size" />
 
                 <TextView
                     android:id="@+id/blinking_explanation"
@@ -93,7 +93,7 @@
                     android:layout_marginTop="@dimen/finding_key_fob_blinking_explanation_margin_top"
                     android:gravity="center"
                     android:text="@string/finding_key_fob_blinking_explanation"
-                    android:textSize="@dimen/finding_key_fob_blinking_explanation_text_size"/>
+                    android:textSize="@dimen/finding_key_fob_blinking_explanation_text_size" />
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>

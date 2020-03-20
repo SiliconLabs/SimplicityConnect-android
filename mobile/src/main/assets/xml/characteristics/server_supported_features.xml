@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><!--Copyright 2015 Bluetooth SIG, Inc. All rights reserved.-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Server Supported Features"
+    type="server_supported_features"
+    uuid="2B3A" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd">
+</Characteristic>

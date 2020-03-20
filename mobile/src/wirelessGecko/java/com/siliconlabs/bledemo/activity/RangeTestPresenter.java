@@ -1,7 +1,7 @@
 package com.siliconlabs.bledemo.activity;
 
 import android.os.Looper;
-import android.support.annotation.UiThread;
+import androidx.annotation.UiThread;
 import com.siliconlabs.bledemo.rangetest.RangeTestMode;
 import com.siliconlabs.bledemo.rangetest.TxPower;
 

@@ -2,16 +2,18 @@ package com.siliconlabs.bledemo.adapters;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.os.Handler;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
+
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
 import com.siliconlabs.bledemo.ble.Discovery;
 import com.siliconlabs.bledemo.utils.FilterDeviceParams;
+import com.siliconlabs.bledemo.utils.SharedPrefUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +21,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +38,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     private final List<T> mostRecentDevicesInfo = new ArrayList<>();
     private final Map<T, Long> mostRecentInfoAge = new HashMap<>();
     private final List<T> devicesInfo = new ArrayList<>();
+    private final Context context;
     private List<T> currentDevicesInfo;
     HashMap<String, String> deviceMacAddressToName = new HashMap<>();
 
@@ -43,6 +47,13 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     private final Comparator<T> reverseItemsComparator = new Comparator<T>() {
         @Override
         public int compare(T lhs, T rhs) {
+            boolean lFav = favoriteDevices.contains(lhs.getAddress());
+            boolean rFav = favoriteDevices.contains(rhs.getAddress());
+            int sComp = Boolean.compare(rFav, lFav);
+            if (sComp != 0) {
+                return sComp;
+            }
+
             final String lName = lhs.scanInfo.getDisplayName(true);
             final String rName = rhs.scanInfo.getDisplayName(true);
             return rName.compareTo(lName);
@@ -50,11 +61,18 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     };
     boolean isThermometerMode = false;
     boolean isBlueGeckoTabSelected = true;
-    private int comp = 4;
+    private int comp = 5;
     private String search = null;
     private final Comparator<T> rssiComparator = new Comparator<T>() {
         @Override
         public int compare(T lhs, T rhs) {
+            boolean lFav = favoriteDevices.contains(lhs.getAddress());
+            boolean rFav = favoriteDevices.contains(rhs.getAddress());
+            int sComp = Boolean.compare(rFav, lFav);
+            if (sComp != 0) {
+                return sComp;
+            }
+
             final int lrssi = lhs.scanInfo.getRssi();
             final int rrssi = rhs.scanInfo.getRssi();
             return ((Integer) rrssi).compareTo(lrssi);
@@ -64,6 +82,13 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     private final Comparator<T> reverseRssiComparator = new Comparator<T>() {
         @Override
         public int compare(T lhs, T rhs) {
+            boolean lFav = favoriteDevices.contains(lhs.getAddress());
+            boolean rFav = favoriteDevices.contains(rhs.getAddress());
+            int sComp = Boolean.compare(rFav, lFav);
+            if (sComp != 0) {
+                return sComp;
+            }
+
             final int lrssi = lhs.scanInfo.getRssi();
             final int rrssi = rhs.scanInfo.getRssi();
             return ((Integer) rrssi).compareTo(lrssi);
@@ -77,6 +102,13 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     private final Comparator<T> itemsComparator = new Comparator<T>() {
         @Override
         public int compare(T lhs, T rhs) {
+            boolean lFav = favoriteDevices.contains(lhs.getAddress());
+            boolean rFav = favoriteDevices.contains(rhs.getAddress());
+            int sComp = Boolean.compare(rFav, lFav);
+            if (sComp != 0) {
+                return sComp;
+            }
+
             final String lName = lhs.scanInfo.getDisplayName(true);
             final String rName = rhs.scanInfo.getDisplayName(true);
             return lName.compareTo(rName);
@@ -86,9 +118,25 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     private final Comparator<T> timeComparator = new Comparator<T>() {
         @Override
         public int compare(T lhs, T rhs) {
-            final Long lTimestampNanos= lhs.scanInfo.getTimestampNanos();
-            final Long rTimestampNanos= rhs.scanInfo.getTimestampNanos();
+            boolean lFav = favoriteDevices.contains(lhs.getAddress());
+            boolean rFav = favoriteDevices.contains(rhs.getAddress());
+            int sComp = Boolean.compare(rFav, lFav);
+            if (sComp != 0) {
+                return sComp;
+            }
+
+            final Long lTimestampNanos = lhs.scanInfo.getTimestampNanos();
+            final Long rTimestampNanos = rhs.scanInfo.getTimestampNanos();
             return lTimestampNanos.compareTo(rTimestampNanos);
+        }
+    };
+
+    private final Comparator<T> onlyFavoriteComparator = new Comparator<T>() {
+        @Override
+        public int compare(T lhs, T rhs) {
+            boolean lFav = favoriteDevices.contains(lhs.getAddress());
+            boolean rFav = favoriteDevices.contains(rhs.getAddress());
+            return Boolean.compare(rFav, lFav);
         }
     };
     private final Runnable delayedUpdater = new Runnable() {
@@ -102,8 +150,11 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
 
     private ListItemListener listItemListener;
     private FilterDeviceParams filterDeviceParams;
+    private SharedPrefUtils sharedPrefUtils;
+    private LinkedHashSet<String> favoriteDevices;
 
     public void sort(int comparator, boolean resetDeviceList) {
+        this.favoriteDevices = sharedPrefUtils.getFavoritesDevices();
         comp = comparator;
         switch (comparator) {
             case 0:
@@ -121,13 +172,18 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
             case 4:
                 sortDevices(timeComparator, resetDeviceList);
                 break;
+            case 5:
+                sortDevices(onlyFavoriteComparator, resetDeviceList);
+                break;
             default:
                 break;
         }
     }
 
-    public ScannedDevicesAdapter(DeviceInfoViewHolder.Generator generator) {
+    public ScannedDevicesAdapter(DeviceInfoViewHolder.Generator generator, Context context) {
         this.generator = generator;
+        this.context = context;
+        this.sharedPrefUtils = new SharedPrefUtils(context);
     }
 
     @Override
@@ -155,19 +211,6 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         final T info = devicesInfo.get(position); //TODO It was final
         holder.setData(info, position);
 
-        if (isDebugMode) {
-            ((DebugModeDeviceAdapter.ViewHolder) holder).connectingSpinner.setVisibility(View.GONE);
-        }
-
-        if (isDebugMode && debugModeConnectingDevice != null) {
-            String addressListItem = info.scanInfo.getDevice().getAddress();
-            String addressConnectingItem = debugModeConnectingDevice.getAddress();
-            if (TextUtils.equals(addressListItem, addressConnectingItem)) {
-                ((DebugModeDeviceAdapter.ViewHolder) holder).startConnectingSpinnerAnim();
-            } else {
-                ((DebugModeDeviceAdapter.ViewHolder) holder).stopConnectingSpinnerAnim();
-            }
-        }
     }
 
     public void setDebugMode() {
@@ -198,8 +241,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         if (this.devicesInfo.isEmpty()) {
             if (filterDeviceParams == null || filterDeviceParams.isEmptyFilter()) {
                 updateDevicesInfo();
-            }
-            else if (!updatePending) {
+            } else if (!updatePending) {
                 updatePending = true;
                 handler.postDelayed(delayedUpdater, 1000);
             }
@@ -321,7 +363,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         mostRecentDevicesInfoIsDirty = true;
         resetDeviceList();
         sort(comp, false);
-        if(filterDeviceParams != null) {
+        if (filterDeviceParams != null) {
             filterDevices(filterDeviceParams, false);
         }
         if (listItemListener != null) {
@@ -331,7 +373,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         notifyDataSetChanged();
     }
 
-    private void preapareDevicesInfo(List<T> devicesInfo){
+    private void preapareDevicesInfo(List<T> devicesInfo) {
         Long now = System.currentTimeMillis(); //TODO Deleting here
         mostRecentDevicesInfoIsDirty = true;
 
@@ -410,7 +452,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
     }
 
     public void sortDevices(Comparator<T> comparator, boolean resetDeviceList) {
-        if(resetDeviceList){
+        if (resetDeviceList) {
             resetDeviceList();
         }
         if (this.devicesInfo.size() > 0) {
@@ -418,18 +460,60 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         }
     }
 
+    private boolean isNameOrAddressContain(FilterDeviceParams filterDeviceParams, T device) {
+        return device.getAddress().toLowerCase().contains(filterDeviceParams.getName().toLowerCase())
+                || (device.getName() != null && device.getName().toLowerCase().contains(filterDeviceParams.getName().toLowerCase()));
+    }
+
     public void filterDevices(FilterDeviceParams filterDeviceParams, boolean resetDeviceList) {
         this.filterDeviceParams = filterDeviceParams;
-        if(resetDeviceList){
+        if (resetDeviceList) {
             resetDeviceList();
         }
-        if(this.filterDeviceParams.isEmptyFilter()) return;
-        for (Iterator<T> deviceIterator = devicesInfo.iterator(); deviceIterator.hasNext(); ){
+        if (this.filterDeviceParams.isEmptyFilter()) return;
+        LinkedHashSet<String> favorites = sharedPrefUtils.getFavoritesDevices();
+        for (Iterator<T> deviceIterator = devicesInfo.iterator(); deviceIterator.hasNext(); ) {
             T device = deviceIterator.next();
-            if (filterDeviceParams.isFilterName() && (device.getName() == null || !device.getName().toLowerCase().contains((filterDeviceParams.getName().toLowerCase())))) {
+            if (!isNameOrAddressContain(filterDeviceParams, device)) {
                 deviceIterator.remove();
-            } else if (filterDeviceParams.isFilterRssi() && device.getRssi() < filterDeviceParams.getRssi()) {
+                continue;
+            }
+            if (filterDeviceParams.isRssiFlag() && device.getRssi() < filterDeviceParams.getRssiValue()) {
                 deviceIterator.remove();
+                continue;
+            }
+            if (!filterDeviceParams.getBleFormats().isEmpty() && !filterDeviceParams.getBleFormats().contains(device.getBleFormat())) {
+                deviceIterator.remove();
+                continue;
+            }
+
+            if (filterDeviceParams.getAdvertising() != null && !filterDeviceParams.getAdvertising().equals("")) {
+                if (device.scanInfo != null && device.scanInfo.getAdvertData() != null && !device.scanInfo.getAdvertData().isEmpty()) {
+
+                    boolean containText = false;
+
+                    if (device.rawData.toLowerCase().contains(filterDeviceParams.getAdvertising().toLowerCase())) {
+                        containText = true;
+                    }
+
+                    if (device.getAddress() != null && !device.getAddress().equals("") && device.getAddress().toLowerCase().contains(filterDeviceParams.getAdvertising().toLowerCase())) {
+                        containText = true;
+                    }
+                    if (!containText) {
+                        deviceIterator.remove();
+                        continue;
+                    }
+                }
+            }
+
+            if (filterDeviceParams.isOnlyFavourite() && !favorites.contains(device.getAddress())) {
+                deviceIterator.remove();
+                continue;
+            }
+
+            if (filterDeviceParams.isOnlyConnectable() && !device.isConnectable) {
+                deviceIterator.remove();
+                continue;
             }
         }
     }

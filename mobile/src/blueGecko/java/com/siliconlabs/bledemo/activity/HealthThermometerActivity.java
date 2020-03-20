@@ -5,7 +5,9 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+
+import androidx.appcompat.widget.Toolbar;
+
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.MenuItem;
@@ -33,7 +35,7 @@ public class HealthThermometerActivity extends BaseActivity {
     private HealthThermometerActivityFragment healthThermometerActivityFragment;
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
-
+    private TemperatureReading.HtmType htmType = TemperatureReading.HtmType.UNKNOWN;
     private final TimeoutGattCallback gattCallback = new TimeoutGattCallback() {
 
         @Override
@@ -52,9 +54,29 @@ public class HealthThermometerActivity extends BaseActivity {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
+            boolean startNotificationForCharacteristicFromHere = true;
             List<BluetoothGattService> services = gatt.getServices();
+            if (services != null) {
+                for (BluetoothGattService s : services) {
+                    if (s.getCharacteristics() != null) {
+                        for (BluetoothGattCharacteristic ch : s.getCharacteristics()) {
+                            if (GattCharacteristic.TemperatureType.uuid.equals(ch.getUuid())) {
+                                startNotificationForCharacteristicFromHere = false;
+                                gatt.readCharacteristic(ch);
+                                break;
+                            }
 
-            BLEUtils.SetNotificationForCharacteristic(gatt, GattService.HealthThermometer, GattCharacteristic.Temperature, BLEUtils.Notifications.INDICATE);
+                        }
+                    }
+                }
+            }
+
+            if (startNotificationForCharacteristicFromHere) {
+                BLEUtils.SetNotificationForCharacteristic(gatt, GattService.HealthThermometer,
+                        GattCharacteristic.Temperature,
+                        BLEUtils.Notifications.INDICATE);
+            }
+
         }
 
         @Override
@@ -62,6 +84,7 @@ public class HealthThermometerActivity extends BaseActivity {
             super.onCharacteristicChanged(gatt, characteristic);
             if (GattCharacteristic.fromUuid(characteristic.getUuid()) == GattCharacteristic.Temperature) {
                 final TemperatureReading reading = TemperatureReading.fromCharacteristic(characteristic);
+                reading.setHtmType(htmType);
                 String deviceName = gatt.getDevice().getName();
                 if (TextUtils.isEmpty(deviceName)) {
                     deviceName = gatt.getDevice().getAddress();
@@ -76,6 +99,18 @@ public class HealthThermometerActivity extends BaseActivity {
                 });
             }
         }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            super.onCharacteristicRead(gatt, characteristic, status);
+            if (GattCharacteristic.fromUuid(characteristic.getUuid()) == GattCharacteristic.TemperatureType) {
+                htmType = TemperatureReading.HtmType.values()[characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)];
+
+                BLEUtils.SetNotificationForCharacteristic(gatt, GattService.HealthThermometer,
+                        GattCharacteristic.Temperature,
+                        BLEUtils.Notifications.INDICATE);
+            }
+        }
     };
 
     @Override
@@ -85,6 +120,7 @@ public class HealthThermometerActivity extends BaseActivity {
         ButterKnife.inject(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         healthThermometerActivityFragment = (HealthThermometerActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
         bluetoothBinding = new BlueToothService.Binding(this) {
             @Override
@@ -148,28 +184,25 @@ public class HealthThermometerActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_change_bt) {
-            onChangeButtonClick();
-            return true;
-        }
+//        if (id == R.id.action_change_bt) {
+//            onChangeButtonClick();
+//            return true;
+//        }
 
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                if (service != null && service.getConnectedGatt() != null)
-                    BLEUtils.SetNotificationForCharacteristic(service.getConnectedGatt(), GattService.HealthThermometer, GattCharacteristic.Temperature,
-                                                              BLEUtils.Notifications.DISABLED);
-                
-                finish();
-                return true;
-            default:
-                break;
+        if (item.getItemId() == android.R.id.home) {
+            if (service != null && service.getConnectedGatt() != null)
+                BLEUtils.SetNotificationForCharacteristic(service.getConnectedGatt(), GattService.HealthThermometer, GattCharacteristic.Temperature,
+                        BLEUtils.Notifications.DISABLED);
+
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     public void onChangeButtonClick() {
-        SelectDeviceDialog dialog = SelectDeviceDialog.newDialog(R.string.demo_thermometer_title, R.string.demo_thermometer_text,
+        SelectDeviceDialog dialog = SelectDeviceDialog.newDialog(R.string.title_Health_Thermometer, R.string.description_Thermometer,
                 Arrays.asList(new Pair<>(R.string.htp_title, R.string.htp_id)), BlueToothService.GattConnectType.THERMOMETER);
         dialog.show(getSupportFragmentManager(), "select_device_tag");
     }

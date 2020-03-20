@@ -11,8 +11,10 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.util.Pair;
+
+import androidx.core.content.ContextCompat;
+import androidx.core.util.Pair;
+
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
@@ -62,20 +64,20 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
-import timber.log.Timber;
 import static java.lang.StrictMath.abs;
 
 public class FragmentCharacteristicDetail extends Fragment {
     //padding
     public static final int FIELD_CONTAINER_PADDING_LEFT = 10;
-    public static final int FIELD_CONTAINER_PADDING_TOP = 10;
+    public static final int FIELD_CONTAINER_PADDING_TOP = 15;
     public static final int FIELD_CONTAINER_PADDING_RIGHT = 10;
-    public static final int FIELD_CONTAINER_PADDING_BOTTOM = 10;
+    public static final int FIELD_CONTAINER_PADDING_BOTTOM = 15;
     public static final int FIELD_VALUE_EDIT_TEXT_PADDING_LEFT = 0;
     public static final int FIELD_VALUE_EDIT_TEXT_PADDING_TOP = 0;
     public static final int FIELD_VALUE_EDIT_TEXT_PADDING_RIGHT = 0;
@@ -149,6 +151,8 @@ public class FragmentCharacteristicDetail extends Fragment {
     HashMap<Field, Boolean> fieldsInRangeMap;
     HashMap<Field, Boolean> fieldsValidMap;
 
+    private boolean writeString = false;
+
     public FragmentCharacteristicDetail() {
 
     }
@@ -156,7 +160,7 @@ public class FragmentCharacteristicDetail extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO inflate appropriate layout file
-        viewBackgroundColor = getActivity().getResources().getColor(R.color.debug_mode_characteristic_expansion_background);
+        viewBackgroundColor = ContextCompat.getColor(getActivity(), R.color.silabs_white);
 
         View view = inflater.inflate(R.layout.fragment_characteristic_details, container, false);
         fragmentRootView = view;
@@ -164,15 +168,15 @@ public class FragmentCharacteristicDetail extends Fragment {
         context = getActivity();
         defaultMargin = getResources().getDimensionPixelSize(R.dimen.characteristic_text_left_margin);
 
-        valuesLayout = (LinearLayout) view.findViewById(R.id.values_layout);
+        valuesLayout = view.findViewById(R.id.values_layout);
 
         mDevice = ((DeviceServicesActivity) getActivity()).getBluetoothGatt();
         mCharact = Engine.getInstance().getCharacteristic(mBluetoothCharact.getUuid());
         mService = Engine.getInstance().getService(mBluetoothCharact.getService().getUuid());
-        mDescriptors = new ArrayList<BluetoothGattDescriptor>();
+        mDescriptors = new ArrayList<>();
         setProperties();
 
-        Log.d("Charac",mBluetoothCharact.getUuid().toString() + " " + mBluetoothCharact.getInstanceId());
+        Log.d("Charac", mBluetoothCharact.getUuid().toString() + " " + mBluetoothCharact.getInstanceId());
 
         mBluetoothCharact.getProperties();
         configureWriteable();
@@ -280,7 +284,7 @@ public class FragmentCharacteristicDetail extends Fragment {
         this.mBluetoothCharact = mBluetoothCharact;
     }
 
-    public void setmService(BluetoothGattService service){
+    public void setmService(BluetoothGattService service) {
         mGattService = service;
     }
 
@@ -306,22 +310,19 @@ public class FragmentCharacteristicDetail extends Fragment {
     }
 
     private void writeValueToCharacteristic() {
-        EditText hexEdit = (EditText) editableFieldsDialog.findViewById(R.id.hexEdit);
+        EditText hexEdit = editableFieldsDialog.findViewById(R.id.hexEdit);
         if (hexEdit != null) {
             String hex = hexEdit.getText().toString().replaceAll("\\s+", "");
             byte[] newValue = hexToByteArray(hex);
-            try{
-                if (Common.isSetProperty(Common.PropertyType.WRITE, mBluetoothCharact.getProperties()))
-                {
+            try {
+                if (Common.isSetProperty(Common.PropertyType.WRITE, mBluetoothCharact.getProperties())) {
                     mBluetoothCharact.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-                }
-                else if (Common.isSetProperty(Common.PropertyType.WRITE_NO_RESPONSE, mBluetoothCharact.getProperties()))
-                {
+                } else if (Common.isSetProperty(Common.PropertyType.WRITE_NO_RESPONSE, mBluetoothCharact.getProperties())) {
                     mBluetoothCharact.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
                 }
 
-                Log.d("Name", "" +mDevice.getDevice().getName());
-                Log.d("Address", "" +mDevice.getDevice().getAddress());
+                Log.d("Name", "" + mDevice.getDevice().getName());
+                Log.d("Address", "" + mDevice.getDevice().getAddress());
                 Log.d("Service", "" + mBluetoothCharact.getService().getUuid());
                 Log.d("Charac", "" + mBluetoothCharact.getUuid());
                 mBluetoothCharact.setValue(newValue);
@@ -329,11 +330,11 @@ public class FragmentCharacteristicDetail extends Fragment {
                 mDevice.writeCharacteristic(mBluetoothCharact);
                 editableFieldsDialog.dismiss();
 
-            } catch (Exception e){
+            } catch (Exception e) {
                 Log.e("Service", "null" + e);
             }
         } else {
-            if(possibleToSave()){
+            if (possibleToSave()) {
                 mBluetoothCharact.setValue(value);
                 mDevice.writeCharacteristic(mBluetoothCharact);
                 Log.d("write_val", "Standard Value to write (hex): " + Converters.getHexValue(value));
@@ -404,7 +405,7 @@ public class FragmentCharacteristicDetail extends Fragment {
             return null;
         }
 
-        ArrayList<Descriptor> descriptors = new ArrayList<Descriptor>();
+        ArrayList<Descriptor> descriptors = new ArrayList<>();
 
         for (ServiceCharacteristic charact : mService.getCharacteristics()) {
             if (charact.getType().equals(mCharact.getType())) {
@@ -456,6 +457,9 @@ public class FragmentCharacteristicDetail extends Fragment {
     // Build activity UI based on characteristic content and also take account
     // of field requirements
     private boolean addNormalValue() {
+        if (writableFieldsContainer != null) {
+            writableFieldsContainer.removeAllViews();
+        }
         for (int i = 0; i < mCharact.getFields().size(); i++) {
             try {
                 Field field = mCharact.getFields().get(i);
@@ -563,11 +567,11 @@ public class FragmentCharacteristicDetail extends Fragment {
     // Converts string given in hexadecimal system to byte array
     public byte[] hexToByteArray(String hex) {
 
-        if(hex.length() != 0 && hex.length() % 2 != 0){
+        if (hex.length() != 0 && hex.length() % 2 != 0) {
             hex = "0" + hex;
         }
-        int len = hex.length()/ 2;
-        byte byteArr[] = new byte[len];
+        int len = hex.length() / 2;
+        byte[] byteArr = new byte[len];
         for (int i = 0; i < byteArr.length; i++) {
             int init = i * 2;
             int end = init + 2;
@@ -582,8 +586,8 @@ public class FragmentCharacteristicDetail extends Fragment {
         if (dec.length() == 0) {
             return new byte[]{};
         }
-        String decArray[] = dec.split(" ");
-        byte byteArr[] = new byte[decArray.length];
+        String[] decArray = dec.split(" ");
+        byte[] byteArr = new byte[decArray.length];
 
         for (int i = 0; i < decArray.length; i++) {
             try {
@@ -597,7 +601,7 @@ public class FragmentCharacteristicDetail extends Fragment {
 
     // Converts int to byte array
     private byte[] intToByteArray(int newVal, int formatLength) {
-        byte val[] = new byte[formatLength];
+        byte[] val = new byte[formatLength];
         for (int i = 0; i < formatLength; i++) {
             val[i] = (byte) (newVal & 0xff);
             newVal >>= 8;
@@ -607,7 +611,7 @@ public class FragmentCharacteristicDetail extends Fragment {
 
     // Checks if decimal input value is valid
     private boolean isDecValueValid(String decValue) {
-        char value[] = decValue.toCharArray();
+        char[] value = decValue.toCharArray();
         int valLength = value.length;
         boolean valid = false;
         if (decValue.length() < 4) {
@@ -651,23 +655,23 @@ public class FragmentCharacteristicDetail extends Fragment {
         int formatLength = Engine.getInstance().getFormat(format);
 
         // binaryString is used for sints, used to fix original bluegiga code ignoring data format type
-        String binaryString = "";
+        StringBuilder binaryString = new StringBuilder();
         try {
             for (int i = offset; i < offset + formatLength; i++) {
-                binaryString += String.format("%8s", Integer.toBinaryString(value[i] & 0xFF)).replace(' ', '0');
+                binaryString.append(String.format("%8s", Integer.toBinaryString(value[i] & 0xFF)).replace(' ', '0'));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        String result = "";
+        StringBuilder result = new StringBuilder();
         // If field length equals 0 then reads from offset to end of characteristic data
         if (formatLength == 0) {
             if (format.toLowerCase().equals("reg-cert-data-list")) {
-                result = "0x" + Converters.getHexValue(Arrays.copyOfRange(value, offset, value.length));
-                result = result.replace(" ", "");
+                result = new StringBuilder("0x" + Converters.getHexValue(Arrays.copyOfRange(value, offset, value.length)));
+                result = new StringBuilder(result.toString().replace(" ", ""));
             } else {
-                result = new String(Arrays.copyOfRange(value, offset, value.length));
+                result = new StringBuilder(new String(Arrays.copyOfRange(value, offset, value.length)));
             }
             offset += value.length;
         } else {
@@ -675,10 +679,10 @@ public class FragmentCharacteristicDetail extends Fragment {
             if (format.equals(TYPE_SFLOAT) || format.equals(TYPE_FLOAT) || format.equals(TYPE_FLOAT_32)
                     || format.equals(TYPE_FLOAT_64)) {
                 double fValue = readFloat(format, formatLength);
-                result = String.format("%.3f", fValue);
+                result = new StringBuilder(String.format(Locale.US, "%.3f", fValue));
             } else {
                 for (int i = offset; i < offset + formatLength; i++) {
-                    result += (int) (value[i] & 0xff);
+                    result.append((int) (value[i] & 0xff));
                 }
             }
 
@@ -688,8 +692,8 @@ public class FragmentCharacteristicDetail extends Fragment {
         // bluegiga code fix, original source code did not check for sint or uint
         if (format.toLowerCase().startsWith("sint")) {
             try {
-                result = Converters.getDecimalValueFromTwosComplement(binaryString);
-                return result;
+                result = new StringBuilder(Converters.getDecimalValueFromTwosComplement(binaryString.toString()));
+                return result.toString();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -711,20 +715,25 @@ public class FragmentCharacteristicDetail extends Fragment {
             }
         }
 
-        return result;
+        return result.toString();
     }
 
     // Reads float value for given format
     private double readFloat(String format, int formatLength) {
         double result = 0.0;
-        if (format.equals(TYPE_SFLOAT)) {
-            result = Common.readSfloat(value, offset, formatLength - 1);
-        } else if (format.equals(TYPE_FLOAT)) {
-            result = Common.readFloat(value, offset, formatLength - 1);
-        } else if (format.equals(TYPE_FLOAT_32)) {
-            result = Common.readFloat32(value, offset, formatLength);
-        } else if (format.equals(TYPE_FLOAT_64)) {
-            result = Common.readFloat64(value, offset, formatLength);
+        switch (format) {
+            case TYPE_SFLOAT:
+                result = Common.readSfloat(value, offset, formatLength - 1);
+                break;
+            case TYPE_FLOAT:
+                result = Common.readFloat(value, offset, formatLength - 1);
+                break;
+            case TYPE_FLOAT_32:
+                result = Common.readFloat32(value, offset, formatLength);
+                break;
+            case TYPE_FLOAT_64:
+                result = Common.readFloat64(value, offset, formatLength);
+                break;
         }
         return result;
     }
@@ -741,8 +750,8 @@ public class FragmentCharacteristicDetail extends Fragment {
 
     // Sets value from offset position
     private void setValue(int off, byte[] val) {
-        for (int i = off; i < val.length; i++) {
-            value[i] = val[i];
+        for (int i = off; i < off + val.length; i++) {
+            value[i] = val[i - off];
         }
     }
 
@@ -782,7 +791,7 @@ public class FragmentCharacteristicDetail extends Fragment {
 
     // Gets all bit fields for this characteristic
     private ArrayList<Field> getBitFields() {
-        ArrayList<Field> bitFields = new ArrayList<Field>();
+        ArrayList<Field> bitFields = new ArrayList<>();
         for (Field field : mCharact.getFields()) {
             bitFields.addAll(getBitField(field));
         }
@@ -791,7 +800,7 @@ public class FragmentCharacteristicDetail extends Fragment {
 
     // Gets bit field when field has references to other fields
     private ArrayList<Field> getBitField(Field field) {
-        ArrayList<Field> bitFields = new ArrayList<Field>();
+        ArrayList<Field> bitFields = new ArrayList<>();
         if (field.getBitfield() != null) {
             bitFields.add(field);
         } else if (field.getReferenceFields().size() > 0) {
@@ -814,13 +823,20 @@ public class FragmentCharacteristicDetail extends Fragment {
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View readableFieldsForInline = layoutInflater.inflate(R.layout.characteristic_value_read_only, null);
 
-        hex = (TextView) readableFieldsForInline.findViewById(R.id.hex_readonly);
-        ascii = (TextView) readableFieldsForInline.findViewById(R.id.ascii_readonly);
-        decimal = (TextView) readableFieldsForInline.findViewById(R.id.decimal_readonly);
+        hex = readableFieldsForInline.findViewById(R.id.hex_readonly);
+        ascii = readableFieldsForInline.findViewById(R.id.ascii_readonly);
+        decimal = readableFieldsForInline.findViewById(R.id.decimal_readonly);
 
-        hexEdit = (EditText) readableFieldsForInline.findViewById(R.id.hex_edit_readonly);
-        asciiEdit = (EditText) readableFieldsForInline.findViewById(R.id.ascii_edit_readonly);
-        decimalEdit = (EditText) readableFieldsForInline.findViewById(R.id.decimalEdit_readonly);
+        hexEdit = readableFieldsForInline.findViewById(R.id.hex_edit_readonly);
+        asciiEdit = readableFieldsForInline.findViewById(R.id.ascii_edit_readonly);
+        decimalEdit = readableFieldsForInline.findViewById(R.id.decimalEdit_readonly);
+
+        hex.setKeyListener(null);
+        ascii.setKeyListener(null);
+        decimal.setKeyListener(null);
+        hexEdit.setKeyListener(null);
+        asciiEdit.setKeyListener(null);
+        decimalEdit.setKeyListener(null);
 
         editTexts.add(hexEdit);
         editTexts.add(asciiEdit);
@@ -846,19 +862,18 @@ public class FragmentCharacteristicDetail extends Fragment {
         valuesLayout.addView(readableFieldsForInline);
 
         // writable fields for dialog
-        View writableFieldsForDialog = layoutInflater.inflate(R.layout.characteristic_value,null);
+        View writableFieldsForDialog = layoutInflater.inflate(R.layout.characteristic_value, null);
 
-        hex = (TextView) writableFieldsForDialog.findViewById(R.id.hex);
-        ascii = (TextView) writableFieldsForDialog.findViewById(R.id.ascii);
-        decimal = (TextView) writableFieldsForDialog.findViewById(R.id.decimal);
+        hex = writableFieldsForDialog.findViewById(R.id.hex);
+        ascii = writableFieldsForDialog.findViewById(R.id.ascii);
+        decimal = writableFieldsForDialog.findViewById(R.id.decimal);
 
-        hexEdit = (EditText) writableFieldsForDialog.findViewById(R.id.hexEdit);
-        asciiEdit = (EditText) writableFieldsForDialog.findViewById(R.id.asciiEdit);
-        decimalEdit = (EditText) writableFieldsForDialog.findViewById(R.id.decimalEdit);
+        hexEdit = writableFieldsForDialog.findViewById(R.id.hexEdit);
+        asciiEdit = writableFieldsForDialog.findViewById(R.id.asciiEdit);
+        decimalEdit = writableFieldsForDialog.findViewById(R.id.decimalEdit);
         editTexts.add(hexEdit);
         editTexts.add(asciiEdit);
         editTexts.add(decimalEdit);
-
 
 
         TextWatcher hexWatcher = getHexTextWatcher();
@@ -881,10 +896,6 @@ public class FragmentCharacteristicDetail extends Fragment {
             hex.setVisibility(View.GONE);
             ascii.setVisibility(View.GONE);
             decimal.setVisibility(View.GONE);
-
-            hexEdit.setText(Converters.getHexValue(value));
-            asciiEdit.setText(Converters.getAsciiValue(value));
-            decimalEdit.setText(Converters.getDecimalValue(value));
         } else {
             hexEdit.setVisibility(View.GONE);
             asciiEdit.setVisibility(View.GONE);
@@ -898,6 +909,7 @@ public class FragmentCharacteristicDetail extends Fragment {
         updateSaveButtonState();
 
         if (writableFieldsContainer != null) {
+            writableFieldsContainer.removeAllViews();
             writableFieldsContainer.addView(writableFieldsForDialog);
         }
     }
@@ -906,13 +918,14 @@ public class FragmentCharacteristicDetail extends Fragment {
         editableFieldsDialog = new Dialog(getActivity());
         editableFieldsDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         editableFieldsDialog.setContentView(R.layout.dialog_characteristic_write);
-        writableFieldsContainer = (LinearLayout) editableFieldsDialog.findViewById(R.id.characteristic_writable_fields_container);
+        editableFieldsDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        writableFieldsContainer = editableFieldsDialog.findViewById(R.id.characteristic_writable_fields_container);
 
-        saveValueBtn = (Button) editableFieldsDialog.findViewById(R.id.save_btn);
+        saveValueBtn = editableFieldsDialog.findViewById(R.id.save_btn);
     }
 
     public void showCharacteristicWriteDialog() {
-        // if any textfields are empty, save button will be initialized to be disabled
+        // if any textfields are empty, save rounded_button_red will be initialized to be disabled
         updateSaveButtonState();
 
         saveValueBtn.setOnClickListener(new View.OnClickListener() {
@@ -922,11 +935,13 @@ public class FragmentCharacteristicDetail extends Fragment {
             }
         });
 
-        Button cancelBtn = (Button) editableFieldsDialog.findViewById(R.id.cancel_btn);
+        Button cancelBtn = editableFieldsDialog.findViewById(R.id.cancel_btn);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editableFieldsDialog.dismiss();
+                for (EditText et : editTexts) {
+                    et.setText("");
+                }
             }
         });
 
@@ -934,14 +949,14 @@ public class FragmentCharacteristicDetail extends Fragment {
         String characteristicName = mCharact != null ? mCharact.getName().trim() : getString(R.string.unknown_characteristic_label);
         String characteristicUuid = mCharact != null ? Common.getUuidText(mCharact.getUuid()) : Common.getUuidText(mBluetoothCharact.getUuid());
 
-        TextView serviceNameTextView = (TextView) editableFieldsDialog.findViewById(R.id.picker_dialog_service_name);
-        TextView characteristicTextView = (TextView) editableFieldsDialog.findViewById(R.id.characteristic_dialog_characteristic_name);
-        TextView uuidTextView = (TextView) editableFieldsDialog.findViewById(R.id.picker_dialog_characteristic_uuid);
+        TextView serviceNameTextView = editableFieldsDialog.findViewById(R.id.picker_dialog_service_name);
+        TextView characteristicTextView = editableFieldsDialog.findViewById(R.id.characteristic_dialog_characteristic_name);
+        TextView uuidTextView = editableFieldsDialog.findViewById(R.id.picker_dialog_characteristic_uuid);
         serviceNameTextView.setText(serviceName);
         characteristicTextView.setText(characteristicName);
         uuidTextView.setText(characteristicUuid);
 
-        LinearLayout propertiesContainer = (LinearLayout) editableFieldsDialog.findViewById(R.id.picker_dialog_properties_container);
+        LinearLayout propertiesContainer = editableFieldsDialog.findViewById(R.id.picker_dialog_properties_container);
         initPropertiesForEditableFieldsDialog(propertiesContainer);
 
         editableFieldsDialog.show();
@@ -960,9 +975,8 @@ public class FragmentCharacteristicDetail extends Fragment {
             propertyValueTrimmed.toUpperCase();
             propertyView.setText(propertyValueTrimmed);
             propertyView.append("  ");
-            propertyView.setBackgroundColor(getResources().getColor(R.color.debug_mode_characteristic_expansion_background));
             propertyView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_property_text_size));
-            propertyView.setTextColor(getResources().getColor(R.color.debug_mode_characteristic_expansion_property_text_color));
+            propertyView.setTextColor(ContextCompat.getColor(context, R.color.silabs_blue));
             propertyView.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
 
             LinearLayout propertyContainer = new LinearLayout(context);
@@ -973,15 +987,15 @@ public class FragmentCharacteristicDetail extends Fragment {
             if (propertyValue.trim().toUpperCase().equals("BROADCAST")) {
                 iconId = R.drawable.debug_prop_broadcast;
             } else if (propertyValue.trim().toUpperCase().equals("READ")) {
-                iconId = R.drawable.debug_prop_read;
+                iconId = R.drawable.ic_icon_read_on;
             } else if (propertyValue.trim().toUpperCase().equals("WRITE NO RESPONSE")) {
                 iconId = R.drawable.debug_prop_write_no_resp;
             } else if (propertyValue.trim().toUpperCase().equals("WRITE")) {
-                iconId = R.drawable.debug_prop_write;
+                iconId = R.drawable.ic_icon_edit_on;
             } else if (propertyValue.trim().toUpperCase().equals("NOTIFY")) {
-                iconId = R.drawable.debug_prop_notify;
+                iconId = R.drawable.ic_icon_notify_on;
             } else if (propertyValue.trim().toUpperCase().equals("INDICATE")) {
-                iconId = R.drawable.debug_prop_indicate;
+                iconId = R.drawable.ic_icon_indicate_on;
             } else if (propertyValue.trim().toUpperCase().equals("SIGNED WRITE")) {
                 iconId = R.drawable.debug_prop_signed_write;
             } else if (propertyValue.trim().toUpperCase().equals("EXTENDED PROPS")) {
@@ -996,6 +1010,12 @@ public class FragmentCharacteristicDetail extends Fragment {
 
             LinearLayout.LayoutParams paramsIcon = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+
+            if(propertyValue.trim().toUpperCase().equals("WRITE NO RESPONSE")) {
+                float d = getResources().getDisplayMetrics().density;
+                paramsIcon = new LinearLayout.LayoutParams((int)(24*d),((int)(24*d)));
+                paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+            }
 
             propertyContainer.addView(propertyView, paramsText);
             propertyContainer.addView(propertyIcon, paramsIcon);
@@ -1015,7 +1035,7 @@ public class FragmentCharacteristicDetail extends Fragment {
                 if (hexEdit.hasFocus()) {
                     int textLength = hexEdit.getText().toString().length();
 
-                    byte newValue[];
+                    byte[] newValue;
                     if (textLength % 2 == 1) {
                         String temp = hexEdit.getText().toString();
                         temp = temp.substring(0, textLength - 1) + "0" + temp.charAt(textLength - 1);
@@ -1050,7 +1070,7 @@ public class FragmentCharacteristicDetail extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (decimalEdit.hasFocus()) {
                     if (isDecValueValid(decimalEdit.getText().toString())) {
-                        byte newValue[] = decToByteArray(decimalEdit.getText().toString());
+                        byte[] newValue = decToByteArray(decimalEdit.getText().toString());
                         hexEdit.setText(Converters.getHexValue(newValue));
                         asciiEdit.setText(Converters.getAsciiValue(newValue));
                     } else {
@@ -1084,7 +1104,7 @@ public class FragmentCharacteristicDetail extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (asciiEdit.hasFocus()) {
-                    byte newValue[] = asciiEdit.getText().toString().getBytes();
+                    byte[] newValue = asciiEdit.getText().toString().getBytes();
                     hexEdit.setText(Converters.getHexValue(newValue));
                     decimalEdit.setText(Converters.getDecimalValue(newValue));
                 }
@@ -1122,7 +1142,7 @@ public class FragmentCharacteristicDetail extends Fragment {
                     } else {
                         hexValue = hexEdit.getText().toString();
                     }
-                    byte value[] = hexToByteArray(hexValue);
+                    byte[] value = hexToByteArray(hexValue);
                     hexEdit.setText(Converters.getHexValue(value));
                 }
                 updateSaveButtonState();
@@ -1144,35 +1164,55 @@ public class FragmentCharacteristicDetail extends Fragment {
 
         LinearLayout valueLayout = addValueLayout();
         TextView fieldNameView = addValueFieldName(field.getName(), valueLayout.getId());
+        fieldNameView.setGravity(Gravity.CENTER_VERTICAL);
         fieldNameView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_label_text_size));
         TextView fieldUnitView = addValueUnit(field);
         fieldUnitView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_label_text_size));
+        fieldUnitView.setGravity(Gravity.CENTER_VERTICAL);
 
         if (!parseProblem && field.getReference() == null) {
             String format = field.getFormat();
             String val = readNextValue(format);
 
-            int decimalExponentAbs = (int) abs(field.getDecimalExponent());
-            double divider = Math.pow(10, decimalExponentAbs);
-            double valDouble = Double.valueOf(val);
-            double valTmp = valDouble / divider;
-            val = Double.toString(valTmp);
+
+            if (!(format.toLowerCase().equals("utf8s") || format.toLowerCase().equals("utf16s"))) {
+                int decimalExponentAbs = (int) abs(field.getDecimalExponent());
+                double divider = Math.pow(10, decimalExponentAbs);
+                double valDouble = Double.parseDouble(val);
+                double valTmp = valDouble / divider;
+                val = Double.toString(valTmp);
+            } else {
+                writeString = true;
+                val = val.replace("\0", "");
+            }
+
 
             if (writeable) {
                 // inline field value
                 EditText fieldValueEdit = addValueEdit(field, val);
+                fieldValueEdit.setGravity(Gravity.CENTER_VERTICAL);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.5f);
+                params.setMargins(5, 0, 0, 0);
+                params.gravity = Gravity.CENTER_VERTICAL;
+                fieldValueEdit.setLayoutParams(params);
                 fieldValueEdit.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_text_size));
                 editTexts.add(fieldValueEdit);
                 TextView fieldValue = (TextView) addFieldName(fieldValueEdit.getText().toString());
-                fieldValue.setTextColor(getResources().getColor(R.color.characteristic_field_value));
+                fieldValue.setTextColor(ContextCompat.getColor(getActivity(), R.color.silabs_primary_text));
                 valueLayout.addView(fieldValue);
 
                 // dialog field value
                 // field name
                 View fieldName = addFieldName(field.getName());
+                params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.5f);
+                params.gravity = Gravity.CENTER_VERTICAL;
+                fieldName.setLayoutParams(params);
                 // container for editable field value and field name
                 LinearLayout fieldContainer = new LinearLayout(context);
                 fieldContainer.setOrientation(LinearLayout.HORIZONTAL);
+                params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.setMargins(0, 5, 0, 5);
+                fieldContainer.setLayoutParams(params);
                 fieldContainer.addView(fieldName);
                 fieldContainer.addView(fieldValueEdit);
                 fieldContainer.setPadding(FIELD_CONTAINER_PADDING_LEFT, FIELD_CONTAINER_PADDING_TOP, FIELD_CONTAINER_PADDING_RIGHT, FIELD_CONTAINER_PADDING_BOTTOM);
@@ -1187,7 +1227,6 @@ public class FragmentCharacteristicDetail extends Fragment {
         }
 
         valueLayout.addView(fieldUnitView);
-
         parentLayout.addView(valueLayout);
         parentLayout.addView(fieldNameView);
         valuesLayout.addView(parentLayout);
@@ -1199,7 +1238,7 @@ public class FragmentCharacteristicDetail extends Fragment {
         valueLayout.setBackgroundColor(viewBackgroundColor);
         RelativeLayout.LayoutParams valueLayoutParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        valueLayoutParams.setMargins(0, defaultMargin, defaultMargin, 0);
+        valueLayoutParams.setMargins(0, 0, defaultMargin, 0);
         valueLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         valueLayoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
         valueLayout.setLayoutParams(valueLayoutParams);
@@ -1217,7 +1256,7 @@ public class FragmentCharacteristicDetail extends Fragment {
         fieldUnitView.setBackgroundColor(viewBackgroundColor);
         LinearLayout.LayoutParams fieldUnitParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        fieldUnitParams.setMargins(defaultMargin, 0, 0, 0);
+        fieldUnitParams.setMargins(0, 0, 0, 0);
         fieldUnitView.setLayoutParams(fieldUnitParams);
 
         Unit unit = Engine.getInstance().getUnit(field.getUnit());
@@ -1234,12 +1273,12 @@ public class FragmentCharacteristicDetail extends Fragment {
             }
         }
 
-        fieldUnitView.setTextColor(getResources().getColor(R.color.characteristic_field_value));
+        fieldUnitView.setTextColor(ContextCompat.getColor(getActivity(), R.color.silabs_primary_text));
         return fieldUnitView;
     }
 
 
-    private boolean isNumberFormat(String format){
+    private boolean isNumberFormat(String format) {
         switch (format) {
             case "uint8":
             case "uint16":
@@ -1271,11 +1310,13 @@ public class FragmentCharacteristicDetail extends Fragment {
         fieldValueEdit.setPadding(FIELD_VALUE_EDIT_TEXT_PADDING_LEFT, FIELD_VALUE_EDIT_TEXT_PADDING_TOP, FIELD_VALUE_EDIT_TEXT_PADDING_RIGHT, FIELD_VALUE_EDIT_TEXT_PADDING_BOTTOM);
 
         LinearLayout.LayoutParams fieldValueParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        fieldValueParams.gravity = Gravity.CENTER_VERTICAL;
         fieldValueParams.leftMargin = FIELD_VALUE_EDIT_LEFT_MARGIN;
 
         fieldValueEdit.setLayoutParams(fieldValueParams);
-        fieldValueEdit.setTextColor(getResources().getColor(R.color.characteristic_value_screen_value));
+        fieldValueEdit.setTextColor(context.getColor(R.color.silabs_primary_text));
+        fieldValueEdit.setSingleLine();
         fieldValueEdit.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_text_size));
         fieldValueEdit.setText(value);
 
@@ -1286,8 +1327,7 @@ public class FragmentCharacteristicDetail extends Fragment {
         }
         final byte[] valArr = new byte[formatLength];
 
-
-        if(isNumberFormat(field.getFormat())){
+        if (isNumberFormat(field.getFormat())) {
             fieldValueEdit.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
         }
 
@@ -1295,63 +1335,70 @@ public class FragmentCharacteristicDetail extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Arrays.fill(valArr, (byte) 0);
-                String inputVal = fieldValueEdit.getText().toString();
 
-                int decimalExponentAbs = (int) abs(field.getDecimalExponent());
-                String inputValMoved = inputVal;
-                if (decimalExponentAbs != 0) {
-                    int index = inputValMoved.indexOf(".");
-                    if (index != -1) {
-                        if (inputValMoved.length() - 1 - index > decimalExponentAbs) {
-                            inputValMoved = inputValMoved.replace(".", "");
-                            inputValMoved = inputValMoved.substring(0, index + decimalExponentAbs) + "." + inputValMoved.substring(index + decimalExponentAbs);
-                        } else if (inputValMoved.length() - 1 - index == decimalExponentAbs) {
-                            inputValMoved = inputValMoved.replace(".", "");
+                if (writeString) {
+                    int textSize = fieldValueEdit.getText().toString().length();
+                    byte[] array = fieldValueEdit.getText().toString().getBytes();
+
+                    if (valArr.length > textSize) {
+                        Arrays.fill(valArr, (byte) 0);
+                        System.arraycopy(array, 0, valArr, 0, textSize);
+                        fillValue(valArr);
+                    } else {
+                        fillValue(array);
+                    }
+
+                } else {
+                    Arrays.fill(valArr, (byte) 0);
+                    String inputVal = fieldValueEdit.getText().toString();
+
+                    int decimalExponentAbs = (int) abs(field.getDecimalExponent());
+                    StringBuilder inputValMoved = new StringBuilder(inputVal);
+                    if (decimalExponentAbs != 0) {
+                        int index = inputValMoved.indexOf(".");
+                        if (index != -1) {
+                            if (inputValMoved.length() - 1 - index > decimalExponentAbs) {
+                                inputValMoved = new StringBuilder(inputValMoved.toString().replace(".", ""));
+                                inputValMoved = new StringBuilder(inputValMoved.substring(0, index + decimalExponentAbs) + "." + inputValMoved.substring(index + decimalExponentAbs));
+                            } else if (inputValMoved.length() - 1 - index == decimalExponentAbs) {
+                                inputValMoved = new StringBuilder(inputValMoved.toString().replace(".", ""));
+                            } else {
+                                inputValMoved = new StringBuilder(inputValMoved.toString().replace(".", ""));
+                                for (int i = inputValMoved.length() - index; i < decimalExponentAbs; i++) {
+                                    inputValMoved.append("0");
+                                }
+                            }
                         } else {
-                            inputValMoved = inputValMoved.replace(".", "");
-                            for (int i = inputValMoved.length() - index; i < decimalExponentAbs; i++) {
-                                inputValMoved = inputValMoved + "0";
+                            for (int i = 0; i < decimalExponentAbs; i++) {
+                                inputValMoved.append("0");
                             }
                         }
-                    } else {
-                        for (int i = 0; i < decimalExponentAbs; i++) {
-                            inputValMoved = inputValMoved + "0";
+                    }
+
+                    Pair<byte[], Boolean> pair = Converters.convertStringTo(inputValMoved.toString(), field.getFormat());
+                    byte[] newVal = pair.first;
+                    Boolean inRange = pair.second;
+
+
+                    Log.d("write_val", "Value to write from edittext conversion (hex): " + Converters.getHexValue(newVal));
+
+                    for (int i = 0; i < valArr.length; i++) {
+                        if (i < newVal.length) {
+                            valArr[i] = newVal[i];
                         }
                     }
-                }
 
-                Pair<byte[], Boolean> pair = Converters.convertStringTo(inputValMoved, field.getFormat());
-                byte[] newVal = pair.first;
-                Boolean inRange = pair.second;
+                    int off = getFieldOffset(field);
 
-
-                Log.d("write_val", "Value to write from edittext conversion (hex): " + Converters.getHexValue(newVal));
-
-                for (int i = 0; i < valArr.length; i++) {
-                    if (i < newVal.length) {
-                        valArr[i] = newVal[i];
+                    fieldsInRangeMap.put(field, inRange);
+                    if (isNumberFormat(field.getFormat())) {
+                        fieldsValidMap.put(field, isNumeric(inputVal));
+                    } else {
+                        fieldsValidMap.put(field, true);
                     }
-                }
 
-                int off = getFieldOffset(field);
-
-                byte[] valArrReversed = valArr.clone();
-                for (int i = 0; i < valArrReversed.length / 2; i++) {
-                    byte temp = valArrReversed[i];
-                    valArrReversed[i] = valArrReversed[valArrReversed.length - i - 1];
-                    valArrReversed[valArrReversed.length - i - 1] = temp;
+                    setValue(off, valArr);
                 }
-
-                fieldsInRangeMap.put(field, inRange);
-                if(isNumberFormat(field.getFormat())){
-                    fieldsValidMap.put(field, isNumeric(inputVal));
-                }
-                else {
-                    fieldsValidMap.put(field, true);
-                }
-
-                setValue(off, valArrReversed);
                 updateSaveButtonState();
             }
 
@@ -1369,11 +1416,16 @@ public class FragmentCharacteristicDetail extends Fragment {
         return fieldValueEdit;
     }
 
+    private void fillValue(byte[] array) {
+        value = new byte[array.length];
+        System.arraycopy(array, 0, value, 0, array.length);
+    }
+
     private void updateSaveButtonState() {
         boolean emptyFieldExists = true;
         for (EditText editableField : editTexts) {
             emptyFieldExists = !editableField.getText().toString().equals("");
-            Log.d("editableField", " Empty: " + editableField.getText().toString().equals("") );
+            Log.d("editableField", " Empty: " + editableField.getText().toString().equals(""));
         }
 
         if (saveValueBtn != null) {
@@ -1391,10 +1443,9 @@ public class FragmentCharacteristicDetail extends Fragment {
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
         fieldValueView.setLayoutParams(fieldValueParams);
-
         fieldValueView.setText(value);
 
-        fieldValueView.setTextColor(getResources().getColor(R.color.characteristic_field_value));
+        fieldValueView.setTextColor(ContextCompat.getColor(getActivity(), R.color.silabs_primary_text));
         return fieldValueView;
     }
 
@@ -1411,11 +1462,11 @@ public class FragmentCharacteristicDetail extends Fragment {
         fieldNameParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         fieldNameParams.addRule(RelativeLayout.LEFT_OF, leftViewId);
         fieldNameParams.addRule(RelativeLayout.CENTER_VERTICAL);
-        fieldNameParams.setMargins(defaultMargin, 0, defaultMargin, FIELD_NAME_OF_VALUE_MARGIN_RIGHT);
+        fieldNameParams.setMargins(0, 0, 0, 15);
 
         fieldNameView.setLayoutParams(fieldNameParams);
 
-        fieldNameView.setTextColor(getResources().getColor(R.color.characteristic_field_name));
+        fieldNameView.setTextColor(ContextCompat.getColor(getActivity(), R.color.silabs_subtle_text));
         return fieldNameView;
     }
 
@@ -1462,7 +1513,7 @@ public class FragmentCharacteristicDetail extends Fragment {
                 bitNameParams.setMargins(0, 0, 0, 0);
                 bitNameView.setLayoutParams(bitNameParams);
                 bitNameView.setText(bit.getName());
-                bitNameView.setTextColor(getResources().getColor(R.color.characteristic_field_value));
+                bitNameView.setTextColor(ContextCompat.getColor(getActivity(), R.color.silabs_primary_text));
 
                 for (int i = 0; i < Math.pow(2, bit.getSize() - 1); i++) {
                     CheckBox checkBox = new CheckBox(context);
@@ -1512,22 +1563,31 @@ public class FragmentCharacteristicDetail extends Fragment {
             final Dialog dialog = new Dialog(getActivity());
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.dialog_characteristic_picker);
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
-            final RadioGroup radioGroup = (RadioGroup) dialog.findViewById(R.id.characteristic_dialog_radio_group);
-            Button selectValueBtn = (Button) dialog.findViewById(R.id.confirm_selection_btn);
+                if (!context.getResources().getBoolean(R.bool.isTablet)) {
+                    int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.80);
+                    dialog.getWindow().setLayout(width, LinearLayout.LayoutParams.WRAP_CONTENT);
+                }
+            }
+
+
+            final RadioGroup radioGroup = dialog.findViewById(R.id.characteristic_dialog_radio_group);
+            Button selectValueBtn = dialog.findViewById(R.id.confirm_selection_btn);
 
             String serviceName = mService != null ? mService.getName().trim() : getString(R.string.unknown_characteristic_label);
             String characteristicName = mCharact != null ? mCharact.getName().trim() : getString(R.string.unknown_characteristic_label);
             String characteristicUuid = (mCharact != null ? Common.getUuidText(mCharact.getUuid()) : getString(R.string.unknown_characteristic_uuid_label));
 
             ((TextView) dialog.findViewById(R.id.picker_dialog_service_name)).setText(serviceName);
-            ((TextView) dialog.findViewById(R.id.picker_dialog_service_name)).setSelected(true);
+            dialog.findViewById(R.id.picker_dialog_service_name).setSelected(true);
             ((TextView) dialog.findViewById(R.id.characteristic_dialog_characteristic_name)).setText(characteristicName);
-            ((TextView) dialog.findViewById(R.id.characteristic_dialog_characteristic_name)).setSelected(true);
+            dialog.findViewById(R.id.characteristic_dialog_characteristic_name).setSelected(true);
             ((TextView) dialog.findViewById(R.id.picker_dialog_characteristic_uuid)).setText(characteristicUuid);
-            ((TextView) dialog.findViewById(R.id.picker_dialog_characteristic_uuid)).setSelected(true);
+            dialog.findViewById(R.id.picker_dialog_characteristic_uuid).setSelected(true);
 
-            LinearLayout propertiesContainer = (LinearLayout) dialog.findViewById(R.id.picker_dialog_properties_container);
+            LinearLayout propertiesContainer = dialog.findViewById(R.id.picker_dialog_properties_container);
             String propertiesString = Common.getProperties(getActivity(), mBluetoothCharact.getProperties());
             String[] propsExploded = propertiesString.split(",");
             for (String propertyValue : propsExploded) {
@@ -1537,9 +1597,9 @@ public class FragmentCharacteristicDetail extends Fragment {
                 propertyValueTrimmed.toUpperCase();
                 propertyView.setText(propertyValueTrimmed);
                 propertyView.append("  ");
-                propertyView.setBackgroundColor(getResources().getColor(R.color.debug_mode_characteristic_expansion_background));
+                propertyView.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.silabs_dialog_title_background));
                 propertyView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_property_text_size));
-                propertyView.setTextColor(getResources().getColor(R.color.debug_mode_characteristic_expansion_property_text_color));
+                propertyView.setTextColor(ContextCompat.getColor(context, R.color.silabs_blue));
                 propertyView.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
 
                 LinearLayout propertyContainer = new LinearLayout(context);
@@ -1550,15 +1610,15 @@ public class FragmentCharacteristicDetail extends Fragment {
                 if (propertyValue.trim().toUpperCase().equals("BROADCAST")) {
                     iconId = R.drawable.debug_prop_broadcast;
                 } else if (propertyValue.trim().toUpperCase().equals("READ")) {
-                    iconId = R.drawable.debug_prop_read;
+                    iconId = R.drawable.ic_icon_read_on;
                 } else if (propertyValue.trim().toUpperCase().equals("WRITE NO RESPONSE")) {
                     iconId = R.drawable.debug_prop_write_no_resp;
                 } else if (propertyValue.trim().toUpperCase().equals("WRITE")) {
-                    iconId = R.drawable.debug_prop_write;
+                    iconId = R.drawable.ic_icon_edit_on;
                 } else if (propertyValue.trim().toUpperCase().equals("NOTIFY")) {
-                    iconId = R.drawable.debug_prop_notify;
+                    iconId = R.drawable.ic_icon_notify_on;
                 } else if (propertyValue.trim().toUpperCase().equals("INDICATE")) {
-                    iconId = R.drawable.debug_prop_indicate;
+                    iconId = R.drawable.ic_icon_indicate_on;
                 } else if (propertyValue.trim().toUpperCase().equals("SIGNED WRITE")) {
                     iconId = R.drawable.debug_prop_signed_write;
                 } else if (propertyValue.trim().toUpperCase().equals("EXTENDED PROPS")) {
@@ -1574,15 +1634,22 @@ public class FragmentCharacteristicDetail extends Fragment {
                 LinearLayout.LayoutParams paramsIcon = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
 
+                if(propertyValue.trim().toUpperCase().equals("WRITE NO RESPONSE")) {
+                    float d = getResources().getDisplayMetrics().density;
+                    paramsIcon = new LinearLayout.LayoutParams((int)(24*d),((int)(24*d)));
+                    paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+                }
+
                 propertyContainer.addView(propertyView, paramsText);
                 propertyContainer.addView(propertyIcon, paramsIcon);
 
                 LinearLayout.LayoutParams paramsTextAndIconContainer = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 paramsTextAndIconContainer.gravity = Gravity.RIGHT;
+                paramsTextAndIconContainer.setMargins(0, defaultMargin, 0, defaultMargin);
                 propertiesContainer.addView(propertyContainer, paramsTextAndIconContainer);
             }
 
-            ArrayList<String> enumerationArray = new ArrayList<String>();
+            ArrayList<String> enumerationArray = new ArrayList<>();
 
             for (Enumeration en : field.getEnumerations()) {
                 enumerationArray.add(en.getValue());
@@ -1611,7 +1678,7 @@ public class FragmentCharacteristicDetail extends Fragment {
                         val = val << 8;
                     } else if (offset < value.length - 1) {
                         // for field "Category, last 6 bits of payload are used for sub categories
-                        if(field.getName().equals("Category")) {
+                        if (field.getName().equals("Category")) {
                             int byte1 = value[offset] & 0xff;
                             int byte2 = value[offset + 1] & 0xff;
                             val = (byte2 << 8) | byte1;
@@ -1659,7 +1726,7 @@ public class FragmentCharacteristicDetail extends Fragment {
                             int key = field.getEnumerations().get(position).getKey();
                             int off = getFieldOffset(field);
                             int formatLength = Engine.getInstance().getFormat(field.getFormat());
-                            byte val[] = intToByteArray(key, formatLength);
+                            byte[] val = intToByteArray(key, formatLength);
                             setValue(off, val);
 
                             writeValueToCharacteristic();
@@ -1680,9 +1747,10 @@ public class FragmentCharacteristicDetail extends Fragment {
             spinnerWithLabelContainer.setOrientation(LinearLayout.HORIZONTAL);
             LinearLayout.LayoutParams spinnerWithLabelContainerParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            spinnerWithLabelContainerParams.setMargins(0, SPINNER_WITH_LABEL_CONTAINER_MARGIN_TOP, 0, 0);
+            spinnerWithLabelContainerParams.setMargins(0, defaultMargin, 0, defaultMargin);
 
             View spinnerBtnWithImage = inflater.inflate(R.layout.characteristic_spinner_btn, null);
+            spinnerBtnWithImage.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.2f));
             spinnerBtnWithImage.findViewById(R.id.btn_show_picker_dialog).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -1691,21 +1759,23 @@ public class FragmentCharacteristicDetail extends Fragment {
             });
             LinearLayout spinnerBtnContainer = new LinearLayout(context);
             spinnerBtnContainer.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+            spinnerBtnContainer.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.2f));
             spinnerBtnContainer.addView(spinnerBtnWithImage);
 
             LinearLayout nameAndValueContainer = new LinearLayout(context);
             nameAndValueContainer.setOrientation(LinearLayout.VERTICAL);
             nameAndValueContainer.setGravity(Gravity.CENTER_VERTICAL);
+            nameAndValueContainer.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.8f));
 
             int radioButtonID = radioGroup.getCheckedRadioButtonId();
-            RadioButton radioButton = (RadioButton) radioGroup.findViewById(radioButtonID);
+            RadioButton radioButton = radioGroup.findViewById(radioButtonID);
             View spinnerValue = addValueText((String) (radioButton.getText()));
             View spinnerName = addFieldName(field.getName());
             nameAndValueContainer.addView(spinnerValue);
             nameAndValueContainer.addView(spinnerName);
 
             spinnerWithLabelContainer.addView(nameAndValueContainer);
-            spinnerWithLabelContainer.addView(spinnerBtnContainer, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            spinnerWithLabelContainer.addView(spinnerBtnContainer, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             valuesLayout.addView(spinnerWithLabelContainer, spinnerWithLabelContainerParams);
         }
@@ -1719,7 +1789,7 @@ public class FragmentCharacteristicDetail extends Fragment {
         problemTextView.setBackgroundColor(viewBackgroundColor);
         LinearLayout.LayoutParams fieldValueParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        fieldValueParams.setMargins(defaultMargin, 0, 0, 0);
+        fieldValueParams.setMargins(0, 0, 0, 0);
 
         problemTextView.setLayoutParams(fieldValueParams);
         problemTextView.setTypeface(Typeface.DEFAULT_BOLD);
@@ -1737,11 +1807,12 @@ public class FragmentCharacteristicDetail extends Fragment {
         fieldNameView.setBackgroundColor(viewBackgroundColor);
         LinearLayout.LayoutParams fieldNameParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        fieldNameParams.setMargins(0, 0, 0, FIELD_NAME_MARGIN_BOTTOM);
+        fieldNameParams.gravity = Gravity.CENTER_VERTICAL;
+        fieldNameParams.setMargins(0, 0, 0, 0);
         fieldNameView.setLayoutParams(fieldNameParams);
         fieldNameView.setText(name);
 
-        fieldNameView.setTextColor(getResources().getColor(R.color.characteristic_field_name));
+        fieldNameView.setTextColor(ContextCompat.getColor(getActivity(), R.color.silabs_subtle_text));
         return fieldNameView;
     }
 
@@ -1752,7 +1823,7 @@ public class FragmentCharacteristicDetail extends Fragment {
                 height);
         lineParams.setMargins(0, convertPxToDp(5), 0, 0);
         horizontalLine.setLayoutParams(lineParams);
-        horizontalLine.setBackgroundColor(getResources().getColor(R.color.characteristic_value_screen_divider));
+        horizontalLine.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.silabs_divider));
         return horizontalLine;
     }
 
@@ -1777,7 +1848,7 @@ public class FragmentCharacteristicDetail extends Fragment {
         try {
             Double.parseDouble(string);
             return true;
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return false;
         }
     }

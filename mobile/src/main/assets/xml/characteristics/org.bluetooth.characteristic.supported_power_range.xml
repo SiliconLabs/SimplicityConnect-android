@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2017 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" name="Supported Power Range" type="org.bluetooth.characteristic.supported_power_range" uuid="2AD8" last-modified="2017-02-14" approved="Yes">
+    <InformativeText>
+        <Summary>
+            The Supported Power Range characteristic is used to send the supported power range as well as the minimum power increment supported by the Server.
+        </Summary>
+    </InformativeText>
+    <Value>
+        <Field name="Minimum Power">
+            <InformativeText>Watt with a resolution of 1</InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>sint16</Format>
+            <Unit>org.bluetooth.unit.power.watt</Unit>
+        </Field>
+        <Field name="Maximum Power">
+            <InformativeText>Watt with a resolution of 1</InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>sint16</Format>
+            <Unit>org.bluetooth.unit.power.watt</Unit>
+        </Field>
+        <Field name="Minimum Increment">
+            <InformativeText>Watt with a resolution of 1</InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>uint16</Format>
+            <Unit>org.bluetooth.unit.power.watt</Unit>
+        </Field>
+    </Value>
+</Characteristic>

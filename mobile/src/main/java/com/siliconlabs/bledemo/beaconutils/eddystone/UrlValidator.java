@@ -15,6 +15,7 @@ package com.siliconlabs.bledemo.beaconutils.eddystone;
 // see https://github.com/google/eddystone
 
 import android.util.Log;
+
 import java.util.Arrays;
 
 
@@ -27,7 +28,7 @@ public class UrlValidator {
 
     private static final String TAG = UrlValidator.class.getSimpleName();
 
-    public  UrlValidator() {
+    public UrlValidator() {
     }
 
     public static void validate(String deviceAddress, byte[] serviceData, Beacon beacon) {

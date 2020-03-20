@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/debug_mode_characteristic_expansion_background"
-    android:paddingLeft="@dimen/fragment_characteristic_details_padding_left"
+    android:background="@color/silabs_white"
     tools:context=".MainActivity">
 
     <RelativeLayout
@@ -15,26 +14,25 @@
         <View
             android:id="@+id/value_divider"
             android:layout_width="match_parent"
-            android:layout_marginTop="20dp"
             android:layout_height="1dp"
-            android:layout_marginRight="@dimen/fragment_charac_details_value_divider_margin_right"
-            android:layout_marginBottom="20dp"
-            android:background="@color/characteristic_value_screen_divider" />
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/silabs_divider" />
     </RelativeLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/value_header_container"
-        android:background="@color/debug_mode_characteristic_expansion_background">
+        android:background="@color/silabs_white">
 
         <LinearLayout
             android:id="@+id/values_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/debug_mode_characteristic_expansion_background"
-            android:orientation="vertical"
-            android:paddingLeft="@dimen/characteristic_detail_mode_charc_value_container_padding_left"
-            android:paddingRight="@dimen/characteristic_detail_mode_charc_value_container_padding_right" />
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="10dp"
+            android:background="@color/silabs_white"
+            android:orientation="vertical" />
     </ScrollView>
 </RelativeLayout>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".toolbars.ConnectionsFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview_connections"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/view_separator"
+        android:splitMotionEvents="false" />
+
+    <View
+        android:id="@+id/view_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@id/relativelayout_bottom"
+        android:background="@color/silabs_secondary_background" />
+
+    <RelativeLayout
+        android:id="@+id/relativelayout_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp">
+
+        <Button
+            android:id="@+id/button_disconnect_all"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="4dp"
+            android:background="@drawable/rounded_button_red"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/Disconnect_all"
+            android:textAllCaps="false"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/browser_button_text_size" />
+
+        <ImageView
+            android:id="@+id/imageview_close"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:src="@drawable/ic_icon_small_x" />
+    </RelativeLayout>
+
+
+</RelativeLayout>

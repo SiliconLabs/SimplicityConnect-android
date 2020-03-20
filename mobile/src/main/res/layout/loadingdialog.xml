@@ -1,57 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/alizarin_crimson">
+        android:background="@color/silabs_red">
+
         <TextView
             android:id="@+id/loading_header"
-            android:text="Preparing for OTA"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
-            android:textStyle="bold"
-            android:textColor="@color/silicon_labs_white"/>
-        
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/Preparing_for_OTA"
+            android:textColor="@color/silabs_white" />
+
     </LinearLayout>
 
     <View
         android:id="@+id/buttons_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/dialog_separator_dark_gray" />
+        android:background="@color/silabs_divider" />
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp">
+        android:layout_margin="20dp"
+        android:orientation="horizontal">
 
         <ProgressBar
             android:id="@+id/connecting_spinner"
             android:layout_width="25dp"
             android:layout_height="25dp"
+            android:layout_gravity="center_vertical|end"
             android:layout_margin="5dp"
-            android:layout_gravity="center_vertical|right"
+            android:layout_weight="0.3"
             android:indeterminate="true"
             android:indeterminateDrawable="@drawable/connecting_spinner_ring"
-            android:visibility="visible"
-            android:layout_weight="0.3" />
+            android:visibility="visible" />
 
         <TextView
+            android:id="@+id/loadingLog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/loadingLog"
-            android:elegantTextHeight="true"
-            android:textStyle="bold"
-            android:layout_margin="15dp"
             android:layout_gravity="center"
-            android:maxLength="25"
+            android:layout_margin="15dp"
+            android:layout_weight="0.7"
+            android:elegantTextHeight="true"
+            android:fontFamily="sans-serif-medium"
             android:gravity="center"
-            android:layout_weight="0.7" />
+            android:maxLength="25" />
     </LinearLayout>
 </LinearLayout>

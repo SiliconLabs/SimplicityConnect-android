@@ -25,8 +25,6 @@ public enum SignalStrength {
                 return context.getString(R.string.keyfob_signal_strength_average);
             case GOOD:
                 return context.getString(R.string.keyfob_signal_strength_good);
-            case UNKNOWN:
-                return context.getString(R.string.keyfob_signal_strength_unknown);
             default:
                 return context.getString(R.string.keyfob_signal_strength_unknown);
         }

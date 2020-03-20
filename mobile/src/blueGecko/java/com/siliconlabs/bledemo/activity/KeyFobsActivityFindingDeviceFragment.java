@@ -1,8 +1,11 @@
 package com.siliconlabs.bledemo.activity;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,8 +36,8 @@ public class KeyFobsActivityFindingDeviceFragment extends Fragment {
     TextView deviceNameText;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
     }
 
     @Override

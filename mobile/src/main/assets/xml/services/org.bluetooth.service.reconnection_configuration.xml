@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2017 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Service xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/service.xsd" name="Reconnection Configuration" type="org.bluetooth.service.reconnection_configuration" uuid="1829" last-modified="2017-12-05" approved="Yes">
+	<InformativeText>
+		<Abstract>
+			This GATT-based service enables the control of certain communication parameters of a Bluetooth Low Energy peripheral device.
+		</Abstract>
+	</InformativeText>
+	<Dependencies>
+		<Dependency>
+			This service is not dependent upon any other services but is intended to be used together with other services.
+		</Dependency>
+	</Dependencies>
+	<GATTRequirements>
+		<Requirement subProcedure="Write">Mandatory</Requirement>
+		<Requirement subProcedure="Notifications">
+			C1: Mandatory if Ready for Disconnect is supported, otherwise Optional.
+		</Requirement>
+		<Requirement subProcedure="Indications">
+			C2: Mandatory if Reconnection Configuration Control Point (RCCP) procedures are supported, otherwise Excluded.
+		</Requirement>
+		<Requirement subProcedure="Read Characteristic Descriptors">Mandatory</Requirement>
+		<Requirement subProcedure="Write Characteristic Descriptors">Mandatory</Requirement>
+	</GATTRequirements>
+	<Transports>
+		<Classic>false</Classic>
+		<LowEnergy>true</LowEnergy>
+	</Transports>
+	<ErrorCodes>
+		<ErrorCode name="Missing CRC" code="0x80" Description="If E2E-CRC is supported and a Write procedure is processed without CRC attached"/>
+		<ErrorCode name="Invalid CRC" code="0x81" Description="If E2E-CRC is supported and a Write procedure is processed with invalid CRC value attached"/>
+	</ErrorCodes>
+	<Characteristics>
+		<Characteristic name="RC Feature" type="org.bluetooth.characteristic.rc_feature">
+			<InformativeText>
+				The RC Features characteristic shall be used to describe the supported features of the Reconnection Configuration server.
+			</InformativeText>
+			<Requirement>Mandatory</Requirement>
+			<Properties>
+				<InformationText/>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+				<ExtendedProperties>Excluded</ExtendedProperties>
+			</Properties>
+			<Descriptors/>
+		</Characteristic>
+		<Characteristic name="RC Settings" type="org.bluetooth.characteristic.rc_settings">
+			<InformativeText>
+				The RC Settings characteristic shall be used to both read and notify supported features on the Reconnection Configuration server.
+			</InformativeText>
+			<Requirement>C1</Requirement>
+			<Properties>
+				<InformationText>
+					C1: Mandatory if device supports one or more of the following features: "Ready for Disconnect", "Advertisement Configuration", "Upgrade to LESC Only", "Next Pairing OOB", "Limited Access", otherwise Excluded. Notify is Mandatory if device supports "Enable Disconnect" feature, otherwise Optional.
+				</InformationText>
+				<Read>Mandatory</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Optional</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+				<ExtendedProperties>Excluded</ExtendedProperties>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>
+						C2: Mandatory if device supports "Ready for Disconnect" feature, otherwise Excluded.
+					</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+		<Characteristic name="Reconnection Configuration Control Point" type="org.bluetooth.characteristic.reconnection_configuration_control_point">
+			<Requirement>C3</Requirement>
+			<Properties>
+				<InformationText>
+					C3: Mandatory if device supports one or more of the following features: "Enable Disconnect", "Propose Reconnection Timeout", "Propose Connection Interval", "Propose Slave Latency", "Propose Supervision Timeout", "Propose Advertisement Interval", "Propose Advertisement Count", "Propose Advertisement Repetition Time", "Advertisement Configuration 1", "Advertisement Configuration 2", "Advertisement Configuration 3", "Advertisement Configuration 4", "Upgrade to LESC Only", "Next Pairing OOB", "Use of White List", "Limited Access", otherwise Excluded.
+				</InformationText>
+				<Read>Mandatory</Read>
+				<Write>Mandatory</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Mandatory</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+				<ExtendedProperties>Excluded</ExtendedProperties>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>
+						C3: Mandatory if device supports one or more of the following features: "Enable Disconnect", "Propose Reconnection Timeout", "Propose Connection Interval", "Propose Slave Latency", "Propose Supervision Timeout", "Propose Advertisement Interval", "Propose Advertisement Count", "Propose Advertisement Repetition Time", "Advertisement Configuration 1", "Advertisement Configuration 2", "Advertisement Configuration 3", "Advertisement Configuration 4", "Upgrade to LESC Only", "Next Pairing OOB", "Use of White List", "Limited Access", otherwise Excluded.
+					</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+	</Characteristics>
+</Service>

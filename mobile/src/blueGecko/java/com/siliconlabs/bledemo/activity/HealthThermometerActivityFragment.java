@@ -1,12 +1,11 @@
 package com.siliconlabs.bledemo.activity;
 
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.SwitchCompat;
+
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.widget.SwitchCompat;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,24 +17,16 @@ import android.widget.TextView;
 import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.models.TemperatureReading;
 import com.siliconlabs.bledemo.views.TemperatureDisplay;
-import com.siliconlabs.bledemo.views.ThermoGraph;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
 
 public class HealthThermometerActivityFragment extends Fragment {
     private TemperatureReading currentReading;
     private TemperatureReading.Type currentType;
 
-    @InjectView(R.id.thermometer_graph)
-    ThermoGraph thermoGraph;
     @InjectView(R.id.thermo_large_temperature)
     TemperatureDisplay largeTemperatureDisplay;
-    @InjectView(R.id.thermo_add_graph_button)
-    FloatingActionButton addToGraphButton;
-    @InjectView(R.id.thermo_clear_button)
-    FloatingActionButton clearButton;
     @InjectView(R.id.thermo_type_value_text)
     TextView thermoTypeText;
     @InjectView(R.id.thermo_large_time_text)
@@ -55,32 +46,17 @@ public class HealthThermometerActivityFragment extends Fragment {
         ButterKnife.inject(this, v);
         setHasOptionsMenu(true);
         largeTemperatureDisplay.setFontFamily("sans-serif-thin", Typeface.NORMAL);
-        thermoGraph.clear();
         typeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 onTabClick(!isChecked);
             }
         });
-        clearButton.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
         return v;
-    }
-
-    @OnClick(R.id.thermo_clear_button)
-    public void onClearClick(View v) {
-        thermoGraph.clear();
-    }
-
-    @OnClick(R.id.thermo_add_graph_button)
-    public void onAddClick(View v) {
-        if (currentReading != null) {
-            thermoGraph.addReading(currentReading);
-        }
     }
 
     private void onTabClick(boolean fahrenheit) {
         currentType = fahrenheit ? TemperatureReading.Type.FAHRENHEIT : TemperatureReading.Type.CELSIUS;
-        thermoGraph.switchDisplayMode(currentType, true);
         largeTemperatureDisplay.setCurrentType(currentType);
     }
 

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" name="Network Availability" type="org.bluetooth.characteristic.network_availability" uuid="2A3E" last-modified="2012-07-20" approved="No">
+    <InformativeText>
+        <Abstract>
+            The Network Availability characteristic represents if network is available or not available.
+        </Abstract>
+    </InformativeText>
+    <Value>
+        <Field name="Network Availability">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Minimum>0</Minimum>
+            <Maximum>1</Maximum>
+            <Enumerations>
+                <Enumeration key="0" value="No network available"/>
+                <Enumeration key="1" value="One or more networks available"/>
+                <ReservedForFutureUse start="2" end="255"/>
+            </Enumerations>
+        </Field>
+    </Value>
+</Characteristic>

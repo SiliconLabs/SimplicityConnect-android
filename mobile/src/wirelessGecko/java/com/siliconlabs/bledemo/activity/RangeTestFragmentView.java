@@ -4,8 +4,8 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -553,9 +553,9 @@ class RangeTestFragmentView implements RangeTestPresenter.RangeTestView {
 
     private void setupChartView() {
         Resources resources = chart.getResources();
-        int textColor = resources.getColor(R.color.black);
-        int axisColor = resources.getColor(R.color.black);
-        int graphColor = resources.getColor(R.color.alizarin_crimson);
+        int textColor = resources.getColor(R.color.silabs_black);
+        int axisColor = resources.getColor(R.color.silabs_black);
+        int graphColor = resources.getColor(R.color.silabs_red);
 
         chart.getDescription().setEnabled(false);
         chart.getLegend().setEnabled(false);

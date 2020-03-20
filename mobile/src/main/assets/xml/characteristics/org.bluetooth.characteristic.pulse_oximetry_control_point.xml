@@ -1,0 +1,339 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Created with Liquid XML Studio Designer Edition 9.1.10.3537 (http://www.liquid-technologies.com)
+-->
+<!--
+Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" name="Pulse Oximetry Control Point" type="org.bluetooth.characteristic.pulse_oximetry_control_point" uuid="2A62" last-modified="2012-05-20" approved="No">
+    <InformativeText>
+        <Summary>
+            The Pulse Oximetry Control Point Characteristic is used to set or get the sensor’s configuration.
+        </Summary>
+    </InformativeText>
+    <Value>
+        <Field name="Operating Mode">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Enumerations>
+                <Enumeration key="1" value="Get Operating Mode" requires="N/A"/>
+                <Enumeration key="129" value="Get Operating Mode Response" requires="C1"/>
+                <Enumeration key="2" value="Set Operating Mode" requires="C2"/>
+                <Enumeration key="130" value="Set Operating Mode Response" requires="C3"/>
+            </Enumerations>
+        </Field>
+        <Field name="Threshold Control and Status">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Enumerations>
+                <Enumeration key="3" value="Get Threshold Control and Select Settings" requires="N/A"/>
+                <Enumeration key="131" value="Get Threshold Control and Select Settings Response" requires="C4"/>
+                <Enumeration key="4" value="Set Threshold Control and Select Settings" requires="C5"/>
+                <Enumeration key="132" value="Set Threshold Control and Select Settings Response" requires="C6"/>
+            </Enumerations>
+        </Field>
+        <Field name="Threshold Settings Op Codes">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Enumerations>
+                <Enumeration key="5" value="Get Threshold Settings" requires="N/A"/>
+                <Enumeration key="133" value="Get Threshold Settings Response" requires="C7"/>
+                <Enumeration key="6" value="Set Threshold Settings" requires="C8"/>
+                <Enumeration key="134" value="Set Threshold Settings Response" requires="C9"/>
+            </Enumerations>
+        </Field>
+        <Field name="Date and Time Op Codes">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Enumerations>
+                <Enumeration key="7" value="Get Date and Time" requires="N/A"/>
+                <Enumeration key="135" value="Get Date and Time Response" requires="C10"/>
+                <Enumeration key="8" value="Set Date and Time" requires="C11"/>
+                <Enumeration key="136" value="Set Date and Time Response" requires="C12"/>
+            </Enumerations>
+        </Field>
+        <Field name="Operating Mode">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Enumerations>
+                <Enumeration key="00" value="Spot-Check Operating Mode"/>
+                <Enumeration key="1" value="Continuous Measurement Operating Mode"/>
+                <ReservedForFutureUse start="2" end="255"/>
+            </Enumerations>
+        </Field>
+        <Field name="Threshold Control">
+            <InformativeText>
+                The Threshold Control field is 1 octet in size, and of type 8bit.
+            </InformativeText>
+            <Format>8bit</Format>
+            <BitField>
+                <Bit name="All annunciations are temporarily inhibited for pulse rate readings out of limits. TIme interval is implementation-specific" index="1" size="1">
+                    <Enumerations>
+                        <Enumeration key="0" value="False"/>
+                        <Enumeration key="1" value="True"/>
+                    </Enumerations>
+                </Bit>
+                <Bit name="Annunciation is off if pulse rate reading is at or above limit" index="1" size="1">
+                    <Enumerations>
+                        <Enumeration key="0" value="False"/>
+                        <Enumeration key="1" value="True"/>
+                    </Enumerations>
+                </Bit>
+                <Bit name="Annunciation is off if pulse rate reading is at or below limit" index="2" size="1">
+                    <Enumerations>
+                        <Enumeration key="0" value="False"/>
+                        <Enumeration key="1" value="True"/>
+                    </Enumerations>
+                </Bit>
+                <Bit name="All annunciations are off for pulse rate readings out of limits" index="3" size="1">
+                    <Enumerations>
+                        <Enumeration key="0" value="False"/>
+                        <Enumeration key="1" value="True"/>
+                    </Enumerations>
+                </Bit>
+                <Bit name="All annunciations are temporarily inhibited for SpO2 readings out of limits. Time interval is implementation-specific" index="4" size="1">
+                    <Enumerations>
+                        <Enumeration key="0" value="False"/>
+                        <Enumeration key="1" value="True"/>
+                    </Enumerations>
+                </Bit>
+                <Bit name="Annunciation is off if SpO2 reading is at or above limit" index="5" size="1">
+                    <Enumerations>
+                        <Enumeration key="0" value="False"/>
+                        <Enumeration key="1" value="True"/>
+                    </Enumerations>
+                </Bit>
+                <Bit name="Annunciation is off if SpO2 reading is at or below limit" index="6" size="1">
+                    <Enumerations>
+                        <Enumeration key="0" value="False"/>
+                        <Enumeration key="1" value="True"/>
+                    </Enumerations>
+                </Bit>
+                <Bit name="All annunciations are off for SpO2 readings out of limits" index="7" size="1">
+                    <Enumerations>
+                        <Enumeration key="0" value="False"/>
+                        <Enumeration key="1" value="True"/>
+                    </Enumerations>
+                </Bit>
+            </BitField>
+        </Field>
+        <Field name="Threshold Metric Selection field">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Enumerations>
+                <Enumeration key="00" value="Threshold comparison uses Normally processed SpO2 and pulse rate measurements"/>
+                <Enumeration key="1" value="Threshold comparison uses Fast-Response SpO2 and pulse rate measurements"/>
+                <Enumeration key="2" value="Threshold comparison uses Slow-Response SpO2 and pulse rate measuremnets"/>
+                <ReservedForFutureUse start="3" end="255"/>
+            </Enumerations>
+        </Field>
+        <Field name="Response Codes field">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Enumerations>
+                <Enumeration key="1" value="Sucess"/>
+                <Enumeration key="2" value="Opcode Not Supported"/>
+                <Enumeration key="3" value="Invalid Parameter"/>
+                <Enumeration key="4" value="Operation Failed"/>
+                <Enumeration key="5" value="Operation Not Supported"/>
+                <ReservedForFutureUse start="00" end="00"/>
+                <ReservedForFutureUse start="6" end="255"/>
+            </Enumerations>
+        </Field>
+        <Field name="Response Codes">
+            <InformativeText>
+                Parameter Value for "Set Date and Time Response" Op Code
+            </InformativeText>
+            <Requirement>C12</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Date Time Characteristic">
+            <InformativeText>Parameter Value for "Set Date and Time" Op Code</InformativeText>
+            <Requirement>C11</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Response Codes">
+            <InformativeText>
+                Parameter Value for "Get Date and Time Response" Op Code
+            </InformativeText>
+            <Requirement>C10</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Date Time Characteristic">
+            <InformativeText>
+                Parameter Value for "Get Date and Time Response" Op Code
+            </InformativeText>
+            <Requirement>C10</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Response Codes">
+            <InformativeText>
+                Parameter Value for "Set Threshold Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C9</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Threshold Control">
+            <InformativeText>
+                Parameter Value for "Set Threshold Settings" Op Code
+            </InformativeText>
+            <Requirement>C8</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Threshold Metric Selection">
+            <InformativeText>
+                Parameter Value for "Set Threshold Settings" Op Code
+            </InformativeText>
+            <Requirement>C8</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="SpO2 Threshold High">
+            <InformativeText>
+                Parameter Value for "Set Threshold Settings" Op Code
+            </InformativeText>
+            <Requirement>C8</Requirement>
+            <Format>SFLOAT</Format>
+        </Field>
+        <Field name="SpO2 Threshold Low">
+            <InformativeText>
+                Parameter Value for "Set Threshold Settings" Op Code
+            </InformativeText>
+            <Requirement>C8</Requirement>
+            <Format>SFLOAT</Format>
+        </Field>
+        <Field name="Pulse Rate Threshold High">
+            <InformativeText>
+                Parameter Value for "Set Threshold Settings" Op Code
+            </InformativeText>
+            <Requirement>C8</Requirement>
+            <Format>SFLOAT</Format>
+        </Field>
+        <Field name="Pulse Rate Threshold Low">
+            <InformativeText>
+                Parameter Value for "Set Threshold Settings" Op Code
+            </InformativeText>
+            <Requirement>C8</Requirement>
+            <Format>SFLOAT</Format>
+        </Field>
+        <Field name="Response Codes">
+            <InformativeText>
+                Parameter Value for "Get Threshold Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C7</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Threshold Control">
+            <InformativeText>
+                Parameter Value for "Get Threshold Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C7</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Threshold Metric Selection">
+            <InformativeText>
+                Parameter Value for "Get Threshold Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C7</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="SpO2 Threshold High">
+            <InformativeText>
+                Parameter Value for "Get Threshold Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C7</Requirement>
+            <Format>SFLOAT</Format>
+        </Field>
+        <Field name="SpO2 Threshold Low">
+            <InformativeText>
+                Parameter Value for "Get Threshold Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C7</Requirement>
+            <Format>SFLOAT</Format>
+        </Field>
+        <Field name="Pulse Rate Threshold High">
+            <InformativeText>
+                Parameter Value for "Get Threshold Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C7</Requirement>
+            <Format>SFLOAT</Format>
+        </Field>
+        <Field name="Pulse Rate Threshold Low">
+            <InformativeText>
+                Parameter Value for "Get Threshold Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C7</Requirement>
+            <Format>SFLOAT</Format>
+        </Field>
+        <Field name="Response Codes">
+            <InformativeText>
+                Parameter Value for "Set Threshold Control and Select Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C6</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Threshold Control">
+            <InformativeText>
+                Paremeter Value for "Set Threshold Control and Select Settings" Op Code
+            </InformativeText>
+            <Requirement>C5</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Threshold Metric Selection">
+            <InformativeText>
+                Paremeter Value for "Set Threshold Control and Select Settings" Op Code
+            </InformativeText>
+            <Requirement>C5</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Response Codes">
+            <InformativeText>
+                Paremeter Value for "Get Threshold COntrol and Select Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C4</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Threshold Control">
+            <InformativeText>
+                Paremeter Value for "Get Threshold COntrol and Select Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C4</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Threshold Metric Selection">
+            <InformativeText>
+                Paremeter Value for "Get Threshold COntrol and Select Settings Response" Op Code
+            </InformativeText>
+            <Requirement>C4</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Response Codes">
+            <InformativeText>
+                Paremeter Value for "Get Operating Mode Response" Op Code
+            </InformativeText>
+            <Requirement>C1</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Operating Mode">
+            <InformativeText>
+                Paremeter Value for "Get Operating Mode Response" Op Code
+            </InformativeText>
+            <Requirement>C1</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Operating Mode">
+            <InformativeText>Parameter Value for "Set Operating Mode" Op Code</InformativeText>
+            <Requirement>C2</Requirement>
+            <Format>uint8</Format>
+        </Field>
+        <Field name="Response Codes">
+            <InformativeText>
+                Parameter Value for "Set Operating Mode Response" Op Code
+            </InformativeText>
+            <Requirement>C3</Requirement>
+            <Format>uint8</Format>
+        </Field>
+    </Value>
+    <Note>
+        The fields in the above table, reading from top to bottom, are shown in the order of LSO to MSO, where LSO = Least Significant Octet and MSO = Most Significant Octet. Where fields with the format ‘nibble’ have been defined in the above table, the fields are shown in the order of Least Significant Nibble first, when reading the table from top to bottom. Where the characteristic definition contains two adjacent nibbles and the service specification has defined that that pair of nibbles comprise a single octet, the Least Significant Nibble means the four bits numbered 0, 1, 2 and 3 of the octet and the Most Significant Nibble means the four bits numbered 4, 5, 6 and 7 of that octet.
+    </Note>
+</Characteristic>

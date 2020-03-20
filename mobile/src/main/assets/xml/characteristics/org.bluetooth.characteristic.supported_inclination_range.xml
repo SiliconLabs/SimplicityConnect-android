@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2017 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" name="Supported Inclination Range" type="org.bluetooth.characteristic.supported_inclination_range" uuid="2AD5" last-modified="2017-02-14" approved="Yes">
+    <InformativeText>
+        <Summary>
+            The Supported Inclination Range characteristic is used to send the supported inclination range as well as the minimum inclination increment supported by the Server.
+        </Summary>
+    </InformativeText>
+    <Value>
+        <Field name="Minimum Inclination">
+            <InformativeText>Percent with a resolution of 0.1</InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>sint16</Format>
+            <Unit>org.bluetooth.unit.percentage</Unit>
+            <DecimalExponent>-1</DecimalExponent>
+        </Field>
+        <Field name="Maximum Inclination">
+            <InformativeText>Percent with a resolution of 0.1</InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>sint16</Format>
+            <Unit>org.bluetooth.unit.percentage</Unit>
+            <DecimalExponent>-1</DecimalExponent>
+        </Field>
+        <Field name="Minimum Increment">
+            <InformativeText>Percent with a resolution of 0.1</InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>uint16</Format>
+            <Unit>org.bluetooth.unit.percentage</Unit>
+            <DecimalExponent>-1</DecimalExponent>
+        </Field>
+    </Value>
+</Characteristic>

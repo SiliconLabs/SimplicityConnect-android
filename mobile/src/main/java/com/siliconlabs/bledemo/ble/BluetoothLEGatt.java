@@ -80,7 +80,7 @@ class BluetoothLEGatt {
             @Override
             public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
                 if (status != BluetoothGatt.GATT_SUCCESS) {
-                    Log.i("onConnectionStateChange","failed with status: " + status + " (newState =" + newState + ") " + device.getAddress());
+                    Log.i("onConnectionStateChange", "failed with status: " + status + " (newState =" + newState + ") " + device.getAddress());
                     Timber.w("onConnectionStateChange failed with status " + status + " (newState =" + newState + ") " + device.getAddress());
                     SYNCHRONIZED_GATT_ACCESS_EXECUTOR.submit(new Runnable() {
                         @Override
@@ -91,7 +91,7 @@ class BluetoothLEGatt {
                     });
                     return;
                 }
-                Log.i("onConnectionStateChange","(newState =" + newState + ") " + device.getAddress());
+                Log.i("onConnectionStateChange", "(newState =" + newState + ") " + device.getAddress());
                 Timber.w("onConnectionStateChange (newState =" + newState + ") " + device.getAddress());
                 switch (newState) {
                     case BluetoothProfile.STATE_CONNECTED:
@@ -117,7 +117,7 @@ class BluetoothLEGatt {
             @Override
             public void onServicesDiscovered(BluetoothGatt gatt, int status) {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
-                    Log.i("onServicesDiscovered","onServicesDiscovered " + device.getAddress());
+                    Log.i("onServicesDiscovered", "onServicesDiscovered " + device.getAddress());
                     Timber.w("onServicesDiscovered " + device.getAddress());
                     SYNCHRONIZED_GATT_ACCESS_EXECUTOR.submit(new Runnable() {
                         @Override
@@ -126,7 +126,7 @@ class BluetoothLEGatt {
                         }
                     });
                 } else {
-                    Log.i("onServicesDiscovered","onServicesDiscovered received: " + status + " " + device.getAddress());
+                    Log.i("onServicesDiscovered", "onServicesDiscovered received: " + status + " " + device.getAddress());
                     Timber.w("onServicesDiscovered received: " + status + " " + device.getAddress());
                     SYNCHRONIZED_GATT_ACCESS_EXECUTOR.submit(new Runnable() {
                         @Override
@@ -140,12 +140,12 @@ class BluetoothLEGatt {
             @Override
             public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
-                    Log.i("onCharacteristicRead","Char " + getCharacteristicName(characteristic.getUuid()) + " <- " + getCharacteristicsValue(characteristic));
+                    Log.i("onCharacteristicRead", "Char " + getCharacteristicName(characteristic.getUuid()) + " <- " + getCharacteristicsValue(characteristic));
                     Timber.d("Char " + getCharacteristicName(characteristic.getUuid()) + " <- " + getCharacteristicsValue(characteristic));
                     characteristics.onRead(getIdentification(characteristic.getUuid()), getCharacteristicsValue(characteristic), true);
                 } else {
                     Timber.w("onCharacteristicRead received: " + status);
-                    Log.i("onCharacteristicRead","onCharacteristicRead received: " + status);
+                    Log.i("onCharacteristicRead", "onCharacteristicRead received: " + status);
                     characteristics.onRead(getIdentification(characteristic.getUuid()), null, false);
                 }
             }
@@ -191,7 +191,7 @@ class BluetoothLEGatt {
             if (gatt != null) {
                 return;
             }
-            Log.e("connect()","Gatt connect for " + device.getAddress());
+            Log.e("connect()", "Gatt connect for " + device.getAddress());
             Timber.d("Gatt connect for " + device.getAddress());
             scanTimeoutFuture = SYNCHRONIZED_GATT_ACCESS_EXECUTOR.schedule(gattScanTimeout, SCAN_CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS);
 
@@ -249,10 +249,10 @@ class BluetoothLEGatt {
                 // Loops through available GATT Services.
                 for (BluetoothGattService gattService : gattServices) {
                     Timber.d("Device has service: " + getServiceName(gattService.getUuid()));
-                    Log.e("displayGattServices()","Device has service: " + getServiceName(gattService.getUuid()));
+                    Log.e("displayGattServices()", "Device has service: " + getServiceName(gattService.getUuid()));
                     characteristics.addCharacteristics(gatt, gattService.getCharacteristics());
                     Timber.d("==========================\n");
-                    Log.e("displayGattServices()","==========================\n");
+                    Log.e("displayGattServices()", "==========================\n");
                 }
             }
         }
@@ -276,9 +276,7 @@ class BluetoothLEGatt {
         }
 
         interestingServices = new ArrayList<>();
-        for (BluetoothGattService service : services) {
-            interestingServices.add(service);
-        }
+        interestingServices.addAll(services);
         isOfInterest = !interestingServices.isEmpty();
     }
 
@@ -299,7 +297,7 @@ class BluetoothLEGatt {
             gatt = null;
         } catch (Exception e) {
             Timber.w(e, "Error closing Gatt");
-            Log.e("displayGattServices()","Error closing Gatt: " + e);
+            Log.e("displayGattServices()", "Error closing Gatt: " + e);
 
         }
     }
@@ -329,12 +327,12 @@ class BluetoothLEGatt {
 
     private static String getServiceName(UUID uuid) {
         GattService service = GATT_SERVICE_DESCS.get(getIdentification(uuid));
-        return (service != null)? service.type : uuid.toString();
+        return (service != null) ? service.type : uuid.toString();
     }
 
     private static String getCharacteristicName(UUID uuid) {
         GattCharacteristic characteristic = GATT_CHARACTER_DESCS.get(getIdentification(uuid));
-        return (characteristic != null)? characteristic.type : uuid.toString();
+        return (characteristic != null) ? characteristic.type : uuid.toString();
     }
 
     private static Object getCharacteristicsValue(BluetoothGattCharacteristic gattCharacteristic) {
@@ -348,7 +346,7 @@ class BluetoothLEGatt {
         }
 
         final int format = characteristic.format;
-        switch(format) {
+        switch (format) {
             case BluetoothGattCharacteristic.FORMAT_UINT8:
             case BluetoothGattCharacteristic.FORMAT_UINT16:
             case BluetoothGattCharacteristic.FORMAT_UINT32:
@@ -364,7 +362,7 @@ class BluetoothLEGatt {
             case 0:
                 final String value = gattCharacteristic.getStringValue(0);
                 final int firstNullCharPos = value.indexOf('\u0000');
-                return (firstNullCharPos >= 0)? value.substring(0, firstNullCharPos) : value;
+                return (firstNullCharPos >= 0) ? value.substring(0, firstNullCharPos) : value;
 
             default:
                 return characteristic.createValue(gattCharacteristic);
@@ -372,7 +370,7 @@ class BluetoothLEGatt {
     }
 
     private static int getIdentification(UUID uuid) {
-        return (int)(uuid.getMostSignificantBits() >>> 32);
+        return (int) (uuid.getMostSignificantBits() >>> 32);
     }
 
     /**

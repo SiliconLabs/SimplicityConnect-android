@@ -3,7 +3,10 @@ package com.siliconlabs.bledemo.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,28 +39,28 @@ public class KeyFobsRecyclerViewAdapter extends RecyclerView.Adapter<KeyFobsRecy
     private final static int TYPE_FOBS = 1;
     private final static int TYPE_OTHER_FOBS_HEADER = 2;
     private final static int TYPE_OTHER_FOBS = 3;
-    final static long MAX_AGE = 10000;
+    private final static long MAX_AGE = 10000;
 
     private int numbBlueGeckoFobs = 0;
     private boolean runHandler = true;
-    boolean mostRecentDevicesInfoIsDirty;
-    boolean updatePending;
+    private boolean mostRecentDevicesInfoIsDirty;
+    private boolean updatePending;
 
-    final List<BluetoothDeviceInfo> mostRecentDevicesInfo = new ArrayList<>();
-    final Map<BluetoothDeviceInfo, Long> mostRecentInfoAge = new HashMap<>();
+    private final List<BluetoothDeviceInfo> mostRecentDevicesInfo = new ArrayList<>();
+    private final Map<BluetoothDeviceInfo, Long> mostRecentInfoAge = new HashMap<>();
     private List<BluetoothDeviceInfo> devicesInfo = new ArrayList<>();
     private FindKeyFobCallback findKeyFobSelectedCallback;
     private Context context;
-    final Handler handler = new Handler();
+    private final Handler handler = new Handler();
 
-    final Runnable delayedUpdater = new Runnable() {
+    private final Runnable delayedUpdater = new Runnable() {
         @Override
         public void run() {
             updateDevicesInfo();
         }
     };
 
-    final Comparator<BluetoothDeviceInfo> itemsComparator = new Comparator<BluetoothDeviceInfo>() {
+    private final Comparator<BluetoothDeviceInfo> itemsComparator = new Comparator<BluetoothDeviceInfo>() {
         @Override
         public int compare(BluetoothDeviceInfo lhs, BluetoothDeviceInfo rhs) {
             if (lhs.isOfInterest && !rhs.isOfInterest) {
@@ -122,7 +125,7 @@ public class KeyFobsRecyclerViewAdapter extends RecyclerView.Adapter<KeyFobsRecy
                 // bluegecko fob header
                 customViewHolder.setData(true, true, null);
                 if (customViewHolder.cardView != null) {
-                    customViewHolder.cardView.setBackgroundColor(context.getResources().getColor(android.R.color.white));
+                    customViewHolder.cardView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
                 }
                 break;
             case TYPE_FOBS:
@@ -133,20 +136,20 @@ public class KeyFobsRecyclerViewAdapter extends RecyclerView.Adapter<KeyFobsRecy
                     customViewHolder.itemDividerBelow.setVisibility(View.GONE);
                 }
                 if (customViewHolder.cardView != null) {
-                    customViewHolder.cardView.setBackgroundColor(context.getResources().getColor(android.R.color.white));
+                    customViewHolder.cardView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
                 }
                 break;
             case TYPE_OTHER_FOBS_HEADER:
                 // other fobs header
                 customViewHolder.setData(true, false, null);
                 if (customViewHolder.cardView != null) {
-                    customViewHolder.cardView.setBackgroundColor(context.getResources().getColor(R.color.transparent));
+                    customViewHolder.cardView.setBackgroundColor(ContextCompat.getColor(context, R.color.silabs_transparent));
                 }
                 break;
             case TYPE_OTHER_FOBS:
                 customViewHolder.setData(false, false, info);
                 if (customViewHolder.cardView != null) {
-                    customViewHolder.cardView.setBackgroundColor(context.getResources().getColor(R.color.transparent));
+                    customViewHolder.cardView.setBackgroundColor(ContextCompat.getColor(context, R.color.silabs_transparent));
                 }
                 break;
             default:
@@ -365,7 +368,7 @@ public class KeyFobsRecyclerViewAdapter extends RecyclerView.Adapter<KeyFobsRecy
             int headerTextStringId = isBlueGecko ? R.string.fob_list_header_text : R.string.fob_list_other_fobs_header_text;
             headerText.setText(headerTextStringId);
 
-            int headerContainerBackgroundColor = isBlueGecko ? Color.WHITE : context.getResources().getColor(R.color.other_fobs_header_background);
+            int headerContainerBackgroundColor = isBlueGecko ? Color.WHITE : ContextCompat.getColor(context, R.color.other_fobs_header_background);
             headerContainer.setBackgroundColor(headerContainerBackgroundColor);
 
             itemDividerBelow.setVisibility(View.GONE);
@@ -374,7 +377,7 @@ public class KeyFobsRecyclerViewAdapter extends RecyclerView.Adapter<KeyFobsRecy
         private void setAsFobEntryItem(boolean isBlueGecko, BluetoothDeviceInfo btInfo) {
             isHeader = false;
             this.isBlueGecko = isBlueGecko;
-            int devContainerColor = isBlueGecko ? Color.WHITE : context.getResources().getColor(R.color.other_fobs_header_background);
+            int devContainerColor = isBlueGecko ? Color.WHITE : ContextCompat.getColor(context, R.color.other_fobs_header_background);
             deviceContainer.setBackgroundColor(devContainerColor);
             container.setBackgroundColor(devContainerColor);
             deviceContainer.setVisibility(View.VISIBLE);

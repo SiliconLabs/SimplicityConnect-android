@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2017 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Service xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/service.xsd" name="Mesh Provisioning Service" type="org.bluetooth.service.mesh_provisioning" uuid="1827">
+	<InformativeText>
+		<Abstract>
+			The Mesh Provisioning Service allows a Provisioning Client to provision a Provisioning Server to allow it to participate in the mesh network.
+		</Abstract>
+	</InformativeText>
+	<Dependencies>
+		<Dependency>
+			This service has no dependencies on other GATT-based services.
+		</Dependency>
+	</Dependencies>
+	<GATTRequirements>
+		<Requirement subProcedure="Write Without Response">Mandatory</Requirement>
+		<Requirement subProcedure="Notification">Mandatory</Requirement>
+		<Requirement subProcedure="Write Characteristic Descriptors">Mandatory</Requirement>
+	</GATTRequirements>
+	<Transports>
+		<Classic>false</Classic>
+		<LowEnergy>true</LowEnergy>
+	</Transports>
+	<Characteristics>
+		<Characteristic name="Mesh Provisioning Data In" type="org.bluetooth.characteristic.mesh_provisioning_data_in">
+			<InformativeText>
+				The Mesh Provisioning Data In characteristic can be written to send a Proxy PDU message containing Provisioning PDU to the Provisioning Server. The characteristic value is 66 octets long to accommodate the longest known Proxy PDU containing Provisioning PDU.
+			</InformativeText>
+			<Requirement>Mandatory</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Mandatory</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Excluded</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+		</Characteristic>
+		<Characteristic name="Mesh Provisioning Data Out" type="org.bluetooth.characteristic.mesh_provisioning_data_out">
+			<InformativeText>
+				The Mesh Provisioning Data Out characteristic can be notified to send a Proxy PDU message containing Provisioning PDU from a Provisioning Server to a Provisioning Client. The characteristic value is 66 octets long to accommodate the longest known Proxy PDU message containing Provisioning PDU.
+			</InformativeText>
+			<Requirement>Mandatory</Requirement>
+			<Properties>
+				<Read>Excluded</Read>
+				<Write>Excluded</Write>
+				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
+				<SignedWrite>Excluded</SignedWrite>
+				<ReliableWrite>Excluded</ReliableWrite>
+				<Notify>Mandatory</Notify>
+				<Indicate>Excluded</Indicate>
+				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
+				<Broadcast>Excluded</Broadcast>
+			</Properties>
+			<Descriptors>
+				<Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+					<Requirement>Mandatory</Requirement>
+					<Properties>
+						<Read>Mandatory</Read>
+						<Write>Mandatory</Write>
+					</Properties>
+				</Descriptor>
+			</Descriptors>
+		</Characteristic>
+	</Characteristics>
+</Service>

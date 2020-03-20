@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,17 +10,17 @@
         android:orientation="vertical"
         tools:context="com.siliconlabs.bledemo.activity.HealthThermometerActivity">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             style="@style/ToolbarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:elevation="0dp"
             android:fitsSystemWindows="true"
-            app:title="@string/title_activity_health_thermometer" />
+            app:title="@string/title_Health_Thermometer"
+            app:titleTextAppearance="@style/TextAppearance.ToolbarTitle" />
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+        <fragment
             android:id="@+id/fragment"
             android:name="com.siliconlabs.bledemo.activity.HealthThermometerActivityFragment"
             android:layout_width="match_parent"
@@ -32,4 +32,4 @@
         layout="@layout/splash"
         android:visibility="gone" />
 
-</FrameLayout>
+</RelativeLayout>

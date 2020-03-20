@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2011 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Characteristic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" type="org.bluetooth.characteristic.scientific_temperature_celsius" uuid="2A3C" name="Scientific Temperature Celsius">
+	<InformativeText>
+		<Abstract> A float temperature </Abstract>
+	</InformativeText>
+	<Value>
+		<Field name="Scientific Temperature">
+			<Requirement>Mandatory</Requirement>
+			<Format>float64</Format>
+			<Unit>
+				org.bluetooth.unit.thermodynamic_temperature.degree_celsius
+			</Unit>
+		</Field>
+	</Value>
+</Characteristic>

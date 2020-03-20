@@ -15,15 +15,15 @@ import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.models.TemperatureReading;
 
 public class TemperatureDisplay extends LinearLayout {
-    TextView mainTempText;
-    TextView decimalText;
+    private TextView mainTempText;
+    private TextView decimalText;
     private TextView degreeSymbol;
     private float defaultTextSize;
     private float largeTextSize;
     private float smallTextSize;
-    Double temp;
-    TemperatureReading.Type currentType;
-    TemperatureReading currentReading;
+    private Double temp;
+    private TemperatureReading.Type currentType;
+    private TemperatureReading currentReading;
 
     public TemperatureDisplay(Context context) {
         super(context);
@@ -46,7 +46,7 @@ public class TemperatureDisplay extends LinearLayout {
         init(attrs);
     }
 
-    public void init(AttributeSet attrs) {
+    private void init(AttributeSet attrs) {
         defaultTextSize = isInEditMode() ? 15 : getContext().getResources().getDimension(R.dimen.thermo_graph_time_text_size);
         if (attrs != null) {
             TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.TemperatureDisplay);
@@ -63,11 +63,11 @@ public class TemperatureDisplay extends LinearLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mainTempText = (TextView) findViewById(R.id.temp_display_primary);
+        mainTempText = findViewById(R.id.temp_display_primary);
         mainTempText.setTextSize(TypedValue.COMPLEX_UNIT_PX, largeTextSize);
-        degreeSymbol = (TextView) findViewById(R.id.temp_degree_symbol);
+        degreeSymbol = findViewById(R.id.temp_degree_symbol);
         degreeSymbol.setTextSize(TypedValue.COMPLEX_UNIT_PX, largeTextSize);
-        decimalText = (TextView) findViewById(R.id.temp_display_secondary);
+        decimalText = findViewById(R.id.temp_display_secondary);
         decimalText.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize);
         if (temp != null) {
             setTemperature(temp);
@@ -77,7 +77,7 @@ public class TemperatureDisplay extends LinearLayout {
     private void setTemperature(double temperature) {
         temp = temperature;
         if (mainTempText != null && decimalText != null) {
-            mainTempText.setText(Integer.toString((int) temperature) + ".");
+            mainTempText.setText((int) temperature + ".");
             decimalText.setText(Integer.toString((int) (temperature * 10) % 10));
         }
     }
