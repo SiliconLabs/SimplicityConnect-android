@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mapping_card_view"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
     android:layout_marginTop="8dp"
     android:layout_marginEnd="8dp"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground"
-    app:cardCornerRadius="8dp">
+    app:cardCornerRadius="16dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -26,16 +24,34 @@
             android:orientation="vertical"
             android:padding="4dp">
 
-            <TextView
-                android:id="@+id/text_view_name"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/linear_layout_charac_service"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/unknown_characteristic_label"
-                android:textColor="@color/silabs_primary_text"
-                android:textSize="@dimen/mapping_title_text_size" />
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:id="@+id/text_view_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:singleLine="true"
+                    android:text="@string/unknown_characteristic_label"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/mapping_title_text_size" />
+
+                <ImageView
+                    android:id="@+id/image_view_edit_charac_service"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_edit_grey_24dp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -56,7 +72,9 @@
                     android:id="@+id/text_view_uuid"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:ellipsize="end"
                     android:fontFamily="sans-serif"
+                    android:singleLine="true"
                     android:text="@string/UUID_label"
                     android:textColor="@color/silabs_primary_text"
                     android:textSize="@dimen/mapping_uuid_text_size" />
@@ -73,7 +91,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="4dp"
             android:backgroundTint="@android:color/white"
-            android:src="@drawable/ic_delete_black_24dp" />
+            android:src="@android:drawable/ic_menu_delete" />
 
     </RelativeLayout>
 

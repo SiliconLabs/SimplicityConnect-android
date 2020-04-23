@@ -205,12 +205,12 @@
     <dimen name="encoded_value_text_size">14sp</dimen>
 
     <!-- Mappings -->
-    <dimen name="mapping_title_text_size">16sp</dimen>
+    <dimen name="mapping_title_text_size">18sp</dimen>
     <dimen name="mapping_uuid_text_size">12sp</dimen>
     <dimen name="tab_text_size">14sp</dimen>
 
     <!-- Other -->
-    <dimen name="toolbar_title_size">24sp</dimen>
+    <dimen name="toolbar_title_size">34sp</dimen>
     <dimen name="enable_disable_bluetooth_bar_text_size">14sp</dimen>
     <dimen name="device_item_text_size">14sp</dimen>
 
@@ -237,6 +237,10 @@
     <dimen name="help_section_and_body_separation">10dp</dimen>
     <dimen name="help_body_and_version_separation">10dp</dimen>
     <dimen name="help_dialog_ok_btn_text_size">14sp</dimen>
+
+    <!-- Dialog Location service -->
+    <dimen name="dialog_location_service_title_text_size">18sp</dimen>
+    <dimen name="dialog_location_service_info_text_size">14sp</dimen>
 
     <!-- Filter Fragment -->
     <dimen name="filter_edit_search_text_size">14sp</dimen>

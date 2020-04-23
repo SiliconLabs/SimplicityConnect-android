@@ -57,6 +57,8 @@
     <string name="stop_scanning_label">Stop Scanning</string>
     <string name="Connection_Interval">Connection Interval</string>
     <string name="Refresh_Services">Refresh Services</string>
+    <string name="not_advertising_shortcut">N/A</string>
+    <string name="You_cannot_send_empty_value_to_charac">You cannot send an empty value to characteristic!</string>
 
     <!-- Health Thermometer -->
     <string name="description_Thermometer">View readings from the Health Thermometer service.</string>
@@ -67,14 +69,21 @@
     <string name="c_symbol">°C</string>
     <string name="htp_title">Health Thermometer Profile</string>
     <string name="htp_id">HTP</string>
-    <string name="select_device">Select a Bluetooth Smart Device</string>
+    <string name="select_device">Select a Bluetooth Device</string>
     <string name="tab_EFR">EFR</string>
     <string name="tab_other_devices">Other</string>
     <string name="device_list">Device List</string>
+    <string name="DEVICE_LIST">DEVICE LIST</string>
+    <string name="CANCEL">CANCEL</string>
 
     <!-- Main Menu -->
     <string name="menu_tile_title">Menu title</string>
     <string name="menu_tile_text">Short description of menu tile</string>
+    <string name="INFO">INFO</string>
+    <string name="ENABLE">ENABLE</string>
+    <string name="Location_disabled">Location disabled.</string>
+    <string name="Location_service">Location service</string>
+    <string name="location_service_info">On some Android phones you have to enable Location service in order to scan for Bluetooth Low Energy devices. If you can\'t find any Bluetooth devices please ensure you have enabled Location service.</string>
 
     <!-- Messages -->
     <string name="Change_characteristic_name">Change characteristic name</string>
@@ -118,6 +127,10 @@
     <string name="zero_percent">0%</string>
     <string name="zero_ms">0ms</string>
     <string name="zero">0</string>
+    <string name="There_was_a_problem_while_preparing_the_file">There was a problem while preparing the file!</string>
+    <string name="Incorrect_file">Incorrect file!</string>
+    <string name="Select_Apploader_gbl_file">Select Apploader .gbl file</string>
+    <string name="Select_Application_gbl_file">Select Application .gbl file</string>
 
     <!-- Button title -->
     <string name="Reset">Reset</string>
@@ -146,18 +159,19 @@
 
     <!-- Help -->
     <string name="help_text_moreinfo_label">For more information visit:</string>
-    <string name="help_text_moreinfo_url"><a href="www.silabs.com/products/wireless">silabs.com/products/wireless</a></string>
+    <string name="help_text_moreinfo_url">silabs.com/products/wireless</string>
     <string name="help_text_sourcecode_label">Source code:</string>
-    <string name="help_text_sourcecode_url"><a href="https://github.com/SiliconLabs/EFRConnect-android">github.com/SiliconLabs/EFRConnect-android</a></string>
+    <string name="help_text_sourcecode_url">github.com/SiliconLabs/EFRConnect-android</string>
     <string name="help_text_support_label">Support:</string>
-    <string name="help_text_support_url"><a href="www.silabs.com/support">silabs.com/support</a></string>
+    <string name="help_text_support_url">silabs.com/support</string>
     <string name="help_text_documentation_label">Additional documentation:</string>
-    <string name="help_text_documentation_url"><a href="https://docs.silabs.com/bluetooth/latest/">docs.silabs.com/bluetooth/latest</a></string>
+    <string name="help_text_documentation_url">docs.silabs.com/bluetooth/latest</string>
     <string name="help_text_pub_label">Additional Apps released by Silicon Labs:</string>
-    <string name="help_text_pub_url"><a href="https://play.google.com/store/search?q=pub:Silicon Labs Web Team">Google Play App Store</a></string>
+    <string name="help_Google_Play_Store">Google Play Store</string>
+    <string name="help_text_pub_url">https://play.google.com/store/search?q=pub:Silicon Labs Web Team"</string>
     <string name="version_text">Version %s</string>
     <string name="about_silicon_labs">ABOUT SILICON LABS</string>
-    <string name="help">Help</string>
+    <string name="info">Info</string>
     <string name="ok">OK</string>
 
     <!-- Key fobs screen -->
@@ -285,6 +299,22 @@
     <string name="decimal">Decimal</string>
     <string name="unknown_service">Unknown service</string>
     <string name="debug_mode_connection_failed_snackbar">"Failed connecting to %1$s"</string>
+
+    <!-- Bluetooth 5 advertising extension -->
+    <string name="Bluetooth_5_Advertising_Extension">Bluetooth 5 advertising extension</string>
+    <string name="Data_Status_colon">Data Status:</string>
+    <string name="Primary_PHY_colon">Primary PHY:</string>
+    <string name="Secondary_PHY_colon">Secondary PHY:</string>
+    <string name="Advertising_Set_ID">Advertising Set ID:</string>
+    <string name="Tx_Power">TX Power:</string>
+    <string name="Periodic_Advertising_Interval_colon">Periodic Advertising Interval:</string>
+    <string name="Not_Present">Not Present</string>
+    <string name="Data_Status_Complete">Complete</string>
+    <string name="Data_Status_Truncated">Truncated</string>
+    <string name="Phy_LE_1M">LE 1M</string>
+    <string name="Phy_LE_2M">LE 2M</string>
+    <string name="Phy_LE_Coded">LE Coded</string>
+    <string name="Phy_Unused">Unused</string>
 
     <!-- ========================================= Delete in the FUTURE=============================================================-->
 

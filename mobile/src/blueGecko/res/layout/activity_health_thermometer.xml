@@ -10,13 +10,28 @@
         android:orientation="vertical"
         tools:context="com.siliconlabs.bledemo.activity.HealthThermometerActivity">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/silabs_red">
+
+            <ImageView
+                android:id="@+id/go_back_button"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:src="@drawable/ic_chevron_left_white_48dp" />
+        </RelativeLayout>
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
-            style="@style/ToolbarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:elevation="0dp"
             android:fitsSystemWindows="true"
+            app:titleMarginTop="0dp"
+            app:titleMarginBottom="0dp"
             app:title="@string/title_Health_Thermometer"
             app:titleTextAppearance="@style/TextAppearance.ToolbarTitle" />
 

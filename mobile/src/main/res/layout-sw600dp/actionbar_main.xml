@@ -7,6 +7,10 @@
     android:elevation="0dp"
     android:fitsSystemWindows="true"
     android:gravity="end"
+    android:paddingTop="24dp"
+    app:titleMarginTop="0dp"
+    app:titleMarginBottom="0dp"
+    android:paddingBottom="8dp"
     app:titleTextAppearance="@style/TextAppearance.ToolbarTitle">
 
     <RelativeLayout
@@ -17,10 +21,10 @@
         android:visibility="visible">
 
         <ImageView
-            android:layout_width="@dimen/actionbar_main_help_icon_width"
-            android:layout_height="@dimen/actionbar_main_help_icon_height"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:contentDescription="@string/help"
+            android:contentDescription="@string/info"
             android:src="@drawable/home_help_phone" />
 
         <Button

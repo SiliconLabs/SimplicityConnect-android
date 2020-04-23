@@ -41,6 +41,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -59,6 +60,7 @@ import androidx.core.view.ViewCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -75,8 +77,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
@@ -88,7 +88,6 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,6 +95,7 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.siliconlabs.bledemo.OtaFileType;
 import com.siliconlabs.bledemo.mappings.Mapping;
 import com.siliconlabs.bledemo.mappings.MappingType;
 import com.siliconlabs.bledemo.mappings.MappingsEditDialog;
@@ -131,9 +131,12 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -161,6 +164,8 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
     private Handler handler;
 
     private static final int WRITE_EXTERNAL_STORAGE_REQUEST_PERMISSION = 300;
+
+    private static final int FILE_CHOOSER_REQUEST_CODE = 9999;
 
     /**
      * Services UUIDs
@@ -223,19 +228,21 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
     private Dialog otaSetup;
     private RadioButton reliabilityRB;
     private RadioButton speedRB;
-    private Spinner folderSpinner;
-    private Spinner appSpinner;
-    private Spinner stackSpinner;
     private Button partialOTA;
     private Button fullOTA;
     private Button OTA_OK;
     private SeekBar requestMTU;
     private SeekBar delaySeekBar;
-    private int delayNoResponse;
+    private int delayNoResponse = 1;
     private TextView sizename;
     private TextView mtuname;
     private CheckBox reliableWrite;
     private TextView delayText;
+
+    private Button appFileButton;
+    private Button appLoaderFileButton;
+    private OtaFileType currentOtaFileType;
+
     private int priority = 2;
 
     private int requestMTUValue;
@@ -243,12 +250,8 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
     /**
      * File Selection
      */
-    private String OTApath = "";
     private String appPath = "";
     private String stackPath = "";
-    private String[] folder;
-    private String[] stringOTAapp;
-    private String[] stringOTAstack;
 
     /**
      * Loading Dialog
@@ -306,6 +309,13 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
 
     private static final int TOOLBAR_OPEN_PERCENTAGE = 95;
     private static final int TOOLBAR_CLOSE_PERCENTACE = 95;
+
+    private final Runnable DFU_OTA_UPLOAD  = new Runnable() {
+        @Override
+        public void run() {
+            DFUMode("OTAUPLOAD");
+        }
+    };
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -548,12 +558,8 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
                     if (ota_mode && ota_process) {
                         Log.d("OTAUPLOAD", "Sent");
                         runOnUiThread(checkbeginrunnable);
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                DFUMode("OTAUPLOAD");
-                            }
-                        }, 500);
+                        handler.removeCallbacks(DFU_OTA_UPLOAD);
+                        handler.postDelayed(DFU_OTA_UPLOAD, 500);
                     } else if (!ota_mode && ota_process) {
                         runOnUiThread(new Runnable() {
                             @Override
@@ -611,12 +617,8 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
                             if (ota_mode && ota_process) {
                                 Log.d("OTAUPLOAD", "Sent");
                                 runOnUiThread(checkbeginrunnable);
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        DFUMode("OTAUPLOAD");
-                                    }
-                                }, 500);
+                                handler.removeCallbacks(DFU_OTA_UPLOAD);
+                                handler.postDelayed(DFU_OTA_UPLOAD, 500);
                             } else if (!ota_mode && ota_process) {
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -909,7 +911,14 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
         ButterKnife.inject(this);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        findViewById(R.id.go_back_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
 
         if (!getResources().getBoolean(R.bool.isTablet)) {
             rssiTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
@@ -980,6 +989,7 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
             @Override
             public void onClick(View v) {
                 if (btToolbarOpened && btToolbarOpenedName == ToolbarName.LOGS) {
+                    loggerFragment.stopLogUpdater();
                     closeToolbar();
                     btToolbarOpened = !btToolbarOpened;
                     return;
@@ -995,7 +1005,8 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
                 setToolbarItemClicked(logIV, logTV);
                 btToolbarOpenedName = ToolbarName.LOGS;
                 setToolbarFragment(loggerFragment);
-
+                loggerFragment.scrollToEnd();
+                loggerFragment.runLogUpdater();
             }
         });
     }
@@ -1128,7 +1139,6 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
      * START OTA BUTTON (UI, Bools)
      */
     public void OTAonClick() {
-
 
         if (ota_mode) {
             ota_process = true;
@@ -1561,6 +1571,21 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
                     }
                 });
             }
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+            int margin16Dp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
+            int margin10Dp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
+
+            if (position == 0) {
+                params.setMargins(margin16Dp, margin16Dp, margin16Dp, margin10Dp);
+            } else if (position == services.size() - 1) {
+                params.setMargins(margin16Dp, margin10Dp, margin16Dp, margin16Dp);
+            } else {
+                params.setMargins(margin16Dp, margin10Dp, margin16Dp, margin10Dp);
+            }
+
+            serviceItemContainer.serviceInfoCardView.setLayoutParams(params);
             servicesContainer.addView(serviceItemContainer, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             serviceItemContainers.put(serviceName, serviceItemContainer);
         }
@@ -1726,12 +1751,12 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
             //int propIconEdgeLength = getResources().getDimensionPixelSize(R.dimen.prop_icon_edge_length);
             LinearLayout.LayoutParams paramsIcon = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             float d = getResources().getDisplayMetrics().density;
-            paramsIcon.setMarginEnd((int)(8*d));
+            paramsIcon.setMarginEnd((int) (8 * d));
             paramsIcon.gravity = Gravity.CENTER_VERTICAL;
 
             if (propertyValue.trim().toUpperCase().equals(Common.PROPERTY_VALUE_WRITE_NO_RESPONSE)) {
-                paramsIcon = new LinearLayout.LayoutParams((int)(24*d),((int)(24*d)));
-                paramsIcon.setMarginEnd((int)(8*d));
+                paramsIcon = new LinearLayout.LayoutParams((int) (24 * d), ((int) (24 * d)));
+                paramsIcon.setMarginEnd((int) (8 * d));
                 paramsIcon.gravity = Gravity.CENTER_VERTICAL;
             }
 
@@ -2017,10 +2042,7 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
         TextView address = otaSetup.findViewById(R.id.device_address);
         address.setText(bluetoothGatt.getDevice().getAddress());
         fullOTA = otaSetup.findViewById(R.id.radio_ota_full);
-        folderSpinner = otaSetup.findViewById(R.id.folderspinner);
-        appSpinner = otaSetup.findViewById(R.id.appspinner);
         final LinearLayout stacklayout = otaSetup.findViewById(R.id.stacklayout);
-        stackSpinner = otaSetup.findViewById(R.id.stackspinner);
         OTA_OK = otaSetup.findViewById(R.id.ota_proceed);
         Button OTA_CANCEL = otaSetup.findViewById(R.id.ota_cancel);
         reliableWrite = otaSetup.findViewById(R.id.check_reliable);
@@ -2049,6 +2071,31 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
             }
         });
 
+
+        appLoaderFileButton = otaSetup.findViewById(R.id.select_apploader_file_btn);
+        appFileButton = otaSetup.findViewById(R.id.select_app_file_btn);
+
+        appLoaderFileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent();
+                i.setType("*/*");
+                i.setAction(Intent.ACTION_GET_CONTENT);
+                currentOtaFileType = OtaFileType.APPLOADER;
+                startActivityForResult(Intent.createChooser(i, "Choose directory"), FILE_CHOOSER_REQUEST_CODE);
+            }
+        });
+
+        appFileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent();
+                i.setType("*/*");
+                i.setAction(Intent.ACTION_GET_CONTENT);
+                currentOtaFileType = OtaFileType.APPLICATION;
+                startActivityForResult(Intent.createChooser(i, "Choose directory"), FILE_CHOOSER_REQUEST_CODE);
+            }
+        });
 
         requestMTU.setMax(250 - 23);
         requestMTU.setProgress(250 - 23);
@@ -2141,6 +2188,16 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
                 stacklayout.setVisibility(View.VISIBLE);
                 partialOTA.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_red));
                 fullOTA.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_red_selected));
+                doubleStepUpload = true;
+
+                if (areFullOTAFilesCorrect()) {
+                    OTA_OK.setClickable(true);
+                    OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_red));
+                } else {
+                    OTA_OK.setClickable(false);
+                    OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_button_inactive));
+                }
+
             }
         });
         partialOTA.setOnClickListener(new View.OnClickListener() {
@@ -2149,6 +2206,16 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
                 stacklayout.setVisibility(View.GONE);
                 partialOTA.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_red_selected));
                 fullOTA.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_red));
+                doubleStepUpload = false;
+
+                if (arePartialOTAFilesCorrect()) {
+                    OTA_OK.setClickable(true);
+                    OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_red));
+                } else {
+                    OTA_OK.setClickable(false);
+                    OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_button_inactive));
+                }
+
             }
         });
 
@@ -2335,8 +2402,18 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
         if (otaSetup != null && !otaSetup.isShowing()) {
             otaSetup.show();
             otaSetup.setCanceledOnTouchOutside(false);
-            OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_button_inactive));
-            OTA_OK.setClickable(false);
+
+            if (areFullOTAFilesCorrect() && doubleStepUpload) {
+                OTA_OK.setClickable(true);
+                OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_red));
+            } else if (arePartialOTAFilesCorrect() && !doubleStepUpload) {
+                OTA_OK.setClickable(true);
+                OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_red));
+            } else {
+                OTA_OK.setClickable(false);
+                OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_button_inactive));
+            }
+
             if (reliable) {
                 reliableWrite.setChecked(true);
             } else {
@@ -2344,8 +2421,6 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
                 delayText.setVisibility(View.VISIBLE);
             }
 
-
-            foldersPath();
         }
     }
 
@@ -2540,21 +2615,22 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
     }
 
     //Not used - White with NO RESPONSE*************************************************/
-    public void whiteOtaData(final byte[] datathread) {
+    public synchronized void whiteOtaData(final byte[] datathread) {
         boolOTAdata = true;
         byte[] value = new byte[MTU - 3];
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         long current = System.currentTimeMillis();
         int j = 0;
         for (int i = 0; i < datathread.length; i++) {
             value[j] = datathread[i];
             j++;
             if (j >= MTU - 3 || i >= (datathread.length - 1)) {
-                long wait = System.currentTimeMillis();
+                long wait = System.nanoTime();
+
                 final BluetoothGattCharacteristic charac = bluetoothGatt.getService(ota_service).getCharacteristic(ota_data);
                 charac.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
                 final float progress = ((float) (i + 1) / datathread.length) * 100;
-                final float bitrate = ((float) ((i + 1) * (8.0)) / (wait - start));
+                final float bitrate = ((float) ((i + 1) * (8.0)) / ((float)((wait - start)/1000000.0)));
                 if (j < MTU - 3) {
                     byte[] end = new byte[j];
                     System.arraycopy(value, 0, end, 0, j);
@@ -2594,11 +2670,11 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
                         }
                     });
 
-                    while (System.currentTimeMillis() - wait < delayNoResponse) ;
+                    while ((System.nanoTime() - wait)/1000000.0 < delayNoResponse) ;
                 } else {
                     do {
-                        while (System.currentTimeMillis() - wait < delayNoResponse) ;
-                        wait = System.currentTimeMillis();
+                        while ((System.nanoTime() - wait)/1000000.0 < delayNoResponse) ;
+                        wait = System.nanoTime();
 
                     } while (!bluetoothGatt.writeCharacteristic(charac));
                 }
@@ -2622,7 +2698,7 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
     /**
      * WRITES EBL/GBL FILES TO OTA_DATA CHARACTERISTIC
      *****************************************/
-    public void otaWriteDataReliable() {
+    public synchronized void otaWriteDataReliable() {
 
         boolOTAdata = true;
         if (pack == 0) {
@@ -2698,121 +2774,6 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
     }
 
     /**
-     * (FOLDER SPINNER IN OTA SETUP) FIND FOLDERS IN THE PHONE STORAGE
-     ************************************/
-    public void foldersPath() {
-        OTApath = Environment.getExternalStorageDirectory() + File.separator + "SiliconLabs_EFRConnect" + File.separator + "OTAFiles" + File.separator;
-        final File directory = new File(OTApath);
-        if (!directory.exists()) directory.mkdirs();
-        File[] directories = directory.listFiles();
-        if (directories != null) {
-            folder = new String[directories.length + 1];
-            folder[0] = "";
-            for (int i = 1; i <= directories.length; i++) {
-                int last = directories[i - 1].toString().lastIndexOf(File.separator);
-                folder[i] = directories[i - 1].toString().substring(last);
-            }
-            ArrayAdapter<String> files = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, folder);
-            files.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            folderSpinner.setAdapter(files);
-            folderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (position > 0) {
-                        OTApath = directory.getPath().concat(folder[position] + File.separator);
-                        Log.d("OTApath", "" + OTApath);
-                        filePath();
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                    folderSpinner.setSelection(0);
-                }
-            });
-        } else {
-            Toast.makeText(getBaseContext(), "No OTA files in the directory", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * (APP AND STACK SPINNER IN OTA SETUP) FIND FILES IN THE PHONE STORAGE
-     ************************************/
-    public void filePath() {
-        File OTAfile = new File(OTApath);
-        File[] OTAFiles = OTAfile.listFiles();
-        if (OTAFiles != null) {
-            String[] testapp = new String[OTAFiles.length + 1];
-            String[] teststack = new String[OTAFiles.length + 1];
-            int app = 0;
-            int stack = 0;
-            for (File otaFile : OTAFiles) {
-                int last = otaFile.toString().lastIndexOf(File.separator);
-                String testing = otaFile.toString().substring(last);
-                if (testing.toUpperCase().contains(".EBL") || testing.toUpperCase().contains(".GBL")) {
-                    //if (testing.toUpperCase().contains("APP")){
-                    testapp[app] = testing;
-                    app++;
-                    //}
-                    //if (testing.toUpperCase().contains("STACK")){
-                    teststack[stack] = testing;
-                    stack++;
-                    //}
-                }
-            }
-            stringOTAapp = new String[app + 1];
-            stringOTAapp[0] = "";
-            if (app >= 0) System.arraycopy(testapp, 0, stringOTAapp, 1, app);
-            stringOTAstack = new String[stack + 1];
-            stringOTAstack[0] = "";
-            if (app >= 0) System.arraycopy(teststack, 0, stringOTAstack, 1, app);
-            ArrayAdapter<String> apps = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, stringOTAapp);
-            ArrayAdapter<String> stacks = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, stringOTAstack);
-            apps.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            stacks.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            appSpinner.setAdapter(apps);
-            stackSpinner.setAdapter(stacks);
-            appSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (position > 0) {
-                        OTA_OK.setClickable(true);
-                        OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_red));
-                        appPath = OTApath.concat(stringOTAapp[position]);
-                        Log.d("appPath", "" + appPath);
-                    }
-                    if (position == 0) {
-                        OTA_OK.setClickable(false);
-                        OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_button_inactive));
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                    appSpinner.setSelection(0);
-                }
-            });
-
-            stackSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (position > 0) {
-                        stackPath = OTApath.concat(stringOTAstack[position]);
-                        Log.d("stackPath", "" + stackPath);
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                    stackSpinner.setSelection(0);
-                }
-            });
-        } else {
-            Toast.makeText(getBaseContext(), "No gbl files in this directory", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
      * (RUNNABLE) CHECKS OTA BEGIN BOX AND STARTS
      **********************************/
     private Runnable checkbeginrunnable = new Runnable() {
@@ -2842,7 +2803,7 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
     /**
      * OTA STATE MACHINE
      */
-    public void DFUMode(String step) {
+    public synchronized void DFUMode(String step) {
 
         switch (step) {
 
@@ -2880,12 +2841,12 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
                         byte[] ebl = null;
                         try {
                             Log.d("stackPath", "" + stackPath);
-                            Log.d("appPath", "" + stackPath);
+                            Log.d("appPath", "" + appPath);
                             File file;
-                            if (!stackPath.equals("")) {
+
+                            if (!stackPath.equals("") && doubleStepUpload) {
                                 file = new File(stackPath);
                                 boolFullOTA = true;
-                                doubleStepUpload = true;
                             } else {
                                 file = new File(appPath);
                                 boolFullOTA = false;
@@ -2906,7 +2867,7 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
                         /**Check if it is partial of full OTA*/
 
                         final String fn;
-                        if (!stackPath.equals("")) {
+                        if (!stackPath.equals("") && doubleStepUpload) {
                             int last = stackPath.lastIndexOf(File.separator);
                             fn = stackPath.substring(last);
                             Log.d("CurrentlyUpdating", "apploader");
@@ -3708,4 +3669,136 @@ public class DeviceServicesActivity extends AppCompatActivity implements Service
             }
         });
     }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case FILE_CHOOSER_REQUEST_CODE:
+                    OtaFileType type = currentOtaFileType;
+                    Uri uri = data.getData();
+                    String filename;
+
+                    try {
+                        filename = getFileName(uri);
+                    } catch (Exception e) {
+                        filename = "";
+                    }
+
+                    if (!hasOtaFileCorrectExtension(filename)) {
+                        Toast.makeText(DeviceServicesActivity.this, getResources().getString(R.string.Incorrect_file), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // APPLICATION
+                    if (type.equals(OtaFileType.APPLICATION)) {
+                        prepareOtaFile(uri, OtaFileType.APPLICATION, filename);
+                        // APPLOADER
+                    } else {
+                        prepareOtaFile(uri, OtaFileType.APPLOADER, filename);
+                    }
+                    break;
+            }
+        }
+
+        if (areFullOTAFilesCorrect() && doubleStepUpload) {
+            OTA_OK.setClickable(true);
+            OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_red));
+        } else if (arePartialOTAFilesCorrect() && !doubleStepUpload) {
+            OTA_OK.setClickable(true);
+            OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_red));
+        } else {
+            OTA_OK.setClickable(false);
+            OTA_OK.setBackgroundColor(ContextCompat.getColor(DeviceServicesActivity.this, R.color.silabs_button_inactive));
+        }
+
+    }
+
+
+    private boolean areFullOTAFilesCorrect() {
+        return !appFileButton.getText().equals(getString(R.string.Select_Application_gbl_file)) && !appLoaderFileButton.getText().equals(getString(R.string.Select_Apploader_gbl_file));
+    }
+
+    private boolean arePartialOTAFilesCorrect() {
+        return !appFileButton.getText().equals(getString(R.string.Select_Application_gbl_file));
+    }
+
+    /*
+    public String getFileName(Uri uri) {
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        if (cursor == null) return ""; //If cursor is null return empty string
+
+        int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        cursor.moveToFirst();
+        String name = cursor.getString(nameIndex);
+        cursor.close();
+
+        return name;
+    }
+*/
+    public String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
+    }
+
+    public boolean hasOtaFileCorrectExtension(String filename) {
+        if (filename.toUpperCase().contains(".GBL")) return true;
+        return false;
+    }
+
+    public void prepareOtaFile(Uri uri, OtaFileType type, String filename) {
+
+        try {
+            InputStream is = getContentResolver().openInputStream(uri);
+
+            if (is == null) {
+                Toast.makeText(DeviceServicesActivity.this, getResources().getString(R.string.There_was_a_problem_while_preparing_the_file), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            File file = new File(getCacheDir(), filename);
+
+            OutputStream output = new FileOutputStream(file);
+            byte[] buffer = new byte[4 * 1024];
+            int read;
+
+            while ((read = is.read(buffer)) != -1) {
+                output.write(buffer, 0, read);
+            }
+
+            if (type.equals(OtaFileType.APPLICATION)) {
+                appPath = file.getAbsolutePath();
+                appFileButton.setText(filename);
+            } else {
+                stackPath = file.getAbsolutePath();
+                appLoaderFileButton.setText(filename);
+            }
+
+            output.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(DeviceServicesActivity.this, getResources().getString(R.string.Incorrect_file), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
 }

@@ -10,5 +10,7 @@ public interface DebugModeCallback {
 
     void removeFromFavorite(String deviceAddress);
 
+    void addToTemporaryFavorites(String deviceAddress);
+
     void updateCountOfConnectedDevices();
 }

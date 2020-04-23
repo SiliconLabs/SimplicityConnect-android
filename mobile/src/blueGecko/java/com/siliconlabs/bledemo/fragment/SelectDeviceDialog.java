@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,12 +19,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Pair;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -79,22 +79,9 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
         return dialog;
     }
 
-    @InjectView(android.R.id.title)
-    TextView titleView;
-    @InjectView(R.id.blue_gecko_tab)
-    TextView blueGeckoTab;
-    @InjectView(R.id.other_tab)
-    TextView otherTab;
-
     @InjectView(android.R.id.list)
     RecyclerView listView;
 
-    @Optional
-    @InjectView(android.R.id.text1)
-    TextView descriptionView;
-    @Optional
-    @InjectView(R.id.profiles_used)
-    ViewGroup profilesUsed;
 
     private GridLayoutManager layout;
     private RecyclerView.ItemDecoration itemDecoration;
@@ -136,7 +123,6 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
         discovery = new Discovery(adapter, this);
 
         adapter.setThermometerMode();
-        adapter.setBlueGeckoTabSelected(true);
 
         discovery.connect(context);
 
@@ -198,31 +184,6 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
         listView.setHasFixedSize(true);
         listView.setAdapter(adapter);
 
-        titleView.setText(titleInfo);
-        if (descriptionView != null) {
-            descriptionView.setText(descriptionInfo);
-        }
-
-        if (profilesUsed != null) {
-            if (profilesInfo.isEmpty()) {
-                profilesUsed.setVisibility(View.GONE);
-            } else {
-                for (int i = 0; i < profilesInfo.size(); i += 2) {
-                    View valuesItem = inflater.inflate(R.layout.demo_item_value, profilesUsed, false);
-                    TextView titleView = ButterKnife.findById(valuesItem, android.R.id.text1);
-                    TextView idView = ButterKnife.findById(valuesItem, android.R.id.text2);
-
-                    titleView.setText(profilesInfo.get(i));
-                    idView.setText(profilesInfo.get(i + 1));
-
-                    profilesUsed.addView(valuesItem);
-                }
-            }
-        }
-
-        blueGeckoTab.setText(R.string.tab_EFR);
-        otherTab.setText(R.string.tab_other_devices);
-
         return view;
     }
 
@@ -231,6 +192,11 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.setCanceledOnTouchOutside(true);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
         return dialog;
     }
 
@@ -239,23 +205,9 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
         super.onResume();
 
         if (BluetoothAdapter.getDefaultAdapter() != null && BluetoothAdapter.getDefaultAdapter().isEnabled() && getDialog() != null && getDialog().getWindow() != null) {
-            int maxWidth = getResources().getDimensionPixelSize(R.dimen.device_selection_max_width);
-            int maxHeight = getResources().getDimensionPixelSize(R.dimen.device_selection_max_height);
-            if (maxWidth > 0 || maxHeight > 0) {
-                WindowManager.LayoutParams attributes = getDialog().getWindow().getAttributes();
-                attributes.gravity = Gravity.NO_GRAVITY;
-
-                if (maxWidth > 0 && attributes.width < 0) {
-                    attributes.width = maxWidth;
-                }
-
-                if (maxHeight > 0 && attributes.height < 0) {
-                    attributes.height = maxHeight;
-                }
-                getDialog().getWindow().setAttributes(attributes);
-            }
-
-            reDiscover(true);
+                int height = (int)(getResources().getDisplayMetrics().heightPixels * 0.50);
+                getDialog().getWindow().setLayout(LinearLayout.LayoutParams.WRAP_CONTENT,height);
+                reDiscover(true);
         } else {
             dismiss();
         }
@@ -266,13 +218,7 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
             return;
         }
 
-        if (!blueGeckoTab.isSelected() && !otherTab.isSelected()) {
-            blueGeckoTab.performClick();
-        } else if (blueGeckoTab.isSelected()) {
-            startDiscovery(discovery, clearCachedDiscoveries);
-        } else {
-            startDiscovery(discovery, clearCachedDiscoveries);
-        }
+        startDiscovery(discovery,clearCachedDiscoveries);
     }
 
     private void startDiscovery(Discovery discovery, boolean clearCachedDiscoveries) {
@@ -287,33 +233,10 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
         discovery.stopDiscovery(true);
     }
 
-    @OnClick(R.id.blue_gecko_tab)
-    public void onBlueGeckoTabClicked(View view) {
-        if (!blueGeckoTab.isSelected()) {
-            blueGeckoTab.setSelected(true);
-            otherTab.setSelected(false);
-
-            // filters discovered devices to show
-            adapter.setThermometerMode();
-            adapter.setBlueGeckoTabSelected(true);
-
-            discovery.stopDiscovery(true);
-            reDiscover(true);
-        }
-    }
-
-    @OnClick(R.id.other_tab)
-    public void onOtherTabClicked(View view) {
-        if (!otherTab.isSelected()) {
-            blueGeckoTab.setSelected(false);
-            otherTab.setSelected(true);
-
-            // filters discovered devices to show
-            adapter.setThermometerMode();
-            adapter.setBlueGeckoTabSelected(false);
-
-            discovery.stopDiscovery(true);
-            reDiscover(true);
+    @OnClick(R.id.button_cancel)
+    public void onCancelButtonClicked(View view) {
+        if(getDialog() != null) {
+            getDialog().dismiss();
         }
     }
 
@@ -395,7 +318,7 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
         }
 
         @Override
-        public void setData(BluetoothDeviceInfo btInfo, int position) {
+        public void setData(BluetoothDeviceInfo btInfo, int position, int size) {
             this.btInfo = btInfo;
 
             ScanResultCompat scanInfo = btInfo.scanInfo;

@@ -12,33 +12,85 @@
         android:fitsSystemWindows="true" />
 
     <RelativeLayout
-        android:id="@+id/bluetooth_enable"
+        android:id="@+id/information_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
-        android:layout_gravity="top"
-        android:background="@color/silabs_red_dark"
-        android:padding="@dimen/bluetooth_enable_bar_padding"
-        android:visibility="gone">
+        android:layout_below="@id/toolbar">
 
-        <TextView
-            android:id="@+id/bluetooth_enable_msg"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/bluetooth_enable"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:text="@string/bluetooth_adapter_bar_disabled"
-            android:textColor="@android:color/white" />
+            android:layout_gravity="top"
+            android:background="@color/silabs_red_dark"
+            android:visibility="gone">
 
-        <TextView
-            android:id="@+id/bluetooth_enable_btn"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/bluetooth_enable_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:fontFamily="sans-serif-medium"
+                android:layout_centerVertical="true"
+                android:padding="12dp"
+                android:text="@string/bluetooth_adapter_bar_disabled"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/bluetooth_enable_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:fontFamily="sans-serif-medium"
+                android:layout_centerVertical="true"
+                android:background="?android:listChoiceBackgroundIndicator"
+                android:text="@string/bluetooth_adapter_enable_bar_enable"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp"
+                android:textColor="@android:color/white" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/location_disabled"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="?android:listChoiceBackgroundIndicator"
-            android:text="@string/bluetooth_adapter_enable_bar_enable"
-            android:textColor="@android:color/white" />
+            android:background="@color/silabs_red_dark"
+            android:layout_below="@id/bluetooth_enable"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:padding="12dp"
+                android:text="@string/Location_disabled"
+                android:textColor="@color/silabs_white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/enable_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:padding="12dp"
+                android:text="@string/ENABLE"
+                android:textColor="@color/silabs_white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/location_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginEnd="8dp"
+                android:padding="12dp"
+                android:text="@string/INFO"
+                android:textColor="@color/silabs_white" />
+        </LinearLayout>
     </RelativeLayout>
 
     <androidx.viewpager.widget.ViewPager
@@ -46,7 +98,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/bottom_navigation_view"
-        android:layout_below="@id/bluetooth_enable"
+        android:layout_below="@id/information_bar"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <View
@@ -62,7 +114,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@android:color/white"
-        android:paddingBottom="4dp"
+        android:paddingBottom="12dp"
         app:itemBackground="@drawable/bottom_item_selector"
         app:itemIconTint="@drawable/nav_bar_selector"
         app:itemTextAppearanceActive="@style/Widget.BottomNavigationViewActive"

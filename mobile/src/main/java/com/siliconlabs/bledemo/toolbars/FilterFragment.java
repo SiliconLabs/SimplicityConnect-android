@@ -287,12 +287,7 @@ public class FilterFragment extends Fragment {
         sharedPrefUtils = new SharedPrefUtils(getContext());
         init(view);
         ui();
-
-        if (sharedPrefUtils.getLastFilter() != null) {
-            fillFields(sharedPrefUtils.getLastFilter());
-        } else {
-            resetUi();
-        }
+        resetUi();
 
         return view;
     }

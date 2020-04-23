@@ -60,7 +60,6 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         }
     };
     boolean isThermometerMode = false;
-    boolean isBlueGeckoTabSelected = true;
     private int comp = 5;
     private String search = null;
     private final Comparator<T> rssiComparator = new Comparator<T>() {
@@ -209,7 +208,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         }
 
         final T info = devicesInfo.get(position); //TODO It was final
-        holder.setData(info, position);
+        holder.setData(info, position,getItemCount());
 
     }
 
@@ -230,10 +229,6 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
                 removeOldDevices();
             }
         }, 0, PERIOD_UPDATE_REMOVE_OUTDATED_HTM);
-    }
-
-    public void setBlueGeckoTabSelected(boolean isBlueGeckoMode) {
-        isBlueGeckoTabSelected = isBlueGeckoMode;
     }
 
     public void updateWith(List<T> devicesInfo) {
@@ -472,6 +467,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
         }
         if (this.filterDeviceParams.isEmptyFilter()) return;
         LinkedHashSet<String> favorites = sharedPrefUtils.getFavoritesDevices();
+        LinkedHashSet<String> tmpFavorites = sharedPrefUtils.getTemporaryFavoritesDevices();
         for (Iterator<T> deviceIterator = devicesInfo.iterator(); deviceIterator.hasNext(); ) {
             T device = deviceIterator.next();
             if (!isNameOrAddressContain(filterDeviceParams, device)) {
@@ -506,7 +502,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
                 }
             }
 
-            if (filterDeviceParams.isOnlyFavourite() && !favorites.contains(device.getAddress())) {
+            if (filterDeviceParams.isOnlyFavourite() && !(favorites.contains(device.getAddress()) || tmpFavorites.contains(device.getAddress()))) {
                 deviceIterator.remove();
                 continue;
             }

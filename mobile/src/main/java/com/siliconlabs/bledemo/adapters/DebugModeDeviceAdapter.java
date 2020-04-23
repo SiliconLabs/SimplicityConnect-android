@@ -10,16 +10,16 @@ import androidx.cardview.widget.CardView;
 import android.os.ParcelUuid;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.activity.BrowserActivity;
 import com.siliconlabs.bledemo.beaconutils.BleFormat;
 import com.siliconlabs.bledemo.beaconutils.altbeacon.AltBeacon;
 import com.siliconlabs.bledemo.beaconutils.eddystone.Beacon;
@@ -34,6 +34,7 @@ import com.siliconlabs.bledemo.ble.ScanResultCompat;
 import com.siliconlabs.bledemo.interfaces.DebugModeCallback;
 import com.siliconlabs.bledemo.utils.SharedPrefUtils;
 import com.siliconlabs.bledemo.views.ServiceItemContainerRe;
+import com.siliconlabs.bledemo.activity.BrowserActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -140,11 +141,25 @@ public class DebugModeDeviceAdapter extends ScannedDevicesAdapter<BluetoothDevic
         }
 
         @Override
-        public void setData(BluetoothDeviceInfo bluetoothDeviceInfo, int position) {
+        public void setData(BluetoothDeviceInfo bluetoothDeviceInfo, int position, int size) {
             // set data for the list item
             device = bluetoothDeviceInfo;
             advertisementContainer.removeAllViews();
             refreshButtonsConnected(isConnected(device.getAddress()));
+
+            int margin16Dp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, context.getResources().getDisplayMetrics());
+            int margin10Dp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, context.getResources().getDisplayMetrics());
+
+            ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) cardView.getLayoutParams();
+            if (position == 0) {
+                layoutParams.setMargins(margin16Dp, margin16Dp, margin16Dp, margin10Dp);
+            } else if (position == size - 1) {
+                layoutParams.setMargins(margin16Dp, margin10Dp, margin16Dp, margin16Dp);
+            } else {
+                layoutParams.setMargins(margin16Dp, margin10Dp, margin16Dp, margin10Dp);
+            }
+            cardView.requestLayout();
+
 
             if (currentAdvertismentDataMap.containsKey(device.getAddress())) {
                 addAdvertsToContainer(currentAdvertismentDataMap.get(device.getAddress()));
@@ -159,21 +174,29 @@ public class DebugModeDeviceAdapter extends ScannedDevicesAdapter<BluetoothDevic
             }
             intervalTV.setText(String.valueOf(device.intervalNanos / 1000000));
             addressTV.setText(device.getAddress());
-            String deviceNameText = device.getName() == null || device.getName().isEmpty() ? "Unknown" : device.getName();
+            String deviceNameText = device.getName() == null || device.getName().isEmpty() ? context.getResources().getString(R.string.not_advertising_shortcut) : device.getName();
             deviceName.setText(deviceNameText);
             deviceRssi.setText(context.getResources().getString(R.string.n_dBm, device.getRssi()));
             deviceAddress.setText(device.getAddress());
             bleFormat = device.getBleFormat();
             deviceType.setText(context.getResources().getString(bleFormat.getNameResId()));
-            final boolean isFavorite = sharedPrefUtils.isFavorite(device.getAddress());
+
+            boolean isFavorite = sharedPrefUtils.isFavorite(device.getAddress()) || sharedPrefUtils.isTemporaryFavorite(device.getAddress());
             favoriteBtn.setChecked(isFavorite);
-            favoriteBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            if (sharedPrefUtils.isFavorite(device.getAddress())) {
+                ViewHolder.this.debugModeCallback.removeFromFavorite(device.getAddress());
+                ViewHolder.this.debugModeCallback.addToTemporaryFavorites(device.getAddress());
+            }
+
+            favoriteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                public void onClick(View v) {
+                    boolean isFavorite = sharedPrefUtils.isFavorite(device.getAddress()) || sharedPrefUtils.isTemporaryFavorite(device.getAddress());
                     if (isFavorite) {
-                        ViewHolder.this.debugModeCallback.removeFromFavorite(device.getAddress());
+                        ViewHolder.this.debugModeCallback.removeFromFavorite(device.getAddress()); //Remove device from temporaryDevices and devices
                     } else {
-                        ViewHolder.this.debugModeCallback.addToFavorite(device.getAddress());
+                        ViewHolder.this.debugModeCallback.addToTemporaryFavorites(device.getAddress()); //Ad device to temporaryDevices
                     }
                 }
             });
@@ -230,6 +253,12 @@ public class DebugModeDeviceAdapter extends ScannedDevicesAdapter<BluetoothDevic
                 AdvertismentData advertismentData = new AdvertismentData();
                 List<AdvertismentRow> rows = new ArrayList<>();
 
+                // If not legacy, prepare extra Advertising Extension to show
+                if (!device.scanInfo.isLegacy()) {
+                    rows.add(new AdvertismentRow(context.getResources().getString(R.string.Bluetooth_5_Advertising_Extension),
+                            prepareBluetooth5AdvertExtensionData(device.scanInfo)));
+                }
+
                 for (int i = 0; i < device.getAdvertData().size(); i++) {
                     String data = device.getAdvertData().get(i);
                     String[] advertiseData = data.split(SPLIT);
@@ -265,6 +294,68 @@ public class DebugModeDeviceAdapter extends ScannedDevicesAdapter<BluetoothDevic
             }
         }
 
+        private String prepareBluetooth5AdvertExtensionData(ScanResultCompat scanResult) {
+
+            StringBuilder builder = new StringBuilder();
+
+            //Data status
+            builder.append((context.getString(R.string.Data_Status_colon)))
+                    .append(" ");
+            if (scanResult.getDataStatus() == 0)
+                builder.append(context.getString(R.string.Data_Status_Complete));
+            else builder.append(context.getString(R.string.Data_Status_Truncated));
+            builder.append("<br/>");
+
+            //Primary PHY
+            builder.append(context.getString(R.string.Primary_PHY_colon))
+                    .append(" ");
+            if (scanResult.getPrimaryPhy() == 1)
+                builder.append(context.getString(R.string.Phy_LE_1M));
+            else builder.append(context.getString(R.string.Phy_LE_Coded));
+            builder.append("<br/>");
+
+            //Secondary PHY
+            builder.append(context.getString(R.string.Secondary_PHY_colon))
+                    .append(" ");
+            if (scanResult.getSecondaryPhy() == 1)
+                builder.append(context.getString(R.string.Phy_LE_1M));
+            else if (scanResult.getSecondaryPhy() == 2)
+                builder.append(context.getString(R.string.Phy_LE_2M));
+            else if (scanResult.getSecondaryPhy() == 3)
+                builder.append(context.getString(R.string.Phy_LE_Coded));
+            else builder.append(context.getString(R.string.Phy_Unused));
+            builder.append("<br/>");
+
+            //Advertising Set ID
+            builder.append(context.getString(R.string.Advertising_Set_ID))
+                    .append(" ");
+            if (scanResult.getAdvertisingSetID() == 255)
+                builder.append(context.getString(R.string.Not_Present));
+            else builder.append(scanResult.getAdvertisingSetID());
+            builder.append("<br/>");
+
+            //Tx Power
+            builder.append(context.getString(R.string.Tx_Power))
+                    .append(" ");
+            if (scanResult.getTxPower() == 127)
+                builder.append(context.getString(R.string.Not_Present));
+            else builder.append(scanResult.getTxPower()).append("dBm");
+            builder.append("<br/>");
+
+            //Periodic Advertising Interval
+            builder.append(context.getString(R.string.Periodic_Advertising_Interval_colon))
+                    .append(" ");
+            if (6 <= scanResult.getPeriodicAdvertisingInterval() && scanResult.getPeriodicAdvertisingInterval() <= 65536) {
+                double ms = scanResult.getPeriodicAdvertisingInterval() * 1.25;
+                builder.append(ms)
+                        .append("ms");
+            } else {
+                builder.append(context.getString(R.string.Not_Present));
+            }
+
+            return builder.toString();
+        }
+
         //copy from BeaconScreenScannedDevicesAdapter
         private void validateEddyStoneServiceData(Beacon beacon, String deviceAddress, byte[] serviceData) {
             if (serviceData == null) {
@@ -296,7 +387,7 @@ public class DebugModeDeviceAdapter extends ScannedDevicesAdapter<BluetoothDevic
             for (AdvertismentRow row : advertismentData.getRows()) {
                 final ServiceItemContainerRe serviceItemContainer = new ServiceItemContainerRe(context);
                 serviceItemContainer.serviceTitleTextView.setText(row.getTitle());
-                serviceItemContainer.serviceUuidTextView.setText(row.getBody());
+                serviceItemContainer.serviceUuidTextView.setText(Html.fromHtml(row.getBody()));
                 advertisementContainer.addView(serviceItemContainer, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             }
         }
@@ -313,12 +404,12 @@ public class DebugModeDeviceAdapter extends ScannedDevicesAdapter<BluetoothDevic
                 int minor = iBeaconInfo.getMinor();
                 int rssiAt1m = iBeaconInfo.getPower();
 
-                String details = "Minor: " + minor + "<br><br>" +
-                        "Major: " + major + "<br><br>" +
-                        "UUID: " + uuid + "<br><br>" +
+                String details = "Minor: " + minor + "<br>" +
+                        "Major: " + major + "<br>" +
+                        "UUID: " + uuid + "<br>" +
                         "RSSI at 1m: " + rssiAt1m;
 
-                rows.add(new AdvertismentRow("iBeacon data", Html.fromHtml(details).toString()));
+                rows.add(new AdvertismentRow("iBeacon data", details));
 
             }
         }
@@ -387,7 +478,7 @@ public class DebugModeDeviceAdapter extends ScannedDevicesAdapter<BluetoothDevic
                     "<b>" + context.getString(R.string.beacon_details_dialog_tlm_data) + ":</b><br>" + eddystoneTlm +
                             "<br>";
 
-            rows.add(new AdvertismentRow("Eddystone data", Html.fromHtml(dataValue).toString()));
+            rows.add(new AdvertismentRow("Eddystone data", dataValue));
         }
 
         //copy from BeaconScreenScannedDevicesAdapter
@@ -405,7 +496,7 @@ public class DebugModeDeviceAdapter extends ScannedDevicesAdapter<BluetoothDevic
             dataValue +=
                     "<b>" + context.getString(R.string.beacon_details_dialog_reference_rssi) + ":</b> " + refRssi +
                             "&nbsp;dBm<br>";
-            rows.add(new AdvertismentRow("AltBeacon data", Html.fromHtml(dataValue).toString()));
+            rows.add(new AdvertismentRow("AltBeacon data", dataValue));
         }
 
     }

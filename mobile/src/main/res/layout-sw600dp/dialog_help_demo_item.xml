@@ -1,134 +1,158 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/tablet_dialog_help_demo_item_width"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/silabs_white"
-    android:orientation="vertical">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/help_button_height"
-        android:background="@color/silabs_dialog_title_background"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="start|center_vertical"
-        android:paddingStart="@dimen/help_text_padding"
-        android:paddingEnd="0dp"
-        android:text="@string/help"
-        android:textSize="@dimen/help_dialog_title_text_size" />
-
-    <ScrollView
+    <LinearLayout
         android:layout_width="@dimen/tablet_dialog_help_demo_item_width"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/silabs_white"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/silabs_white"
-            android:orientation="vertical"
-            android:padding="@dimen/help_text_padding">
+            android:layout_height="@dimen/help_button_height"
+            android:background="@color/silabs_dialog_title_background"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="@string/info"
+            android:textColor="@color/silabs_primary_text"
+            android:textSize="@dimen/help_dialog_title_text_size" />
 
-            <TextView
+        <ScrollView
+            android:layout_width="@dimen/tablet_dialog_help_demo_item_width"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/about_silicon_labs"
-                android:textSize="@dimen/help_text_size" />
+                android:layout_height="match_parent"
+                android:background="@color/silabs_white"
+                android:orientation="vertical"
+                android:padding="@dimen/help_text_padding">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/help_section_and_body_separation"
-                android:fontFamily="sans-serif"
-                android:text="@string/help_text_moreinfo_label"
-                android:textSize="@dimen/help_text_size" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/about_silicon_labs"
+                    android:textSize="@dimen/help_text_size" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:fontFamily="sans-serif"
-                android:text="@string/help_text_moreinfo_url"
-                android:textSize="@dimen/help_text_size" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/silabs_secondary_background" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/help_section_and_body_separation"
-                android:text="@string/help_text_support_label"
-                android:textSize="@dimen/help_text_size" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/help_section_and_body_separation"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_text_moreinfo_label"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/help_text_size" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:fontFamily="sans-serif"
-                android:text="@string/help_text_support_url"
-                android:textSize="@dimen/help_text_size" />
+                <TextView
+                    android:id="@+id/silabs_products_wireless"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_text_moreinfo_url"
+                    android:textColor="@color/silabs_blue"
+                    android:textSize="@dimen/help_text_size" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/help_section_and_body_separation"
-                android:fontFamily="sans-serif"
-                android:text="@string/help_text_sourcecode_label"
-                android:textSize="@dimen/help_text_size" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/help_section_and_body_separation"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_text_support_label"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/help_text_size" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:fontFamily="sans-serif"
-                android:text="@string/help_text_sourcecode_url"
-                android:textSize="@dimen/help_text_size" />
+                <TextView
+                    android:id="@+id/silabs_support"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_text_support_url"
+                    android:textColor="@color/silabs_blue"
+                    android:textSize="@dimen/help_text_size" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/help_section_and_body_separation"
-                android:fontFamily="sans-serif"
-                android:text="@string/help_text_documentation_label"
-                android:textSize="@dimen/help_text_size" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/help_section_and_body_separation"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_text_sourcecode_label"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/help_text_size" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:fontFamily="sans-serif"
-                android:text="@string/help_text_documentation_url"
-                android:textSize="@dimen/help_text_size" />
+                <TextView
+                    android:id="@+id/github_siliconlabs_efrconnect"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_text_sourcecode_url"
+                    android:textColor="@color/silabs_blue"
+                    android:textSize="@dimen/help_text_size" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/help_section_and_body_separation"
-                android:fontFamily="sans-serif"
-                android:text="@string/help_text_pub_label"
-                android:textSize="@dimen/help_text_size" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/help_section_and_body_separation"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_text_documentation_label"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/help_text_size" />
 
-            <TextView
-                android:id="@+id/help_text_playstore"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:text="@string/help_text_pub_url"
-                android:textSize="@dimen/help_text_size" />
+                <TextView
+                    android:id="@+id/docs_silabs_bluetooth_latest"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_text_documentation_url"
+                    android:textColor="@color/silabs_blue"
+                    android:textSize="@dimen/help_text_size" />
 
-            <TextView
-                android:id="@+id/dialog_help_version_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/help_body_and_version_separation"
-                android:fontFamily="sans-serif"
-                android:textSize="@dimen/help_text_size" />
-        </LinearLayout>
-    </ScrollView>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/help_section_and_body_separation"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_text_pub_label"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/help_text_size" />
 
-    <Button
-        android:id="@+id/help_ok_button"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/help_button_height"
-        android:background="@drawable/ok_button_selector"
-        android:fontFamily="sans-serif-medium"
-        android:text="@string/ok"
-        android:textColor="@color/silabs_white"
-        android:textSize="@dimen/help_dialog_ok_btn_text_size" />
-</LinearLayout>
+                <TextView
+                    android:id="@+id/help_text_playstore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_Google_Play_Store"
+                    android:textColor="@color/silabs_blue"
+                    android:textSize="@dimen/help_text_size" />
+
+                <TextView
+                    android:id="@+id/dialog_help_version_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/help_body_and_version_separation"
+                    android:fontFamily="sans-serif"
+                    android:textSize="@dimen/help_text_size" />
+            </LinearLayout>
+        </ScrollView>
+
+        <Button
+            android:id="@+id/help_ok_button"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/help_button_height"
+            android:background="@drawable/ok_button_selector"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/ok"
+            android:textColor="@color/silabs_white"
+            android:textSize="@dimen/help_dialog_ok_btn_text_size" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

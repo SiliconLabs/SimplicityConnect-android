@@ -14,12 +14,28 @@
         android:background="@android:color/white"
         tools:context=".MainActivityBlueGiga">
 
+        <RelativeLayout
+            android:id="@+id/go_back_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/silabs_red">
+
+            <ImageView
+                android:id="@+id/go_back_button"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/ic_chevron_left_white_48dp"/>
+        </RelativeLayout>
+
         <include
             android:id="@+id/toolbar"
             layout="@layout/actionbar_debug_device_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
+            android:layout_below="@id/go_back_relative_layout" />
 
         <include
             android:id="@+id/bluetooth_browser_toolbar"
@@ -201,7 +217,7 @@
             <Button
                 android:id="@+id/button_scanning"
                 android:layout_width="wrap_content"
-                android:layout_height="35dp"
+                android:layout_height="38dp"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:background="@drawable/button_disconnect_background"

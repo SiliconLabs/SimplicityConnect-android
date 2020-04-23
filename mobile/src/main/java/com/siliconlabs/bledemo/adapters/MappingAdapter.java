@@ -4,12 +4,15 @@ import android.app.Dialog;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.siliconlabs.bledemo.mappings.Mapping;
@@ -29,13 +32,17 @@ public class MappingAdapter extends RecyclerView.Adapter<MappingAdapter.NameMapp
         TextView uuidTV;
         TextView nameTV;
         ImageButton deleteIB;
+        LinearLayout characServiceTitleLL;
+        CardView mappingCV;
 
         public NameMappingViewHolder(View itemView) {
             super(itemView);
             uuidTV = itemView.findViewById(R.id.text_view_uuid);
             nameTV = itemView.findViewById(R.id.text_view_name);
             deleteIB = itemView.findViewById(R.id.image_button_delete);
-            itemView.setOnClickListener(this);
+            mappingCV = itemView.findViewById(R.id.mapping_card_view);
+            characServiceTitleLL = itemView.findViewById(R.id.linear_layout_charac_service);
+            characServiceTitleLL.setOnClickListener(this);
         }
 
         @Override
@@ -64,6 +71,20 @@ public class MappingAdapter extends RecyclerView.Adapter<MappingAdapter.NameMapp
     @Override
     public void onBindViewHolder(MappingAdapter.NameMappingViewHolder holder, final int position) {
         Mapping mapping = list.get(position);
+
+        int margin16Dp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, context.getResources().getDisplayMetrics());
+        int margin10Dp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, context.getResources().getDisplayMetrics());
+
+
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) holder.mappingCV.getLayoutParams();
+        if (position == 0) {
+            layoutParams.setMargins(margin16Dp, margin16Dp, margin16Dp, margin10Dp);
+        } else if (position == getItemCount() - 1) {
+            layoutParams.setMargins(margin16Dp, margin10Dp, margin16Dp, margin16Dp);
+        } else {
+            layoutParams.setMargins(margin16Dp, margin10Dp, margin16Dp, margin10Dp);
+        }
+        holder.mappingCV.requestLayout();
 
         holder.uuidTV.setText(mapping.getUuid());
         holder.nameTV.setText(mapping.getName());

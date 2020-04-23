@@ -41,8 +41,8 @@ android {
         blueGecko {
             dimension "version"
             applicationId "com.siliconlabs.bledemo"
-            versionCode 13
-            versionName "2.0.1"
+            versionCode 14
+            versionName "2.0.2"
         }
         wirelessGecko {
             dimension "version"

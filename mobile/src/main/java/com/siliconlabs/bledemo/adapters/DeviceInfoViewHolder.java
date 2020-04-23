@@ -12,7 +12,7 @@ public abstract class DeviceInfoViewHolder<T extends BluetoothDeviceInfo> extend
 
     private View.OnClickListener onClickListener;
 
-    public abstract void setData(T info, int position);
+    public abstract void setData(T info, int position, int size);
 
     public DeviceInfoViewHolder(View itemView) {
         super(itemView);

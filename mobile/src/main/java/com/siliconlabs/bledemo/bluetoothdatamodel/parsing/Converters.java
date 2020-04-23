@@ -60,7 +60,13 @@ public class Converters {
             return "";
         }
 
-        return new String(value);
+        StringBuilder builder = new StringBuilder();
+        for(int i=0; i<value.length; i++) {
+            if(32 <= value[i] && value[i] <= 126) builder.append((char)value[i]);
+            else builder.append("\uFFFD");
+        }
+
+        return builder.toString();
     }
 
     // Gets value in decimal system

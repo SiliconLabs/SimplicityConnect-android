@@ -59,6 +59,9 @@
                             android:fontFamily="sans-serif-medium"
                             android:paddingStart="0dp"
                             android:paddingEnd="4dp"
+                            android:ellipsize="end"
+                            android:singleLine="true"
+                            android:maxLines="1"
                             android:text="@string/services_list_service_name_default"
                             android:textColor="@color/silabs_primary_text"
                             android:textSize="@dimen/service_name_text_size" />

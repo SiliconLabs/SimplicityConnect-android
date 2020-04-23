@@ -98,6 +98,8 @@ public class FragmentCharacteristicDetail extends Fragment {
     public static final int SPINNER_WITH_LABEL_CONTAINER_MARGIN_TOP = 15;
     public static final int FIELD_NAME_MARGIN_BOTTOM = 15;
 
+    private int EDIT_NOT_CLEAR_ID = 1000;
+
     private Context context;
 
     final private int REFRESH_INTERVAL = 500; // miliseconds
@@ -148,10 +150,14 @@ public class FragmentCharacteristicDetail extends Fragment {
     Dialog editableFieldsDialog;
     LinearLayout writableFieldsContainer;
     Button saveValueBtn;
+    Button cancelBtn;
+    ImageView closeIV;
     HashMap<Field, Boolean> fieldsInRangeMap;
     HashMap<Field, Boolean> fieldsValidMap;
 
     private boolean writeString = false;
+
+    private String parsingProblemInfo;
 
     public FragmentCharacteristicDetail() {
 
@@ -466,13 +472,56 @@ public class FragmentCharacteristicDetail extends Fragment {
                 addField(field);
             } catch (Exception ex) {
                 Log.i("CharacteristicUI", String.valueOf(i));
-                //Log.i("Characteristic fields size", String.valueOf(mCharact.getFields().size()));
                 Log.i("Characteristic value", Converters.getDecimalValue(value));
+                parsingProblemInfo = prepareParsingProblemInfo(mCharact, value.length);
                 parseProblem = true;
                 return false;
             }
         }
         return true;
+    }
+
+    private String prepareParsingProblemInfo(Characteristic characteristic, int readSize) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("An error occurred while parsing this characteristic.").append("\n");
+
+        int expectedBytes = 0;
+
+        for (int i = 0; i < characteristic.getFields().size(); i++) {
+            Field field = characteristic.getFields().get(i);
+            expectedBytes += Engine.getInstance().getFormat(field.getFormat());
+        }
+
+        if (expectedBytes != readSize) {
+
+            int expectedBits = expectedBytes * 8;
+            int readBits = readSize * 8;
+
+            builder.append("Reason: expected data length is ")
+                    .append(expectedBits)
+                    .append("-bit (")
+                    .append(expectedBytes);
+
+            if (expectedBytes == 1) {
+                builder.append(" byte), ");
+            } else {
+                builder.append(" bytes), ");
+            }
+
+            builder.append("\n")
+                    .append("read data length is ")
+                    .append(readBits)
+                    .append("-bit (")
+                    .append(readSize);
+
+            if (readSize == 1) {
+                builder.append(" byte).");
+            } else {
+                builder.append(" bytes).");
+            }
+        }
+
+        return builder.toString();
     }
 
     // Add single field
@@ -646,6 +695,26 @@ public class FragmentCharacteristicDetail extends Fragment {
         return result;
     }
 
+    private String getSint16AsString(byte[] array) {
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] < 0) {
+                array[i] = (byte) (array[i] + 256);
+            }
+        }
+
+        for (int i = array.length - 1; i >= 0; i--) {
+            builder.append(Converters.getHexValue(array[i]));
+        }
+
+        int result = Integer.parseInt(builder.toString(), 16);
+
+        if (result >= 32768) result = result - 65536;
+
+        return String.valueOf(result);
+    }
+
     // Reads next value for given format
     private String readNextValue(String format) {
         if (value == null) {
@@ -653,6 +722,13 @@ public class FragmentCharacteristicDetail extends Fragment {
         }
 
         int formatLength = Engine.getInstance().getFormat(format);
+
+        // if format is sint16
+        if (format.toLowerCase().equals("sint16")) {
+            byte[] array = Arrays.copyOfRange(value, offset, offset + formatLength);
+            offset += formatLength;
+            return getSint16AsString(array);
+        }
 
         // binaryString is used for sints, used to fix original bluegiga code ignoring data format type
         StringBuilder binaryString = new StringBuilder();
@@ -831,6 +907,10 @@ public class FragmentCharacteristicDetail extends Fragment {
         asciiEdit = readableFieldsForInline.findViewById(R.id.ascii_edit_readonly);
         decimalEdit = readableFieldsForInline.findViewById(R.id.decimalEdit_readonly);
 
+        hexEdit.setId(EDIT_NOT_CLEAR_ID);
+        asciiEdit.setId(EDIT_NOT_CLEAR_ID);
+        decimalEdit.setId(EDIT_NOT_CLEAR_ID);
+
         hex.setKeyListener(null);
         ascii.setKeyListener(null);
         decimal.setKeyListener(null);
@@ -922,6 +1002,16 @@ public class FragmentCharacteristicDetail extends Fragment {
         writableFieldsContainer = editableFieldsDialog.findViewById(R.id.characteristic_writable_fields_container);
 
         saveValueBtn = editableFieldsDialog.findViewById(R.id.save_btn);
+        cancelBtn = editableFieldsDialog.findViewById(R.id.cancel_btn);
+        closeIV = editableFieldsDialog.findViewById(R.id.image_view_close);
+    }
+
+    private boolean isAnyWriteFieldEmpty() {
+        for(EditText e: editTexts) {
+            if(e.getId() == EDIT_NOT_CLEAR_ID) continue;
+            if(e.getText().toString().isEmpty()) return true;
+        }
+        return false;
     }
 
     public void showCharacteristicWriteDialog() {
@@ -931,16 +1021,28 @@ public class FragmentCharacteristicDetail extends Fragment {
         saveValueBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                writeValueToCharacteristic();
+                if(!isAnyWriteFieldEmpty()) {
+                    writeValueToCharacteristic();
+                } else {
+                    Toast.makeText(getActivity(),getString(R.string.You_cannot_send_empty_value_to_charac),Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-        Button cancelBtn = editableFieldsDialog.findViewById(R.id.cancel_btn);
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 for (EditText et : editTexts) {
                     et.setText("");
+                }
+            }
+        });
+
+        closeIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (editableFieldsDialog != null) {
+                    editableFieldsDialog.dismiss();
                 }
             }
         });
@@ -958,6 +1060,13 @@ public class FragmentCharacteristicDetail extends Fragment {
 
         LinearLayout propertiesContainer = editableFieldsDialog.findViewById(R.id.picker_dialog_properties_container);
         initPropertiesForEditableFieldsDialog(propertiesContainer);
+
+        //Clear EditText fields
+        for (EditText et : editTexts) {
+            if(et.getId() != EDIT_NOT_CLEAR_ID) {
+                et.setText("");
+            }
+        }
 
         editableFieldsDialog.show();
         updateSaveButtonState();
@@ -1011,9 +1120,9 @@ public class FragmentCharacteristicDetail extends Fragment {
             LinearLayout.LayoutParams paramsIcon = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
 
-            if(propertyValue.trim().toUpperCase().equals("WRITE NO RESPONSE")) {
+            if (propertyValue.trim().toUpperCase().equals("WRITE NO RESPONSE")) {
                 float d = getResources().getDisplayMetrics().density;
-                paramsIcon = new LinearLayout.LayoutParams((int)(24*d),((int)(24*d)));
+                paramsIcon = new LinearLayout.LayoutParams((int) (24 * d), ((int) (24 * d)));
                 paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
             }
 
@@ -1422,15 +1531,16 @@ public class FragmentCharacteristicDetail extends Fragment {
     }
 
     private void updateSaveButtonState() {
+/*
         boolean emptyFieldExists = true;
         for (EditText editableField : editTexts) {
             emptyFieldExists = !editableField.getText().toString().equals("");
             Log.d("editableField", " Empty: " + editableField.getText().toString().equals(""));
         }
-
+*/
         if (saveValueBtn != null) {
-            saveValueBtn.setEnabled(emptyFieldExists);
-            saveValueBtn.setClickable(emptyFieldExists);
+            saveValueBtn.setEnabled(true);
+            saveValueBtn.setClickable(true);
         }
     }
 
@@ -1634,9 +1744,9 @@ public class FragmentCharacteristicDetail extends Fragment {
                 LinearLayout.LayoutParams paramsIcon = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
 
-                if(propertyValue.trim().toUpperCase().equals("WRITE NO RESPONSE")) {
+                if (propertyValue.trim().toUpperCase().equals("WRITE NO RESPONSE")) {
                     float d = getResources().getDisplayMetrics().density;
-                    paramsIcon = new LinearLayout.LayoutParams((int)(24*d),((int)(24*d)));
+                    paramsIcon = new LinearLayout.LayoutParams((int) (24 * d), ((int) (24 * d)));
                     paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
                 }
 
@@ -1794,7 +1904,8 @@ public class FragmentCharacteristicDetail extends Fragment {
         problemTextView.setLayoutParams(fieldValueParams);
         problemTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
-        problemTextView.setText(getText(R.string.parse_problem));
+        //problemTextView.setText(getText(R.string.parse_problem));
+        problemTextView.setText(parsingProblemInfo);
         valuesLayout.addView(problemTextView);
 
         problemTextView.setTextColor(Color.RED);

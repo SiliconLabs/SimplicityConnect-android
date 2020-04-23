@@ -8,6 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,18 +23,20 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Environment;
-import android.text.method.LinkMovementMethod;
+import android.provider.Settings;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.siliconlabs.bledemo.BuildConfig;
+import com.siliconlabs.bledemo.dialogs.LocationInfoDialog;
 import com.siliconlabs.bledemo.menu.MenuItemType;
 import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.adapters.MenuAdapter;
@@ -41,9 +46,6 @@ import com.siliconlabs.bledemo.fragment.DemoFragment;
 import com.siliconlabs.bledemo.fragment.DevelopFragment;
 import com.siliconlabs.bledemo.fragment.SelectDeviceDialog;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,6 +76,12 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
     TextView bluetoothEnableMsg;
     @InjectView(R.id.bluetooth_enable_btn)
     TextView bluetoothEnableBtn;
+    @InjectView(R.id.location_disabled)
+    LinearLayout locationDisabledBar;
+    @InjectView(R.id.enable_location)
+    TextView locationEnableBtn;
+    @InjectView(R.id.location_info)
+    TextView locationInfoBtn;
     @InjectView(R.id.help_button)
     TextView helpButton;
     @InjectView(R.id.view_pager)
@@ -108,51 +116,6 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
         }
     };
 
-    private void createFiles() {
-
-        File path = new File(Environment.getExternalStorageDirectory(), "SiliconLabs_EFRConnect");
-        //File path = new File(getExternalFilesDir(null),"SiliconLabs_EFRConnect");
-
-        //if(!path.exists()) {
-        Log.d("BG Folder", "Creating folder path");
-        path.mkdirs();
-        File logo = new File(path, "Welcome.txt");
-        String welcome = "Welcome to EFR Connect App";
-        try {
-            FileWriter writer = new FileWriter(logo);
-            writer.append(welcome);
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            Log.e("CreatingFolder", "Error" + e);
-        }
-        //} else Log.d("BG Folder","Path already exists");
-
-        File path2 = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),
-                "SiliconLabs_EFRConnect" + File.separator + "OTAFiles");
-
-        //if(!path2.exists()) {
-        Log.d("OTA Folder", "Creating folder path");
-        path2.mkdirs(); //TODO Still not appearing on Windows 7
-        File instructions = new File(path2, "OTAInstructions.txt");
-        String inst = "Welcome to Silicon Labs EFR Connect App - OTA Instruction" + "\n" + "\n" +
-                "To start update applications and stacks you need to save the respective files in a subfolder in this folder: " +
-                "\n" +
-                "Example -> SiliconLabs_EFRConnect/OTAFiles/ExampleFolder/Example.gbl" + "\n" + "\n" +
-                "Organize your folders the way you find better, remember the root OTAFiles is static, and the app do not accept a sub-subfolder from the root." +
-                "\n" + "\n" +
-                "Good OTA!";
-        try {
-            FileWriter writer = new FileWriter(instructions);
-            writer.append(inst);
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            Log.e("CreatingFolder", "Error" + e);
-        }
-        //} else Log.d("BG Folder","Path already exists");
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,8 +126,8 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
 
         bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
-        toolbar.setTitle(getString(R.string.title_Demo));
-        bottomNavigationView.setSelectedItemId(R.id.navigation_demo);
+        toolbar.setTitle(getString(R.string.title_Develop));
+        bottomNavigationView.setSelectedItemId(R.id.navigation_develop);
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null) {
@@ -173,15 +136,11 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
             isBluetoothAdapterEnabled = false;
         }
 
-        if (!isBluetoothAdapterEnabled) {
-            showEnableBluetoothAdapterBar();
-        }
-
         // handle bluetooth adapter on/off state
         bluetoothEnableBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeEnableBluetoothAdapterToConnecing();
+                changeEnableBluetoothAdapterToConnecting();
             }
         });
 
@@ -192,6 +151,22 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
             }
         });
 
+        locationEnableBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(enableLocationIntent);
+            }
+        });
+
+        locationInfoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LocationInfoDialog dialog = new LocationInfoDialog();
+                dialog.show(getSupportFragmentManager(), "location_info_dialog");
+            }
+        });
+
         initHelpDialog();
         initHiddenDebugDialog();
         initViewPager();
@@ -199,15 +174,13 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
 
     private void initViewPager() {
         setupViewPager(viewPager);
-        viewPager.setCurrentItem(0);
+        viewPager.setCurrentItem(1);
         initViewPagerBehavior(viewPager);
     }
 
     private void askForWriteExternalStoragePermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
-        } else {
-            createFiles();
         }
     }
 
@@ -279,6 +252,12 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
             showEnableBluetoothAdapterBar();
         }
 
+        if (!isLocationEnabled()) {
+            showLocationDisabledBar();
+        } else {
+            hideLocationDisabledBar();
+        }
+
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(bluetoothAdapterStateChangeListener, filter);
     }
@@ -300,21 +279,91 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
         return super.onOptionsItemSelected(item);
     }
 
+    private boolean isLocationEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager != null) {
+            return locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        }
+        return false;
+    }
+
+    private void hideLocationDisabledBar() {
+        locationDisabledBar.setVisibility(View.GONE);
+    }
+
+    private void showLocationDisabledBar() {
+        locationDisabledBar.setVisibility(VISIBLE);
+    }
+
     private void initHelpDialog() {
         helpDialog = new Dialog(MainMenuActivity.this);
+        if (helpDialog.getWindow() != null) {
+            helpDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
         helpDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         helpDialog.setContentView(R.layout.dialog_help_demo_item);
         ((TextView) helpDialog.findViewById(R.id.dialog_help_version_text)).setText(getString(R.string.version_text,
                 BuildConfig.VERSION_NAME));
         View okButton = helpDialog.findViewById(R.id.help_ok_button);
-        TextView textView = helpDialog.findViewById(R.id.help_text_playstore);
-        textView.setMovementMethod(LinkMovementMethod.getInstance());
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 helpDialog.dismiss();
             }
         });
+
+        final TextView silabsProductsWirelessTV = helpDialog.findViewById(R.id.silabs_products_wireless);
+        final TextView silabsSupportTV = helpDialog.findViewById(R.id.silabs_support);
+        final TextView githubSiliconLabsEfrconnectTV = helpDialog.findViewById(R.id.github_siliconlabs_efrconnect);
+        final TextView docsSilabsBluetoothLatestTV = helpDialog.findViewById(R.id.docs_silabs_bluetooth_latest);
+        final TextView playStoreSiliconLabsApps = helpDialog.findViewById(R.id.help_text_playstore);
+
+        silabsProductsWirelessTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uriUrl = Uri.parse("https://" + getString(R.string.help_text_moreinfo_url));
+                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+                startActivity(launchBrowser);
+            }
+        });
+
+        silabsSupportTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uriUrl = Uri.parse("https://" + getString(R.string.help_text_support_url));
+                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+                startActivity(launchBrowser);
+            }
+        });
+
+        githubSiliconLabsEfrconnectTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uriUrl = Uri.parse("https://" + getString(R.string.help_text_sourcecode_url));
+                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+                startActivity(launchBrowser);
+            }
+        });
+
+        docsSilabsBluetoothLatestTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uriUrl = Uri.parse("https://" + getString(R.string.help_text_documentation_url));
+                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+                startActivity(launchBrowser);
+            }
+        });
+
+        playStoreSiliconLabsApps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uriUrl = Uri.parse(getString(R.string.help_text_pub_url));
+                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+                startActivity(launchBrowser);
+            }
+        });
+
+
     }
 
     private void initHiddenDebugDialog() {
@@ -338,7 +387,7 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
         Toast.makeText(MainMenuActivity.this, R.string.toast_bluetooth_not_enabled, Toast.LENGTH_SHORT).show();
     }
 
-    private void changeEnableBluetoothAdapterToConnecing() {
+    private void changeEnableBluetoothAdapterToConnecting() {
         BluetoothAdapter.getDefaultAdapter().enable();
         bluetoothEnableBtn.setVisibility(View.GONE);
         bluetoothEnableMsg.setText(R.string.bluetooth_adapter_bar_turning_on);
@@ -393,11 +442,9 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
             case WRITE_EXTERNAL_STORAGE_REQUEST_CODE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(MainMenuActivity.this, getResources().getString(R.string.Permissions_granted_succesfully), Toast.LENGTH_SHORT).show();
-                    createFiles();
                 } else {
                     Toast.makeText(MainMenuActivity.this, getResources().getString(R.string.Grant_WRITE_FILES_permission_to_access_OTA), Toast.LENGTH_LONG).show();
                 }
-
                 break;
         }
     }
