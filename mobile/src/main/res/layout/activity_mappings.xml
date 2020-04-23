@@ -12,6 +12,20 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/silabs_red">
+
+            <ImageView
+                android:id="@+id/go_back_button"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:src="@drawable/ic_chevron_left_white_48dp" />
+        </RelativeLayout>
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             style="@style/ToolbarStyle"
@@ -19,18 +33,48 @@
             android:layout_height="wrap_content"
             android:elevation="0dp"
             android:fitsSystemWindows="true"
+            app:titleMarginTop="0dp"
+            app:titleMarginBottom="0dp"
+            android:paddingBottom="8dp"
             app:title="@string/title_Mappings_dictionary"
             app:titleTextAppearance="@style/TextAppearance.ToolbarTitle" />
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/toolbar"
-            android:background="?attr/colorPrimary"
-            app:tabIndicatorColor="@android:color/white"
-            app:tabIndicatorHeight="3dp"
-            app:tabTextAppearance="@style/TextAppearance.TabText" />
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingBottom="6dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_button_red_dark"
+                android:orientation="horizontal"
+                android:padding="2dp">
+
+                <TextView
+                    android:id="@+id/characteristic_tab_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:background="@drawable/rounded_button_white"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:text="@string/title_Characteristics"
+                    android:textColor="@color/silabs_red" />
+
+                <TextView
+                    android:id="@+id/services_tab_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:background="@drawable/rounded_button_red_dark"
+                    android:fontFamily="sans-serif"
+                    android:gravity="center"
+                    android:text="@string/title_Services"
+                    android:textColor="@color/silabs_white" />
+            </LinearLayout>
+
+        </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager.widget.ViewPager

@@ -44,6 +44,9 @@
                     android:gravity="start|center_vertical"
                     android:paddingStart="0dp"
                     android:paddingEnd="4dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:maxLines="1"
                     android:text="@string/characteristic_default_name"
                     android:textColor="@color/silabs_subtle_text"
                     android:textSize="@dimen/characteristic_name_text_size" />

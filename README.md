@@ -32,6 +32,7 @@ The develop view contains functionalities focused on helping developers create a
     - Connectable only
   - Option to save filters for later use
   - Support for multiple connections
+  - Support for Bluetooth 5 advertising extensions
   - Ability to rename services/characteristics with 128-bit UUIDs (mappings dictionary)
   - Over-the-air (OTA) device firmware upgrade (DFU) with both reliable and speed modes
   - Configurable MTU and connection interval

@@ -4,10 +4,12 @@ package com.siliconlabs.bledemo.toolbars;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -31,11 +33,33 @@ public class LoggerFragment extends Fragment {
 
     private LogAdapter adapter;
     private RecyclerView logRV;
+    private Handler handler;
+    private boolean allowRefreshScrollBottom = true;
+    private boolean isFiltering = false;
+
+    public static String IS_FILTERING_EXTRA = "IS_FILTERING_EXTRA";
+    public static String FILTERING_PHRASE_EXTRA = "FILTERING_PHRASE_EXTRA";
+
+    private String filteringPhrase;
 
     public LoggerFragment() {
     }
 
     private ToolbarCallback toolbarCallback;
+
+    private static final int LOG_UPDATE_PERIOD = 2000;
+    private final Runnable logUpdater = new Runnable() {
+
+        @Override
+        public void run() {
+            adapter.notifyDataSetChanged();
+            handler.postDelayed(logUpdater, LOG_UPDATE_PERIOD);
+            if (allowRefreshScrollBottom) {
+                logRV.scrollToPosition(adapter.getItemCount() - 1);
+            }
+            android.util.Log.d("Log_Updater","RUN");
+        }
+    };
 
     public LoggerFragment setCallback(ToolbarCallback toolbarCallback) {
         this.toolbarCallback = toolbarCallback;
@@ -61,6 +85,7 @@ public class LoggerFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 toolbarCallback.close();
+                stopLogUpdater();
             }
         });
         clearBtn.setOnClickListener(new View.OnClickListener() {
@@ -82,6 +107,10 @@ public class LoggerFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), ShareLogServices.class);
+                intent.putExtra(IS_FILTERING_EXTRA,isFiltering);
+                if(isFiltering) {
+                    intent.putExtra(FILTERING_PHRASE_EXTRA, filteringPhrase);
+                }
                 getActivity().startService(intent);
             }
         });
@@ -113,8 +142,28 @@ public class LoggerFragment extends Fragment {
                         filtered.add(log);
                     }
                 }
-                adapter.setLogList(filtered);
+
+                if(s.toString().length() <= 0) {
+                    adapter.setLogList(Constants.LOGS);
+                    isFiltering = false;
+                } else {
+                    adapter.setLogList(filtered);
+                    isFiltering = true;
+                    filteringPhrase = s.toString();
+                }
                 adapter.notifyDataSetChanged();
+
+            }
+        });
+
+        logRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if(!recyclerView.canScrollVertically(1)) allowRefreshScrollBottom = true;
+                else allowRefreshScrollBottom = false;
+
             }
         });
 
@@ -124,9 +173,14 @@ public class LoggerFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (adapter.getItemCount() > 1) {
-            logRV.smoothScrollToPosition(adapter.getItemCount() - 1);
-        }
+        runLogUpdater();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopLogUpdater();
+        android.util.Log.d("OnPause", "LoggerFragment");
     }
 
     public void setAdapter(LogAdapter adapter) {
@@ -160,6 +214,29 @@ public class LoggerFragment extends Fragment {
             }
         });
 
+    }
+
+    public void scrollToEnd() {
+        if (logRV != null && adapter.getItemCount() > 1) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    logRV.scrollToPosition(adapter.getItemCount() - 1);
+                }
+            }, 200);
+        }
+    }
+
+    public void runLogUpdater() {
+        if (handler == null) handler = new Handler();
+        handler.removeCallbacks(logUpdater);
+        handler.postDelayed(logUpdater, LOG_UPDATE_PERIOD);
+        android.util.Log.d("Log_Updater","START");
+    }
+
+    public void stopLogUpdater() {
+        handler.removeCallbacks(logUpdater);
+        android.util.Log.d("Log_Updater","STOP");
     }
 
     public LogAdapter getAdapter() {

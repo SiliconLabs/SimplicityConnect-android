@@ -1,109 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/gallery"
-    android:divider="@drawable/item_divider"
-    android:orientation="vertical"
-    android:showDividers="middle">
+    android:layout_height="72dp"
+    android:background="@color/silabs_dialog_title_background"
+    android:padding="@dimen/item_margin">
 
-    <LinearLayout
+    <TextView
+        style="@style/HeadLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="@dimen/item_margin">
+        android:layout_gravity="center_vertical"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/select_device"
+        android:textColor="@color/silabs_primary_text"
+        android:textSize="18sp" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="16"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@android:id/title"
-                style="@style/HeadLine"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="RetailBeacon" />
-
-            <TextView
-                android:id="@android:id/text1"
-                style="@style/Body"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Identify Beacons, etc" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/profiles_used"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_weight="15"
-            android:gravity="end"
-            android:orientation="vertical">
-            <!--<include layout="@layout/demo_item_value"/>-->
-            <!--<include layout="@layout/demo_item_value"/>-->
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_weight="0"
-            android:gravity="end">
-
-            <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:orientation="horizontal"
-        android:paddingStart="@dimen/item_margin"
-        android:paddingEnd="@dimen/item_margin">
-
-        <TextView
-            style="@style/HeadLine"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="16"
-            android:paddingStart="0dp"
-            android:paddingEnd="24dp"
-            android:text="@string/select_device"
-            android:textSize="@dimen/text_size_subhead" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="15"
-            android:orientation="horizontal">
-
-            <include
-                android:id="@+id/blue_gecko_tab"
-                layout="@layout/include_device_list_tab" />
-
-            <View
-                android:layout_width="24dp"
-                android:layout_height="1dp" />
-
-            <include
-                android:id="@+id/other_tab"
-                layout="@layout/include_device_list_tab" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="invisible" />
 </LinearLayout>

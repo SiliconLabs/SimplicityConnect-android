@@ -6,12 +6,28 @@
     android:background="@color/silabs_background"
     tools:context=".activity.DeviceServicesActivity">
 
+    <RelativeLayout
+        android:id="@+id/go_back_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/silabs_red">
+
+        <ImageView
+            android:id="@+id/go_back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/ic_chevron_left_white_48dp"/>
+    </RelativeLayout>
+
     <include
         android:id="@+id/toolbar"
         layout="@layout/actionbar_debug_services_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
+        android:layout_below="@id/go_back_relative_layout"/>
 
     <LinearLayout
         android:id="@+id/header_services"

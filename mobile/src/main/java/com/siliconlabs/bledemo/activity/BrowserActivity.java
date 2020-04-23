@@ -142,10 +142,11 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
     private Dialog dialogLicense;
     private SharedPrefUtils sharedPrefUtils;
     private ConnectionsFragment connectionsFragment;
+    private FilterFragment filterFragment;
     private ConnectionsAdapter connectionsAdapter;
     private LoggerFragment loggerFragment;
     private boolean scanning = false;
-    private boolean userStartScanning = true;
+    private boolean allowUpdating = true;
     private volatile boolean running = false;
 
     private static final int TOOLBAR_OPEN_PERCENTAGE = 95;
@@ -165,15 +166,7 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
                         BluetoothAdapter.ERROR);
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
-                        isBluetoothAdapterEnabled = false;
-                        Toast.makeText(BrowserActivity.this,
-                                R.string.toast_bluetooth_not_enabled,
-                                Toast.LENGTH_SHORT).show();
-                        swipeRefreshLayout.setRefreshing(false);
-                        showEnableBluetoothAdapterBar();
                         finish();
-                        //flushContainer();
-                        //noDevicesFound.setVisibility(View.VISIBLE);
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
                     case BluetoothAdapter.STATE_TURNING_ON:
@@ -266,6 +259,25 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
     private ToolbarName btToolbarOpenedName = null;
     private TextView tv;
 
+    private static final int RESTART_SCAN_TIMEOUT = 1000;
+    private Handler handler;
+
+    private final Runnable restartScanTimeout = new Runnable() {
+        @Override
+        public void run() {
+
+            discovery.clearDevicesCache();
+            flushContainer();
+            sharedPrefUtils.mergeTmpDevicesToFavorites();
+            allowUpdating = true;
+
+            if(!scanning) {
+                // If wasnt scanning before - start scanning
+                startScanning();
+            }
+        }
+    };
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -280,14 +292,20 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
         setContentView(R.layout.activity_browser);
         ButterKnife.inject(this);
 
+        findViewById(R.id.go_back_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+        handler = new Handler();
+
         // init bluetoooth discovery engine, matches to accepted bluetooth gatt profiles
         Engine.getInstance().init(this.getApplicationContext());
 
         // init/config ui
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
 
         setShowSpinnerDialogVisibility(false);
 
@@ -325,6 +343,8 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        startScanning();
 
         fragmentsInit();
         handleToolbarClickEvents();
@@ -374,6 +394,8 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
         connectionsFragment.setAdapter(connectionsAdapter);
         connectionsFragment.getAdapter().setServicesConnectionsCallback(this);
 
+        filterFragment = new FilterFragment();
+
     }
 
     @Override
@@ -415,21 +437,17 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
 
         scanningGradientContainer.setVisibility(View.VISIBLE);
 
-        //flushContainer();
-        //noDevicesFound.setVisibility(View.VISIBLE);
-
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(bluetoothAdapterStateChangeListener, filter);
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter.isEnabled()) {
-            if (userStartScanning) {
-                startScanning();
-                scanningButton.setText(getResources().getText(R.string.Stop_Scanning));
-                scanningButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(BrowserActivity.this, R.color.silabs_red)));
-            }
-        } else {
-            showEnableBluetoothAdapterBar();
+
+        if(!scanning){
+            setScanningButtonStart();
+        }
+
+        if (!bluetoothAdapter.isEnabled()) {
+            finish();
         }
 
         if (bluetoothAdapter != null) {
@@ -458,6 +476,7 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
             @Override
             public void onClick(View v) {
                 if (btToolbarOpened && btToolbarOpenedName == ToolbarName.LOGS) {
+                    loggerFragment.stopLogUpdater();
                     closeToolbar();
                     btToolbarOpened = !btToolbarOpened;
                     return;
@@ -473,6 +492,8 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
                 setToolbarItemClicked(logIV, logTV);
                 btToolbarOpenedName = ToolbarName.LOGS;
                 setToolbarFragment(loggerFragment);
+                loggerFragment.runLogUpdater();
+                loggerFragment.scrollToEnd();
             }
         });
 
@@ -516,7 +537,7 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
                 setToolbarItemsNotClicked();
                 setToolbarItemClicked(filterIV, filterTV);
                 btToolbarOpenedName = ToolbarName.FILTER;
-                setToolbarFragment(new FilterFragment().setCallback(new ToolbarCallback() {
+                setToolbarFragment(filterFragment.setCallback(new ToolbarCallback() {
                     @Override
                     public void close() {
                         closeToolbar();
@@ -536,6 +557,16 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
             }
         });
 
+    }
+
+    public void setScanningButtonStart() {
+        scanningButton.setText(getResources().getString(R.string.Start_Scanning));
+        scanningButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(BrowserActivity.this, R.color.silabs_blue)));
+    }
+
+    public void setScanningButtonStop() {
+        scanningButton.setText(getResources().getString(R.string.Stop_Scanning));
+        scanningButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(BrowserActivity.this, R.color.silabs_red)));
     }
 
     private void hideKeyboard() {
@@ -622,12 +653,10 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
     @Override
     protected void onPause() {
         super.onPause();
+
         Log.d("onPause", "Called");
-        if (scanning) {
-            onScanningStopped();
-            scanningButton.setText(getResources().getString(R.string.Start_Scanning));
-            scanningButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(BrowserActivity.this, R.color.silabs_blue)));
-        }
+        onScanningStopped();
+
         unregisterReceiver(bluetoothAdapterStateChangeListener);
 
     }
@@ -711,14 +740,11 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
     @OnClick(R.id.button_scanning)
     public void onScanningButtonClicked() {
 
-        if (scanning) {
-            userStartScanning = false;
-            scanningButton.setText(getResources().getString(R.string.Start_Scanning));
-            scanningButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(BrowserActivity.this, R.color.silabs_blue)));
+        if (scanning || scanningButton.getText().equals(getString(R.string.Stop_Scanning))) {
+            handler.removeCallbacks(restartScanTimeout);
+            devicesRecyclerView.setVisibility(View.VISIBLE);
             onScanningStopped();
         } else {
-            scanningButton.setText(getResources().getString(R.string.Stop_Scanning));
-            scanningButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(BrowserActivity.this, R.color.silabs_red)));
             startScanning();
         }
 
@@ -910,14 +936,15 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
     @Override
     public void onRefresh() {
         // callback for swiperefreshlayout
+        handler.removeCallbacks(restartScanTimeout);
 
-        onScanningStopped();
-        flushContainer();
-        userStartScanning = true;
-        startScanning();
+        allowUpdating = false;
+        devicesRecyclerView.setVisibility(View.GONE);
+        noDevicesFound.setVisibility(View.GONE);
+        lookingForDevicesBackgroundMessage.setVisibility(View.VISIBLE);
+        setScanningButtonStop();
 
-        scanningButton.setText(getResources().getText(R.string.Stop_Scanning));
-        scanningButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(BrowserActivity.this, R.color.silabs_red)));
+        handler.postDelayed(restartScanTimeout,RESTART_SCAN_TIMEOUT);
 
         swipeRefreshLayout.post(new Runnable() {
             @Override
@@ -929,6 +956,7 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
 
 
     private void initDevicesRecyclerView() {
+        sharedPrefUtils.mergeTmpDevicesToFavorites();
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         devicesRecyclerView.setLayoutManager(layoutManager);
         devicesAdapter = new DebugModeDeviceAdapter(this,
@@ -1166,9 +1194,7 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
 
     // Displays scanning status in UI and starts scanning for new BLE devices
     private void startScanning() {
-        if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
-            bluetoothEnable();
-        }
+        setScanningButtonStop();
         scanning = true;
         setScanningProgress(true);
         setScanningStatus(true);
@@ -1178,7 +1204,7 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
     }
 
     private void onScanningStopped() {
-        Log.d("onScanningStopped", "Called");
+        setScanningButtonStart();
         scanning = false;
         discovery.stopDiscovery(false);
         setScanningStatus(devicesAdapter.getItemCount() > 0);
@@ -1196,10 +1222,6 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
         if (!foundDevices) {
             noDevicesFound.setVisibility(View.VISIBLE);
             lookingForDevicesBackgroundMessage.setVisibility(View.GONE);
-
-            if (BluetoothAdapter.getDefaultAdapter().isEnabled()) {
-                startScanning();
-            }
         }
     }
 
@@ -1387,6 +1409,12 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
     @Override
     public void removeFromFavorite(String deviceAddress) {
         sharedPrefUtils.removeDeviceFromFavorites(deviceAddress);
+        sharedPrefUtils.removeDeviceFromTemporaryFavorites(deviceAddress);
+    }
+
+    @Override
+    public void addToTemporaryFavorites(String deviceAddress) {
+        sharedPrefUtils.addDeviceToTemporaryFavorites(deviceAddress);
     }
 
     @Override
@@ -1463,20 +1491,26 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
 
     @Override
     public void updateWithDevices(List devices) {
-        devicesAdapter.updateWith(devices);
+        if(allowUpdating) devicesAdapter.updateWith(devices);
+        else return;
+
         if (devicesAdapter.getItemCount() > 0) {
             lookingForDevicesBackgroundMessage.setVisibility(View.GONE);
             noDevicesFound.setVisibility(View.GONE);
+            devicesRecyclerView.setVisibility(View.VISIBLE);
         } else {
             lookingForDevicesBackgroundMessage.setVisibility(View.VISIBLE);
         }
     }
 
     public void updateWithDevices(List devices, String string) {
-        devicesAdapter.updateWith(devices, string);
+        if(allowUpdating) devicesAdapter.updateWith(devices, string);
+        else return;
+
         if (devicesAdapter.getItemCount() > 0) {
             lookingForDevicesBackgroundMessage.setVisibility(View.GONE);
             noDevicesFound.setVisibility(View.GONE);
+            devicesRecyclerView.setVisibility(View.VISIBLE);
         } else {
             lookingForDevicesBackgroundMessage.setVisibility(View.VISIBLE);
         }

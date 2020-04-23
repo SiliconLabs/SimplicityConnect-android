@@ -20,6 +20,7 @@ public class SharedPrefUtils {
     private static final String MAP_KEY = "MAP_KEY";
     private static final String LAST_FILTER_KEY = "LAST_FILTER_KEY";
     private static final String FAVORITES_DEVICES_KEY = "FAVORITES_DEVICES_KEY";
+    private static final String TEMPORARY_FAVORITES_DEVICES_KEY = "TEMPORARY_FAVORITES_DEVICES_KEY";
 //    private static final String LOGS_KEY = "LOGS_KEY";
 
     private static final String CHARACTERISTIC_NAMES_KEY = "CHARACTERISTIC_NAMES_KEY";
@@ -38,16 +39,6 @@ public class SharedPrefUtils {
             Type type = new TypeToken<HashMap<String, FilterDeviceParams>>() {
             }.getType();
             return gson.fromJson(getString(MAP_KEY), type);
-        }
-    }
-
-    public LinkedHashSet<String> getFavoritesDevices() {
-        if (getString(FAVORITES_DEVICES_KEY) == null) {
-            return new LinkedHashSet<>();
-        } else {
-            Type type = new TypeToken<LinkedHashSet<String>>() {
-            }.getType();
-            return gson.fromJson(getString(FAVORITES_DEVICES_KEY), type);
         }
     }
 
@@ -74,11 +65,48 @@ public class SharedPrefUtils {
 //        editor.commit();
 //    }
 
+    public LinkedHashSet<String> getFavoritesDevices() {
+        if (getString(FAVORITES_DEVICES_KEY) == null) {
+            return new LinkedHashSet<>();
+        } else {
+            Type type = new TypeToken<LinkedHashSet<String>>() {
+            }.getType();
+            return gson.fromJson(getString(FAVORITES_DEVICES_KEY), type);
+        }
+    }
+
+    public LinkedHashSet<String> getTemporaryFavoritesDevices() {
+        if (getString(TEMPORARY_FAVORITES_DEVICES_KEY) == null) {
+            return new LinkedHashSet<>();
+        } else {
+            Type type = new TypeToken<LinkedHashSet<String>>() {
+            }.getType();
+            return gson.fromJson(getString(TEMPORARY_FAVORITES_DEVICES_KEY), type);
+        }
+    }
+
+    public void mergeTmpDevicesToFavorites() {
+        LinkedHashSet<String> favoritesDevices = getFavoritesDevices();
+        LinkedHashSet<String> temporaryFavoritesDevices = getTemporaryFavoritesDevices();
+        favoritesDevices.addAll(temporaryFavoritesDevices);
+        String json = gson.toJson(favoritesDevices);
+        editor.putString(FAVORITES_DEVICES_KEY, json);
+        editor.commit();
+    }
+
     public void addDeviceToFavorites(String device) {
         LinkedHashSet<String> favoritesDevices = getFavoritesDevices();
         favoritesDevices.add(device);
         String json = gson.toJson(favoritesDevices);
         editor.putString(FAVORITES_DEVICES_KEY, json);
+        editor.commit();
+    }
+
+    public void addDeviceToTemporaryFavorites(String device) {
+        LinkedHashSet<String> temporaryFavoritesDevices = getTemporaryFavoritesDevices();
+        temporaryFavoritesDevices.add(device);
+        String json = gson.toJson(temporaryFavoritesDevices);
+        editor.putString(TEMPORARY_FAVORITES_DEVICES_KEY, json);
         editor.commit();
     }
 
@@ -90,9 +118,22 @@ public class SharedPrefUtils {
         editor.commit();
     }
 
+    public void removeDeviceFromTemporaryFavorites(String device) {
+        LinkedHashSet<String> temporaryFavoritesDevices = getTemporaryFavoritesDevices();
+        temporaryFavoritesDevices.remove(device);
+        String json = gson.toJson(temporaryFavoritesDevices);
+        editor.putString(TEMPORARY_FAVORITES_DEVICES_KEY, json);
+        editor.commit();
+    }
+
     public boolean isFavorite(String device) {
         if (getString(FAVORITES_DEVICES_KEY) == null) return false;
         return getFavoritesDevices().contains(device);
+    }
+
+    public boolean isTemporaryFavorite(String device) {
+        if (getString(TEMPORARY_FAVORITES_DEVICES_KEY) == null) return false;
+        return getTemporaryFavoritesDevices().contains(device);
     }
 
     private String getString(String key) {

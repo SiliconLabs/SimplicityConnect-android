@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/listChoiceBackgroundIndicator"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
     android:orientation="horizontal">
 
     <ImageView
@@ -28,6 +30,7 @@
         android:drawablePadding="@dimen/device_selection_item_padding"
         android:ellipsize="end"
         android:fontFamily="sans-serif"
+        android:textColor="@color/silabs_primary_text"
         android:gravity="center_vertical"
         android:lines="2"
         android:paddingTop="@dimen/device_selection_item_padding"

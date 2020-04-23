@@ -120,6 +120,10 @@ public class Discovery implements BlueToothService.Listener {
         }
     }
 
+    public void clearDevicesCache() {
+        blueToothService.clearCache();
+    }
+
     public void stopDiscovery(boolean clearCachedDiscoveries) {
         if (blueToothService != null) {
             isScanning = false;

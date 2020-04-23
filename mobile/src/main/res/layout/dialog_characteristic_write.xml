@@ -71,6 +71,16 @@
                     android:layout_height="1dp"
                     android:background="@color/silabs_transparent" />
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/image_view_close"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_gravity="top"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:padding="10dp"
+                android:src="@drawable/ic_icon_small_x" />
         </LinearLayout>
 
         <View
@@ -102,7 +112,10 @@
                 android:id="@+id/cancel_btn"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/rounded_button_transparent"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="@string/Clear"
@@ -113,7 +126,10 @@
             <Button
                 android:id="@+id/save_btn"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/rounded_button_blue"
                 android:backgroundTint="@color/silabs_blue"
                 android:clickable="false"
                 android:enabled="false"

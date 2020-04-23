@@ -58,12 +58,8 @@ import timber.log.Timber;
  */
 public class BlueToothService extends LocalService<BlueToothService> {
 
-    // Discovery (of all devices) is cancelled after DISCOVERY_MAX_TIMEOUT milliseconds.
-    private static final int DISCOVERY_MAX_TIMEOUT = 10000;
     // If connection is not successfully established or error message received after CONNECTION_TIMEOUT milliseconds.
     private static final int CONNECTION_TIMEOUT = 15000;
-    // If no additional device is discovered, cancel discovery after DISCOVERY_NO_NEW_DISCOVERIES_TIMEOUT milliseconds.
-    private static final int DISCOVERY_NO_NEW_DISCOVERIES_TIMEOUT = 2000;
     // If a scan of one device's services takes more than SCAN_DEVICE_TIMEOUT milliseconds, cancel it.
     private static final int SCAN_DEVICE_TIMEOUT = 4000;
 
@@ -215,21 +211,8 @@ public class BlueToothService extends LocalService<BlueToothService> {
     private Object bleScannerCallback;
 
     private boolean discoveryStarted;
-    private final Runnable discoveryTimeout = new Runnable() {
-        @Override
-        public void run() {
-            stopDiscovery();
-            if (!scanDiscoveredDevices()) {
-                onScanningCanceled();
-            }
-        }
-    };
-    private final Runnable newDiscoveryTimeout = new Runnable() {
-        @Override
-        public void run() {
-            discoveryTimeout.run();
-        }
-    };
+
+
     private final Runnable scanTimeout = new Runnable() {
         @Override
         public void run() {
@@ -313,8 +296,6 @@ public class BlueToothService extends LocalService<BlueToothService> {
 
         handler.removeCallbacks(scanTimeout);
         stopScanning();
-        handler.removeCallbacks(newDiscoveryTimeout);
-        handler.removeCallbacks(discoveryTimeout);
         stopDiscovery();
         clearGatt();
 
@@ -473,9 +454,11 @@ public class BlueToothService extends LocalService<BlueToothService> {
                     interestingDevices.clear();
                 }
             }
-            handler.removeCallbacks(newDiscoveryTimeout);
-            handler.removeCallbacks(discoveryTimeout);
-            discoveryTimeout.run();
+
+            stopDiscovery();
+            if (!scanDiscoveredDevices()) {
+                onScanningCanceled();
+            }
         }
     }
 
@@ -497,17 +480,24 @@ public class BlueToothService extends LocalService<BlueToothService> {
         }
 
         handler.removeCallbacks(scanTimeout);
-        handler.removeCallbacks(newDiscoveryTimeout);
-        handler.removeCallbacks(discoveryTimeout);
-        handler.postDelayed(discoveryTimeout, DISCOVERY_MAX_TIMEOUT);
 
         if (useBLE) {
             ScanCallback scannerCallback = new BLEScanCallbackLollipop(this);
             bleScannerCallback = scannerCallback;
-            ScanSettings settings = new ScanSettings.Builder()
-                    .setReportDelay(0)
-                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
-            bluetoothAdapter.getBluetoothLeScanner().startScan((List<ScanFilter>) listeners.getScanFilterL(), settings, scannerCallback);
+
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                ScanSettings settings = new ScanSettings.Builder()
+                        .setLegacy(false)
+                        .setReportDelay(0)
+                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
+                bluetoothAdapter.getBluetoothLeScanner().startScan((List<ScanFilter>) listeners.getScanFilterL(), settings, scannerCallback);
+            } else{
+                ScanSettings settings = new ScanSettings.Builder()
+                        .setReportDelay(0)
+                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
+                bluetoothAdapter.getBluetoothLeScanner().startScan((List<ScanFilter>) listeners.getScanFilterL(), settings, scannerCallback);
+            }
+
         } else {
             if (!bluetoothAdapter.startDiscovery()) {
                 onDiscoveryCanceled();
@@ -516,8 +506,6 @@ public class BlueToothService extends LocalService<BlueToothService> {
     }
 
     void onDiscoveryCanceled() {
-        handler.removeCallbacks(newDiscoveryTimeout);
-        handler.removeCallbacks(discoveryTimeout);
         if (discoveryStarted) {
             discoveryStarted = false;
             listeners.onScanEnded();
@@ -771,10 +759,6 @@ public class BlueToothService extends LocalService<BlueToothService> {
                 @Override
                 public void run() {
                     listeners.onScanResultUpdated(listenerResult, listenerChanged);
-                    if (postNewDiscoveryTimeout) {
-                        handler.removeCallbacks(newDiscoveryTimeout);
-                        handler.postDelayed(newDiscoveryTimeout, DISCOVERY_NO_NEW_DISCOVERIES_TIMEOUT);
-                    }
                 }
             });
         }
@@ -818,8 +802,6 @@ public class BlueToothService extends LocalService<BlueToothService> {
     boolean scanDiscoveredDevices() {
         Timber.d("scanDiscoveredDevices called.");
         Log.d("scanDiscoveredDevices", "called");
-        handler.removeCallbacks(newDiscoveryTimeout);
-        handler.removeCallbacks(discoveryTimeout);
         handler.removeCallbacks(scanTimeout);
         handler.postDelayed(scanTimeout, SCAN_DEVICE_TIMEOUT);
 

@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.siliconlabs.bledemo.R;
@@ -119,7 +120,13 @@ public class HealthThermometerActivity extends BaseActivity {
         setContentView(R.layout.activity_health_thermometer);
         ButterKnife.inject(this);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        findViewById(R.id.go_back_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
         healthThermometerActivityFragment = (HealthThermometerActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
         bluetoothBinding = new BlueToothService.Binding(this) {
