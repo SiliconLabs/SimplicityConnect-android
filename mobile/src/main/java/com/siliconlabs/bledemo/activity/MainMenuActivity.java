@@ -315,6 +315,7 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
         final TextView silabsProductsWirelessTV = helpDialog.findViewById(R.id.silabs_products_wireless);
         final TextView silabsSupportTV = helpDialog.findViewById(R.id.silabs_support);
         final TextView githubSiliconLabsEfrconnectTV = helpDialog.findViewById(R.id.github_siliconlabs_efrconnect);
+        final TextView usersGuideTV = helpDialog.findViewById(R.id.users_guide_efrconnect);
         final TextView docsSilabsBluetoothLatestTV = helpDialog.findViewById(R.id.docs_silabs_bluetooth_latest);
         final TextView playStoreSiliconLabsApps = helpDialog.findViewById(R.id.help_text_playstore);
 
@@ -349,6 +350,15 @@ public class MainMenuActivity extends BaseActivity implements MenuAdapter.OnMenu
             @Override
             public void onClick(View v) {
                 Uri uriUrl = Uri.parse("https://" + getString(R.string.help_text_documentation_url));
+                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+                startActivity(launchBrowser);
+            }
+        });
+
+        usersGuideTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uriUrl = Uri.parse("https://" + getString(R.string.help_text_users_guide_url));
                 Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
                 startActivity(launchBrowser);
             }

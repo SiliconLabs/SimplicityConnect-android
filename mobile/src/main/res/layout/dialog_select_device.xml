@@ -63,8 +63,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="@color/silabs_blue"
-            android:fontFamily="sans-serif"
+            android:background="@drawable/blue_button_selector"
+            android:fontFamily="sans-serif-medium"
             android:text="@string/CANCEL"
             android:textColor="@color/silabs_white"
             android:textSize="14sp" />

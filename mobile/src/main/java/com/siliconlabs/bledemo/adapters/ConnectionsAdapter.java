@@ -56,7 +56,7 @@ public class ConnectionsAdapter extends RecyclerView.Adapter<ConnectionsAdapter.
         String name = connectionsList.get(position).getName();
         String address = connectionsList.get(position).getAddress();
         if (name == null || name.equals("")) {
-            name = Constants.UNKNOWN;
+            name = Constants.NA;
         }
         if (getSelectedDevice() != null) {
             if (address.toLowerCase().equals(getSelectedDevice().toLowerCase())) {

@@ -14,6 +14,7 @@ import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
 import com.siliconlabs.bledemo.ble.Discovery;
 import com.siliconlabs.bledemo.utils.FilterDeviceParams;
 import com.siliconlabs.bledemo.utils.SharedPrefUtils;
+import com.siliconlabs.bledemo.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -457,6 +458,7 @@ public class ScannedDevicesAdapter<T extends BluetoothDeviceInfo> extends Recycl
 
     private boolean isNameOrAddressContain(FilterDeviceParams filterDeviceParams, T device) {
         return device.getAddress().toLowerCase().contains(filterDeviceParams.getName().toLowerCase())
+                || StringUtils.getStringWithoutColons(device.getAddress().toLowerCase()).contains(filterDeviceParams.getName().toLowerCase())
                 || (device.getName() != null && device.getName().toLowerCase().contains(filterDeviceParams.getName().toLowerCase()));
     }
 

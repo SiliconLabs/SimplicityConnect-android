@@ -241,6 +241,32 @@
     <!-- Dialog Location service -->
     <dimen name="dialog_location_service_title_text_size">18sp</dimen>
     <dimen name="dialog_location_service_info_text_size">14sp</dimen>
+    <dimen name="dialog_location_service_button_text_size">14sp</dimen>
+
+    <!-- Dialog Leave Browser -->
+    <dimen name="dialog_leave_browser_title_text_size">18sp</dimen>
+    <dimen name="dialog_leave_browser_info_text_size">14sp</dimen>
+    <dimen name="dialog_leave_browser_button_text_size">14sp</dimen>
+
+    <!-- Dialog About Mappings Dictionary -->
+    <dimen name="dialog_about_mappings_title_text_size">18sp</dimen>
+    <dimen name="dialog_about_mappings_info_text_size">14sp</dimen>
+    <dimen name="dialog_about_mappings_text_size">14sp</dimen>
+    <dimen name="dialog_about_mappings_info_section_and_body_separation">10dp</dimen>
+    <dimen name="dialog_about_mappings_header_height">50dp</dimen>
+    <dimen name="dialog_about_mappings_ok_height">50dp</dimen>
+    <dimen name="dialog_about_mappings_text_padding">22dp</dimen>
+    <dimen name="dialog_about_mappings_ok_btn_text_size">14sp</dimen>
+
+    <!-- Dialog Error -->
+    <dimen name="dialog_error_title_text_size">18sp</dimen>
+    <dimen name="dialog_error_info_text_size">14sp</dimen>
+    <dimen name="dialog_error_text_size">14sp</dimen>
+    <dimen name="dialog_error_info_section_and_body_separation">10dp</dimen>
+    <dimen name="dialog_error_header_height">50dp</dimen>
+    <dimen name="dialog_error_ok_height">50dp</dimen>
+    <dimen name="dialog_error_text_padding">22dp</dimen>
+    <dimen name="dialog_error_ok_btn_text_size">14sp</dimen>
 
     <!-- Filter Fragment -->
     <dimen name="filter_edit_search_text_size">14sp</dimen>
@@ -272,5 +298,8 @@
     <dimen name="characteristic_uuid_text_size">12sp</dimen>
     <dimen name="characteristic_name_text_size">14sp</dimen>
     <dimen name="descriptor_text_size">12sp</dimen>
+
+    <!-- Toolbar common dimensions -->
+    <dimen name="toolbar_min_height">60dp</dimen>
 
 </resources>

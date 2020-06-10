@@ -485,13 +485,13 @@ public class BlueToothService extends LocalService<BlueToothService> {
             ScanCallback scannerCallback = new BLEScanCallbackLollipop(this);
             bleScannerCallback = scannerCallback;
 
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 ScanSettings settings = new ScanSettings.Builder()
                         .setLegacy(false)
                         .setReportDelay(0)
                         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
                 bluetoothAdapter.getBluetoothLeScanner().startScan((List<ScanFilter>) listeners.getScanFilterL(), settings, scannerCallback);
-            } else{
+            } else {
                 ScanSettings settings = new ScanSettings.Builder()
                         .setReportDelay(0)
                         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
@@ -1001,7 +1001,9 @@ public class BlueToothService extends LocalService<BlueToothService> {
         if (bluetoothGatt != null) {
             Log.d("clearGatt", "called");
             bluetoothGatt.disconnect();
-            bluetoothGatt.close();
+            if (bluetoothGatt != null) {
+                bluetoothGatt.close();
+            }
             bluetoothGatt = null;
         }
     }
@@ -1060,7 +1062,7 @@ public class BlueToothService extends LocalService<BlueToothService> {
     public boolean isGattConnected(String deviceAddress) {
         List<BluetoothDevice> list = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
         for (BluetoothDevice bd : list) {
-            if (bd.getAddress().contains(deviceAddress)) {
+            if (deviceAddress != null && bd.getAddress().contains(deviceAddress)) {
                 return true;
             }
         }
@@ -1114,10 +1116,10 @@ public class BlueToothService extends LocalService<BlueToothService> {
                 super.onConnectionStateChange(gatt, status, newState);
                 gattMap.put(device.getAddress(), gatt);
                 handler.removeCallbacks(connectionTimeout);
-                if (callback != null && newState != BluetoothProfile.STATE_CONNECTED) {
+                if (callback != null && newState == BluetoothGatt.STATE_DISCONNECTED) {
                     callback.onConnectionStateChange(gatt, status, newState);
                 }
-                if (extraCallback != null) {
+                if (extraCallback != null && (!(extraCallback.toString().contains("Browser") && newState == BluetoothGatt.STATE_DISCONNECTED))) {
                     extraCallback.onConnectionStateChange(gatt, status, newState);
                 }
 

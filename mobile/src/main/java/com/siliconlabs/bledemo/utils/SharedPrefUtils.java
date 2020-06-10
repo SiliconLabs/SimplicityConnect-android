@@ -21,6 +21,7 @@ public class SharedPrefUtils {
     private static final String LAST_FILTER_KEY = "LAST_FILTER_KEY";
     private static final String FAVORITES_DEVICES_KEY = "FAVORITES_DEVICES_KEY";
     private static final String TEMPORARY_FAVORITES_DEVICES_KEY = "TEMPORARY_FAVORITES_DEVICES_KEY";
+    private static final String DISPLAY_BROWSER_LEAVE_DIALOG_KEY = "DISPLAY_BROWSER_LEAVE_DIALOG_KEY";
 //    private static final String LOGS_KEY = "LOGS_KEY";
 
     private static final String CHARACTERISTIC_NAMES_KEY = "CHARACTERISTIC_NAMES_KEY";
@@ -202,6 +203,16 @@ public class SharedPrefUtils {
     public void saveServiceNamesMap(HashMap<String, Mapping> map) {
         String json = gson.toJson(map);
         editor.putString(SERVICE_NAMES_KEY, json);
+        editor.apply();
+    }
+
+    public boolean shouldDisplayLeaveBrowserDialog() {
+        boolean displayDialog = mPrefs.getBoolean(DISPLAY_BROWSER_LEAVE_DIALOG_KEY,true);
+        return displayDialog;
+    }
+
+    public void setShouldDisplayLeaveBrowserDialog(boolean displayDialog) {
+        editor.putBoolean(DISPLAY_BROWSER_LEAVE_DIALOG_KEY,displayDialog);
         editor.apply();
     }
 

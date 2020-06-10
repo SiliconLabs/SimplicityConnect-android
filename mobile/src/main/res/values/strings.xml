@@ -59,6 +59,11 @@
     <string name="Refresh_Services">Refresh Services</string>
     <string name="not_advertising_shortcut">N/A</string>
     <string name="You_cannot_send_empty_value_to_charac">You cannot send an empty value to characteristic!</string>
+    <string name="Write_with_response">Write with response (write request)</string>
+    <string name="Write_without_response">Write without response (write command)</string>
+    <string name="leave_browser_info">Leaving the browser will disconnect all devices!</string>
+    <string name="Do_not_give_this_warning_again">Do not give this warning again</string>
+    <string name="Leave_Browser">Leave Browser?</string>
 
     <!-- Health Thermometer -->
     <string name="description_Thermometer">View readings from the Health Thermometer service.</string>
@@ -98,10 +103,12 @@
     <string name="title_Mappings_dictionary">Mappings Dictionary</string>
     <string name="title_Characteristics">Characteristics</string>
     <string name="title_Services">Services</string>
+    <string name="title_Mappings_about">About Mappings Dictionary</string>
 
     <!-- OTA -->
     <string name="Preparing_for_OTA">Preparing for OTA</string>
-    <string name="OTA_Setup">OTA Setup</string>
+    <string name="OTA_DFU">OTA DFU</string>
+    <string name="OTA_Device_Firmware_Update">OTA Device Firmware Update</string>
     <string name="PARTIAL_OTA">PARTIAL OTA</string>
     <string name="FULL_OTA">FULL OTA</string>
     <string name="OTA_Progress">OTA Progress</string>
@@ -131,6 +138,11 @@
     <string name="Incorrect_file">Incorrect file!</string>
     <string name="Select_Apploader_gbl_file">Select Apploader .gbl file</string>
     <string name="Select_Application_gbl_file">Select Application .gbl file</string>
+
+    <!-- Error dialog -->
+    <string name="An_error_occured">An error occured</string>
+    <string name="Error">Error</string>
+    <string name="Error_colon">Error:</string>
 
     <!-- Button title -->
     <string name="Reset">Reset</string>
@@ -162,6 +174,8 @@
     <string name="help_text_moreinfo_url">silabs.com/products/wireless</string>
     <string name="help_text_sourcecode_label">Source code:</string>
     <string name="help_text_sourcecode_url">github.com/SiliconLabs/EFRConnect-android</string>
+    <string name="help_text_users_guide_url">docs.silabs.com/bluetooth/latest/miscellaneous/mobile/efr-connect-mobile-app</string>
+    <string name="help_text_users_guide_label">EFR Connect User\'s Guide:</string>
     <string name="help_text_support_label">Support:</string>
     <string name="help_text_support_url">silabs.com/support</string>
     <string name="help_text_documentation_label">Additional documentation:</string>
@@ -273,6 +287,8 @@
     <string name="permissions_not_granted">Required permissions were not granted. Please accept permissions or set them using application settings within the system settings.</string>
     <string name="Permissions_granted_succesfully">Permissions granted successfully!</string>
     <string name="Grant_WRITE_FILES_permission_to_access_OTA">Grant WRITE_FILES permission to have access to OTA!</string>
+    <string name="Copied_to_clipboard">Copied to clipboard!</string>
+    <string name="Incorrect_data_format">Incorrect data format!</string>
 
     <!-- Bluetooth Permission Config Dialog -->
     <string name="toast_debug_mode_device_disconnected">DEVICE DISCONNECTED</string>
@@ -315,6 +331,12 @@
     <string name="Phy_LE_2M">LE 2M</string>
     <string name="Phy_LE_Coded">LE Coded</string>
     <string name="Phy_Unused">Unused</string>
+
+    <!-- About Mappings Dictionary - Dialog -->
+    <string name="about_mappings_dictionary_info">The mappings dictionary contains the 128-bit UUIDs for services and characteristics that have been renamed by the user. The main purpose is simple consultation but it is also possible to change or delete them from this view. When deleted, the 128-bit UUIDs will again be shown as \"Unknown Service\" or \"Unknown Characteristic\" in the GATT.</string>
+    <string name="ABOUT_MAPPINGS_DICTIONARY">ABOUT MAPPINGS DICTIONARY</string>
+    <string name="About">About</string>
+
 
     <!-- ========================================= Delete in the FUTURE=============================================================-->
 

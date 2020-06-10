@@ -20,7 +20,7 @@
             android:paddingStart="@dimen/advertisement_details_title_padding_left"
             android:paddingTop="@dimen/advertisement_details_title_padding_top"
             android:paddingEnd="0dp"
-            android:text="@string/OTA_Setup"
+            android:text="@string/OTA_Device_Firmware_Update"
             android:textColor="@android:color/background_light"
             android:textSize="@dimen/advertisement_details_title_text_size" />
 

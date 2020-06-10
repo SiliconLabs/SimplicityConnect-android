@@ -187,4 +187,8 @@
     <dimen name="characteristic_list_item_value_text_size">16sp</dimen>
     <dimen name="characteristic_list_item_value_label_text_size">14sp</dimen>
     <dimen name="characteristic_property_text_size">12sp</dimen>
+
+    <!-- Toolbar common dimensions -->
+    <dimen name="toolbar_min_height">80dp</dimen>
+
 </resources>

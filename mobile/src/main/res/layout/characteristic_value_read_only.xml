@@ -11,7 +11,7 @@
 
         <TextView
             android:id="@+id/hex_text_readonly"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/encoded_label_width"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:fontFamily="sans-serif-medium"
@@ -20,20 +20,25 @@
             android:textSize="@dimen/encoded_label_text_size" />
 
         <EditText
-            android:id="@+id/hex_edit_readonly"
-            android:layout_width="match_parent"
+            android:id="@+id/hex_readonly"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:singleLine="true"
             android:textSize="@dimen/encoded_value_text_size" />
 
-        <EditText
-            android:id="@+id/hex_readonly"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/hex_copy"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:singleLine="true"
-            android:textSize="@dimen/encoded_value_text_size" />
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:padding="8dp"
+            android:src="@drawable/ic_icon_copy"
+            android:tint="@color/silabs_blue" />
+
     </LinearLayout>
 
 
@@ -44,7 +49,7 @@
 
         <TextView
             android:id="@+id/ascii_text_readonly"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/encoded_label_width"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:fontFamily="sans-serif-medium"
@@ -53,20 +58,24 @@
             android:textSize="@dimen/encoded_label_text_size" />
 
         <EditText
-            android:id="@+id/ascii_edit_readonly"
-            android:layout_width="match_parent"
+            android:id="@+id/ascii_readonly"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:singleLine="true"
             android:textSize="@dimen/encoded_value_text_size" />
 
-        <EditText
-            android:id="@+id/ascii_readonly"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/ascii_copy"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:singleLine="true"
-            android:textSize="@dimen/encoded_value_text_size" />
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:padding="8dp"
+            android:src="@drawable/ic_icon_copy"
+            android:tint="@color/silabs_blue" />
     </LinearLayout>
 
 
@@ -77,7 +86,7 @@
 
         <TextView
             android:id="@+id/decimal_text_readonly"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/encoded_label_width"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:fontFamily="sans-serif-medium"
@@ -86,20 +95,24 @@
             android:textSize="@dimen/encoded_label_text_size" />
 
         <EditText
-            android:id="@+id/decimalEdit_readonly"
-            android:layout_width="match_parent"
+            android:id="@+id/decimal_readonly"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:singleLine="true"
             android:textSize="@dimen/encoded_value_text_size" />
 
-        <EditText
-            android:id="@+id/decimal_readonly"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/decimal_copy"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:singleLine="true"
-            android:textSize="@dimen/encoded_value_text_size" />
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:padding="8dp"
+            android:src="@drawable/ic_icon_copy"
+            android:tint="@color/silabs_blue" />
     </LinearLayout>
 
 </LinearLayout>

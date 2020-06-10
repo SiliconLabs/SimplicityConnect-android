@@ -10,7 +10,7 @@ import com.siliconlabs.bledemo.utils.Objects;
 
 import java.util.ArrayList;
 
-import static com.siliconlabs.bledemo.utils.Constants.UNKNOWN;
+import static com.siliconlabs.bledemo.utils.Constants.NA;
 
 /**
  * Represents a compatible version of {@link ScanResult} from Lollipop or higher.
@@ -97,7 +97,7 @@ public class ScanResultCompat {
 
     public String getDisplayName(boolean forSorting) {
         final String name = device.getName(); //it was - final String name = getScanRecord().getDeviceName();
-        return !TextUtils.isEmpty(name) ? " " + name : UNKNOWN; //TODO It was getDevice().getAddress()
+        return !TextUtils.isEmpty(name) ? " " + name : NA; //TODO It was getDevice().getAddress()
     }
 
     public boolean isLegacy() {

@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
     app:cardCornerRadius="16dp">
 
     <LinearLayout
@@ -103,6 +104,41 @@
         </ScrollView>
 
         <LinearLayout
+            android:id="@+id/write_method_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/silabs_white"
+                android:orientation="vertical">
+
+                <RadioButton
+                    android:id="@+id/write_with_resp_radio_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/Write_with_response"/>
+
+
+                <RadioButton
+                    android:id="@+id/write_without_resp_radio_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/Write_without_response"/>
+
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/about_blue_giga_dialog_close_btn_height"
             android:background="#FFFFFF"
@@ -110,7 +146,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/cancel_btn"
+                android:id="@+id/clear_btn"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"

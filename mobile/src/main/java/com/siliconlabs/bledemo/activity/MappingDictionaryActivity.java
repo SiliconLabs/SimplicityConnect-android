@@ -2,6 +2,8 @@ package com.siliconlabs.bledemo.activity;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -12,6 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.adapters.ViewPagerAdapter;
+import com.siliconlabs.bledemo.dialogs.AboutMappingsDictionaryDialog;
 import com.siliconlabs.bledemo.fragment.CharacteristicMappingsFragment;
 import com.siliconlabs.bledemo.fragment.ServiceMappingsFragment;
 
@@ -62,6 +65,26 @@ public class MappingDictionaryActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_mappings_dictionary, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mappings_about:
+                AboutMappingsDictionaryDialog dialog = new AboutMappingsDictionaryDialog();
+                dialog.show(getSupportFragmentManager(), "about_mappings_dictionary_dialog");
+                break;
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

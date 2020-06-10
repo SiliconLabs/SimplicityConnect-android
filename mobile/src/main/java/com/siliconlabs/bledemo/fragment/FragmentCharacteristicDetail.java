@@ -2,11 +2,12 @@ package com.siliconlabs.bledemo.fragment;
 
 import android.app.Dialog;
 import android.app.Fragment;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -15,6 +16,7 @@ import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
+import android.os.Handler;
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
@@ -29,21 +31,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.activity.DeviceServicesActivity;
-import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
 import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Bit;
 import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Characteristic;
 import com.siliconlabs.bledemo.bluetoothdatamodel.datatypes.Descriptor;
@@ -57,6 +58,7 @@ import com.siliconlabs.bledemo.bluetoothdatamodel.parsing.Converters;
 import com.siliconlabs.bledemo.bluetoothdatamodel.parsing.Engine;
 import com.siliconlabs.bledemo.bluetoothdatamodel.parsing.Unit;
 import com.siliconlabs.bledemo.services.BluetoothLeService;
+import com.siliconlabs.bledemo.utils.StringUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -74,29 +76,15 @@ import static java.lang.StrictMath.abs;
 
 public class FragmentCharacteristicDetail extends Fragment {
     //padding
-    public static final int FIELD_CONTAINER_PADDING_LEFT = 10;
     public static final int FIELD_CONTAINER_PADDING_TOP = 15;
-    public static final int FIELD_CONTAINER_PADDING_RIGHT = 10;
     public static final int FIELD_CONTAINER_PADDING_BOTTOM = 15;
     public static final int FIELD_VALUE_EDIT_TEXT_PADDING_LEFT = 0;
     public static final int FIELD_VALUE_EDIT_TEXT_PADDING_TOP = 0;
     public static final int FIELD_VALUE_EDIT_TEXT_PADDING_RIGHT = 0;
     public static final int FIELD_VALUE_EDIT_TEXT_PADDING_BOTTOM = 0;
-    //textsize
-    public static final int FIELD_NAME_TEXT_SIZE = 12;
-    public static final int FIELD_UNIT_TEXT_SIZE = 14;
-    public static final int FIELD_VALUE_EDIT_TEXT_SIZE = 14;
-    public static final int FIELD_VALUE_TEXT_SIZE = 14;
-    public static final int FIELD_VALUE_EDIT_TEXT_TEXT_SIZE = 12;
-    public static final int FIELD_VALUE_NAME_TEXT_SIZE = 12;
-    public static final int CHECKBOX_LIST_HEADER_TEXT_SIZE = 14;
-    public static final int BIT_NAME_VIEW_TEXT_SIZE = 12;
-    public static final int PROBLEM_TEXT_SIZE = 12;
+
     //margins
     public static int FIELD_VALUE_EDIT_LEFT_MARGIN = 15;
-    public static final int FIELD_NAME_OF_VALUE_MARGIN_RIGHT = 15;
-    public static final int SPINNER_WITH_LABEL_CONTAINER_MARGIN_TOP = 15;
-    public static final int FIELD_NAME_MARGIN_BOTTOM = 15;
 
     private int EDIT_NOT_CLEAR_ID = 1000;
 
@@ -119,6 +107,7 @@ public class FragmentCharacteristicDetail extends Fragment {
     private BluetoothGattDescriptor lastDescriptor;
     private boolean readable = false;
     private boolean writeable = false;
+    private boolean writeableWithoutResponse = false;
     private boolean notify = false;
     private boolean notificationsEnabled = false;
     private boolean indicationsEnabled = false;
@@ -127,9 +116,8 @@ public class FragmentCharacteristicDetail extends Fragment {
     private int offset = 0; // in bytes
     private int currRefreshInterval = REFRESH_INTERVAL; // in seconds
     private byte[] value;
+    private byte[] previousValue;
     private BluetoothGatt mDevice;
-    private BluetoothDevice bluetoothDevice;
-    private BluetoothDeviceInfo bluetoothDeviceInfo;
     private int defaultMargin;
     private boolean foundField = false;
     // the following arraylist is used to check if fields in dialog for editable characteristics are empty, then set enabled stat for save btn
@@ -144,20 +132,47 @@ public class FragmentCharacteristicDetail extends Fragment {
     private EditText hexEdit;
     private EditText asciiEdit;
     private EditText decimalEdit;
-    private TextView hex;
-    private TextView ascii;
-    private TextView decimal;
+    private EditText hex;
+    private EditText ascii;
+    private EditText decimal;
     Dialog editableFieldsDialog;
     LinearLayout writableFieldsContainer;
     Button saveValueBtn;
-    Button cancelBtn;
+    Button clearBtn;
     ImageView closeIV;
     HashMap<Field, Boolean> fieldsInRangeMap;
     HashMap<Field, Boolean> fieldsValidMap;
 
+    private boolean writeWithResponse = true;
+    private Handler handler;
+
     private boolean writeString = false;
 
     private String parsingProblemInfo;
+
+    public boolean displayWriteDialog = false;
+
+    private final String HEX_ID = "HEX";
+    private final String ASCII_ID = "ASCII";
+    private final String DECIMAL_ID = "DECIMAL";
+
+    private ArrayList<View> hidableViews = new ArrayList<>();
+    private ArrayList<EditText> rawValueViews = new ArrayList<>();
+    private ArrayList<String> rawValueData;
+
+    private final Runnable postLoadValueViews = new Runnable() {
+        @Override
+        public void run() {
+            loadValueViews();
+        }
+    };
+
+    private final Runnable postDisplayValues = new Runnable() {
+        @Override
+        public void run() {
+            displayValues();
+        }
+    };
 
     public FragmentCharacteristicDetail() {
 
@@ -167,6 +182,8 @@ public class FragmentCharacteristicDetail extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO inflate appropriate layout file
         viewBackgroundColor = ContextCompat.getColor(getActivity(), R.color.silabs_white);
+
+        handler = new Handler();
 
         View view = inflater.inflate(R.layout.fragment_characteristic_details, container, false);
         fragmentRootView = view;
@@ -189,15 +206,15 @@ public class FragmentCharacteristicDetail extends Fragment {
 
         updateBall();
 
-        if (readable) {
-            //mBluetoothLeService.readCharacteristic(mDevice, mBluetoothCharact);
-            mDevice.readCharacteristic(mBluetoothCharact);
-        } else { // Another case prepare empty data and show UI
-            if (!isRawValue) {
-                prepareValueData();
-            }
-            loadValueViews();
+        if (!isRawValue) {
+            prepareValueData();
         }
+        loadValueViews();
+
+        if (displayWriteDialog) {
+            showCharacteristicWriteDialog();
+        }
+
         return view;
     }
 
@@ -222,10 +239,12 @@ public class FragmentCharacteristicDetail extends Fragment {
     private void loadValueViews() {
         fieldsInRangeMap = new HashMap<>();
         fieldsValidMap = new HashMap<>();
+        editTexts.clear();
 
-        valuesLayout.removeAllViews();
+
         if (!isRawValue) {
             if (parseProblem || !addNormalValue()) {
+                editTexts.clear();
                 addInvalidValue();
             }
         } else {
@@ -235,7 +254,7 @@ public class FragmentCharacteristicDetail extends Fragment {
 
     // Configures characteristic if it is writeable
     private void configureWriteable() {
-        if (writeable) {
+        if (writeable || writeableWithoutResponse) {
             initCharacteristicWriteDialog();
         }
     }
@@ -258,6 +277,7 @@ public class FragmentCharacteristicDetail extends Fragment {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     Toast.makeText(getActivity(), getText(R.string.characteristic_write_success),
                             Toast.LENGTH_SHORT).show();
+                    editableFieldsDialog.dismiss();
                     ((DeviceServicesActivity) getActivity()).refreshCharacteristicExpansion();
                 } else {
                     Toast.makeText(getActivity(), getText(R.string.characteristic_write_fail),
@@ -278,7 +298,25 @@ public class FragmentCharacteristicDetail extends Fragment {
                             currRefreshInterval = 0;
                             offset = 0;
                             value = mBluetoothCharact.getValue();
-                            loadValueViews();
+
+                            if (indicationsEnabled || notificationsEnabled) {
+                                valuesLayout.removeAllViews();
+                                loadValueViews();
+                            } else if (Arrays.equals(value, previousValue)) {
+                                // redraw ui elements
+                                hideValues();
+                                handler.removeCallbacks(postDisplayValues);
+                                handler.postDelayed(postDisplayValues, 150);
+                            } else {
+
+                                valuesLayout.removeAllViews();
+                                handler.removeCallbacks(postLoadValueViews);
+                                handler.postDelayed(postLoadValueViews, 150);
+                            }
+
+                            if (value != null) {
+                                previousValue = value.clone();
+                            }
                         }
                     }
                 });
@@ -300,9 +338,12 @@ public class FragmentCharacteristicDetail extends Fragment {
             readable = true;
         }
 
-        if (Common.isSetProperty(Common.PropertyType.WRITE, mBluetoothCharact.getProperties())
-                || Common.isSetProperty(Common.PropertyType.WRITE_NO_RESPONSE, mBluetoothCharact.getProperties())) {
+        if (Common.isSetProperty(Common.PropertyType.WRITE, mBluetoothCharact.getProperties())) {
             writeable = true;
+        }
+
+        if (Common.isSetProperty(Common.PropertyType.WRITE_NO_RESPONSE, mBluetoothCharact.getProperties())) {
+            writeableWithoutResponse = true;
         }
 
         if (Common.isSetProperty(Common.PropertyType.NOTIFY, mBluetoothCharact.getProperties())
@@ -310,23 +351,25 @@ public class FragmentCharacteristicDetail extends Fragment {
             notify = true;
         }
 
-        if (mCharact == null || mCharact.getFields() == null) {
+        //Display IEEE characteristic as raw data
+        if (mCharact == null || mCharact.getFields() == null || mCharact.getName().equals("IEEE 11073-20601 Regulatory Certification Data List")) {
             isRawValue = true;
         }
     }
 
     private void writeValueToCharacteristic() {
-        EditText hexEdit = editableFieldsDialog.findViewById(R.id.hexEdit);
+        EditText hexEdit = editableFieldsDialog.findViewById(R.id.hex_edit);
+
+        if (writeWithResponse) {
+            mBluetoothCharact.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+        } else {
+            mBluetoothCharact.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+        }
+
         if (hexEdit != null) {
             String hex = hexEdit.getText().toString().replaceAll("\\s+", "");
             byte[] newValue = hexToByteArray(hex);
             try {
-                if (Common.isSetProperty(Common.PropertyType.WRITE, mBluetoothCharact.getProperties())) {
-                    mBluetoothCharact.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-                } else if (Common.isSetProperty(Common.PropertyType.WRITE_NO_RESPONSE, mBluetoothCharact.getProperties())) {
-                    mBluetoothCharact.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-                }
-
                 Log.d("Name", "" + mDevice.getDevice().getName());
                 Log.d("Address", "" + mDevice.getDevice().getAddress());
                 Log.d("Service", "" + mBluetoothCharact.getService().getUuid());
@@ -334,7 +377,6 @@ public class FragmentCharacteristicDetail extends Fragment {
                 mBluetoothCharact.setValue(newValue);
                 Log.d("hex", "" + Converters.getHexValue(mBluetoothCharact.getValue()));
                 mDevice.writeCharacteristic(mBluetoothCharact);
-                editableFieldsDialog.dismiss();
 
             } catch (Exception e) {
                 Log.e("Service", "null" + e);
@@ -346,6 +388,33 @@ public class FragmentCharacteristicDetail extends Fragment {
                 Log.d("write_val", "Standard Value to write (hex): " + Converters.getHexValue(value));
             }
         }
+    }
+
+    private void hideValues() {
+
+        for (View view : hidableViews) {
+            view.setVisibility(View.GONE);
+        }
+
+        rawValueData = new ArrayList<>();
+        for (EditText et : rawValueViews) {
+            rawValueData.add(et.getText().toString());
+            et.setText("");
+        }
+
+    }
+
+    private void displayValues() {
+
+        for (View view : hidableViews) {
+            view.setVisibility(View.VISIBLE);
+        }
+
+        int i = 0;
+        for (EditText et : rawValueViews) {
+            et.setText(rawValueData.get(i++));
+        }
+
     }
 
     private boolean possibleToSave() {
@@ -403,6 +472,10 @@ public class FragmentCharacteristicDetail extends Fragment {
 
     public void setIndicationsEnabled(boolean enabled) {
         indicationsEnabled = enabled;
+    }
+
+    public Characteristic getmCharact() {
+        return mCharact;
     }
 
     // Gets all characteristic descriptors
@@ -473,23 +546,34 @@ public class FragmentCharacteristicDetail extends Fragment {
             } catch (Exception ex) {
                 Log.i("CharacteristicUI", String.valueOf(i));
                 Log.i("Characteristic value", Converters.getDecimalValue(value));
-                parsingProblemInfo = prepareParsingProblemInfo(mCharact, value.length);
+                parsingProblemInfo = prepareParsingProblemInfo(mCharact);
                 parseProblem = true;
                 return false;
             }
         }
+
+        for (EditText et : editTexts) {
+            et.setText("");
+        }
+
         return true;
     }
 
-    private String prepareParsingProblemInfo(Characteristic characteristic, int readSize) {
+    private String prepareParsingProblemInfo(Characteristic characteristic) {
         StringBuilder builder = new StringBuilder();
         builder.append("An error occurred while parsing this characteristic.").append("\n");
+        if (value == null) return builder.toString();
 
         int expectedBytes = 0;
+        int readSize = value.length;
 
-        for (int i = 0; i < characteristic.getFields().size(); i++) {
-            Field field = characteristic.getFields().get(i);
-            expectedBytes += Engine.getInstance().getFormat(field.getFormat());
+        try {
+            for (int i = 0; i < characteristic.getFields().size(); i++) {
+                Field field = characteristic.getFields().get(i);
+                expectedBytes += Engine.getInstance().getFormat(field.getFormat());
+            }
+        } catch (NullPointerException ex) {
+            return builder.toString();
         }
 
         if (expectedBytes != readSize) {
@@ -682,18 +766,6 @@ public class FragmentCharacteristicDetail extends Fragment {
         return val;
     }
 
-    // Reads next enumeration value for given enum length
-    private int readNextEnum(int formatLength) {
-        int result = 0;
-        for (int i = 0; i < formatLength; i++) {
-            result |= value[offset];
-            if (i < formatLength - 1) {
-                result <<= 8;
-            }
-        }
-        offset += formatLength;
-        return result;
-    }
 
     private String getSint16AsString(byte[] array) {
         StringBuilder builder = new StringBuilder();
@@ -903,95 +975,144 @@ public class FragmentCharacteristicDetail extends Fragment {
         ascii = readableFieldsForInline.findViewById(R.id.ascii_readonly);
         decimal = readableFieldsForInline.findViewById(R.id.decimal_readonly);
 
-        hexEdit = readableFieldsForInline.findViewById(R.id.hex_edit_readonly);
-        asciiEdit = readableFieldsForInline.findViewById(R.id.ascii_edit_readonly);
-        decimalEdit = readableFieldsForInline.findViewById(R.id.decimalEdit_readonly);
+        ImageView hexCopyIV = readableFieldsForInline.findViewById(R.id.hex_copy);
+        ImageView asciiCopyIV = readableFieldsForInline.findViewById(R.id.ascii_copy);
+        ImageView decimalCopyIV = readableFieldsForInline.findViewById(R.id.decimal_copy);
 
-        hexEdit.setId(EDIT_NOT_CLEAR_ID);
-        asciiEdit.setId(EDIT_NOT_CLEAR_ID);
-        decimalEdit.setId(EDIT_NOT_CLEAR_ID);
+        hex.setId(EDIT_NOT_CLEAR_ID);
+        ascii.setId(EDIT_NOT_CLEAR_ID);
+        decimal.setId(EDIT_NOT_CLEAR_ID);
 
         hex.setKeyListener(null);
         ascii.setKeyListener(null);
         decimal.setKeyListener(null);
-        hexEdit.setKeyListener(null);
-        asciiEdit.setKeyListener(null);
-        decimalEdit.setKeyListener(null);
 
-        editTexts.add(hexEdit);
-        editTexts.add(asciiEdit);
-        editTexts.add(decimalEdit);
+        hex.setText(Converters.getHexValue(value));
+        ascii.setText(Converters.getAsciiValue(value));
+        decimal.setText(Converters.getDecimalValue(value));
 
-        if (writeable) {
-            hex.setVisibility(View.GONE);
-            ascii.setVisibility(View.GONE);
-            decimal.setVisibility(View.GONE);
+        rawValueViews.add(hex);
+        rawValueViews.add(ascii);
+        rawValueViews.add(decimal);
 
-            hexEdit.setText(Converters.getHexValue(value));
-            asciiEdit.setText(Converters.getAsciiValue(value));
-            decimalEdit.setText(Converters.getDecimalValue(value));
-        } else {
-            hexEdit.setVisibility(View.GONE);
-            asciiEdit.setVisibility(View.GONE);
-            decimalEdit.setVisibility(View.GONE);
+        setCopyListener(hex, hexCopyIV);
+        setCopyListener(ascii, asciiCopyIV);
+        setCopyListener(decimal, decimalCopyIV);
 
-            hex.setText(Converters.getHexValue(value));
-            ascii.setText(Converters.getAsciiValue(value));
-            decimal.setText(Converters.getDecimalValue(value));
-        }
         valuesLayout.addView(readableFieldsForInline);
 
-        // writable fields for dialog
-        View writableFieldsForDialog = layoutInflater.inflate(R.layout.characteristic_value, null);
+        if (writeable || writeableWithoutResponse) {
+            View writableFieldsForDialog = layoutInflater.inflate(R.layout.characteristic_value, null);
 
-        hex = writableFieldsForDialog.findViewById(R.id.hex);
-        ascii = writableFieldsForDialog.findViewById(R.id.ascii);
-        decimal = writableFieldsForDialog.findViewById(R.id.decimal);
+            hexEdit = writableFieldsForDialog.findViewById(R.id.hex_edit);
+            asciiEdit = writableFieldsForDialog.findViewById(R.id.ascii_edit);
+            decimalEdit = writableFieldsForDialog.findViewById(R.id.decimal_edit);
 
-        hexEdit = writableFieldsForDialog.findViewById(R.id.hexEdit);
-        asciiEdit = writableFieldsForDialog.findViewById(R.id.asciiEdit);
-        decimalEdit = writableFieldsForDialog.findViewById(R.id.decimalEdit);
-        editTexts.add(hexEdit);
-        editTexts.add(asciiEdit);
-        editTexts.add(decimalEdit);
+            ImageView hexPasteIV = writableFieldsForDialog.findViewById(R.id.hex_paste);
+            ImageView asciiPasteIV = writableFieldsForDialog.findViewById(R.id.ascii_paste);
+            ImageView decimalPasteIV = writableFieldsForDialog.findViewById(R.id.decimal_paste);
 
+            editTexts.add(hexEdit);
+            editTexts.add(asciiEdit);
+            editTexts.add(decimalEdit);
 
-        TextWatcher hexWatcher = getHexTextWatcher();
-        TextWatcher decWatcher = getDecTextWatcher();
-        TextWatcher asciiWatcher = getAsciiTextWatcher();
+            TextWatcher hexWatcher = getHexTextWatcher();
+            TextWatcher decWatcher = getDecTextWatcher();
+            TextWatcher asciiWatcher = getAsciiTextWatcher();
 
-        View.OnFocusChangeListener hexListener = getHexFocusChangeListener();
+            View.OnFocusChangeListener hexListener = getHexFocusChangeListener();
 
-        hexEdit.setOnFocusChangeListener(hexListener);
-        WriteCharacteristic commiter = new WriteCharacteristic();
-        hexEdit.setOnEditorActionListener(commiter);
-        asciiEdit.setOnEditorActionListener(commiter);
-        decimalEdit.setOnEditorActionListener(commiter);
+            hexEdit.setOnFocusChangeListener(hexListener);
+            WriteCharacteristic commiter = new WriteCharacteristic();
+            hexEdit.setOnEditorActionListener(commiter);
+            asciiEdit.setOnEditorActionListener(commiter);
+            decimalEdit.setOnEditorActionListener(commiter);
 
-        hexEdit.addTextChangedListener(hexWatcher);
-        asciiEdit.addTextChangedListener(asciiWatcher);
-        decimalEdit.addTextChangedListener(decWatcher);
+            hexEdit.addTextChangedListener(hexWatcher);
+            asciiEdit.addTextChangedListener(asciiWatcher);
+            decimalEdit.addTextChangedListener(decWatcher);
 
-        if (writeable) {
-            hex.setVisibility(View.GONE);
-            ascii.setVisibility(View.GONE);
-            decimal.setVisibility(View.GONE);
-        } else {
-            hexEdit.setVisibility(View.GONE);
-            asciiEdit.setVisibility(View.GONE);
-            decimalEdit.setVisibility(View.GONE);
+            setPasteListener(hexEdit, hexPasteIV, HEX_ID);
+            setPasteListener(asciiEdit, asciiPasteIV, ASCII_ID);
+            setPasteListener(decimalEdit, decimalPasteIV, DECIMAL_ID);
 
-            hex.setText(Converters.getHexValue(value));
-            ascii.setText(Converters.getAsciiValue(value));
-            decimal.setText(Converters.getDecimalValue(value));
+            updateSaveButtonState();
+
+            if (writableFieldsContainer != null) {
+                writableFieldsContainer.removeAllViews();
+                writableFieldsContainer.addView(writableFieldsForDialog);
+            }
+
+        }
+    }
+
+    private void setCopyListener(final EditText copyFromET, final ImageView copyIV) {
+        copyIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipboardManager clipboardManager = context.getSystemService(ClipboardManager.class);
+                ClipData clip = ClipData.newPlainText("characteristic-value", copyFromET.getText().toString());
+                if (clipboardManager != null) {
+                    clipboardManager.setPrimaryClip(clip);
+                    Toast.makeText(context, getString(R.string.Copied_to_clipboard), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void setPasteListener(final EditText pasteToET, final ImageView pasteIV, final String expectedPasteType) {
+
+        pasteIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipboardManager clipboardManager = context.getSystemService(ClipboardManager.class);
+                if (clipboardManager != null && clipboardManager.getPrimaryClip() != null) {
+                    ClipData clip = clipboardManager.getPrimaryClip();
+                    String text = clip.getItemAt(0).getText().toString();
+
+                    pasteToET.requestFocus();
+
+                    switch (expectedPasteType) {
+                        case HEX_ID:
+                            text = StringUtils.getStringWithoutWhitespaces(text);
+                            if (isHexStringCorrect(text)) pasteToET.setText(text);
+                            else
+                                Toast.makeText(context, getString(R.string.Incorrect_data_format), Toast.LENGTH_SHORT).show();
+                            break;
+                        case ASCII_ID:
+                            pasteToET.setText(text);
+                            break;
+                        case DECIMAL_ID:
+                            if (isDecimalCorrect(text)) pasteToET.setText(text);
+                            else
+                                Toast.makeText(context, getString(R.string.Incorrect_data_format), Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                }
+            }
+        });
+    }
+
+    private boolean isHexStringCorrect(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            if (!StringUtils.HEX_VALUES.contains(String.valueOf(text.charAt(i)))) return false;
+        }
+        return true;
+    }
+
+    private boolean isDecimalCorrect(String text) {
+        String[] arr = text.split(" ");
+
+        try {
+            for (String s : arr) {
+                int tmp = Integer.parseInt(s);
+                if (!(0 <= tmp && tmp <= 255)) return false;
+            }
+        } catch (Exception e) {
+            return false;
         }
 
-        updateSaveButtonState();
-
-        if (writableFieldsContainer != null) {
-            writableFieldsContainer.removeAllViews();
-            writableFieldsContainer.addView(writableFieldsForDialog);
-        }
+        return true;
     }
 
     private void initCharacteristicWriteDialog() {
@@ -1001,15 +1122,20 @@ public class FragmentCharacteristicDetail extends Fragment {
         editableFieldsDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         writableFieldsContainer = editableFieldsDialog.findViewById(R.id.characteristic_writable_fields_container);
 
+        int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.9);
+        editableFieldsDialog.getWindow().setLayout(width, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        initWriteModeView(editableFieldsDialog);
+
         saveValueBtn = editableFieldsDialog.findViewById(R.id.save_btn);
-        cancelBtn = editableFieldsDialog.findViewById(R.id.cancel_btn);
+        clearBtn = editableFieldsDialog.findViewById(R.id.clear_btn);
         closeIV = editableFieldsDialog.findViewById(R.id.image_view_close);
     }
 
     private boolean isAnyWriteFieldEmpty() {
-        for(EditText e: editTexts) {
-            if(e.getId() == EDIT_NOT_CLEAR_ID) continue;
-            if(e.getText().toString().isEmpty()) return true;
+        for (EditText e : editTexts) {
+            if (e.getId() == EDIT_NOT_CLEAR_ID) continue;
+            if (e.getText().toString().isEmpty()) return true;
         }
         return false;
     }
@@ -1021,19 +1147,21 @@ public class FragmentCharacteristicDetail extends Fragment {
         saveValueBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isAnyWriteFieldEmpty()) {
+                if (!isAnyWriteFieldEmpty()) {
                     writeValueToCharacteristic();
                 } else {
-                    Toast.makeText(getActivity(),getString(R.string.You_cannot_send_empty_value_to_charac),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.You_cannot_send_empty_value_to_charac), Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        cancelBtn.setOnClickListener(new View.OnClickListener() {
+        clearBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 for (EditText et : editTexts) {
-                    et.setText("");
+                    if (et.getId() != EDIT_NOT_CLEAR_ID) {
+                        et.setText("");
+                    }
                 }
             }
         });
@@ -1048,7 +1176,16 @@ public class FragmentCharacteristicDetail extends Fragment {
         });
 
         String serviceName = mService != null ? mService.getName().trim() : getString(R.string.unknown_service);
-        String characteristicName = mCharact != null ? mCharact.getName().trim() : getString(R.string.unknown_characteristic_label);
+        serviceName = Common.checkOTAService(mGattService.getUuid().toString(), serviceName);
+
+        String characteristicName;
+        if (mCharact != null) {
+            characteristicName = mCharact.getName().trim();
+        } else {
+            characteristicName = getOtaSpecificCharacteristicName(mBluetoothCharact.getUuid().toString());
+        }
+
+
         String characteristicUuid = mCharact != null ? Common.getUuidText(mCharact.getUuid()) : Common.getUuidText(mBluetoothCharact.getUuid());
 
         TextView serviceNameTextView = editableFieldsDialog.findViewById(R.id.picker_dialog_service_name);
@@ -1063,7 +1200,7 @@ public class FragmentCharacteristicDetail extends Fragment {
 
         //Clear EditText fields
         for (EditText et : editTexts) {
-            if(et.getId() != EDIT_NOT_CLEAR_ID) {
+            if (et.getId() != EDIT_NOT_CLEAR_ID) {
                 et.setText("");
             }
         }
@@ -1277,7 +1414,10 @@ public class FragmentCharacteristicDetail extends Fragment {
         fieldNameView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_label_text_size));
         TextView fieldUnitView = addValueUnit(field);
         fieldUnitView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_label_text_size));
-        fieldUnitView.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.gravity = Gravity.BOTTOM;
+        fieldUnitView.setLayoutParams(layoutParams);
+        hidableViews.add(fieldUnitView);
 
         if (!parseProblem && field.getReference() == null) {
             String format = field.getFormat();
@@ -1296,17 +1436,19 @@ public class FragmentCharacteristicDetail extends Fragment {
             }
 
 
-            if (writeable) {
+            if (writeable || writeableWithoutResponse) {
                 // inline field value
                 EditText fieldValueEdit = addValueEdit(field, val);
                 fieldValueEdit.setGravity(Gravity.CENTER_VERTICAL);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.5f);
-                params.setMargins(5, 0, 0, 0);
+                params.setMargins(8, 0, 0, 0);
                 params.gravity = Gravity.CENTER_VERTICAL;
                 fieldValueEdit.setLayoutParams(params);
                 fieldValueEdit.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_text_size));
                 editTexts.add(fieldValueEdit);
                 TextView fieldValue = (TextView) addFieldName(fieldValueEdit.getText().toString());
+                fieldValue.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_text_size));
+                hidableViews.add(fieldValue);
                 fieldValue.setTextColor(ContextCompat.getColor(getActivity(), R.color.silabs_primary_text));
                 valueLayout.addView(fieldValue);
 
@@ -1314,6 +1456,7 @@ public class FragmentCharacteristicDetail extends Fragment {
                 // field name
                 View fieldName = addFieldName(field.getName());
                 params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.5f);
+                params.setMargins(0, 0, 8, 0);
                 params.gravity = Gravity.CENTER_VERTICAL;
                 fieldName.setLayoutParams(params);
                 // container for editable field value and field name
@@ -1324,11 +1467,12 @@ public class FragmentCharacteristicDetail extends Fragment {
                 fieldContainer.setLayoutParams(params);
                 fieldContainer.addView(fieldName);
                 fieldContainer.addView(fieldValueEdit);
-                fieldContainer.setPadding(FIELD_CONTAINER_PADDING_LEFT, FIELD_CONTAINER_PADDING_TOP, FIELD_CONTAINER_PADDING_RIGHT, FIELD_CONTAINER_PADDING_BOTTOM);
+                fieldContainer.setPadding(0, FIELD_CONTAINER_PADDING_TOP, 0, FIELD_CONTAINER_PADDING_BOTTOM);
                 writableFieldsContainer.addView(fieldContainer);
             } else {
                 TextView fieldValueView = addValueText(val);
                 fieldValueView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_text_size));
+                hidableViews.add(fieldValueView);
                 valueLayout.addView(fieldValueView);
             }
 
@@ -1446,17 +1590,8 @@ public class FragmentCharacteristicDetail extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                 if (writeString) {
-                    int textSize = fieldValueEdit.getText().toString().length();
                     byte[] array = fieldValueEdit.getText().toString().getBytes();
-
-                    if (valArr.length > textSize) {
-                        Arrays.fill(valArr, (byte) 0);
-                        System.arraycopy(array, 0, valArr, 0, textSize);
-                        fillValue(valArr);
-                    } else {
-                        fillValue(array);
-                    }
-
+                    fillValue(array);
                 } else {
                     Arrays.fill(valArr, (byte) 0);
                     String inputVal = fieldValueEdit.getText().toString();
@@ -1580,207 +1715,286 @@ public class FragmentCharacteristicDetail extends Fragment {
         return fieldNameView;
     }
 
-    // Adds views related to bitfield value
-    // Each bit is presented as CheckBox view
-    private void addBitfield(Field field) {
 
-        TextView checkboxListHeader = (TextView) addFieldName(field.getName());
+    private TextView getBitNameView(String name, LinearLayout bitsLayout) {
+        TextView bitNameView = new TextView(context);
+        bitNameView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_label_text_size));
+        bitNameView.setBackgroundColor(viewBackgroundColor);
+        RelativeLayout.LayoutParams bitNameParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        bitNameParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        bitNameParams.addRule(RelativeLayout.CENTER_VERTICAL);
+        bitNameParams.addRule(RelativeLayout.LEFT_OF, bitsLayout.getId());
+        bitNameParams.setMargins(0, 0, 0, 0);
+        bitNameView.setLayoutParams(bitNameParams);
+        bitNameView.setText(name);
+        bitNameView.setTextColor(ContextCompat.getColor(getActivity(), R.color.silabs_primary_text));
+
+        return bitNameView;
+    }
+
+    private TextView getCheckboxListHeader(String name) {
+        TextView checkboxListHeader = (TextView) addFieldName(name);
         checkboxListHeader.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_text_size));
         checkboxListHeader.setTextColor(Color.BLACK);
-        valuesLayout.addView(checkboxListHeader);
 
-        if (field.getReference() == null) {
+        return checkboxListHeader;
+    }
 
-            String format = field.getFormat();
-            final int formatLength = Engine.getInstance().getFormat(format);
-            final int off = getFieldOffset(field);
-            final int fieldValue = readNextEnum(formatLength);
+    private LinearLayout getBitsLayout() {
+        LinearLayout bitsLayout = new LinearLayout(context);
+        bitsLayout.setBackgroundColor(viewBackgroundColor);
+        //noinspection ResourceType
+        bitsLayout.setId(1);
+        RelativeLayout.LayoutParams bitsLayoutParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        bitsLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        bitsLayout.setLayoutParams(bitsLayoutParams);
+        bitsLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-            for (final Bit bit : field.getBitfield().getBits()) {
-                RelativeLayout parentLayout = new RelativeLayout(context);
-                parentLayout.setBackgroundColor(viewBackgroundColor);
-                parentLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT));
+        return bitsLayout;
+    }
 
-                LinearLayout bitsLayout = new LinearLayout(context);
-                bitsLayout.setBackgroundColor(viewBackgroundColor);
-                //noinspection ResourceType
-                bitsLayout.setId(1);
-                RelativeLayout.LayoutParams bitsLayoutParams = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                bitsLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                bitsLayout.setLayoutParams(bitsLayoutParams);
-                bitsLayout.setOrientation(LinearLayout.HORIZONTAL);
+    private void setStringBuilderBitsInRange(StringBuilder builder, int startBit, int endBit, int value) {
+        while (startBit < endBit) {
+            char bitValue = ((value & 1) == 1) ? '1' : '0';
+            builder.setCharAt(endBit - 1, bitValue);
+            value >>= 1;
+            endBit--;
+        }
+    }
 
-                TextView bitNameView = new TextView(context);
-                bitNameView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_list_item_value_label_text_size));
-                bitNameView.setBackgroundColor(viewBackgroundColor);
-                RelativeLayout.LayoutParams bitNameParams = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                bitNameParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-                bitNameParams.addRule(RelativeLayout.CENTER_VERTICAL);
-                bitNameParams.addRule(RelativeLayout.LEFT_OF, bitsLayout.getId());
-                bitNameParams.setMargins(0, 0, 0, 0);
-                bitNameView.setLayoutParams(bitNameParams);
-                bitNameView.setText(bit.getName());
-                bitNameView.setTextColor(ContextCompat.getColor(getActivity(), R.color.silabs_primary_text));
+    // Get value from bitsString in range start (inclusive) -> end (exclusive)
+    // bits String order must be:
+    // least significant (index 0), to most significant (index last)
+    private int getValueInStringBitsRange(int start, int end, String bits) {
+        int result = 0;
 
-                for (int i = 0; i < Math.pow(2, bit.getSize() - 1); i++) {
-                    CheckBox checkBox = new CheckBox(context);
-                    checkBox.setBackgroundColor(viewBackgroundColor);
-                    checkBox.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT));
+        while (start < end) {
+            if (bits.charAt(start) == '1') {
+                result |= 1;
+            } else {
+                result |= 0;
+            }
 
-                    if (!parseProblem) {
-                        checkBox.setEnabled(writeable);
-                        checkBox.setChecked(Common.isBitSet(bit.getIndex() + i, fieldValue));
+            if (start + 1 < end) {
+                result <<= 1;
+            }
 
-                        final int whichBit = i;
+            start++;
+        }
 
-                        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        return result;
+    }
 
-                            @Override
-                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                int newVal = Common.toggleBit(bit.getIndex() + whichBit, fieldValue);
-                                byte[] val = intToByteArray(newVal, formatLength);
-                                setValue(off, val);
-                            }
+    // Get value bits as String from offset to offest+formatLength
+    // bits are parsed in order: LSO(least significant octet) ===> MSO (most significant octet)
+    // String charAt(0) - least significant bit,
+    // String charAt(last) most significant bit.
+    private String getFieldValueAs_LSO_MSO_BitsString(int offset, int formatLength) {
+        StringBuilder result = new StringBuilder();
 
-                        });
-                    } else {
-                        checkBox.setEnabled(false);
-                    }
-
-                    bitsLayout.addView(checkBox);
+        for (int i = offset; i < offset + formatLength; i++) {
+            byte val = value[i];
+            for (int j = 0; j < 8; j++) {
+                if ((val & 0b0000_0001) == 0b0000_0001) {
+                    result.append(1);
+                } else {
+                    result.append(0);
                 }
-
-                parentLayout.addView(bitNameView);
-                parentLayout.addView(bitsLayout);
-
-                valuesLayout.addView(parentLayout);
+                val >>= 1;
             }
         }
 
-        View spacingAferCheckboxes = new View(context);
-        valuesLayout.addView(spacingAferCheckboxes, 1, 15);
+        return result.toString();
+    }
+
+    private StringBuilder fillStringBuilderWithZeros(int count) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            builder.append('0');
+        }
+        return builder;
+    }
+
+    // Convert String of bits where bitsString charAt(0) is least significant
+    // to byte array
+    private byte[] bitsStringToByteArray(String bitsString, int length) {
+        byte arr[] = new byte[length];
+        for (int i = 0; i < length; i++) {
+            int tmp = 0;
+            for (int j = 8 * (i + 1) - 1; j >= i * 8; j--) {
+                char bitChar = bitsString.charAt(j);
+                if (bitChar == '1') {
+                    tmp |= 1;
+                } else {
+                    tmp |= 0;
+                }
+
+                if (j > i * 8) {
+                    tmp <<= 1;
+                }
+            }
+            arr[i] = (byte) tmp;
+        }
+
+        return arr;
+    }
+
+
+    // Adds views related to bitfield value
+    private void addBitfield(Field field) {
+
+        if (field.getReference() == null) {
+
+            final int formatLength = Engine.getInstance().getFormat(field.getFormat());
+            final int bitsLength = formatLength * 8;
+            int currentBit = 0;
+            String valueBits = getFieldValueAs_LSO_MSO_BitsString(offset, formatLength);
+            final StringBuilder builder = fillStringBuilderWithZeros(bitsLength);
+
+
+            // Display read bitfields
+            for (Bit bit : field.getBitfield().getBits()) {
+                final ArrayList<String> enumerations = new ArrayList<>();
+
+                // Bits in range startBitIndex to endBitIndex will be replaced with new value for given bitField
+                final int startBitIndex = currentBit;
+                final int endBitIndex = currentBit + bit.getSize();
+
+                for (Enumeration enumeration : bit.getEnumerations()) {
+                    enumerations.add(enumeration.getValue());
+                }
+
+                LinearLayout.LayoutParams nameAndValueParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                nameAndValueParams.setMargins(0, defaultMargin, 0, 12 + defaultMargin / 2);
+                LinearLayout nameAndValueContainer = new LinearLayout(context);
+                nameAndValueContainer.setOrientation(LinearLayout.VERTICAL);
+                nameAndValueContainer.setLayoutParams(nameAndValueParams);
+
+                View valueText = addValueText(enumerations.get(getValueInStringBitsRange(startBitIndex, endBitIndex, valueBits)));
+                View nameText = addFieldName(bit.getName());
+                nameAndValueContainer.addView(valueText);
+                nameAndValueContainer.addView(nameText);
+                valuesLayout.addView(nameAndValueContainer);
+
+                hidableViews.add(valueText);
+
+                if (writeable || writeableWithoutResponse) {
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.5f);
+                    params.gravity = Gravity.CENTER_VERTICAL;
+                    params.setMargins(8, 0, 0, 0);
+
+                    final Spinner spinner = new Spinner(context);
+                    ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(context, R.layout.enumeration_spinner_dropdown_item, enumerations);
+                    spinner.setAdapter(spinnerArrayAdapter);
+                    spinner.setLayoutParams(params);
+
+                    final int off = offset;
+
+                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                            // After each spinner selection bits are prepared for characteristic write - value array is updated with selected value
+                            setStringBuilderBitsInRange(builder, startBitIndex, endBitIndex, position);
+                            byte[] val = bitsStringToByteArray(builder.toString(), formatLength);
+                            //intToByteArray(Integer.parseInt(builder.toString(), 2), formatLength);
+                            setValue(off, val);
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+
+                        }
+                    });
+
+                    View fieldName = addFieldName(bit.getName());
+                    params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.5f);
+                    params.gravity = Gravity.CENTER_VERTICAL;
+                    params.setMargins(0, 0, 8, 0);
+                    fieldName.setLayoutParams(params);
+
+                    LinearLayout linearLayout = new LinearLayout(context);
+                    linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                    linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                    linearLayout.addView(fieldName);
+                    linearLayout.addView(spinner);
+
+                    writableFieldsContainer.addView(linearLayout);
+
+                }
+                currentBit = currentBit + bit.getSize();
+            }
+            offset += formatLength;
+        }
+    }
+
+    private void initWriteModeView(Dialog dialog) {
+        final RadioButton writeWithResponseRB = dialog.findViewById(R.id.write_with_resp_radio_button);
+        final RadioButton writeWithoutResponseRB = dialog.findViewById(R.id.write_without_resp_radio_button);
+        final LinearLayout writeMethodLL = dialog.findViewById(R.id.write_method_linear_layout);
+
+        if (writeable) {
+            writeWithResponseRB.setChecked(true);
+            writeWithResponseRB.setChecked(true);
+            writeWithResponse = true;
+
+            writeWithResponseRB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    writeWithResponse = true;
+                }
+            });
+
+        } else {
+            writeWithResponseRB.setEnabled(false);
+            writeWithResponseRB.setChecked(false);
+        }
+
+        if (writeableWithoutResponse) {
+            writeWithoutResponseRB.setEnabled(true);
+            if (!writeWithResponseRB.isChecked()) {
+                writeWithoutResponseRB.setChecked(true);
+                writeWithResponse = false;
+            }
+
+            writeWithoutResponseRB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    writeWithResponse = false;
+                }
+            });
+
+        } else {
+            writeWithoutResponseRB.setEnabled(false);
+            writeWithoutResponseRB.setChecked(false);
+        }
+
+        if (!writeableWithoutResponse && !writeable) {
+            writeMethodLL.setVisibility(View.GONE);
+        }
+
+
     }
 
     // Adds views related to enumeration value
     // Each enumeration is presented as Spinner view
     private void addEnumeration(final Field field) {
         if (field.getReference() == null) {
-            LayoutInflater inflater = LayoutInflater.from(context);
-            final Dialog dialog = new Dialog(getActivity());
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.setContentView(R.layout.dialog_characteristic_picker);
-            if (dialog.getWindow() != null) {
-                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
-                if (!context.getResources().getBoolean(R.bool.isTablet)) {
-                    int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.80);
-                    dialog.getWindow().setLayout(width, LinearLayout.LayoutParams.WRAP_CONTENT);
-                }
-            }
-
-
-            final RadioGroup radioGroup = dialog.findViewById(R.id.characteristic_dialog_radio_group);
-            Button selectValueBtn = dialog.findViewById(R.id.confirm_selection_btn);
-
-            String serviceName = mService != null ? mService.getName().trim() : getString(R.string.unknown_characteristic_label);
-            String characteristicName = mCharact != null ? mCharact.getName().trim() : getString(R.string.unknown_characteristic_label);
-            String characteristicUuid = (mCharact != null ? Common.getUuidText(mCharact.getUuid()) : getString(R.string.unknown_characteristic_uuid_label));
-
-            ((TextView) dialog.findViewById(R.id.picker_dialog_service_name)).setText(serviceName);
-            dialog.findViewById(R.id.picker_dialog_service_name).setSelected(true);
-            ((TextView) dialog.findViewById(R.id.characteristic_dialog_characteristic_name)).setText(characteristicName);
-            dialog.findViewById(R.id.characteristic_dialog_characteristic_name).setSelected(true);
-            ((TextView) dialog.findViewById(R.id.picker_dialog_characteristic_uuid)).setText(characteristicUuid);
-            dialog.findViewById(R.id.picker_dialog_characteristic_uuid).setSelected(true);
-
-            LinearLayout propertiesContainer = dialog.findViewById(R.id.picker_dialog_properties_container);
-            String propertiesString = Common.getProperties(getActivity(), mBluetoothCharact.getProperties());
-            String[] propsExploded = propertiesString.split(",");
-            for (String propertyValue : propsExploded) {
-                TextView propertyView = new TextView(context);
-                String propertyValueTrimmed = propertyValue.trim();
-                propertyValueTrimmed = propertyValue.length() > 13 ? propertyValue.substring(0, 13) : propertyValueTrimmed;
-                propertyValueTrimmed.toUpperCase();
-                propertyView.setText(propertyValueTrimmed);
-                propertyView.append("  ");
-                propertyView.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.silabs_dialog_title_background));
-                propertyView.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.characteristic_property_text_size));
-                propertyView.setTextColor(ContextCompat.getColor(context, R.color.silabs_blue));
-                propertyView.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
-
-                LinearLayout propertyContainer = new LinearLayout(context);
-                propertyContainer.setOrientation(LinearLayout.HORIZONTAL);
-
-                ImageView propertyIcon = new ImageView(context);
-                int iconId;
-                if (propertyValue.trim().toUpperCase().equals("BROADCAST")) {
-                    iconId = R.drawable.debug_prop_broadcast;
-                } else if (propertyValue.trim().toUpperCase().equals("READ")) {
-                    iconId = R.drawable.ic_icon_read_on;
-                } else if (propertyValue.trim().toUpperCase().equals("WRITE NO RESPONSE")) {
-                    iconId = R.drawable.debug_prop_write_no_resp;
-                } else if (propertyValue.trim().toUpperCase().equals("WRITE")) {
-                    iconId = R.drawable.ic_icon_edit_on;
-                } else if (propertyValue.trim().toUpperCase().equals("NOTIFY")) {
-                    iconId = R.drawable.ic_icon_notify_on;
-                } else if (propertyValue.trim().toUpperCase().equals("INDICATE")) {
-                    iconId = R.drawable.ic_icon_indicate_on;
-                } else if (propertyValue.trim().toUpperCase().equals("SIGNED WRITE")) {
-                    iconId = R.drawable.debug_prop_signed_write;
-                } else if (propertyValue.trim().toUpperCase().equals("EXTENDED PROPS")) {
-                    iconId = R.drawable.debug_prop_ext;
-                } else {
-                    iconId = R.drawable.debug_prop_ext;
-                }
-                propertyIcon.setBackgroundResource(iconId);
-
-                LinearLayout.LayoutParams paramsText = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                paramsText.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
-
-                LinearLayout.LayoutParams paramsIcon = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
-
-                if (propertyValue.trim().toUpperCase().equals("WRITE NO RESPONSE")) {
-                    float d = getResources().getDisplayMetrics().density;
-                    paramsIcon = new LinearLayout.LayoutParams((int) (24 * d), ((int) (24 * d)));
-                    paramsIcon.gravity = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
-                }
-
-                propertyContainer.addView(propertyView, paramsText);
-                propertyContainer.addView(propertyIcon, paramsIcon);
-
-                LinearLayout.LayoutParams paramsTextAndIconContainer = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                paramsTextAndIconContainer.gravity = Gravity.RIGHT;
-                paramsTextAndIconContainer.setMargins(0, defaultMargin, 0, defaultMargin);
-                propertiesContainer.addView(propertyContainer, paramsTextAndIconContainer);
-            }
-
-            ArrayList<String> enumerationArray = new ArrayList<>();
-
+            final ArrayList<String> enumerationArray = new ArrayList<>();
             for (Enumeration en : field.getEnumerations()) {
                 enumerationArray.add(en.getValue());
-
-                RadioButton radioButton = new RadioButton(context);
-                radioButton.setText(en.getValue());
-                radioGroup.addView(radioButton);
             }
 
             if (!parseProblem) {
-                radioGroup.setEnabled(writeable);
-                for (int i = 0; i < radioGroup.getChildCount(); i++) {
-                    radioGroup.getChildAt(i).setClickable(writeable);
-                }
 
-                int off = getFieldOffset(field);
                 int formatLength = Engine.getInstance().getFormat(field.getFormat());
-
                 int pos = 0;
-
                 int val = 0;
+
                 if (field.getFormat().toLowerCase().equals("16bit")) {
                     if (offset == value.length - 1) {
                         // case for when only 8 bits of 16 are sent
@@ -1822,72 +2036,60 @@ public class FragmentCharacteristicDetail extends Fragment {
                     pos = 0;
                 }
 
-                radioGroup.getChildAt(pos).setSelected(true);
+                LinearLayout.LayoutParams nameAndValueParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                nameAndValueParams.setMargins(0, defaultMargin, 0, 12 + defaultMargin / 2);
+                LinearLayout nameAndValueContainer = new LinearLayout(context);
+                nameAndValueContainer.setOrientation(LinearLayout.VERTICAL);
+                nameAndValueContainer.setLayoutParams(nameAndValueParams);
 
-                ((RadioButton) radioGroup.getChildAt(pos)).setChecked(true);
-                selectValueBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (writeable) {
-                            int radioButtonID = radioGroup.getCheckedRadioButtonId();
-                            View radioButton = radioGroup.findViewById(radioButtonID);
-                            int position = radioGroup.indexOfChild(radioButton);
+                View valueText = addValueText(enumerationArray.get(pos));
+                hidableViews.add(valueText);
+                View nameText = addFieldName(field.getName());
+                nameAndValueContainer.addView(valueText);
+                nameAndValueContainer.addView(nameText);
+
+                valuesLayout.addView(nameAndValueContainer);
+
+                if (writeable || writeableWithoutResponse) {
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.5f);
+                    params.gravity = Gravity.CENTER_VERTICAL;
+
+                    final int offset = getFieldOffset(field);
+
+                    final Spinner spinner = new Spinner(context);
+                    ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(context, R.layout.enumeration_spinner_dropdown_item, enumerationArray);
+                    spinner.setAdapter(spinnerArrayAdapter);
+                    spinner.setLayoutParams(params);
+
+                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                             int key = field.getEnumerations().get(position).getKey();
-                            int off = getFieldOffset(field);
                             int formatLength = Engine.getInstance().getFormat(field.getFormat());
                             byte[] val = intToByteArray(key, formatLength);
-                            setValue(off, val);
-
-                            writeValueToCharacteristic();
+                            setValue(offset, val);
                         }
 
-                        dialog.dismiss();
-                    }
-                });
-            } else {
-                radioGroup.setEnabled(false);
-                for (int i = 0; i < radioGroup.getChildCount(); i++) {
-                    radioGroup.getChildAt(i).setClickable(false);
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+
+                        }
+                    });
+
+                    View fieldName = addFieldName(field.getName());
+                    fieldName.setLayoutParams(params);
+
+                    LinearLayout linearLayout = new LinearLayout(context);
+                    linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                    linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                    linearLayout.addView(fieldName);
+                    linearLayout.addView(spinner);
+
+                    writableFieldsContainer.addView(linearLayout);
                 }
             }
-
-            LinearLayout spinnerWithLabelContainer = new LinearLayout(context);
-            spinnerWithLabelContainer.setGravity(Gravity.CENTER_VERTICAL);
-            spinnerWithLabelContainer.setOrientation(LinearLayout.HORIZONTAL);
-            LinearLayout.LayoutParams spinnerWithLabelContainerParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            spinnerWithLabelContainerParams.setMargins(0, defaultMargin, 0, defaultMargin);
-
-            View spinnerBtnWithImage = inflater.inflate(R.layout.characteristic_spinner_btn, null);
-            spinnerBtnWithImage.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.2f));
-            spinnerBtnWithImage.findViewById(R.id.btn_show_picker_dialog).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.show();
-                }
-            });
-            LinearLayout spinnerBtnContainer = new LinearLayout(context);
-            spinnerBtnContainer.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
-            spinnerBtnContainer.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.2f));
-            spinnerBtnContainer.addView(spinnerBtnWithImage);
-
-            LinearLayout nameAndValueContainer = new LinearLayout(context);
-            nameAndValueContainer.setOrientation(LinearLayout.VERTICAL);
-            nameAndValueContainer.setGravity(Gravity.CENTER_VERTICAL);
-            nameAndValueContainer.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.8f));
-
-            int radioButtonID = radioGroup.getCheckedRadioButtonId();
-            RadioButton radioButton = radioGroup.findViewById(radioButtonID);
-            View spinnerValue = addValueText((String) (radioButton.getText()));
-            View spinnerName = addFieldName(field.getName());
-            nameAndValueContainer.addView(spinnerValue);
-            nameAndValueContainer.addView(spinnerName);
-
-            spinnerWithLabelContainer.addView(nameAndValueContainer);
-            spinnerWithLabelContainer.addView(spinnerBtnContainer, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            valuesLayout.addView(spinnerWithLabelContainer, spinnerWithLabelContainerParams);
         }
     }
 
@@ -1962,6 +2164,27 @@ public class FragmentCharacteristicDetail extends Fragment {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    private String getOtaSpecificCharacteristicName(String uuid) {
+        uuid = uuid.toUpperCase();
+        switch (uuid) {
+            case "F7BF3564-FB6D-4E53-88A4-5E37E0326063":
+                return "OTA Control Attribute";
+            case "984227F3-34FC-4045-A5D0-2C581F81A153":
+                return "OTA Data Attribute";
+            case "4F4A2368-8CCA-451E-BFFF-CF0E2EE23E9F":
+                return "AppLoader version";
+            case "4CC07BCF-0868-4B32-9DAD-BA4CC41E5316":
+                return "OTA version";
+            case "25F05C0A-E917-46E9-B2A5-AA2BE1245AFE":
+                return "Gecko Bootloader version";
+            case "0D77CC11-4AC1-49F2-BFA9-CD96AC7A92F8":
+                return "Application version";
+            default:
+                return getString(R.string.unknown_characteristic_label);
+        }
+
     }
 
 }

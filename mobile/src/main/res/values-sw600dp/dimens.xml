@@ -189,4 +189,7 @@
     <dimen name="characteristic_property_text_size">12sp</dimen>
 
     <dimen name="device_item_card_padding">15dp</dimen>
+
+    <!-- Toolbar common dimensions -->
+    <dimen name="toolbar_min_height">80dp</dimen>
 </resources>

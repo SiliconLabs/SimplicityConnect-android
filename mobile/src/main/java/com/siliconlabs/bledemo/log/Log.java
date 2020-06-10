@@ -52,7 +52,7 @@ public class Log {
 
     public static String getDeviceName(String name) {
         if (name == null) {
-            return Constants.UNKNOWN;
+            return "N/A";
         }
         return name;
     }
