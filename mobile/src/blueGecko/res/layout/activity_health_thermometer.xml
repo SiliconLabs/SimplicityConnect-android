@@ -30,9 +30,10 @@
             android:layout_height="wrap_content"
             android:elevation="0dp"
             android:fitsSystemWindows="true"
-            app:titleMarginTop="0dp"
-            app:titleMarginBottom="0dp"
+            android:minHeight="@dimen/toolbar_min_height"
             app:title="@string/title_Health_Thermometer"
+            app:titleMarginBottom="0dp"
+            app:titleMarginTop="0dp"
             app:titleTextAppearance="@style/TextAppearance.ToolbarTitle" />
 
         <fragment

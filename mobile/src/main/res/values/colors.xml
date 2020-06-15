@@ -28,6 +28,9 @@
     <color name="silabs_clickable_text">#555555</color>
     <color name="silabs_primary_text">#333333</color>
 
+    <color name="silabs_primary_icon">#333333</color>
+    <color name="silabs_dark_gray_icon">#666666</color>
+
     <color name="silabs_dialog_title_background">#F2F2F2</color>
     <color name="silabs_divider">#CCCCCC</color>
 

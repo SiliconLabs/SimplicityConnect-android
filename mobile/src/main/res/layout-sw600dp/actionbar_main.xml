@@ -7,10 +7,11 @@
     android:elevation="0dp"
     android:fitsSystemWindows="true"
     android:gravity="end"
+    android:minHeight="@dimen/toolbar_min_height"
     android:paddingTop="24dp"
-    app:titleMarginTop="0dp"
-    app:titleMarginBottom="0dp"
     android:paddingBottom="8dp"
+    app:titleMarginBottom="0dp"
+    app:titleMarginTop="0dp"
     app:titleTextAppearance="@style/TextAppearance.ToolbarTitle">
 
     <RelativeLayout

@@ -109,7 +109,7 @@ public class ScanRecordParser {
                 if (data.length <= 0) {
                     advertismentData.append(AD_STRING_NO_DATA);
                 } else if (data.length % 2 == 0) {
-                    advertismentData.append(get16bitServiceUUIDsAsString(data));
+                    advertismentData.append(get16bitServicesUUIDsWithNamesAsString(data));
                 } else {
                     advertismentData.append(getParsingErrorOctets0x__AsString(data));
                 }
@@ -122,7 +122,7 @@ public class ScanRecordParser {
                 if (data.length <= 0) {
                     advertismentData.append(AD_STRING_NO_DATA);
                 } else if (data.length % 2 == 0) {
-                    advertismentData.append(get16bitServiceUUIDsAsString(data));
+                    advertismentData.append(get16bitServicesUUIDsWithNamesAsString(data));
                 } else {
                     advertismentData.append(getParsingErrorOctets0x__AsString(data));
                 }
@@ -1132,6 +1132,99 @@ public class ScanRecordParser {
         }
     }
 
+    private static String get16BitServiceName(int value) {
+
+        switch(value) {
+            case 0x1800:
+                return "Generic Access";
+            case 0x1811:
+                return "Alert Notification Service";
+            case 0x1815:
+                return "Automation IO";
+            case 0x180F:
+                return "Battery Service";
+            case 0x183B:
+                return "Binary Sensor";
+            case 0x1810:
+                return "Blood Pressure";
+            case 0x181B:
+                return "Body Composition";
+            case 0x181E:
+                return "Bond Management Service";
+            case 0x181F:
+                return "Continuous Glucose Monitoring";
+            case 0x1805:
+                return "Current Time Service";
+            case 0x1818:
+                return "Cycling Power";
+            case 0x1816:
+                return "Cycling Speed and Cadence";
+            case 0x180A:
+                return "Device Information";
+            case 0x183C:
+                return "Emergency Configuration";
+            case 0x181A:
+                return "Environmental Sensing";
+            case 0x1826:
+                return "Fitness Machine";
+            case 0x1801:
+                return "Generic Attribute";
+            case 0x1808:
+                return "Glucose";
+            case 0x1809:
+                return "Health Thermometer";
+            case 0x180D:
+                return "Heart Rate";
+            case 0x1823:
+                return "HTTP Proxy";
+            case 0x1812:
+                return "Human Interface Device";
+            case 0x1802:
+                return "Immediate Alert";
+            case 0x1821:
+                return "Indoor Positioning";
+            case 0x183A:
+                return "Insulin Delivery";
+            case 0x1820:
+                return "Internet Protocol Support Service";
+            case 0x1803:
+                return "Link Loss";
+            case 0x1819:
+                return "Location and Navigation";
+            case 0x1827:
+                return "Mesh Provisioning Service";
+            case 0x1828:
+                return "Mesh Proxy Service";
+            case 0x1807:
+                return "Next DST Change Service";
+            case 0x1825:
+                return "Object Transfer Service";
+            case 0x180E:
+                return "Phone Alert Status Service";
+            case 0x1822:
+                return "Pulse Oximeter Service";
+            case 0x1829:
+                return "Reconnection Configuration";
+            case 0x1806:
+                return "Reference Time Update Service";
+            case 0x1814:
+                return "Running Speed and Cadence";
+            case 0x1813:
+                return "Scan Parameters";
+            case 0x1824:
+                return "Transport Discovery";
+            case 0x1804:
+                return "Tx Power";
+            case 0x181C:
+                return "User Data";
+            case 0x181D:
+                return "Weight Scale";
+            default:
+                return "Unknown Service UUID";
+        }
+
+    }
+
     private static String getRawDataOctets0x__AsString(byte[] data) {
         StringBuilder builder = new StringBuilder();
 
@@ -1154,6 +1247,26 @@ public class ScanRecordParser {
                 builder.append(Converters.getHexValue(data[j]));
             }
             if (i != addressess) builder.append(", ");
+        }
+        return builder.toString();
+    }
+
+    private static String get16bitServicesUUIDsWithNamesAsString(byte[] data) {
+        StringBuilder builder = new StringBuilder();
+        int addressess = data.length / 2;
+
+        if (data.length % 2 != 0) return "";
+
+        for (int i = 1; i <= addressess; i++) {
+            StringBuilder valueBuilder = new StringBuilder();
+
+            for (int j = (i * 2) - 1; j >= (i - 1) * 2; j--) {
+                valueBuilder.append(Converters.getHexValue(data[j]));
+            }
+
+            int value = Integer.parseInt(valueBuilder.toString(),16);
+            builder.append("0x").append(valueBuilder.toString()).append(" - ").append(get16BitServiceName(value));
+            if (i != addressess) builder.append(", ").append("<br/>");
         }
         return builder.toString();
     }
@@ -1565,11 +1678,10 @@ public class ScanRecordParser {
 
     // Gets next advertise data for given start position
     public static byte[] getNextAdType(byte[] data, int startPos) {
-        if (startPos >= data.length) return null;
+        if (data == null || startPos >= data.length) return null;
         try {
             return Arrays.copyOfRange(data, startPos, startPos + data[startPos] + 1);
-        } catch (ArrayIndexOutOfBoundsException | NullPointerException ex) {
-            ex.printStackTrace();
+        } catch (ArrayIndexOutOfBoundsException | NullPointerException | IllegalArgumentException ex) {
             return null;
         }
     }

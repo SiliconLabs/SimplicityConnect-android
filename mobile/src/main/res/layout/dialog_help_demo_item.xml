@@ -105,6 +105,24 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/help_section_and_body_separation"
                     android:fontFamily="sans-serif"
+                    android:text="@string/help_text_users_guide_label"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/help_text_size" />
+
+                <TextView
+                    android:id="@+id/users_guide_efrconnect"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_text_users_guide_url"
+                    android:textColor="@color/silabs_blue"
+                    android:textSize="@dimen/help_text_size" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/help_section_and_body_separation"
+                    android:fontFamily="sans-serif"
                     android:text="@string/help_text_documentation_label"
                     android:textColor="@color/silabs_primary_text"
                     android:textSize="@dimen/help_text_size" />
@@ -152,7 +170,7 @@
             android:id="@+id/help_ok_button"
             android:layout_width="match_parent"
             android:layout_height="@dimen/help_button_height"
-            android:background="@drawable/ok_button_selector"
+            android:background="@drawable/red_button_selector"
             android:fontFamily="sans-serif-medium"
             android:text="@string/ok"
             android:textColor="@color/silabs_white"

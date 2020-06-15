@@ -1,0 +1,73 @@
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dialog_about_mappings_header_height"
+            android:background="@color/silabs_dialog_title_background"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="@string/About"
+            android:textColor="@color/silabs_primary_text"
+            android:textSize="18sp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/silabs_white"
+                android:orientation="vertical"
+                android:padding="@dimen/dialog_about_mappings_text_padding">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/ABOUT_MAPPINGS_DICTIONARY"
+                    android:textColor="@color/silabs_subtle_text"
+                    android:textSize="@dimen/dialog_about_mappings_text_size" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/silabs_secondary_background" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_about_mappings_info_section_and_body_separation"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/about_mappings_dictionary_info"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/help_text_size" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <Button
+            android:id="@+id/ok_btn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dialog_about_mappings_ok_height"
+            android:background="@drawable/red_button_selector"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/ok"
+            android:textColor="@color/silabs_white"
+            android:textSize="@dimen/dialog_about_mappings_ok_btn_text_size" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

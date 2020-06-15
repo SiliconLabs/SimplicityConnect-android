@@ -163,6 +163,7 @@ public class Engine {
         formats.put("boolean", 1);
         formats.put("2bit", 1);
         formats.put("nibble", 2);
+        formats.put("4bit",1);
         formats.put("8bit", 1);
         formats.put("16bit", 2);
         formats.put("24bit", 3);

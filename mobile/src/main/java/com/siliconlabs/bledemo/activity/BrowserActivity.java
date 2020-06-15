@@ -41,8 +41,6 @@ import android.provider.Settings;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -57,7 +55,6 @@ import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -87,12 +84,14 @@ import com.siliconlabs.bledemo.adapters.LogAdapter;
 import com.siliconlabs.bledemo.ble.BlueToothService;
 import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
 import com.siliconlabs.bledemo.ble.Discovery;
+import com.siliconlabs.bledemo.ble.ErrorCodes;
 import com.siliconlabs.bledemo.ble.TimeoutGattCallback;
 import com.siliconlabs.bledemo.bluetoothdatamodel.parsing.Common;
 import com.siliconlabs.bledemo.bluetoothdatamodel.parsing.Converters;
 import com.siliconlabs.bledemo.bluetoothdatamodel.parsing.Device;
 import com.siliconlabs.bledemo.bluetoothdatamodel.parsing.Engine;
 import com.siliconlabs.bledemo.dialogs.Dialogs;
+import com.siliconlabs.bledemo.dialogs.LeaveBrowserDialog;
 import com.siliconlabs.bledemo.fragment.LogFragment;
 import com.siliconlabs.bledemo.fragment.SearchFragment;
 import com.siliconlabs.bledemo.interfaces.DebugModeCallback;
@@ -117,6 +116,7 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -152,6 +152,7 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
     private static final int TOOLBAR_OPEN_PERCENTAGE = 95;
     private static final int TOOLBAR_CLOSE_PERCENTACE = 95;
 
+    private String connectToDeviceAddress = "";
     //log
     private Thread logUpdate;
 
@@ -176,9 +177,10 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
                         if (defaultBluetoothAdapter != null &&
                                 defaultBluetoothAdapter.isEnabled()) {
                             if (!isBluetoothAdapterEnabled) {
-                                Toast.makeText(BrowserActivity.this,
+                                toast = Toast.makeText(BrowserActivity.this,
                                         R.string.toast_bluetooth_enabled,
-                                        Toast.LENGTH_SHORT).show();
+                                        Toast.LENGTH_SHORT);
+                                toast.show();
                             }
 
                             updateListWhenAdapterIsReady = false;
@@ -248,8 +250,6 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
     TextView connectionsTV;
     @InjectView(R.id.textview_filter)
     TextView filterTV;
-    @InjectView(R.id.imageview_filter_start)
-    ImageView filterStartIV;
     @InjectView(R.id.bluetooth_browser_background)
     RelativeLayout bluetoothBrowserBackgroundRL;
     @InjectView(R.id.button_scanning)
@@ -261,6 +261,27 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
 
     private static final int RESTART_SCAN_TIMEOUT = 1000;
     private Handler handler;
+
+    private final LinkedList<String> errorMessageQueue = new LinkedList<>();
+
+    private Toast toast;
+
+    private final Runnable displayQueuedMessages = new Runnable() {
+        @Override
+        public void run() {
+            handler.removeCallbacks(displayQueuedMessages);
+
+            synchronized (displayQueuedMessages) {
+                if (errorMessageQueue.size() > 0 && toast != null && toast.getView() != null && toast.getView().isShown()) {
+                    handler.postDelayed(displayQueuedMessages, 1000);
+                } else if (errorMessageQueue.size() > 0) {
+                    toast = Toast.makeText(BrowserActivity.this, errorMessageQueue.removeFirst(), Toast.LENGTH_LONG);
+                    toast.show();
+                    handler.postDelayed(displayQueuedMessages, 1000);
+                }
+            }
+        }
+    };
 
     private final Runnable restartScanTimeout = new Runnable() {
         @Override
@@ -306,6 +327,9 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
 
         // init/config ui
         setSupportActionBar(toolbar);
+
+        // clear logs
+        Constants.clearLogs();
 
         setShowSpinnerDialogVisibility(false);
 
@@ -405,7 +429,8 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
             protected void onBound(BlueToothService service) {
                 boolean successDisconnected = service.disconnectGatt(deviceInfo.getAddress());
                 if (!successDisconnected) {
-                    Toast.makeText(getApplicationContext(), R.string.device_not_from_EFR, Toast.LENGTH_LONG).show();
+                    toast = Toast.makeText(getApplicationContext(), R.string.device_not_from_EFR, Toast.LENGTH_LONG);
+                    toast.show();
                 }
                 updateCountOfConnectedDevices();
                 devicesAdapter.notifyDataSetChanged();
@@ -550,7 +575,13 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
                             closeToolbar();
                             btToolbarOpened = !btToolbarOpened;
                         }
-                        filterStartIV.setVisibility(filterDeviceParams.isEmptyFilter() ? View.GONE : View.VISIBLE);
+                        if(filterDeviceParams.isEmptyFilter()) {
+                            filterIV.setImageDrawable(ContextCompat.getDrawable(BrowserActivity.this,R.drawable.ic_icon_filter));
+                        } else {
+                            filterIV.setImageDrawable(ContextCompat.getDrawable(BrowserActivity.this,R.drawable.ic_icon_filter_active));
+                        }
+
+
                         filterDevices(filterDeviceParams);
                     }
                 }));
@@ -671,7 +702,17 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
 
             hideConnectingAnimation();
         } else {
-            super.onBackPressed();
+            if(sharedPrefUtils.shouldDisplayLeaveBrowserDialog() && getConnectedBluetoothDevices().size() > 0) {
+                LeaveBrowserDialog dialog = new LeaveBrowserDialog(new LeaveBrowserDialog.LeaveBrowserCallback() {
+                    @Override
+                    public void onOkClicked() {
+                        BrowserActivity.super.onBackPressed();
+                    }
+                },BrowserActivity.this);
+                dialog.show(getSupportFragmentManager(),"leave_browser_dialog");
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -923,7 +964,8 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
     }
 
     public void performSearch(String string) {
-        Toast.makeText(getBaseContext(), getResources().getString(R.string.Search_for_s, string), Toast.LENGTH_SHORT).show();
+        toast = Toast.makeText(getBaseContext(), getResources().getString(R.string.Search_for_s, string), Toast.LENGTH_SHORT);
+        toast.show();
         if (string.equals("")) {
             updateWithDevices(devicesAdapter.getDevicesInfo());
         } else {
@@ -1289,6 +1331,8 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
 
     @Override
     public void connectToDevice(final BluetoothDeviceInfo deviceInfo) {
+        connectToDeviceAddress = deviceInfo.getAddress();
+
         if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
             return;
         }
@@ -1325,6 +1369,7 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
                 //fixme
 
                 if (service.isGattConnected(deviceInfo.getAddress())) {
+                    connectToDeviceAddress = "";
                     hideConnectingAnimation();
                     if (btToolbarOpened) {
                         closeToolbar();
@@ -1337,48 +1382,44 @@ public class BrowserActivity extends BaseActivity implements DebugModeCallback, 
                 }
 
                 service.connectGatt(bluetoothDeviceInfo.device, false, new TimeoutGattCallback() {
-
                     @Override
                     public void onTimeout() {
                         Constants.LOGS.add(new TimeoutLog(bluetoothDeviceInfo.device));
-                        Toast.makeText(BrowserActivity.this,
+                        toast = Toast.makeText(BrowserActivity.this,
                                 R.string.toast_connection_timed_out,
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT);
+                        toast.show();
                         hideConnectingAnimation();
+                        connectToDeviceAddress = "";
                     }
 
                     @Override
-                    public void onConnectionStateChange(BluetoothGatt gatt, final int status, final int newState) {
+                    public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int newState) {
                         super.onConnectionStateChange(gatt, status, newState);
                         updateCountOfConnectedDevices();
                         service.gattMap.put(deviceInfo.getAddress(), gatt);
                         hideConnectingAnimation();
 
-                        if (status != BluetoothGatt.GATT_SUCCESS) {
-
-                            final String deviceName = TextUtils.isEmpty(bluetoothDeviceInfo.getName()) ? "Unknown" : bluetoothDeviceInfo
-                                    .getName();
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Snackbar snackbar = Snackbar.make(coordinatorLayout,
-                                            getString(R.string.debug_mode_connection_failed_snackbar,
-                                                    deviceName),
-                                            Snackbar.LENGTH_SHORT);
-                                    View snackbarLayout = snackbar.getView();
-                                    TextView textView = snackbarLayout.findViewById(com.google.android.material.R.id.snackbar_text);
-                                    textView.setTextSize(11);
-                                    textView.setGravity(Gravity.CENTER_VERTICAL);
-                                    textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.debug_failed, 0, 0, 0);
-                                    textView.setCompoundDrawablePadding(getResources().getDimensionPixelOffset(R.dimen.debug_mode_device_selection_snackbar_padding));
-                                    snackbar.show();
+                        if (newState == BluetoothGatt.STATE_DISCONNECTED && status != BluetoothGatt.GATT_SUCCESS) {
+                            final String deviceName = TextUtils.isEmpty(bluetoothDeviceInfo.getName()) ? getString(R.string.not_advertising_shortcut) : bluetoothDeviceInfo.getName();
+                            if (gatt.getDevice().getAddress().equals(connectToDeviceAddress)) {
+                                connectToDeviceAddress = "";
+                                synchronized (errorMessageQueue) {
+                                    errorMessageQueue.add(ErrorCodes.getFailedConnectingToDeviceMessage(deviceName, status));
                                 }
-                            });
-                        } else if (newState == BluetoothGatt.STATE_CONNECTED) {
+                            } else {
+                                synchronized (errorMessageQueue) {
+                                    errorMessageQueue.add(ErrorCodes.getDeviceDisconnectedMessage(deviceName, status));
+                                }
+                            }
+
+                            handler.removeCallbacks(displayQueuedMessages);
+                            handler.postDelayed(displayQueuedMessages, 500);
+
+                        } else if (newState == BluetoothGatt.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
                             //refreshDeviceCache(gatt);
                             if (service.isGattConnected()) {
-
+                                connectToDeviceAddress = "";
                                 if (btToolbarOpened) {
                                     closeToolbar();
                                     btToolbarOpened = !btToolbarOpened;

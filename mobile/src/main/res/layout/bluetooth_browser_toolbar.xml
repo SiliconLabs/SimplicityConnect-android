@@ -80,7 +80,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_icon_search_off" />
+                android:src="@drawable/ic_icon_filter" />
 
             <TextView
                 android:id="@+id/textview_filter"
@@ -93,15 +93,6 @@
                 android:text="@string/Filter"
                 android:textColor="#333333"
                 android:textSize="@dimen/browser_toolbar_text_size" />
-
-            <ImageView
-                android:id="@+id/imageview_filter_start"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_filter_list_24px"
-                android:visibility="gone" />
-
         </LinearLayout>
 
 
