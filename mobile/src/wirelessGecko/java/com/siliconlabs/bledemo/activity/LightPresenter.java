@@ -1,6 +1,6 @@
 package com.siliconlabs.bledemo.activity;
 
-import com.siliconlabs.bledemo.ble.GattService;
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService;
 
 import java.util.Timer;
 import java.util.TimerTask;

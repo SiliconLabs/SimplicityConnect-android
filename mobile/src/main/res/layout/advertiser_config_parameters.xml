@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            style="@style/TextViewTitleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/advertiser_title_advertising_parameters" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextViewTitleSmall"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/advertiser_label_primary_phy"
+                android:textColor="@color/silabs_subtle_text" />
+
+            <Spinner
+                android:id="@+id/sp_primary_phy"
+                style="@style/CustomSpinner"
+                android:layout_width="110dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextViewTitleSmall"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/advertiser_label_secondary_phy"
+                android:textColor="@color/silabs_subtle_text" />
+
+            <Spinner
+                android:id="@+id/sp_secondary_phy"
+                style="@style/CustomSpinner"
+                android:layout_width="110dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_advertising_interval"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextViewTitleSmall"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/advertiser_label_advertising_interval_with_range"
+                android:textColor="@color/silabs_subtle_text" />
+
+            <EditText
+                android:id="@+id/et_advertising_interval"
+                style="@style/EditTextNormal"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/et_background"
+                android:gravity="center_horizontal"
+                android:inputType="number"
+                android:maxLength="8" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_tx_power"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextViewTitleSmall"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/advertiser_label_tx_power_with_range"
+                android:textColor="@color/silabs_subtle_text" />
+
+            <EditText
+                android:id="@+id/et_tx_power"
+                style="@style/EditTextNormal"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/et_background"
+                android:gravity="center_horizontal"
+                android:inputType="numberSigned"
+                android:maxLength="4" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_advertising_interval_low_api"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextViewTitleSmall"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/advertiser_label_advertising_interval"
+                android:textColor="@color/silabs_subtle_text" />
+
+            <Spinner
+                android:id="@+id/sp_advertising_interval_low_api"
+                style="@style/CustomSpinner"
+                android:layout_width="150dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_tx_power_low_api"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextViewTitleSmall"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/advertiser_label_tx_power"
+                android:textColor="@color/silabs_subtle_text" />
+
+            <Spinner
+                android:id="@+id/sp_tx_power_low_api"
+                style="@style/CustomSpinner"
+                android:layout_width="150dp" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/TextViewNoteInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/advertiser_note_tx_power" />
+
+        <TextView
+            style="@style/TextViewTitleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/advertiser_label_advertising_time_limit"
+            android:textColor="@color/silabs_subtle_text" />
+
+        <RadioButton
+            android:id="@+id/rb_no_limit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:checked="true"
+            android:gravity="center_vertical"
+            android:text="@string/advertiser_label_time_no_limit"
+            android:textColor="@color/silabs_subtle_text"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_time_limit"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/advertiser_label_time_limit"
+                android:textColor="@color/silabs_subtle_text"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/et_time_limit"
+                style="@style/EditTextNormal"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:gravity="center_horizontal"
+                android:inputType="number"
+                android:maxLength="6" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_event_limit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_event_limit"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/advertiser_label_event_limit"
+                android:textColor="@color/silabs_subtle_text"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/et_event_limit"
+                style="@style/EditTextNormal"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:gravity="center_horizontal"
+                android:inputType="number"
+                android:maxLength="3"
+                android:maxLines="1" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

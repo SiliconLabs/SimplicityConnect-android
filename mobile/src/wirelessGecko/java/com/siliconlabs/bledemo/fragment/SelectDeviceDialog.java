@@ -31,9 +31,9 @@ import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.activity.BaseActivity;
 import com.siliconlabs.bledemo.activity.LightActivity;
 import com.siliconlabs.bledemo.activity.RangeTestActivity;
-import com.siliconlabs.bledemo.adapters.DeviceInfoViewHolder;
-import com.siliconlabs.bledemo.adapters.ScannedDevicesAdapter;
-import com.siliconlabs.bledemo.ble.*;
+import com.siliconlabs.bledemo.Adapters.DeviceInfoViewHolder;
+import com.siliconlabs.bledemo.Adapters.ScannedDevicesAdapter;
+import com.siliconlabs.bledemo.Bluetooth.BLE.*;
 import timber.log.Timber;
 
 import java.util.ArrayList;
@@ -137,7 +137,7 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
         }
     };
 
-    final ScannedDevicesAdapter adapter = new ScannedDevicesAdapter(new DeviceInfoViewHolder.Generator(R.layout.device_item) {
+    final ScannedDevicesAdapter adapter = new ScannedDevicesAdapter(new DeviceInfoViewHolder.Generator(R.layout.adapter_bluetooth_device) {
         @Override
         public DeviceInfoViewHolder generate(View itemView) {
             final ViewHolder holder = new ViewHolder(itemView);

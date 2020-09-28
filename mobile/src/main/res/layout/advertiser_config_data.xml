@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/ll_advertising_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                style="@style/TextViewTitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/advertiser_title_advertising_data" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_advertising_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="#F2F2F2">
+
+                <include
+                    android:id="@+id/ll_data_advertising_data"
+                    layout="@layout/advertiser_data_container" />
+
+            </androidx.cardview.widget.CardView>
+
+            <Spinner
+                android:id="@+id/sp_advertising_data"
+                style="@style/ButtonBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/silabs_transparent" />
+
+            <Button
+                android:id="@+id/btn_add_advertising_data"
+                style="@style/ButtonBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="3dp"
+                android:text="@string/advertiser_button_add_data_type" />
+
+            <TextView
+                android:id="@+id/tv_adv_data_available_bytes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/silabs_inactive_light"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <include layout="@layout/horizontal_separator" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ll_scan_resp_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                style="@style/TextViewTitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/advertiser_title_scan_response_data" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cv_scan_response_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="#F2F2F2">
+
+                <include
+                    android:id="@+id/ll_data_scan_resp_data"
+                    layout="@layout/advertiser_data_container" />
+            </androidx.cardview.widget.CardView>
+
+            <Spinner
+                android:id="@+id/sp_scan_response_data"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/silabs_transparent" />
+
+            <Button
+                android:id="@+id/btn_add_scan_response_data"
+                style="@style/ButtonBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="3dp"
+                android:text="@string/advertiser_button_add_data_type" />
+
+            <TextView
+                android:id="@+id/tv_scan_resp_available_bytes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/silabs_inactive_light"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <include layout="@layout/horizontal_separator" />
+    </LinearLayout>
+</LinearLayout>

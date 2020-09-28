@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    app:cardCornerRadius="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/silabs_dialog_title_background"
+        android:minWidth="300dp"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/DialogHeaderText"
+            android:layout_width="match_parent"
+            android:text="@string/advertiser_data_type_complete_list_of_16bit_service" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/silabs_white"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <AutoCompleteTextView
+                android:id="@+id/actv_16bit_services"
+                style="@style/EditTextSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/advertiser_hint_16_bit_uuid_or_service_name" />
+
+            <TextView
+                style="@style/TextViewSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/advertiser_note_16bit_services"
+                android:textColor="@color/silabs_dark_gray_text" />
+
+            <Button
+                android:id="@+id/btn_bluetooth_gatt_services"
+                style="@style/ButtonBlueWithBorders"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/advertiser_label_bluetooth_gatt_services" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/silabs_white"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_clear"
+                style="@style/ButtonBorderlessBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/button_clear" />
+
+            <Button
+                android:id="@+id/btn_cancel"
+                style="@style/ButtonBorderlessBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/button_cancel" />
+
+            <Button
+                android:id="@+id/btn_save"
+                style="@style/ButtonBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:enabled="false"
+                android:text="@string/button_save" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -4,36 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/silabs_background"
-    tools:context=".activity.DeviceServicesActivity">
-
-    <RelativeLayout
-        android:id="@+id/go_back_relative_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/silabs_red">
-
-        <ImageView
-            android:id="@+id/go_back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            android:layout_alignParentTop="true"
-            android:src="@drawable/ic_chevron_left_white_48dp"/>
-    </RelativeLayout>
+    tools:context=".Browser.Activities.DeviceServicesActivity">
 
     <include
-        android:id="@+id/toolbar"
-        layout="@layout/actionbar_debug_services_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/go_back_relative_layout"/>
+        android:id="@+id/toolbar_device_services"
+        layout="@layout/actionbar"/>
 
     <LinearLayout
         android:id="@+id/header_services"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@id/toolbar_device_services"
         android:background="@color/silabs_red"
         android:gravity="end"
         android:orientation="horizontal"
@@ -45,7 +26,7 @@
             android:id="@+id/rssi_image_view"
             android:layout_width="wrap_content"
             android:layout_height="24dp"
-            android:src="@drawable/ic_icon_wifi"
+            android:src="@drawable/ic_wifi"
             android:tint="@android:color/white" />
 
         <TextView
@@ -61,13 +42,20 @@
             android:textSize="@dimen/rssi_indicator_text_size" />
     </LinearLayout>
 
-
     <include
         android:id="@+id/services_toolbar"
-        layout="@layout/services_toolbar"
+        layout="@layout/toolbar_device_services"
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:layout_below="@id/header_services" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_height"
+        android:background="@drawable/scanning_bar_shadow"
+        android:layout_below="@id/services_toolbar"
+        android:elevation="1dp"
+        android:rotation="180" />
 
     <RelativeLayout
         android:id="@+id/framelayout_container"

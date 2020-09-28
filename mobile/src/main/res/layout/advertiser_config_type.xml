@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            style="@style/TextViewTitleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/advertiser_title_advertising_type" />
+
+        <RadioButton
+            android:id="@+id/rb_legacy_advertising"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:checked="true"
+            android:text="@string/advertiser_label_legacy_advertising"
+            android:textColor="@color/silabs_primary_text"
+            android:textSize="12sp" />
+
+        <Spinner
+            android:id="@+id/sp_legacy"
+            style="@style/CustomSpinner"
+            android:layout_width="match_parent"
+            android:layout_marginTop="4dp" />
+
+        <RadioButton
+            android:id="@+id/rb_extended_advertising"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/advertiser_label_extended_advertising"
+            android:textColor="@drawable/text_state_color"
+            android:textSize="12sp" />
+
+        <Spinner
+            android:id="@+id/sp_extended"
+            style="@style/CustomSpinner"
+            android:layout_width="match_parent"
+            android:layout_marginTop="4dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cb_include_tx_power"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/advertiser_label_include_tx_power"
+                android:textColor="@drawable/text_state_color"
+                android:textSize="12sp" />
+
+            <CheckBox
+                android:id="@+id/cb_anonymous"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/advertiser_label_anonymous"
+                android:textColor="@drawable/text_state_color"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_extended_adv_not_supported"
+            style="@style/TextViewNoteInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/advertiser_note_extended_advertising_not_supported"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <include layout="@layout/horizontal_separator" />
+</LinearLayout>

@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+    <item
+        android:id="@+id/menu_mappings"
+        android:icon="@drawable/ic_dictionary_book"
+        android:title="@string/title_Mappings_dictionary"
+        app:showAsAction="always" />
+</menu>

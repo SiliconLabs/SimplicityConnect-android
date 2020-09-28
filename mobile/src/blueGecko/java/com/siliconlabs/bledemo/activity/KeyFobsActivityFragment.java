@@ -15,9 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.adapters.KeyFobsRecyclerViewAdapter;
-import com.siliconlabs.bledemo.ble.Discovery;
-import com.siliconlabs.bledemo.ble.GattService;
+import com.siliconlabs.bledemo.Adapters.KeyFobsRecyclerViewAdapter;
+import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery;
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService;
 import com.siliconlabs.bledemo.interfaces.FindKeyFobCallback;
 
 import butterknife.ButterKnife;

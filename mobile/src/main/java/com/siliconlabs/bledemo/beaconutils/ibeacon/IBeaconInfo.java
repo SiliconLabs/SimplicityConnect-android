@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.beaconutils.ibeacon;
+package com.siliconlabs.bledemo.BeaconUtils.ibeacon;
 
 public class IBeaconInfo {
     private String uuid = "unknown";

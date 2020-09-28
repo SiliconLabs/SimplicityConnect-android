@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.views;
+package com.siliconlabs.bledemo.Views;
 
 import android.content.Context;
 
@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.utils.BLEUtils;
+import com.siliconlabs.bledemo.Utils.BLEUtils;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -14,7 +14,7 @@
             android:name=".activity.KeyFobsActivity"
             android:label="@string/title_activity_key_fobs"
             android:screenOrientation="portrait"
-            android:parentActivityName=".activity.MainMenuActivity"
+            android:parentActivityName=".MainMenu.Activities.MainMenuActivity"
             android:theme="@style/AppTheme"
             />
     </application>

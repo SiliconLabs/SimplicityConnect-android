@@ -56,30 +56,23 @@
             android:orientation="horizontal">
 
             <Button
+                style="@style/ButtonBorderlessBlue"
                 android:id="@+id/button_cancel"
-                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/rounded_button_transparent"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/Cancel"
-                android:textAllCaps="false"
-                android:textSize="@dimen/dialog_mapping_button_text_size" />
+                android:text="@string/button_cancel" />
 
             <Button
+                style="@style/ButtonBlue"
                 android:id="@+id/button_save"
-                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/rounded_button_blue"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/Save"
-                android:textAllCaps="false"
-                android:textSize="@dimen/dialog_mapping_button_text_size" />
+                android:text="@string/button_save"/>
 
         </LinearLayout>
 

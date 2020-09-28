@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.views;
+package com.siliconlabs.bledemo.Views;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -21,6 +21,13 @@ public class ServiceItemContainerRe extends LinearLayout {
     public ServiceItemContainerRe(Context context) {
         super(context);
         init(context);
+    }
+
+    public ServiceItemContainerRe(Context context, String title, String text) {
+        super(context);
+        init(context);
+        serviceTitleTextView.setText(title);
+        serviceUuidTextView.setText(text);
     }
 
     public ServiceItemContainerRe(Context context, AttributeSet attrs) {

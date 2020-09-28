@@ -79,7 +79,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/separator_ad_and_btns"
-        android:background="@drawable/debug_mode_dialog_button_selector"
+        android:background="@drawable/btn_debug_mode_dialog_selector"
         android:gravity="center"
         android:text="@string/ad_dialog_close_btn_default_text"
         android:textAllCaps="false"

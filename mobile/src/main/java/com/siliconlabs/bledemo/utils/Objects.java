@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.siliconlabs.bledemo.utils;
+package com.siliconlabs.bledemo.Utils;
 
 import java.util.Arrays;
 import java.util.Comparator;

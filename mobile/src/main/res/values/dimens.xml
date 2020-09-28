@@ -301,5 +301,6 @@
 
     <!-- Toolbar common dimensions -->
     <dimen name="toolbar_min_height">60dp</dimen>
+    <dimen name="shadow_height">7dp</dimen>
 
 </resources>

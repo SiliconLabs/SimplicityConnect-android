@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.beaconutils.ibeacon;
+package com.siliconlabs.bledemo.BeaconUtils.ibeacon;
 
 import android.bluetooth.BluetoothDevice;
 

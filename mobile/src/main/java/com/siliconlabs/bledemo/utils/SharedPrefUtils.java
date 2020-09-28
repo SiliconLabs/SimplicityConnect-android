@@ -1,11 +1,11 @@
-package com.siliconlabs.bledemo.utils;
+package com.siliconlabs.bledemo.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.siliconlabs.bledemo.mappings.Mapping;
+import com.siliconlabs.bledemo.Browser.Model.Mapping;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -215,5 +215,4 @@ public class SharedPrefUtils {
         editor.putBoolean(DISPLAY_BROWSER_LEAVE_DIALOG_KEY,displayDialog);
         editor.apply();
     }
-
 }

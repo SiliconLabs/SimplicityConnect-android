@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.utils;
+package com.siliconlabs.bledemo.Utils;
 
 import android.content.Context;
 

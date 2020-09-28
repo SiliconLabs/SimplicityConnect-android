@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.beaconutils.eddystone;
+package com.siliconlabs.bledemo.BeaconUtils.eddystone;
 // see https://github.com/google/eddystone
 
 public class EddyStoneBeaconInfo {

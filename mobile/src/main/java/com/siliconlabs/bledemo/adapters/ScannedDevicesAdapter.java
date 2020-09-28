@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.adapters;
+package com.siliconlabs.bledemo.Adapters;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
 
-import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
-import com.siliconlabs.bledemo.ble.Discovery;
-import com.siliconlabs.bledemo.utils.FilterDeviceParams;
-import com.siliconlabs.bledemo.utils.SharedPrefUtils;
-import com.siliconlabs.bledemo.utils.StringUtils;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo;
+import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery;
+import com.siliconlabs.bledemo.Utils.FilterDeviceParams;
+import com.siliconlabs.bledemo.Utils.SharedPrefUtils;
+import com.siliconlabs.bledemo.Utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,6 +1,6 @@
-package com.siliconlabs.bledemo.utils;
+package com.siliconlabs.bledemo.Utils;
 
-import com.siliconlabs.bledemo.beaconutils.BleFormat;
+import com.siliconlabs.bledemo.BeaconUtils.BleFormat;
 
 import java.util.List;
 

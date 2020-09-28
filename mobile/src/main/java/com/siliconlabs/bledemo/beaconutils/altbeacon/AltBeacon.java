@@ -1,7 +1,7 @@
-package com.siliconlabs.bledemo.beaconutils.altbeacon;
+package com.siliconlabs.bledemo.BeaconUtils.altbeacon;
 
-import com.siliconlabs.bledemo.beaconutils.BleFormat;
-import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
+import com.siliconlabs.bledemo.BeaconUtils.BleFormat;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo;
 
 import java.util.Arrays;
 

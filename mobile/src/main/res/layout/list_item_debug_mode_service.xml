@@ -71,7 +71,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:src="@drawable/ic_edit_grey_24dp"
+                            android:src="@drawable/ic_edit"
                             android:visibility="gone" />
 
                     </LinearLayout>
@@ -86,18 +86,15 @@
                         android:textSize="@dimen/service_uuid_text_size" />
 
                     <Button
+                        style="@style/ButtonBorderlessBlue"
                         android:id="@+id/btn_expand_to_show_characteristics"
                         android:layout_width="wrap_content"
                         android:layout_height="30dp"
                         android:layout_weight="1"
                         android:background="@color/silabs_transparent"
-                        android:fontFamily="sans-serif-medium"
                         android:gravity="start|center"
                         android:maxLines="1"
-                        android:text="@string/More_Info"
-                        android:textAllCaps="false"
-                        android:textColor="@color/silabs_blue"
-                        android:textSize="@dimen/browser_button_text_size" />
+                        android:text="@string/More_Info" />
                 </LinearLayout>
             </LinearLayout>
 

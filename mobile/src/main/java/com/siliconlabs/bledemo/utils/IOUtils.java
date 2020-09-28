@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.utils;
+package com.siliconlabs.bledemo.Utils;
 
 import android.util.Log;
 
@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

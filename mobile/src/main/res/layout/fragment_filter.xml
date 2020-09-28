@@ -3,7 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".toolbars.FilterFragment">
+    tools:context=".Browser.Fragments.FilterFragment">
+
+    <View
+        android:id="@+id/browser_shadow_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_height"
+        android:background="@drawable/scanning_bar_shadow"
+        android:elevation="1dp"
+        android:rotation="180" />
 
     <ScrollView
         android:id="@+id/scrollview"
@@ -13,7 +21,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp">
 
             <LinearLayout
                 android:id="@+id/search_packet_name_container"
@@ -29,7 +38,7 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
-                    android:src="@drawable/ic_icon_search_off"
+                    android:src="@drawable/ic_search_off"
                     android:tint="#333333" />
 
                 <EditText
@@ -60,7 +69,7 @@
                     android:layout_gravity="center"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
-                    android:src="@drawable/ic_icon_small_x"
+                    android:src="@drawable/ic_small_x"
                     android:visibility="gone" />
             </LinearLayout>
 
@@ -79,7 +88,7 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
-                    android:src="@drawable/ic_icon_search_off"
+                    android:src="@drawable/ic_search_off"
                     android:tint="#333333" />
 
                 <TextView
@@ -118,7 +127,7 @@
                     android:layout_gravity="center"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
-                    android:src="@drawable/ic_icon_small_x"
+                    android:src="@drawable/ic_small_x"
                     android:visibility="gone" />
             </LinearLayout>
 
@@ -137,8 +146,8 @@
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:padding="8dp"
-                    android:src="@drawable/ic_icon_wifi"
-                    android:tint="@color/silabs_primary_icon"/>
+                    android:src="@drawable/ic_wifi"
+                    android:tint="@color/silabs_primary_icon" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -213,8 +222,8 @@
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:padding="8dp"
-                    android:src="@drawable/ic_icon_beacon"
-                    android:tint="@color/silabs_primary_icon"/>
+                    android:src="@drawable/ic_beacon"
+                    android:tint="@color/silabs_primary_icon" />
 
                 <TextView
                     android:id="@+id/textview_beacon"
@@ -296,7 +305,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_centerInParent="true"
                     android:padding="8dp"
-                    android:src="@drawable/ic_icon_save" />
+                    android:src="@drawable/ic_save" />
 
                 <TextView
                     android:id="@+id/textview_save"
@@ -354,52 +363,41 @@
         android:layout_marginBottom="8dp">
 
         <Button
+            style="@style/ButtonBlue"
             android:id="@+id/button_search"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_margin="4dp"
-            android:background="@drawable/rounded_button_blue"
-            android:fontFamily="sans-serif-medium"
-            android:text="@string/Search"
-            android:textAllCaps="false"
-            android:textColor="#ffffff"
-            android:textSize="@dimen/browser_button_text_size" />
-
+            android:text="@string/button_search" />
 
         <Button
+            style="@style/ButtonBorderlessBlue"
             android:id="@+id/button_save"
-            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginEnd="4dp"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/button_search"
-            android:fontFamily="sans-serif-medium"
-            android:text="@string/Save"
-            android:textAllCaps="false"
-            android:textColor="@color/silabs_clickable_text"
-            android:textSize="@dimen/browser_button_text_size" />
+            android:text="@string/button_save" />
 
         <Button
+            style="@style/ButtonBorderlessBlue"
             android:id="@+id/button_reset"
-            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/button_save"
-            android:fontFamily="sans-serif-medium"
-            android:text="@string/Reset"
-            android:textAllCaps="false"
-            android:textColor="@color/silabs_clickable_text"
-            android:textSize="@dimen/browser_button_text_size" />
+            android:text="@string/button_reset" />
 
         <ImageView
             android:id="@+id/imageview_close"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_icon_small_x" />
+            android:padding="10dp"
+            android:src="@drawable/ic_small_x" />
     </RelativeLayout>
 </RelativeLayout>

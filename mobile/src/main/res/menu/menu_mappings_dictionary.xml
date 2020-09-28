@@ -5,6 +5,6 @@
         android:id="@+id/mappings_about"
         android:text="@string/title_Mappings_about"
         android:title="@string/title_Mappings_about"
-        android:icon="@drawable/home_help_phone"
+        android:icon="@drawable/ic_home_help_phone"
         app:showAsAction="always" />
 </menu>

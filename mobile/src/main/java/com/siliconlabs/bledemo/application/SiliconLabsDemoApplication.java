@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.application;
+package com.siliconlabs.bledemo.Application;
 
 import android.app.Application;
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/device_name"
+        android:title="@string/title_device_name"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/create_new"
+        android:title="@string/title_create_new"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/switch_all_off"
+        android:title="@string/title_switch_all_off"
+        app:showAsAction="never" />
+</menu>

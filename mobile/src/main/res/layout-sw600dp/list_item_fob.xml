@@ -61,7 +61,7 @@
                 android:minHeight="50dp"
                 android:orientation="vertical">
 
-                <com.siliconlabs.bledemo.views.KeyFobSignalStrength
+                <com.siliconlabs.bledemo.Views.KeyFobSignalStrength
                     android:id="@+id/signal_strength_graphic"
                     android:layout_width="@dimen/keyfob_signal_strength_edge_length"
                     android:layout_height="@dimen/keyfob_signal_strength_edge_length"

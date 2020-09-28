@@ -1,26 +1,26 @@
-package com.siliconlabs.bledemo.beaconutils;
+package com.siliconlabs.bledemo.BeaconUtils;
 
 import android.bluetooth.BluetoothDevice;
 import android.os.ParcelUuid;
 
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.beaconutils.eddystone.Beacon;
-import com.siliconlabs.bledemo.beaconutils.eddystone.Constants;
-import com.siliconlabs.bledemo.beaconutils.eddystone.TlmValidator;
-import com.siliconlabs.bledemo.beaconutils.eddystone.UidValidator;
-import com.siliconlabs.bledemo.beaconutils.eddystone.UrlValidator;
-import com.siliconlabs.bledemo.beaconutils.ibeacon.IBeaconInfo;
-import com.siliconlabs.bledemo.beaconutils.ibeacon.Utils;
-import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
-import com.siliconlabs.bledemo.ble.ScanResultCompat;
+import com.siliconlabs.bledemo.BeaconUtils.eddystone.Beacon;
+import com.siliconlabs.bledemo.BeaconUtils.eddystone.Constants;
+import com.siliconlabs.bledemo.BeaconUtils.eddystone.TlmValidator;
+import com.siliconlabs.bledemo.BeaconUtils.eddystone.UidValidator;
+import com.siliconlabs.bledemo.BeaconUtils.eddystone.UrlValidator;
+import com.siliconlabs.bledemo.BeaconUtils.ibeacon.IBeaconInfo;
+import com.siliconlabs.bledemo.BeaconUtils.ibeacon.Utils;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo;
+import com.siliconlabs.bledemo.Bluetooth.BLE.ScanResultCompat;
 
 import java.util.List;
 
 public enum BleFormat {
-    UNSPECIFIED(R.string.unspecified, R.drawable.beacon_immediate),
-    I_BEACON(R.string.ibeacon, R.drawable.beacon_ibeacon),
-    ALT_BEACON(R.string.alt_beacon, R.drawable.beacon_alt),
-    EDDYSTONE(R.string.eddystone, R.drawable.beacon_eddystone);
+    UNSPECIFIED(R.string.unspecified, R.drawable.ic_beacon_immediate),
+    I_BEACON(R.string.ibeacon, R.drawable.ic_beacon_ibeacon),
+    ALT_BEACON(R.string.alt_beacon, R.drawable.ic_beacon_alt),
+    EDDYSTONE(R.string.eddystone, R.drawable.ic_beacon_eddystone);
 
     private int nameResId;
     private int iconResId;

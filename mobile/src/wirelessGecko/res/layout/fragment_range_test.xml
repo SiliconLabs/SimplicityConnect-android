@@ -164,7 +164,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"/>
 
-                <com.siliconlabs.bledemo.views.BlockableSpinner
+                <com.siliconlabs.bledemo.Views.BlockableSpinner
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/range_spinner_phy_config"
@@ -194,7 +194,7 @@
                         android:layout_weight="6"
                         android:layout_gravity="center_vertical"/>
 
-                <com.siliconlabs.bledemo.views.BlockableSpinner
+                <com.siliconlabs.bledemo.Views.BlockableSpinner
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:id="@+id/range_spinner_tx_power"
@@ -222,7 +222,7 @@
                         android:layout_weight="6"
                         android:layout_gravity="center_vertical"/>
 
-                <com.siliconlabs.bledemo.views.BlockableSpinner
+                <com.siliconlabs.bledemo.Views.BlockableSpinner
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:id="@+id/range_spinner_payload_length"
@@ -251,7 +251,7 @@
                         android:layout_weight="6"
                         android:layout_gravity="center_vertical"/>
 
-                <com.siliconlabs.bledemo.views.BlockableSpinner
+                <com.siliconlabs.bledemo.Views.BlockableSpinner
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:id="@+id/range_spinner_ma_window_size"
@@ -279,7 +279,7 @@
                     android:layout_weight="5"
                     android:orientation="horizontal">
 
-                    <com.siliconlabs.bledemo.views.BlockableSpinner
+                    <com.siliconlabs.bledemo.Views.BlockableSpinner
                         android:id="@+id/range_spinner_channel_number"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -315,7 +315,7 @@
                     android:layout_weight="5"
                     android:orientation="horizontal">
 
-                    <com.siliconlabs.bledemo.views.BlockableSpinner
+                    <com.siliconlabs.bledemo.Views.BlockableSpinner
                         android:id="@+id/range_spinner_packet_count"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -353,7 +353,7 @@
                     android:layout_weight="5"
                     android:orientation="horizontal">
 
-                    <com.siliconlabs.bledemo.views.BlockableSpinner
+                    <com.siliconlabs.bledemo.Views.BlockableSpinner
                         android:id="@+id/range_spinner_remote_id"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -389,7 +389,7 @@
                     android:layout_weight="5"
                     android:orientation="horizontal">
 
-                    <com.siliconlabs.bledemo.views.BlockableSpinner
+                    <com.siliconlabs.bledemo.Views.BlockableSpinner
                         android:id="@+id/range_spinner_self_id"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"

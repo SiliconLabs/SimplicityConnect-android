@@ -1,8 +1,8 @@
-package com.siliconlabs.bledemo.utils;
+package com.siliconlabs.bledemo.Utils;
 
 import android.view.MenuItem;
 
-import com.siliconlabs.bledemo.log.Log;
+import com.siliconlabs.bledemo.Browser.Model.Logs.Log;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -81,7 +81,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="4dp"
                 android:padding="10dp"
-                android:src="@drawable/ic_icon_small_x" />
+                android:src="@drawable/ic_small_x" />
         </LinearLayout>
 
         <View
@@ -146,35 +146,26 @@
 
             <Button
                 android:id="@+id/clear_btn"
-                style="@style/Widget.AppCompat.Button.Borderless"
+                style="@style/ButtonBorderlessBlue"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/rounded_button_transparent"
-                android:fontFamily="sans-serif-medium"
                 android:gravity="center"
-                android:text="@string/Clear"
-                android:textAllCaps="false"
-                android:textColor="@color/silabs_clickable_text"
-                android:textSize="@dimen/dialog_charac_button_text_size" />
+                android:text="@string/button_clear" />
 
             <Button
                 android:id="@+id/save_btn"
+                style="@style/ButtonBlue"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:background="@drawable/rounded_button_blue"
-                android:backgroundTint="@color/silabs_blue"
                 android:clickable="false"
                 android:enabled="false"
-                android:fontFamily="sans-serif-medium"
                 android:gravity="center"
-                android:text="@string/Send"
-                android:textAllCaps="false"
-                android:textColor="@color/silabs_white"
-                android:textSize="@dimen/dialog_charac_button_text_size" />
+                android:text="@string/button_send" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
