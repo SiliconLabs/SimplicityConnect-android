@@ -7,8 +7,6 @@ import androidx.fragment.app.Fragment;
 import androidx.appcompat.widget.SwitchCompat;
 
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -16,7 +14,7 @@ import android.widget.TextView;
 
 import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.models.TemperatureReading;
-import com.siliconlabs.bledemo.views.TemperatureDisplay;
+import com.siliconlabs.bledemo.Views.TemperatureDisplay;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -77,9 +75,4 @@ public class HealthThermometerActivityFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_health_thermometer, menu);
-    }
 }

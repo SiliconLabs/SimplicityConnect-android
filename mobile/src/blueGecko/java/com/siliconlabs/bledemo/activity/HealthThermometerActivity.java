@@ -14,14 +14,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.siliconlabs.bledemo.Base.Activities.BaseActivity;
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.ble.BlueToothService;
-import com.siliconlabs.bledemo.ble.GattCharacteristic;
-import com.siliconlabs.bledemo.ble.GattService;
-import com.siliconlabs.bledemo.ble.TimeoutGattCallback;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BlueToothService;
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic;
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService;
+import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback;
 import com.siliconlabs.bledemo.fragment.SelectDeviceDialog;
 import com.siliconlabs.bledemo.models.TemperatureReading;
-import com.siliconlabs.bledemo.utils.BLEUtils;
+import com.siliconlabs.bledemo.Utils.BLEUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -117,11 +118,11 @@ public class HealthThermometerActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_health_thermometer);
+        setContentView(R.layout.activity_thermometer);
         ButterKnife.inject(this);
         setSupportActionBar(toolbar);
 
-        findViewById(R.id.go_back_button).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.iv_go_back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
@@ -189,12 +190,6 @@ public class HealthThermometerActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-//        if (id == R.id.action_change_bt) {
-//            onChangeButtonClick();
-//            return true;
-//        }
 
         if (item.getItemId() == android.R.id.home) {
             if (service != null && service.getConnectedGatt() != null)
@@ -209,7 +204,7 @@ public class HealthThermometerActivity extends BaseActivity {
     }
 
     public void onChangeButtonClick() {
-        SelectDeviceDialog dialog = SelectDeviceDialog.newDialog(R.string.title_Health_Thermometer, R.string.description_Thermometer,
+        SelectDeviceDialog dialog = SelectDeviceDialog.newDialog(R.string.title_Health_Thermometer, R.string.main_menu_description_thermometer,
                 Arrays.asList(new Pair<>(R.string.htp_title, R.string.htp_id)), BlueToothService.GattConnectType.THERMOMETER);
         dialog.show(getSupportFragmentManager(), "select_device_tag");
     }

@@ -33,7 +33,7 @@ import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.rangetest.RangeTestMode;
 import com.siliconlabs.bledemo.rangetest.RangeTestValues;
 import com.siliconlabs.bledemo.rangetest.TxPower;
-import com.siliconlabs.bledemo.views.BlockableSpinner;
+import com.siliconlabs.bledemo.Views.BlockableSpinner;
 
 import java.util.*;
 import java.util.regex.Pattern;

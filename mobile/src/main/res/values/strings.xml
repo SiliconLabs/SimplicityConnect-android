@@ -20,7 +20,6 @@
 
     <!-- Browser Other-->
     <string name="Device_address">Device Address</string>
-    <string name="description_Browser">View info about nearby devices and their properties.</string>
     <string name="Non_Connectable">Non-Connectable</string>
     <string name="Connectable">Connectable</string>
     <string name="Device_Type">Device Type</string>
@@ -66,7 +65,7 @@
     <string name="Leave_Browser">Leave Browser?</string>
 
     <!-- Health Thermometer -->
-    <string name="description_Thermometer">View readings from the Health Thermometer service.</string>
+
     <string name="connected_to">CONNECTED TO</string>
     <string name="type">Type</string>
     <string name="temperature">TEMPERATURE</string>
@@ -76,19 +75,21 @@
     <string name="htp_id">HTP</string>
     <string name="select_device">Select a Bluetooth Device</string>
     <string name="tab_EFR">EFR</string>
-    <string name="tab_other_devices">Other</string>
     <string name="device_list">Device List</string>
     <string name="DEVICE_LIST">DEVICE LIST</string>
     <string name="CANCEL">CANCEL</string>
 
     <!-- Main Menu -->
-    <string name="menu_tile_title">Menu title</string>
-    <string name="menu_tile_text">Short description of menu tile</string>
+    <string name="main_menu_title">Menu title</string>
+    <string name="main_menu_description">Short description of menu tile</string>
     <string name="INFO">INFO</string>
     <string name="ENABLE">ENABLE</string>
     <string name="Location_disabled">Location disabled.</string>
     <string name="Location_service">Location service</string>
     <string name="location_service_info">On some Android phones you have to enable Location service in order to scan for Bluetooth Low Energy devices. If you can\'t find any Bluetooth devices please ensure you have enabled Location service.</string>
+    <string name="main_menu_description_advertiser">Utilize this device as a BLE peripheral</string>
+    <string name="main_menu_description_thermometer">View readings from the Health Thermometer service.</string>
+    <string name="main_menu_description_browser">View info about nearby devices and their properties.</string>
 
     <!-- Messages -->
     <string name="Change_characteristic_name">Change characteristic name</string>
@@ -100,10 +101,15 @@
     <string name="title_Demo">Demo</string>
     <string name="title_Browser">Browser</string>
     <string name="title_Health_Thermometer">Health Thermometer</string>
+    <string name="title_Advertiser">Advertiser</string>
     <string name="title_Mappings_dictionary">Mappings Dictionary</string>
     <string name="title_Characteristics">Characteristics</string>
     <string name="title_Services">Services</string>
     <string name="title_Mappings_about">About Mappings Dictionary</string>
+    <string name="title_device_name">Device name</string>
+    <string name="title_save">Save</string>
+    <string name="title_create_new">Create new</string>
+    <string name="title_switch_all_off">Switch all OFF</string>
 
     <!-- OTA -->
     <string name="Preparing_for_OTA">Preparing for OTA</string>
@@ -145,23 +151,24 @@
     <string name="Error_colon">Error:</string>
 
     <!-- Button title -->
-    <string name="Reset">Reset</string>
-    <string name="Search">Search</string>
-    <string name="Filter_Log">Filter Log</string>
-    <string name="Clear_Log">Clear Log</string>
-    <string name="Share">Share</string>
-    <string name="Connect">Connect</string>
-    <string name="Disconnect">Disconnect</string>
-    <string name="Save">Save</string>
-    <string name="Send">Send</string>
-    <string name="Cancel">Cancel</string>
-    <string name="Clear">Clear</string>
-    <string name="Disconnect_all">Disconnect all</string>
-    <string name="Filter">Filter</string>
-    <string name="Log">Log</string>
-    <string name="Stop_Scanning">Stop Scanning</string>
-    <string name="Start_Scanning">Start Scanning</string>
-    <string name="Connections">Connections</string>
+    <string name="button_reset">Reset</string>
+    <string name="button_search">Search</string>
+    <string name="button_filter_log">Filter Log</string>
+    <string name="button_clear_log">Clear Log</string>
+    <string name="button_share">Share</string>
+    <string name="button_connect">Connect</string>
+    <string name="button_disconnect">Disconnect</string>
+    <string name="button_save">Save</string>
+    <string name="button_send">Send</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_clear">Clear</string>
+    <string name="button_disconnect_all">Disconnect all</string>
+    <string name="button_filter">Filter</string>
+    <string name="button_log">Log</string>
+    <string name="button_stop_scanning">Stop Scanning</string>
+    <string name="button_start_scanning">Start Scanning</string>
+    <string name="button_connections">Connections</string>
+    <string name="button_ok">Ok</string>
 
     <!-- Beacon types -->
     <string name="unspecified">Unspecified</string>
@@ -186,7 +193,6 @@
     <string name="version_text">Version %s</string>
     <string name="about_silicon_labs">ABOUT SILICON LABS</string>
     <string name="info">Info</string>
-    <string name="ok">OK</string>
 
     <!-- Key fobs screen -->
     <string name="title_activity_key_fobs">Key Fobs</string>
@@ -317,26 +323,118 @@
     <string name="debug_mode_connection_failed_snackbar">"Failed connecting to %1$s"</string>
 
     <!-- Bluetooth 5 advertising extension -->
-    <string name="Bluetooth_5_Advertising_Extension">Bluetooth 5 advertising extension</string>
+    <string name="Bluetooth_5_Advertising_Extension">Bluetooth 5 Advertising Extension</string>
     <string name="Data_Status_colon">Data Status:</string>
     <string name="Primary_PHY_colon">Primary PHY:</string>
     <string name="Secondary_PHY_colon">Secondary PHY:</string>
     <string name="Advertising_Set_ID">Advertising Set ID:</string>
-    <string name="Tx_Power">TX Power:</string>
+    <string name="Tx_Power">Tx Power:</string>
     <string name="Periodic_Advertising_Interval_colon">Periodic Advertising Interval:</string>
-    <string name="Not_Present">Not Present</string>
-    <string name="Data_Status_Complete">Complete</string>
-    <string name="Data_Status_Truncated">Truncated</string>
-    <string name="Phy_LE_1M">LE 1M</string>
-    <string name="Phy_LE_2M">LE 2M</string>
-    <string name="Phy_LE_Coded">LE Coded</string>
-    <string name="Phy_Unused">Unused</string>
+    <string name="advertising_extension_not_present">Not Present</string>
+    <string name="advertising_extension_status_complete">Complete</string>
+    <string name="advertising_extension_status_truncated">Truncated</string>
+    <string name="advertising_extension_phy_le_1m">LE 1M</string>
+    <string name="advertising_extension_phy_le_2m">LE 2M</string>
+    <string name="advertising_extension_phy_le_coded">LE Coded</string>
+    <string name="advertising_extension_phy_unused">Unused</string>
 
     <!-- About Mappings Dictionary - Dialog -->
-    <string name="about_mappings_dictionary_info">The mappings dictionary contains the 128-bit UUIDs for services and characteristics that have been renamed by the user. The main purpose is simple consultation but it is also possible to change or delete them from this view. When deleted, the 128-bit UUIDs will again be shown as \"Unknown Service\" or \"Unknown Characteristic\" in the GATT.</string>
-    <string name="ABOUT_MAPPINGS_DICTIONARY">ABOUT MAPPINGS DICTIONARY</string>
-    <string name="About">About</string>
+    <string name="about_mappings_note">The mappings dictionary contains the 128-bit UUIDs for services and characteristics that have been renamed by the user. The main purpose is simple consultation but it is also possible to change or delete them from this view. When deleted, the 128-bit UUIDs will again be shown as \"Unknown Service\" or \"Unknown Characteristic\" in the GATT.</string>
+    <string name="about_mappings_title">ABOUT MAPPINGS DICTIONARY</string>
+    <string name="about_mappings_about">About</string>
 
+    <!-- Advertiser -->
+    <string-array name="advertiser_interval_low_api">
+        <item>100ms (Low Latency)</item>
+        <item>250ms (Balanced)</item>
+        <item>1000ms (Low Power)</item>
+    </string-array>
+
+    <string-array name="advertiser_tx_power_low_api">
+        <item>1dBm (High)</item>
+        <item>-7dBm (Medium)</item>
+        <item>-15dBm (Low)</item>
+        <item>-21dBm (Ultra Low)</item>
+    </string-array>
+
+    <string name="advertiser_mode_connectable_scannable">Connectable, scannable</string>
+    <string name="advertiser_mode_connectable_non_scannable">Connectable, non-scannable</string>
+    <string name="advertiser_mode_non_connectable_scannable">Non-connectable, scannable</string>
+    <string name="advertiser_mode_non_connectable_non_scannable">Non-connectable, non-scannable</string>
+
+    <string name="advertiser_title_advertising_set_name">Advertising Set Name</string>
+    <string name="advertiser_title_advertising_type">Advertising Type</string>
+    <string name="advertiser_title_advertising_data">Advertising Data</string>
+    <string name="advertiser_title_scan_response_data">Scan Response Data</string>
+    <string name="advertiser_title_advertising_parameters">Advertising Parameters</string>
+    <string name="advertiser_title_device_name">Device Name</string>
+    <string name="advertiser_title_remove_service_list">Remove Service List?</string>
+    <string name="advertiser_title_remove_advertiser">Remove Advertiser?</string>
+    <string name="advertiser_label_legacy_advertising">Legacy Advertising</string>
+    <string name="advertiser_label_legacy">Legacy</string>
+    <string name="advertiser_label_extended_advertising">Extended Advertising</string>
+    <string name="advertiser_label_extended">Extended</string>
+    <string name="advertiser_label_include_tx_power">Include TX Power</string>
+    <string name="advertiser_label_anonymous">Anonymous</string>
+    <string name="advertiser_label_primary_phy">Primary PHY</string>
+    <string name="advertiser_label_secondary_phy">Secondary PHY</string>
+    <string name="advertiser_label_advertising_interval_with_range">Advertising Interval (ms)\n[100 – 10485759]</string>
+    <string name="advertiser_label_tx_power_with_range">TX Power (dBm)\n[–127 – 1]</string>
+    <string name="advertiser_label_advertising_interval">Advertising Interval (ms)</string>
+    <string name="advertiser_label_tx_power">Tx Power</string>
+    <string name="advertiser_label_advertising_time_limit">Advertising Time Limit</string>
+    <string name="advertiser_label_time_no_limit">No Limit (until manually turned off)</string>
+    <string name="advertiser_label_time_limit_low_api">Time Limit (ms)\n[1 – 180000]</string>
+    <string name="advertiser_label_time_limit">Time Limit (ms)\n[10 – 655350]</string>
+    <string name="advertiser_label_event_limit">Event Limit\n[1 – 255]</string>
+    <string name="advertiser_button_add_data_type">Add Data Type</string>
+    <string name="advertiser_button_add_16bit_service">Add 16-bit service</string>
+    <string name="advertiser_button_add_128bit_service">Add 128-bit service</string>
+    <string name="advertiser_label_company_identifiers">Company identifiers</string>
+    <string name="advertiser_label_bluetooth_gatt_services">Bluetooth GATT Services</string>
+    <string name="advertiser_label_128_bit_example">2e05fa88–e3c1–4170–9c94–6c5e6bc4bcf5</string>
+    <string name="advertiser_label_no_configured_advertisers">No configured advertisers.</string>
+    <string name="advertiser_label_interval">interval</string>
+    <string name="advertiser_label_copy">copy</string>
+    <string name="advertiser_label_edit">edit</string>
+    <string name="advertiser_label_remove">remove</string>
+    <string name="advertiser_label_flags_default">"General Discoverable, [Device specific]"</string>
+    <string name="advertiser_note_extended_advertising_not_supported">Note: This device does not support extended advertising</string>
+    <string name="advertiser_note_tx_power">Note: The stack may override the TX Power selection when the advertisement starts</string>
+    <string name="advertiser_note_company_identifiers">A list of company identifiers can be found in:</string>
+    <string name="advertiser_note_16bit_services">A full list of 16-bit service UUIDs is available on the Bluetooth SIG</string>
+    <string name="advertiser_note_remove_services">This will remove the entire service list, do you wish to continue?</string>
+    <string name="advertiser_note_remove_advertiser">Are you sure you want to delete Advertiser?</string>
+    <string name="advertiser_note_x_bytes_available">%d bytes available</string>
+    <string name="advertiser_note_company_identifier_exists">Note: Company identifier already exists</string>
+    <string name="advertiser_note_x_bytes_beyond">%d byte(s) beyond payload limit, please remove data</string>
+    <string name="advertiser_hint_enter_device_name">Enter device name</string>
+    <string name="advertiser_hint_data_in_hex_format">Data in hex format</string>
+    <string name="advertiser_hint_16bit_company_identifier">16-bit company identifier</string>
+    <string name="advertiser_hint_128_bit_uuid">128-bit UUID</string>
+    <string name="advertiser_hint_16_bit_uuid_or_service_name">16-bit UUID or service name</string>
+    <string name="advertiser_data_type_flags">Flags</string>
+    <string name="advertiser_data_type_complete_16bit_service">Complete List of 16-bit Service Class UUIDs</string>
+    <string name="advertiser_data_type_complete_128bit_service">Complete List of 128-bit Service Class UUIDs</string>
+    <string name="advertiser_data_type_complete_local_name">Complete Local Name</string>
+    <string name="advertiser_data_type_tx_power">Tx Power Level</string>
+    <string name="advertiser_data_type_manufacturer_specific_data">Manufacturer Specific Data</string>
+    <string name="advertiser_data_type_complete_list_of_128bit_service">Complete List of 128-bit Service</string>
+    <string name="advertiser_data_type_complete_list_of_16bit_service">Complete List of 16-bit Service</string>
+    <string name="advertiser_url_company_identifiers">bluetooth.com/specifications/assigned-numbers/company-identifiers/</string>
+    <string name="advertiser_url_bluetooth_gatt_services">bluetooth.com/ specifications/gatt/services/</string>
+    <string name="advertiser_prefix_0x">0x</string>
+
+    <!-- Advertiser Config -->
+    <string name="advertiser_config_message_invalid_interval">Invalid Advertising Interval</string>
+    <string name="advertiser_config_message_invalid_tx_power">Invalid Tx Power</string>
+    <string name="advertiser_config_message_invalid_time_limit">Invalid Time Limit</string>
+    <string name="advertiser_config_message_invalid_event_limit">Invalid Event Limit</string>
+
+    <!-- Units -->
+    <string name="unit_value_ms">%dms</string>
+    <string name="unit_value_dbm">%ddBm</string>
+    <string name="unit_with_whitespace">&#160;%s</string>
 
     <!-- ========================================= Delete in the FUTURE=============================================================-->
 

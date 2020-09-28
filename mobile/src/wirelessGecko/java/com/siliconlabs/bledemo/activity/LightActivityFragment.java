@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.ble.GattService;
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;

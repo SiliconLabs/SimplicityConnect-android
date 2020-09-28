@@ -11,11 +11,11 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.ble.*;
+import com.siliconlabs.bledemo.Bluetooth.BLE.*;
 import com.siliconlabs.bledemo.rangetest.RangeTestAdvertisementHandler;
 import com.siliconlabs.bledemo.rangetest.RangeTestMode;
 import com.siliconlabs.bledemo.rangetest.RangeTestValues;
-import com.siliconlabs.bledemo.utils.BLEUtils;
+import com.siliconlabs.bledemo.Utils.BLEUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

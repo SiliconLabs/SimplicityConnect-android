@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/silabs_red">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/Request_Priority"
+            android:textColor="@color/silabs_white" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/buttons_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/silabs_divider" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <CheckBox
+            android:id="@+id/low_priority"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/LOW_PRIORITY" />
+
+        <CheckBox
+            android:id="@+id/balanced_priority"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/BALANCED_PRIORITY" />
+
+        <CheckBox
+            android:id="@+id/high_priority"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/HIGH_PRIORITY" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancel_request"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:background="@color/silabs_red"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/button_cancel"
+            android:textColor="@color/silabs_white"
+            android:textSize="@dimen/browser_button_text_size" />
+
+        <View
+            android:id="@+id/buttons_separator2"
+            android:layout_width="1dp"
+            android:layout_height="50dp"
+            android:background="@color/silabs_divider" />
+
+        <Button
+            android:id="@+id/request"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:background="@color/silabs_red"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/Request"
+            android:textColor="@color/silabs_white"
+            android:textSize="@dimen/browser_button_text_size" />
+    </LinearLayout>
+
+
+</LinearLayout>

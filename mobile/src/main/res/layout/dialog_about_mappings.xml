@@ -11,14 +11,9 @@
         android:orientation="vertical">
 
         <TextView
+            style="@style/DialogHeaderText"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dialog_about_mappings_header_height"
-            android:background="@color/silabs_dialog_title_background"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_horizontal|center_vertical"
-            android:text="@string/About"
-            android:textColor="@color/silabs_primary_text"
-            android:textSize="18sp" />
+            android:text="@string/about_mappings_about" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -36,7 +31,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
-                    android:text="@string/ABOUT_MAPPINGS_DICTIONARY"
+                    android:text="@string/about_mappings_title"
                     android:textColor="@color/silabs_subtle_text"
                     android:textSize="@dimen/dialog_about_mappings_text_size" />
 
@@ -51,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dialog_about_mappings_info_section_and_body_separation"
                     android:fontFamily="sans-serif"
-                    android:text="@string/about_mappings_dictionary_info"
+                    android:text="@string/about_mappings_note"
                     android:textColor="@color/silabs_primary_text"
                     android:textSize="@dimen/help_text_size" />
 
@@ -63,9 +58,9 @@
             android:id="@+id/ok_btn"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dialog_about_mappings_ok_height"
-            android:background="@drawable/red_button_selector"
+            android:background="@drawable/btn_red_selector"
             android:fontFamily="sans-serif-medium"
-            android:text="@string/ok"
+            android:text="@string/button_ok"
             android:textColor="@color/silabs_white"
             android:textSize="@dimen/dialog_about_mappings_ok_btn_text_size" />
 

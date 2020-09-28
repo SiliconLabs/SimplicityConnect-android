@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.BrowserActivity">
+    tools:context=".Browser.Activities.BrowserActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_weight="1"
                 android:background="@color/silabs_red"
-                android:text="@string/Save"
+                android:text="@string/button_save"
                 android:textColor="@color/silabs_white" />
 
             <Button
@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@color/silabs_red"
-                android:text="@string/Share"
+                android:text="@string/button_share"
                 android:textColor="@color/silabs_white" />
 
             <Button
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@color/silabs_red"
-                android:text="@string/Clear"
+                android:text="@string/button_clear"
                 android:textColor="@color/silabs_white" />
         </LinearLayout>
 

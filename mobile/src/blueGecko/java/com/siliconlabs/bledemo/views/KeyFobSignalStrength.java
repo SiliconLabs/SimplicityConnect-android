@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.views;
+package com.siliconlabs.bledemo.Views;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import androidx.core.content.ContextCompat;
 
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.utils.SignalStrength;
+import com.siliconlabs.bledemo.Utils.SignalStrength;
 
 public class KeyFobSignalStrength extends ImageView {
     private Paint paintLightGrayStroke;

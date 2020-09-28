@@ -11,11 +11,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.ble.BlueToothService;
-import com.siliconlabs.bledemo.ble.GattCharacteristic;
-import com.siliconlabs.bledemo.ble.GattService;
-import com.siliconlabs.bledemo.ble.TimeoutGattCallback;
-import com.siliconlabs.bledemo.utils.BLEUtils;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BlueToothService;
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic;
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService;
+import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback;
+import com.siliconlabs.bledemo.Utils.BLEUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;

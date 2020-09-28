@@ -1,61 +1,31 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <include
-        android:id="@+id/toolbar"
-        layout="@layout/actionbar_main"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:fitsSystemWindows="true" />
+        android:id="@+id/toolbar_main_menu"
+        layout="@layout/actionbar" />
 
     <RelativeLayout
         android:id="@+id/information_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar">
+        android:layout_below="@id/toolbar_main_menu">
 
-        <RelativeLayout
+        <include
             android:id="@+id/bluetooth_enable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:background="@color/silabs_red_dark"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/bluetooth_enable_msg"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:fontFamily="sans-serif-medium"
-                android:layout_centerVertical="true"
-                android:padding="12dp"
-                android:text="@string/bluetooth_adapter_bar_disabled"
-                android:textColor="@android:color/white" />
-
-            <TextView
-                android:id="@+id/bluetooth_enable_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:fontFamily="sans-serif-medium"
-                android:layout_centerVertical="true"
-                android:background="?android:listChoiceBackgroundIndicator"
-                android:text="@string/bluetooth_adapter_enable_bar_enable"
-                android:padding="12dp"
-                android:layout_marginEnd="8dp"
-                android:textColor="@android:color/white" />
-        </RelativeLayout>
+            layout="@layout/bluetooth_enable_bar"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <LinearLayout
             android:id="@+id/location_disabled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/silabs_red_dark"
             android:layout_below="@id/bluetooth_enable"
+            android:background="@color/silabs_red_dark"
             android:orientation="horizontal"
             android:visibility="gone">
 
@@ -85,8 +55,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:fontFamily="sans-serif-medium"
                 android:layout_marginEnd="8dp"
+                android:fontFamily="sans-serif-medium"
                 android:padding="12dp"
                 android:text="@string/INFO"
                 android:textColor="@color/silabs_white" />
@@ -102,9 +72,17 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_height"
+        android:layout_below="@id/information_bar"
+        android:background="@drawable/scanning_bar_shadow"
+        android:elevation="1dp"
+        android:rotation="180" />
+
+    <View
         android:id="@+id/view_separator"
         android:layout_width="match_parent"
-        android:layout_height="8dp"
+        android:layout_height="@dimen/shadow_height"
         android:layout_above="@id/bottom_navigation_view"
         android:background="@drawable/scanning_bar_shadow" />
 
@@ -119,6 +97,6 @@
         app:itemIconTint="@drawable/nav_bar_selector"
         app:itemTextAppearanceActive="@style/Widget.BottomNavigationViewActive"
         app:itemTextAppearanceInactive="@style/Widget.BottomNavigationViewInactive"
-        app:menu="@menu/bottom_navigation" />
+        app:menu="@menu/menu_bottom_navigation" />
 
 </RelativeLayout>

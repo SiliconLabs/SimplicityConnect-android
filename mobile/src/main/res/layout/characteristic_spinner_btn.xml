@@ -9,7 +9,7 @@
         android:layout_width="@dimen/service_caret_width"
         android:layout_height="@dimen/service_caret_height"
         android:layout_centerVertical="true"
-        android:src="@drawable/debug_list_picker" />
+        android:src="@drawable/ic_debug_list_picker" />
 
     <Button
         android:id="@+id/btn_show_picker_dialog"

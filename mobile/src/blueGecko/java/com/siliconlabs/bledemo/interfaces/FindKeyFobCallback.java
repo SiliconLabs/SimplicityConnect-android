@@ -1,6 +1,6 @@
 package com.siliconlabs.bledemo.interfaces;
 
-import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo;
 
 public interface FindKeyFobCallback {
     void findKeyFob(BluetoothDeviceInfo fob);

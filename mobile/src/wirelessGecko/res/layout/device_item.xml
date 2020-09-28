@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:background="?attr/listChoiceBackgroundIndicator">
 
-    <com.siliconlabs.bledemo.views.SquareImageView
+    <com.siliconlabs.bledemo.Views.SquareImageView
         android:id="@android:id/icon2"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -15,7 +15,7 @@
         android:layout_marginTop="@dimen/device_selection_item_margin"
         android:layout_marginBottom="@dimen/device_selection_item_margin"/>
 
-    <com.siliconlabs.bledemo.views.SquareImageView
+    <com.siliconlabs.bledemo.Views.SquareImageView
         android:id="@android:id/icon"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

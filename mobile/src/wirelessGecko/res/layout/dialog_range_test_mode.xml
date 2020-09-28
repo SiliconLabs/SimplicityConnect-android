@@ -214,7 +214,7 @@
     <Button
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/debug_mode_dialog_button_selector"
+            android:background="@drawable/btn_debug_mode_dialog_selector"
             android:gravity="center"
             android:text="@string/dialog_device_filter_cancel_button"
             android:textAllCaps="true"

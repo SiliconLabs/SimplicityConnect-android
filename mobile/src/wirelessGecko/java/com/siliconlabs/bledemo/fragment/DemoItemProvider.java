@@ -11,7 +11,7 @@ import butterknife.InjectViews;
 import com.siliconlabs.bledemo.R;
 import com.siliconlabs.bledemo.activity.BeaconScanActivity;
 import com.siliconlabs.bledemo.activity.MainActivityDebugMode;
-import com.siliconlabs.bledemo.ble.BlueToothService;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BlueToothService;
 import com.siliconlabs.bledemo.interfaces.DemoPageLauncher;
 
 import java.util.List;
@@ -25,10 +25,10 @@ public class DemoItemProvider {
 
     static {
         //TODO update light demo icon to be various sizes
-        ICONS.put(R.id.demo_retail_beacon, R.drawable.home_retail_beacon);
+        ICONS.put(R.id.demo_retail_beacon, R.drawable.ic_home_retail_beacon);
         ICONS.put(R.id.demo_lightbulb, R.drawable.home_light_demo);
         ICONS.put(R.id.demo_range_test, R.drawable.range_test_demo);
-        ICONS.put(R.id.blue_giga_debug, R.drawable.home_debug_phone);
+        ICONS.put(R.id.blue_giga_debug, R.drawable.ic_home_debug_phone);
 
         TITLES.put(R.id.demo_retail_beacon, R.string.demo_beacon_title);
         TITLES.put(R.id.demo_lightbulb, R.string.demo_item_light_title);

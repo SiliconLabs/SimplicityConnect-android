@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/progress_spinner_ring" />
+            android:src="@drawable/sp_progress_ring" />
 
         <TextView
             android:id="@+id/dialog_text"

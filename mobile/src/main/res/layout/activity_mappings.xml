@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.MappingDictionaryActivity">
+    tools:context=".Browser.Activities.MappingDictionaryActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout"
@@ -12,34 +12,9 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/silabs_red">
-
-            <ImageView
-                android:id="@+id/go_back_button"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:src="@drawable/ic_chevron_left_white_48dp" />
-        </RelativeLayout>
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            style="@style/ToolbarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="0dp"
-            android:fitsSystemWindows="true"
-            android:minHeight="@dimen/toolbar_min_height"
-            android:paddingBottom="8dp"
-            app:title="@string/title_Mappings_dictionary"
-            app:titleMarginBottom="0dp"
-            app:titleMarginTop="0dp"
-            app:titleTextAppearance="@style/TextAppearance.ToolbarTitle" />
-
+        <include
+            android:id="@+id/toolbar_mappings"
+            layout="@layout/actionbar" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -47,28 +22,29 @@
             android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:paddingBottom="6dp">
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rounded_button_red_dark"
+                android:background="@drawable/btn_rounded_red_dark"
                 android:orientation="horizontal"
                 android:padding="2dp">
 
                 <TextView
-                    android:id="@+id/characteristic_tab_textview"
+                    android:id="@+id/tv_characteristics_tab"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
-                    android:background="@drawable/rounded_button_white"
+                    android:background="@drawable/btn_rounded_white"
                     android:fontFamily="sans-serif-medium"
                     android:gravity="center"
                     android:text="@string/title_Characteristics"
                     android:textColor="@color/silabs_red" />
 
                 <TextView
-                    android:id="@+id/services_tab_textview"
+                    android:id="@+id/tv_services_tab"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
-                    android:background="@drawable/rounded_button_red_dark"
+                    android:background="@drawable/btn_rounded_red_dark"
                     android:fontFamily="sans-serif"
                     android:gravity="center"
                     android:text="@string/title_Services"
@@ -84,4 +60,13 @@
         android:layout_height="match_parent"
         android:layout_below="@id/app_bar_layout"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_height"
+        android:layout_below="@id/app_bar_layout"
+        android:background="@drawable/scanning_bar_shadow"
+        android:elevation="1dp"
+        android:rotation="180" />
+
 </RelativeLayout>

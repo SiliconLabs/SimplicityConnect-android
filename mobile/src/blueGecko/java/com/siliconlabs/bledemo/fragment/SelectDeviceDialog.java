@@ -28,18 +28,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.activity.BaseActivity;
+import com.siliconlabs.bledemo.Base.Activities.BaseActivity;
 import com.siliconlabs.bledemo.activity.HealthThermometerActivity;
-import com.siliconlabs.bledemo.adapters.DeviceInfoViewHolder;
-import com.siliconlabs.bledemo.adapters.ScannedDevicesAdapter;
-import com.siliconlabs.bledemo.ble.BlueToothService;
-import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
-import com.siliconlabs.bledemo.ble.Discovery;
-import com.siliconlabs.bledemo.ble.GattService;
-import com.siliconlabs.bledemo.ble.ScanResultCompat;
-import com.siliconlabs.bledemo.ble.TimeoutGattCallback;
-import com.siliconlabs.bledemo.log.TimeoutLog;
-import com.siliconlabs.bledemo.utils.Constants;
+import com.siliconlabs.bledemo.Adapters.DeviceInfoViewHolder;
+import com.siliconlabs.bledemo.Adapters.ScannedDevicesAdapter;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BlueToothService;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo;
+import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery;
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService;
+import com.siliconlabs.bledemo.Bluetooth.BLE.ScanResultCompat;
+import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback;
+import com.siliconlabs.bledemo.Browser.Model.Logs.TimeoutLog;
+import com.siliconlabs.bledemo.Utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,6 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import butterknife.Optional;
 
 public class SelectDeviceDialog extends DialogFragment implements Discovery.BluetoothDiscoveryHost {
 
@@ -101,7 +100,7 @@ public class SelectDeviceDialog extends DialogFragment implements Discovery.Blue
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        adapter = new ScannedDevicesAdapter(new DeviceInfoViewHolder.Generator(R.layout.device_item) {
+        adapter = new ScannedDevicesAdapter(new DeviceInfoViewHolder.Generator(R.layout.adapter_bluetooth_device) {
             @Override
             public DeviceInfoViewHolder generate(View itemView) {
                 final ViewHolder holder = new ViewHolder(itemView);

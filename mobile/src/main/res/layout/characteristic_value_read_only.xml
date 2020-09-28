@@ -32,11 +32,9 @@
             android:id="@+id/hex_copy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
+            android:background="@drawable/btn_blue_ripple_effect"
             android:padding="8dp"
-            android:src="@drawable/ic_icon_copy"
+            android:src="@drawable/ic_copy"
             android:tint="@color/silabs_blue" />
 
     </LinearLayout>
@@ -70,11 +68,9 @@
             android:id="@+id/ascii_copy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
+            android:background="@drawable/btn_blue_ripple_effect"
             android:padding="8dp"
-            android:src="@drawable/ic_icon_copy"
+            android:src="@drawable/ic_copy"
             android:tint="@color/silabs_blue" />
     </LinearLayout>
 
@@ -107,11 +103,9 @@
             android:id="@+id/decimal_copy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
+            android:background="@drawable/btn_blue_ripple_effect"
             android:padding="8dp"
-            android:src="@drawable/ic_icon_copy"
+            android:src="@drawable/ic_copy"
             android:tint="@color/silabs_blue" />
     </LinearLayout>
 

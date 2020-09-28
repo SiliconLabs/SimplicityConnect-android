@@ -7,23 +7,33 @@
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
 
     <application
-        android:name=".application.SiliconLabsDemoApplication"
+        android:name=".Application.SiliconLabsDemoApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name_EFR_Connect"
         android:requestLegacyExternalStorage="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.MappingDictionaryActivity"></activity>
+        <activity
+            android:name=".Advertiser.Activities.AdvertiserConfigActivity"
+            android:label="@string/title_Advertiser" />
+        <activity
+            android:name=".Advertiser.Activities.AdvertiserActivity"
+            android:label="@string/title_Advertiser" />
+        <activity
+            android:name=".Browser.Activities.MappingDictionaryActivity"
+            android:label="@string/title_Mappings_dictionary" />
 
-        <service android:name=".ble.BlueToothService" />
+        <service android:name=".Bluetooth.BLE.BlueToothService" />
+        <service android:name=".Advertiser.Services.AdvertiserService"/>
 
-        <receiver android:name=".ble.BlueToothService$Receiver">
+        <receiver android:name=".Bluetooth.BLE.BlueToothService$Receiver">
             <intent-filter>
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
                 <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED" />
@@ -31,9 +41,10 @@
         </receiver>
 
         <activity
-            android:name=".activity.MainMenuActivity"
+            android:name=".MainMenu.Activities.MainMenuActivity"
             android:label="@string/app_name_EFR_Connect"
             android:screenOrientation="portrait"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,19 +53,19 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".services.BluetoothLeService" />
-        <service android:name=".services.ShareLogServices" />
+        <service android:name=".Bluetooth.Services.BluetoothLeService" />
+        <service android:name=".Browser.Services.ShareLogServices" />
 
         <activity
-            android:name=".activity.BrowserActivity"
-            android:label="@string/title_activity_blue_giga_main"
-            android:parentActivityName=".activity.MainMenuActivity"
+            android:name=".Browser.Activities.BrowserActivity"
+            android:label="@string/title_Browser"
+            android:parentActivityName=".MainMenu.Activities.MainMenuActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".activity.DeviceServicesActivity"
-            android:label="@string/title_activity_device_services"
-            android:parentActivityName=".activity.BrowserActivity"
+            android:name=".Browser.Activities.DeviceServicesActivity"
+            android:label="@string/title_Browser"
+            android:parentActivityName=".Browser.Activities.BrowserActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <!--

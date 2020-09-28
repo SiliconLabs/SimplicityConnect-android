@@ -3,7 +3,7 @@ package com.siliconlabs.bledemo.models;
 import android.bluetooth.BluetoothGattCharacteristic;
 
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.utils.DateUtils;
+import com.siliconlabs.bledemo.Utils.DateUtils;
 
 import java.util.Calendar;
 

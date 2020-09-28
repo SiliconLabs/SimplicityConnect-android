@@ -207,7 +207,7 @@
         android:id="@+id/ok_btn"
         android:layout_width="match_parent"
         android:layout_height="@dimen/about_blue_giga_dialog_close_btn_height"
-        android:background="@drawable/debug_mode_dialog_button_selector"
+        android:background="@drawable/btn_debug_mode_dialog_selector"
         android:gravity="center"
         android:text="@string/hidden_debug_save_btn"
         android:textAllCaps="false"

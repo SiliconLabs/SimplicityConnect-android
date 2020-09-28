@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.adapters;
+package com.siliconlabs.bledemo.Adapters;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -15,12 +15,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
-import com.siliconlabs.bledemo.ble.Discovery;
-import com.siliconlabs.bledemo.ble.ScanResultCompat;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo;
+import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery;
+import com.siliconlabs.bledemo.Bluetooth.BLE.ScanResultCompat;
 import com.siliconlabs.bledemo.interfaces.FindKeyFobCallback;
-import com.siliconlabs.bledemo.utils.SignalStrength;
-import com.siliconlabs.bledemo.views.KeyFobSignalStrength;
+import com.siliconlabs.bledemo.Utils.SignalStrength;
+import com.siliconlabs.bledemo.Views.KeyFobSignalStrength;
 
 import java.util.ArrayList;
 import java.util.Collections;

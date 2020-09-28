@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    app:cardCornerRadius="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/silabs_dialog_title_background"
+        android:minWidth="300dp"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/DialogHeaderText"
+            android:layout_width="match_parent"
+            android:text="@string/advertiser_data_type_complete_list_of_128bit_service" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/silabs_white"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <EditText
+                android:id="@+id/et_128bit_service"
+                style="@style/EditTextSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="0123456789ABCDEFabcdef-"
+                android:hint="@string/advertiser_hint_128_bit_uuid"
+                android:importantForAutofill="no"
+                android:inputType="textNoSuggestions"
+                android:maxLength="36" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextViewSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Example:"
+                    android:textColor="@color/silabs_dark_gray_text" />
+
+                <TextView
+                    style="@style/TextViewSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/advertiser_label_128_bit_example"
+                    android:textColor="@color/silabs_dark_gray_text" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/silabs_white"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <Button
+                android:id="@+id/btn_clear"
+                style="@style/ButtonBorderlessBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/button_clear" />
+
+            <Button
+                android:id="@+id/btn_cancel"
+                style="@style/ButtonBorderlessBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/button_cancel" />
+
+            <Button
+                android:id="@+id/btn_save"
+                style="@style/ButtonBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:enabled="false"
+                android:text="@string/button_save" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

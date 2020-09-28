@@ -11,15 +11,10 @@
         android:orientation="vertical">
 
         <TextView
+            style="@style/DialogHeaderText"
             android:id="@+id/error_title"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dialog_error_header_height"
-            android:background="@color/silabs_dialog_title_background"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_horizontal|center_vertical"
-            android:text="@string/Error"
-            android:textColor="@color/silabs_primary_text"
-            android:textSize="18sp" />
+            android:text="@string/Error" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -65,9 +60,9 @@
             android:id="@+id/ok_btn"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dialog_error_ok_height"
-            android:background="@drawable/red_button_selector"
+            android:background="@drawable/btn_red_selector"
             android:fontFamily="sans-serif-medium"
-            android:text="@string/ok"
+            android:text="@string/button_ok"
             android:textColor="@color/silabs_white"
             android:textSize="@dimen/dialog_error_ok_btn_text_size" />
 

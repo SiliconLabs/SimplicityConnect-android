@@ -37,6 +37,11 @@ The develop view contains functionalities focused on helping developers create a
   - Over-the-air (OTA) device firmware upgrade (DFU) with both reliable and speed modes
   - Configurable MTU and connection interval
   - Support for all GATT operations
+- **Bluetooth Advertiser:** Allows you to create multiple advertisement sets and enable them in parallel
+  - Supports legacy and extended advertising
+  - Configurable advertisement interval, TX Power, primary/secondary PHYs
+  - Ability to manually start/stop advertisement, or stop based on time/event limit
+  - Support for multiple AD types
 
 
 

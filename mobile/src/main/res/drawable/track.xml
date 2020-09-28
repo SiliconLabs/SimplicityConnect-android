@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/color_thumb" android:state_focused="true" />
-    <item android:drawable="@drawable/gray_track" />
+    <item android:drawable="@drawable/sw_color_thumb" android:state_focused="true" />
+    <item android:drawable="@drawable/sw_track_grey" />
 </selector>

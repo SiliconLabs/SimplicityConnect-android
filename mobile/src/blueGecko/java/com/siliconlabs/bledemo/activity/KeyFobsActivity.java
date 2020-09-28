@@ -26,16 +26,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.siliconlabs.bledemo.Base.Activities.BaseActivity;
 import com.siliconlabs.bledemo.R;
-import com.siliconlabs.bledemo.ble.BlueToothService;
-import com.siliconlabs.bledemo.ble.BluetoothDeviceInfo;
-import com.siliconlabs.bledemo.ble.GattCharacteristic;
-import com.siliconlabs.bledemo.ble.GattService;
-import com.siliconlabs.bledemo.ble.TimeoutGattCallback;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BlueToothService;
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo;
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic;
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService;
+import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback;
 import com.siliconlabs.bledemo.interfaces.FindKeyFobCallback;
-import com.siliconlabs.bledemo.log.TimeoutLog;
-import com.siliconlabs.bledemo.utils.BLEUtils;
-import com.siliconlabs.bledemo.utils.Constants;
+import com.siliconlabs.bledemo.Browser.Model.Logs.TimeoutLog;
+import com.siliconlabs.bledemo.Utils.BLEUtils;
+import com.siliconlabs.bledemo.Utils.Constants;
 
 import java.util.List;
 
@@ -355,7 +356,7 @@ public class KeyFobsActivity extends BaseActivity implements FindKeyFobCallback 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up rounded_button_red, so long
+        // automatically handle clicks on the Home/Up btn_rounded_red, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
