@@ -57,7 +57,7 @@
         </ScrollView>
 
         <Button
-            android:id="@+id/ok_btn"
+            android:id="@+id/btn_ok"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dialog_error_ok_height"
             android:background="@drawable/btn_red_selector"

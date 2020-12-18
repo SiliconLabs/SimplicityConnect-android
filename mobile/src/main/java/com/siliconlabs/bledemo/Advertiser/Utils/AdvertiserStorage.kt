@@ -17,6 +17,7 @@ class AdvertiserStorage(val context: Context) {
         private const val KEY_LE_2M_PHY_SUPPORTED = "KEY_LE_2M_PHY_SUPPORTED"
         private const val KEY_LE_CODED_PHY_SUPPORTED = "KEY_LE_CODED_PHY_SUPPORTED"
         private const val KEY_LE_MAX_ADVERTISING_DATA_LENGTH = "KEY_LE_MAX_ADVERTISING_DATA_LENGTH"
+        private const val KEY_DISPLAY_ADVERTISER_CONFIG_LEAVE_DIALOG = "KEY_DISPLAY_ADVERTISER_CONFIG_LEAVE_DIALOG"
     }
 
     private val preferences = context.getSharedPreferences(PREFS_ADVERTISER_STORAGE, MODE_PRIVATE)
@@ -88,4 +89,13 @@ class AdvertiserStorage(val context: Context) {
     fun getLeMaximumDataLength(): Int {
         return preferences.getInt(KEY_LE_MAX_ADVERTISING_DATA_LENGTH, -1)
     }
+
+    fun shouldDisplayLeaveAdvertiserConfigDialog(): Boolean {
+        return preferences.getBoolean(KEY_DISPLAY_ADVERTISER_CONFIG_LEAVE_DIALOG, true)
+    }
+
+    fun setShouldDisplayLeaveAdvertiserConfigDialog(displayDialog: Boolean) {
+        preferences.edit().putBoolean(KEY_DISPLAY_ADVERTISER_CONFIG_LEAVE_DIALOG, displayDialog).apply()
+    }
+
 }

@@ -4,7 +4,8 @@ import android.content.Context
 import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
 import com.siliconlabs.bledemo.Advertiser.Enums.DataType
 import com.siliconlabs.bledemo.Advertiser.Enums.Phy
-import com.siliconlabs.bledemo.Advertiser.Models.*
+import com.siliconlabs.bledemo.Advertiser.Models.DataTypeItem
+import com.siliconlabs.bledemo.Advertiser.Models.Service16Bit
 import com.siliconlabs.bledemo.R
 
 class Translator(val context: Context) {

@@ -1,0 +1,22 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context="com.siliconlabs.bledemo.activity.LightActivity">
+
+        <include
+            android:id="@+id/toolbar_browser"
+            layout="@layout/actionbar" />
+
+        <fragment
+            android:id="@+id/fragment"
+            android:name="com.siliconlabs.bledemo.ConnectedLighting.Fragments.ConnectedLightingFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+</FrameLayout>

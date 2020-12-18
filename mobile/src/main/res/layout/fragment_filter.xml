@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -39,15 +40,14 @@
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
                     android:src="@drawable/ic_search_off"
-                    android:tint="#333333" />
+                    app:tint="#333333" />
 
                 <EditText
-                    android:id="@+id/search_device_name_edit_text"
+                    android:id="@+id/et_search_device_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
-                    android:fontFamily="sans-serif"
                     android:gravity="center_vertical"
                     android:hint="@string/Search_by_device_name_or_address"
                     android:imeOptions="actionSearch"
@@ -63,7 +63,7 @@
                     android:textSize="@dimen/filter_edit_search_text_size" />
 
                 <ImageView
-                    android:id="@+id/search_clear_packet_name"
+                    android:id="@+id/iv_clear_device_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -89,7 +89,7 @@
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
                     android:src="@drawable/ic_search_off"
-                    android:tint="#333333" />
+                    app:tint="#333333" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -100,13 +100,12 @@
                     android:textSize="14sp" />
 
                 <EditText
-                    android:id="@+id/search_packet_content_edit_text"
+                    android:id="@+id/et_search_packet_content"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:digits="0123456789abcdefABCDEF"
-                    android:fontFamily="sans-serif"
                     android:gravity="center_vertical"
                     android:hint="@string/Search_by_raw_advertising_data"
                     android:imeOptions="actionSearch"
@@ -121,7 +120,7 @@
                     android:textSize="@dimen/filter_edit_search_text_size" />
 
                 <ImageView
-                    android:id="@+id/search_clear_packet_content"
+                    android:id="@+id/iv_clear_packet_content"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -147,7 +146,7 @@
                     android:layout_centerVertical="true"
                     android:padding="8dp"
                     android:src="@drawable/ic_wifi"
-                    android:tint="@color/silabs_primary_icon" />
+                    app:tint="@color/silabs_primary_icon" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -163,7 +162,7 @@
 
 
             <TextView
-                android:id="@+id/textview_rssi_value"
+                android:id="@+id/tv_rssi_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/relativelayout_rssi"
@@ -174,10 +173,10 @@
                 android:textSize="@dimen/filter_rssi_value_text_size" />
 
             <SeekBar
-                android:id="@+id/seekbar_rssi"
+                android:id="@+id/sb_rssi"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/textview_rssi_value"
+                android:layout_below="@id/tv_rssi_value"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:progressTint="@color/silabs_blue"
@@ -188,10 +187,9 @@
                 android:id="@+id/textview_seekbar_min"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/seekbar_rssi"
+                android:layout_below="@id/sb_rssi"
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="8dp"
-                android:fontFamily="sans-serif"
                 android:text="-100"
                 android:textSize="@dimen/filter_rssi_min_max_text_size" />
 
@@ -199,11 +197,10 @@
                 android:id="@+id/textview_seekbar_max"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/seekbar_rssi"
+                android:layout_below="@id/sb_rssi"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
-                android:fontFamily="sans-serif"
                 android:text="@string/zero"
                 android:textSize="@dimen/filter_rssi_min_max_text_size" />
 
@@ -223,7 +220,7 @@
                     android:layout_centerVertical="true"
                     android:padding="8dp"
                     android:src="@drawable/ic_beacon"
-                    android:tint="@color/silabs_primary_icon" />
+                    app:tint="@color/silabs_primary_icon" />
 
                 <TextView
                     android:id="@+id/textview_beacon"
@@ -238,7 +235,7 @@
                     android:textSize="@dimen/filter_header_bold_text_size" />
 
                 <ImageView
-                    android:id="@+id/imageview_beacon_arrow"
+                    android:id="@+id/iv_beacon_arrow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -250,7 +247,7 @@
             </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerview_beacon_type"
+                android:id="@+id/rv_beacon_type"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:layout_below="@id/relativelayout_beacon"
@@ -259,13 +256,12 @@
                 android:scrollbars="vertical" />
 
             <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/only_favourites"
+                android:id="@+id/cb_only_favourites"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_below="@id/recyclerview_beacon_type"
+                android:layout_below="@id/rv_beacon_type"
                 android:layout_margin="8dp"
                 android:layout_marginStart="10dp"
-                android:fontFamily="sans-serif"
                 android:gravity="start|center_vertical"
                 android:paddingStart="@dimen/dialog_device_filter_title_padding_horizontal"
                 android:paddingEnd="@dimen/dialog_device_filter_title_padding_horizontal"
@@ -275,15 +271,11 @@
 
 
             <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/only_connectable"
+                android:id="@+id/cb_only_connectable"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_below="@id/only_favourites"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="sans-serif"
+                android:layout_below="@id/cb_only_favourites"
+                android:layout_margin="8dp"
                 android:gravity="start|center_vertical"
                 android:paddingStart="@dimen/dialog_device_filter_title_padding_horizontal"
                 android:paddingEnd="@dimen/dialog_device_filter_title_padding_horizontal"
@@ -291,11 +283,24 @@
                 android:textColor="@color/silabs_subtle_text"
                 android:textSize="@dimen/filter_checkbox_text_size" />
 
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/cb_only_bonded"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_below="@id/cb_only_connectable"
+                android:layout_margin="8dp"
+                android:gravity="start|center_vertical"
+                android:paddingStart="@dimen/dialog_device_filter_title_padding_horizontal"
+                android:paddingEnd="@dimen/dialog_device_filter_title_padding_horizontal"
+                android:text="@string/Only_Bonded"
+                android:textColor="@color/silabs_subtle_text"
+                android:textSize="@dimen/filter_checkbox_text_size" />
+
             <RelativeLayout
                 android:id="@+id/relativelayout_saved_searches"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/only_connectable"
+                android:layout_below="@id/cb_only_bonded"
                 android:layout_margin="8dp">
 
                 <ImageView
@@ -320,7 +325,7 @@
                     android:textSize="@dimen/filter_header_bold_text_size" />
 
                 <ImageView
-                    android:id="@+id/imageview_save_arrow"
+                    android:id="@+id/iv_save_arrow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
@@ -332,7 +337,7 @@
             </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerview_saved_searches"
+                android:id="@+id/rv_saved_searches"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:layout_below="@id/relativelayout_saved_searches"
@@ -341,7 +346,6 @@
                 android:scrollbars="vertical" />
 
         </RelativeLayout>
-
 
     </ScrollView>
 
@@ -363,8 +367,8 @@
         android:layout_marginBottom="8dp">
 
         <Button
+            android:id="@+id/btn_search"
             style="@style/ButtonBlue"
-            android:id="@+id/button_search"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_alignParentStart="true"
@@ -373,26 +377,26 @@
             android:text="@string/button_search" />
 
         <Button
+            android:id="@+id/btn_save"
             style="@style/ButtonBorderlessBlue"
-            android:id="@+id/button_save"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
-            android:layout_marginEnd="4dp"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/button_search"
+            android:layout_marginEnd="4dp"
+            android:layout_toEndOf="@id/btn_search"
             android:text="@string/button_save" />
 
         <Button
+            android:id="@+id/btn_reset"
             style="@style/ButtonBorderlessBlue"
-            android:id="@+id/button_reset"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/button_save"
+            android:layout_toEndOf="@id/btn_save"
             android:text="@string/button_reset" />
 
         <ImageView
-            android:id="@+id/imageview_close"
+            android:id="@+id/iv_close"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_alignParentEnd="true"

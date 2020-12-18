@@ -7,7 +7,8 @@ import android.bluetooth.le.AdvertisingSetCallback
 import android.os.Build
 import android.os.Handler
 import com.siliconlabs.bledemo.Advertiser.Activities.IAdvertiserActivityView
-import com.siliconlabs.bledemo.Advertiser.Models.*
+import com.siliconlabs.bledemo.Advertiser.Models.Advertiser
+import com.siliconlabs.bledemo.Advertiser.Models.BluetoothInfo
 import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
 import com.siliconlabs.bledemo.Bluetooth.BLE.ErrorCodes
 

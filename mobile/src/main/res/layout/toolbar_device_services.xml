@@ -14,7 +14,7 @@
         android:weightSum="2">
 
         <LinearLayout
-            android:id="@+id/linearlayout_log"
+            android:id="@+id/ll_log"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -22,14 +22,14 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/imageview_log"
+                android:id="@+id/iv_log"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_log_off" />
 
             <TextView
-                android:id="@+id/textview_log"
+                android:id="@+id/tv_log"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -42,7 +42,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/linearlayout_connections"
+            android:id="@+id/ll_connections"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -50,14 +50,14 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/imageview_connections"
+                android:id="@+id/iv_connections"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_connect" />
 
             <TextView
-                android:id="@+id/textview_connections"
+                android:id="@+id/tv_connections"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

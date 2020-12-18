@@ -29,10 +29,17 @@
             android:id="@+id/browser_shadow_top"
             android:layout_width="match_parent"
             android:layout_height="@dimen/shadow_height"
-            android:layout_below="@id/bluetooth_browser_toolbar"
+            android:layout_below="@id/etv_active_filter_bar"
             android:background="@drawable/scanning_bar_shadow"
             android:elevation="1dp"
             android:rotation="180" />
+
+        <com.siliconlabs.bledemo.Browser.Views.ExpandableTextView
+            android:id="@+id/etv_active_filter_bar"
+            android:layout_width="match_parent"
+            android:layout_below="@id/bluetooth_browser_toolbar"
+            android:visibility="gone"
+            android:layout_height="wrap_content"/>
 
         <RelativeLayout
             android:id="@+id/framelayout_container"
@@ -93,31 +100,12 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/filter_body"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_below="@+id/bluetooth_enable"
-            android:animateLayoutChanges="true"
-            android:background="@color/silabs_white"
-            android:paddingTop="3dp"
-            android:visibility="gone">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_alignParentBottom="true"
-                android:background="@color/silabs_red" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
             android:id="@+id/debug_body"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@id/scanning_gradient_container"
-            android:layout_below="@id/filter_body"
+            android:layout_below="@id/bluetooth_browser_toolbar"
             android:background="@color/silabs_background">
-
 
             <LinearLayout
                 android:id="@+id/no_devices_found"
@@ -174,7 +162,7 @@
                 android:background="@color/silabs_transparent">
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerview_debug_devices"
+                    android:id="@+id/rv_debug_devices"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/silabs_transparent"
@@ -204,8 +192,8 @@
             android:layout_alignParentBottom="true">
 
             <Button
+                android:id="@+id/btn_scanning"
                 style="@style/ButtonRed"
-                android:id="@+id/button_scanning"
                 android:layout_width="wrap_content"
                 android:layout_height="38dp"
                 android:layout_centerHorizontal="true"

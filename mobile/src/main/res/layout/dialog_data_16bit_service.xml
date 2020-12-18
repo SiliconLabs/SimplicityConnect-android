@@ -34,7 +34,7 @@
                 android:hint="@string/advertiser_hint_16_bit_uuid_or_service_name" />
 
             <TextView
-                style="@style/TextViewSmall"
+                style="@style/TextSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

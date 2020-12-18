@@ -1,9 +1,6 @@
 package com.siliconlabs.bledemo.Advertiser.Dialogs
 
-import android.app.Dialog
 import android.bluetooth.BluetoothAdapter
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher

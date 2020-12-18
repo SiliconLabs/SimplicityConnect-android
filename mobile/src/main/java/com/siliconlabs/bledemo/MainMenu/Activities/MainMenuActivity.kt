@@ -14,42 +14,32 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Pair
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.Window
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.siliconlabs.bledemo.BuildConfig
-import com.siliconlabs.bledemo.MainMenu.Model.MenuItemType
-import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Advertiser.Activities.AdvertiserActivity
-import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
-import com.siliconlabs.bledemo.Base.Activities.BaseActivity
-import com.siliconlabs.bledemo.Browser.Activities.BrowserActivity
-import com.siliconlabs.bledemo.activity.KeyFobsActivity
-import com.siliconlabs.bledemo.MainMenu.Adapters.MenuAdapter
+import com.siliconlabs.bledemo.Base.BaseActivity
 import com.siliconlabs.bledemo.Browser.Adapters.ViewPagerAdapter
-import com.siliconlabs.bledemo.Bluetooth.BLE.BlueToothService.GattConnectType
+import com.siliconlabs.bledemo.BuildConfig
+import com.siliconlabs.bledemo.MainMenu.Adapters.MenuAdapter
 import com.siliconlabs.bledemo.MainMenu.Dialogs.LocationInfoDialog
 import com.siliconlabs.bledemo.MainMenu.Fragments.DemoFragment
 import com.siliconlabs.bledemo.MainMenu.Fragments.DevelopFragment
-import com.siliconlabs.bledemo.fragment.SelectDeviceDialog
+import com.siliconlabs.bledemo.MainMenu.MenuItems.MainMenuItem
+import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.Utils.Constants
 import com.siliconlabs.bledemo.Views.BluetoothEnableBar
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_main_menu.*
 import kotlinx.android.synthetic.main.bluetooth_enable_bar.*
-import java.util.*
 
 class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
     private var helpDialog: Dialog? = null
-    private var hiddenDebugDialog: Dialog? = null
     private var isBluetoothAdapterEnabled = true
     private lateinit var bluetoothEnableBar: BluetoothEnableBar
 
@@ -65,11 +55,9 @@ class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
                         bluetoothEnableBar.show()
                     }
                     BluetoothAdapter.STATE_ON -> {
-                        if (!isBluetoothAdapterEnabled) {
-                            Toast.makeText(this@MainMenuActivity, R.string.toast_bluetooth_enabled, Toast.LENGTH_SHORT).show()
-                        }
+                        if (!isBluetoothAdapterEnabled) showMessage(R.string.toast_bluetooth_enabled)
                         isBluetoothAdapterEnabled = true
-                        bluetooth_enable!!.visibility = View.GONE
+                        bluetooth_enable?.visibility = View.GONE
                     }
                     BluetoothAdapter.STATE_TURNING_ON -> isBluetoothAdapterEnabled = false
                 }
@@ -100,8 +88,8 @@ class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
             val dialog = LocationInfoDialog()
             dialog.show(supportFragmentManager, "location_info_dialog")
         }
+
         initHelpDialog()
-        initHiddenDebugDialog()
         initViewPager()
     }
 
@@ -122,11 +110,8 @@ class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
             override fun onPageScrolled(i: Int, v: Float, i1: Int) {}
             override fun onPageSelected(position: Int) {
                 bottom_navigation_view.menu.getItem(position).isChecked = true
-                if (position == 0) {
-                    toolbar.title = Constants.BOTTOM_NAVI_DEMO
-                } else if (position == 1) {
-                    toolbar.title = Constants.BOTTOM_NAVI_DEVELOP
-                }
+                if (position == 0) toolbar.title = Constants.BOTTOM_NAVI_DEMO
+                else if (position == 1) toolbar.title = Constants.BOTTOM_NAVI_DEVELOP
             }
 
             override fun onPageScrollStateChanged(i: Int) {}
@@ -178,13 +163,12 @@ class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
             R.id.menu_help -> {
                 helpDialog?.show()
                 true
             }
-
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -205,15 +189,14 @@ class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
 
     private fun initHelpDialog() {
         helpDialog = Dialog(this@MainMenuActivity)
-        if (helpDialog?.window != null) {
-            helpDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
+        helpDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         helpDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         helpDialog?.setContentView(R.layout.dialog_help_demo_item)
         (helpDialog?.findViewById<View>(R.id.dialog_help_version_text) as TextView).text = getString(R.string.version_text,
                 BuildConfig.VERSION_NAME)
-        val okButton = helpDialog!!.findViewById<View>(R.id.help_ok_button)
-        okButton.setOnClickListener { helpDialog?.dismiss() }
+
+        val okButton = helpDialog?.findViewById<View>(R.id.help_ok_button)
+        okButton?.setOnClickListener { helpDialog?.dismiss() }
         val silabsProductsWirelessTV = helpDialog?.findViewById<TextView>(R.id.silabs_products_wireless)
         val silabsSupportTV = helpDialog?.findViewById<TextView>(R.id.silabs_support)
         val githubSiliconLabsEfrconnectTV = helpDialog?.findViewById<TextView>(R.id.github_siliconlabs_efrconnect)
@@ -252,60 +235,34 @@ class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
         }
     }
 
-    private fun initHiddenDebugDialog() {
-        hiddenDebugDialog = Dialog(this@MainMenuActivity)
-        hiddenDebugDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        hiddenDebugDialog?.setContentView(R.layout.dialog_hidden_debug_calibration)
-        val okButton = hiddenDebugDialog?.findViewById<View>(R.id.ok_btn)
-        okButton?.setOnClickListener { hiddenDebugDialog?.dismiss() }
+
+    override fun onMenuItemClick(menuItem: MainMenuItem) {
+        if (askForLocationPermission()) {
+            menuItem.onClick(this@MainMenuActivity)
+        }
     }
 
-    // Detect which menu item was clicked
-    override fun onMenuItemClick(menuItemType: MenuItemType) {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    private fun askForLocationPermission(): Boolean {
+        return if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISION_REQUEST_CODE)
-        } else if (menuItemType == MenuItemType.ADVERTISER) {
-            if (isBluetoothAdapterEnabled || AdvertiserStorage(this).isAdvertisingBluetoothInfoChecked()) {
-                val intent = Intent(this, AdvertiserActivity::class.java)
-                startActivity(intent)
-            } else {
-                Toast.makeText(this, R.string.toast_bluetooth_not_enabled, Toast.LENGTH_SHORT).show()
-            }
-        } else if (isBluetoothAdapterEnabled) {
-            val intent: Intent
-            when (menuItemType) {
-                MenuItemType.HEALTH_THERMOMETER -> {
-                    val connectType = GattConnectType.THERMOMETER
-                    val profilesInfo = Arrays.asList(Pair(R.string.htp_title, R.string.htp_id))
-                    val selectDeviceDialog = SelectDeviceDialog.newDialog(R.string.title_Health_Thermometer, R.string.main_menu_description_thermometer, profilesInfo, connectType)
-                    selectDeviceDialog.show(supportFragmentManager, "select_device_tag")
-                }
-                MenuItemType.KEY_FOBS -> {
-                    intent = Intent(this, KeyFobsActivity::class.java)
-                    startActivity(intent)
-                }
-                MenuItemType.BLUETOOTH_BROWSER -> {
-                    intent = Intent(this, BrowserActivity::class.java)
-                    startActivity(intent)
-                }
-            }
+            false
         } else {
-            Toast.makeText(this, R.string.toast_bluetooth_not_enabled, Toast.LENGTH_SHORT).show()
+            true
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            LOCATION_PERMISION_REQUEST_CODE -> if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this@MainMenuActivity, resources.getString(R.string.Permissions_granted_succesfully), Toast.LENGTH_SHORT).show()
+            LOCATION_PERMISION_REQUEST_CODE -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showMessage(R.string.Permissions_granted_succesfully)
             } else {
-                Toast.makeText(this@MainMenuActivity, R.string.permissions_not_granted, Toast.LENGTH_LONG).show()
+                showMessage(R.string.permissions_not_granted)
             }
-            WRITE_EXTERNAL_STORAGE_REQUEST_CODE -> if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this@MainMenuActivity, resources.getString(R.string.Permissions_granted_succesfully), Toast.LENGTH_SHORT).show()
+            WRITE_EXTERNAL_STORAGE_REQUEST_CODE -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showMessage(R.string.Permissions_granted_succesfully)
             } else {
-                Toast.makeText(this@MainMenuActivity, resources.getString(R.string.Grant_WRITE_FILES_permission_to_access_OTA), Toast.LENGTH_LONG).show()
+                showMessage(R.string.Grant_WRITE_FILES_permission_to_access_OTA)
             }
         }
     }

@@ -9,12 +9,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 30
+    buildToolsVersion '30.0.2'
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 29
+        targetSdkVersion 30
     }
 
     buildTypes {
@@ -44,39 +44,44 @@ android {
         blueGecko {
             dimension "version"
             applicationId "com.siliconlabs.bledemo"
-            versionCode 16
-            versionName "2.1.0"
-        }
-        wirelessGecko {
-            dimension "version"
-            applicationId "com.siliconlabs.wirelessgecko"
-            versionCode 5
-            versionName "1.4.1"
+            versionCode 17
+            versionName "2.2.0"
         }
     }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    wearApp project(':wear')
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.google.android.gms:play-services-base:17.3.0'
-    implementation 'com.google.android.gms:play-services-wearable:17.0.0'
+
+    'android x'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'com.google.android.material:material:1.1.0'
-    implementation 'com.github.frankiesardo:auto-parcel:0.3'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-    annotationProcessor 'com.github.frankiesardo:auto-parcel-processor:0.3'
-    implementation 'com.jakewharton:butterknife:6.1.0'
-    annotationProcessor 'com.jakewharton:butterknife:6.1.0'
-    implementation 'com.jakewharton.timber:timber:4.5.1'
-    implementation project(':libraries:materialdesign')
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.firebase:firebase-appindexing:19.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation "androidx.core:core-ktx:1.3.2"
+
+    'MPAndroidChart'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation "androidx.core:core-ktx:1.3.0"
+
+    'kotlin'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    'google'
+    implementation 'com.google.android.gms:play-services-base:17.5.0'
+    implementation 'com.google.firebase:firebase-appindexing:19.1.0'
+    implementation 'com.google.android.material:material:1.2.1'
+
+    'gson'
     implementation 'com.google.code.gson:gson:2.8.6'
-    //implementation project(path: ':wear')
+
+    'auto-parcel'
+    implementation 'com.github.frankiesardo:auto-parcel:0.3'
+    annotationProcessor 'com.github.frankiesardo:auto-parcel-processor:0.3'
+
+    'timber'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    'materialdesign'
+    implementation project(':libraries:materialdesign')
 }

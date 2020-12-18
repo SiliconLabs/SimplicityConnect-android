@@ -191,6 +191,9 @@
     <dimen name="connection_item_device_name_text_size">18sp</dimen>
     <dimen name="connection_item_progress_bar_text_size">14sp</dimen>
     <dimen name="scanning_button_text_size">18sp</dimen>
+    <dimen name="active_filter_min_height">34dp</dimen>
+
+    <dimen name="sort_toolbar_height">240dp</dimen>
 
     <!-- Bluetooth Browser - device item -->
     <dimen name="device_name_text_size">18sp</dimen>

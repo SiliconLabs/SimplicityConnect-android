@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/range_root_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_pane">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:cardCornerRadius="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TitleSmall"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:text="@string/range_device_info"
+                            android:textColor="@color/silabs_subtle_text" />
+
+                        <TextView
+                            android:id="@+id/tv_range_device_name"
+                            style="@style/TextBig"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            tools:text="Soc-rangetest-rail-dmp" />
+
+                        <TextView
+                            android:id="@+id/tv_range_model_number"
+                            style="@style/TextBig"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            tools:text="EFR32MG12P43F1024GL125 - BRD4164A"
+                            android:textAllCaps="true" />
+                    </LinearLayout>
+
+                    <include layout="@layout/horizontal_separator" />
+
+                    <LinearLayout
+                        android:id="@+id/range_transmitted_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TitleMedium"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/range_tx_transmitted"
+                            android:textColor="@color/silabs_subtle_text" />
+
+                        <TextView
+                            android:id="@+id/tv_range_test_packet_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="@dimen/text_size_increased_twice" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/range_rx_data_row_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/TitleMedium"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/range_rx_label_rx"
+                                android:textColor="@color/silabs_subtle_text" />
+
+                            <TextView
+                                android:id="@+id/tv_range_test_rx"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="@string/range_rx_rx"
+                                android:textColor="@color/silabs_blue"
+                                android:textSize="24sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/TitleMedium"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/range_rx_label_rssi"
+                                android:textColor="@color/silabs_subtle_text" />
+
+                            <TextView
+                                android:id="@+id/tv_range_test_rssi"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="@string/range_rx_rssi"
+                                android:textColor="@color/silabs_blue"
+                                android:textSize="24sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/range_rx_data_row_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/TitleMedium"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/range_rx_label_ma"
+                                android:textColor="@color/silabs_subtle_text" />
+
+                            <TextView
+                                android:id="@+id/tv_range_test_ma"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="@string/range_rx_ma"
+                                android:textColor="@color/silabs_blue"
+                                android:textSize="24sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/TitleMedium"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/range_rx_label_per"
+                                android:textColor="@color/silabs_subtle_text" />
+
+                            <TextView
+                                android:id="@+id/tv_range_test_per"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="@string/range_rx_per"
+                                android:textColor="@color/silabs_blue"
+                                android:textSize="24sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="160dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tv_range_rx_chart_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/range_rx_rssi_level"
+                        android:textColor="@color/silabs_dark_gray_text"
+                        android:textSize="12sp" />
+
+                    <include layout="@layout/horizontal_separator" />
+
+                    <LinearLayout
+                        android:id="@+id/phy_config_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="16dp"
+                        android:orientation="horizontal"
+                        android:paddingTop="8dp">
+
+                        <TextView
+                            style="@style/TitleSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:text="@string/range_config_phy_config"
+                            android:textColor="@color/silabs_subtle_text" />
+
+                        <Spinner
+                            style="@style/CustomSpinner"
+                            android:id="@+id/sp_phy_config"
+                            android:layout_width="0dp"
+                            android:layout_weight="1" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_range_tx_power_layout_1"
+                        style="@style/TitleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_weight="1"
+                        android:text="@string/range_config_tx_power"
+                        android:textColor="@color/silabs_subtle_text" />
+
+                    <LinearLayout
+                        android:id="@+id/range_tx_power_layout_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <SeekBar
+                            android:id="@+id/sb_range_tx_power"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="6" />
+
+                        <Spinner
+                            style="@style/CustomSpinner"
+                            android:id="@+id/sp_tx_power"
+                            android:layout_width="0dp"
+                            android:layout_weight="2" />
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/TitleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_weight="1"
+                        android:text="@string/range_config_payload_length"
+                        android:textColor="@color/silabs_subtle_text" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <SeekBar
+                            android:id="@+id/sb_range_payload_length"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="6" />
+
+                        <Spinner
+                            style="@style/CustomSpinner"
+                            android:id="@+id/sp_payload_length"
+                            android:layout_width="0dp"
+                            android:layout_weight="2" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/TitleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_weight="1"
+                        android:text="@string/range_config_ma_window_size"
+                        android:textColor="@color/silabs_subtle_text" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <SeekBar
+                            android:id="@+id/range_seek_ma_window_size"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="6" />
+
+                        <Spinner
+                            style="@style/CustomSpinner"
+                            android:id="@+id/sp_ma_window_size"
+                            android:layout_width="0dp"
+                            android:layout_weight="2" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/TitleSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:text="@string/range_config_channel_no"
+                            android:textColor="@color/silabs_subtle_text" />
+
+                        <Spinner
+                            style="@style/CustomSpinner"
+                            android:id="@+id/sp_channel_number"
+                            android:layout_width="100dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/TitleSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:text="@string/range_config_packet_count"
+                            android:textColor="@color/silabs_subtle_text" />
+
+                        <Spinner
+                            style="@style/CustomSpinner"
+                            android:id="@+id/sp_packet_count"
+                            android:layout_width="100dp"/>
+                    </LinearLayout>
+
+                    <CheckBox
+                        android:id="@+id/range_check_packet_repeat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="@string/range_config_packet_count_repeat" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/TitleSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:text="@string/range_config_remote_id"
+                            android:textColor="@color/silabs_subtle_text" />
+
+                        <Spinner
+                            style="@style/CustomSpinner"
+                            android:id="@+id/sp_remote_id"
+                            android:layout_width="100dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/TitleSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:text="@string/range_config_self_id"
+                            android:textColor="@color/silabs_subtle_text" />
+
+                        <Spinner
+                            style="@style/CustomSpinner"
+                            android:id="@+id/sp_self_id"
+                            android:layout_width="100dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/TitleSmall"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/range_config_uart_log_enable"
+                            android:textColor="@color/silabs_subtle_text" />
+
+                        <CheckBox
+                            android:id="@+id/range_check_uart_log"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
+
+    <View
+        android:id="@+id/scanning_separator"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_height"
+        android:layout_above="@id/bottom_pane"
+        android:background="@drawable/scanning_bar_shadow" />
+
+    <RelativeLayout
+        android:id="@+id/bottom_pane"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/silabs_white">
+
+        <Button
+            android:id="@+id/range_test_start_stop"
+            style="@style/ButtonBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_centerInParent="true"
+            android:paddingHorizontal="10dp"
+            android:text="@string/range_rx_start"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/range_test_logo"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/icon_proprietary" />
+    </RelativeLayout>
+</RelativeLayout>

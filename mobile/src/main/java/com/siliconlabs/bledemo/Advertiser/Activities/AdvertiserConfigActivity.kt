@@ -9,12 +9,12 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.*
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.LinearLayout
+import android.widget.Spinner
 import com.siliconlabs.bledemo.Advertiser.Adapters.DataTypeAdapter
-import com.siliconlabs.bledemo.Advertiser.Dialogs.ManufacturerDataDialog
-import com.siliconlabs.bledemo.Advertiser.Dialogs.RemoveServicesDialog
-import com.siliconlabs.bledemo.Advertiser.Dialogs.Service128BitDataDialog
-import com.siliconlabs.bledemo.Advertiser.Dialogs.Service16BitDataDialog
+import com.siliconlabs.bledemo.Advertiser.Dialogs.*
 import com.siliconlabs.bledemo.Advertiser.Enums.*
 import com.siliconlabs.bledemo.Advertiser.Models.*
 import com.siliconlabs.bledemo.Advertiser.Presenters.AdvertiserConfigActivityPresenter
@@ -22,7 +22,7 @@ import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
 import com.siliconlabs.bledemo.Advertiser.Utils.HtmlCompat
 import com.siliconlabs.bledemo.Advertiser.Utils.Translator
 import com.siliconlabs.bledemo.Advertiser.Utils.Validator
-import com.siliconlabs.bledemo.Base.BaseAppCompatActivity
+import com.siliconlabs.bledemo.Base.BaseActivity
 import com.siliconlabs.bledemo.R
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.advertiser_config_data.*
@@ -33,11 +33,12 @@ import kotlinx.android.synthetic.main.advertiser_data_container.view.*
 import kotlinx.android.synthetic.main.data_type_item.view.*
 import kotlinx.android.synthetic.main.data_type_layout.view.*
 import kotlinx.android.synthetic.main.data_type_layout.view.ib_remove
-import kotlinx.android.synthetic.main.data_type_layout.view.ll_data
 
-class AdvertiserConfigActivity : BaseAppCompatActivity(), IAdvertiserConfigActivityView {
+class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
     private lateinit var presenter: AdvertiserConfigActivityPresenter
     private lateinit var advertiserData: AdvertiserData
+    private lateinit var startConfigData: AdvertiserData
+
     private val translator = Translator(this)
     private var position: Int? = null
 
@@ -80,6 +81,8 @@ class AdvertiserConfigActivity : BaseAppCompatActivity(), IAdvertiserConfigActiv
         position = intent.getIntExtra(EXTRA_ITEM_POSITION, 0)
         presenter.onItemReceived(advertiserData, AdvertiserStorage(this@AdvertiserConfigActivity).isAdvertisingExtensionSupported())
 
+        startConfigData = advertiserData.deepCopy()
+
         prepareDataSpinners()
         loadData()
         handleAdvertisingSetNameChanges()
@@ -96,8 +99,8 @@ class AdvertiserConfigActivity : BaseAppCompatActivity(), IAdvertiserConfigActiv
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
             R.id.save_advertiser -> {
                 presenter.handleSave()
                 true
@@ -108,8 +111,56 @@ class AdvertiserConfigActivity : BaseAppCompatActivity(), IAdvertiserConfigActiv
 
     private fun prepareToolbar() {
         setSupportActionBar(toolbar)
-        iv_go_back.setOnClickListener { onBackPressed() }
+        iv_go_back.setOnClickListener {
+            exitConfigView()
+        }
     }
+
+    private fun exitConfigView() {
+        if (hasConfigurationChanged() && AdvertiserStorage(this).shouldDisplayLeaveAdvertiserConfigDialog()) {
+            LeaveAdvertiserConfigDialog(object : LeaveAdvertiserConfigDialog.Callback {
+                override fun onYesClicked() {
+                    presenter.handleSave()
+                }
+
+                override fun onNoClicked() {
+                    onBackPressed()
+                }
+
+            }).show(supportFragmentManager, "dialog_leave_advertiser_config")
+        } else {
+            onBackPressed()
+        }
+    }
+
+    private fun hasConfigurationChanged(): Boolean {
+
+        // 1. Verify if advertising data / scan response data has changed
+        if (startConfigData.advertisingData != advertiserData.advertisingData) return true
+        else if (startConfigData.scanResponseData != advertiserData.scanResponseData) return true
+
+        // 2. Verify if any text input is currently not valid
+        if (isAnyInputNotValid()) return true
+
+        // 3. Verify if other data has changed
+        startConfigData.apply {
+            when {
+                name != et_advertising_set_name.text.toString() -> return true
+                isLegacy != rb_legacy_advertising.isChecked -> return true
+                mode != getAdvertisingMode() -> return true
+                settings != getExtendedSettings() -> return true
+                advertisingIntervalMs != getAdvertisingInterval() -> return true
+                txPower != getTxPower() -> return true
+                limitType != getAdvertisingLimitType() -> return true
+                timeLimit.toString() != et_time_limit.text.toString() -> return true
+                isEventLimitAvailable() && eventLimit.toString() != et_event_limit.text.toString() -> return true
+            }
+        }
+
+        // 4. If configuration has not changed return false
+        return false
+    }
+
 
     private fun handleAdvertisingSetNameChanges() {
         et_advertising_set_name.addTextChangedListener(object : TextWatcher {
@@ -121,14 +172,38 @@ class AdvertiserConfigActivity : BaseAppCompatActivity(), IAdvertiserConfigActiv
         })
     }
 
+    private fun isEventLimitAvailable(): Boolean {
+        return ll_event_limit.visibility == View.VISIBLE
+    }
+
+    private fun isTxPowerNotValid(): Boolean {
+        return ll_tx_power.visibility == View.VISIBLE && !Validator.isTxPowerValid(et_tx_power.text.toString())
+    }
+
+    private fun isAdvertisingIntervalNotValid(): Boolean {
+        return ll_advertising_interval.visibility == View.VISIBLE && !Validator.isAdvertisingIntervalValid(et_advertising_interval.text.toString())
+    }
+
+    private fun isTimeLimitNotValid(): Boolean {
+        return rb_time_limit.isChecked && !Validator.isAdvertisingTimeLimitValid(et_time_limit.text.toString(), BluetoothInfo().isExtendedTimeLimitSupported())
+    }
+
+    private fun isEventLimitNotValid(): Boolean {
+        return rb_event_limit.isChecked && !Validator.isAdvertisingEventLimitValid(et_event_limit.text.toString())
+    }
+
+    private fun isAnyInputNotValid(): Boolean {
+        return isTxPowerNotValid() || isAdvertisingIntervalNotValid() || isTimeLimitNotValid() || isEventLimitNotValid()
+    }
+
     override fun onSaveHandled(isExtendedTimeLimitSupported: Boolean) {
-        if (ll_tx_power.visibility == View.VISIBLE && !Validator.isTxPowerValid(et_tx_power.text.toString()))
+        if (isTxPowerNotValid())
             showMessage(R.string.advertiser_config_message_invalid_tx_power)
-        else if (ll_advertising_interval.visibility == View.VISIBLE && !Validator.isAdvertisingIntervalValid(et_advertising_interval.text.toString()))
+        else if (isAdvertisingIntervalNotValid())
             showMessage(R.string.advertiser_config_message_invalid_interval)
-        else if (rb_time_limit.isChecked && !Validator.isAdvertisingTimeLimitValid(et_time_limit.text.toString(), isExtendedTimeLimitSupported))
+        else if (isTimeLimitNotValid())
             showMessage(R.string.advertiser_config_message_invalid_time_limit)
-        else if (rb_event_limit.isChecked && !Validator.isAdvertisingEventLimitValid(et_event_limit.text.toString()))
+        else if (isEventLimitNotValid())
             showMessage(R.string.advertiser_config_message_invalid_event_limit)
         else {
             val name = et_advertising_set_name.text.toString()

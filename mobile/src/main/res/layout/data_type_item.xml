@@ -13,7 +13,7 @@
 
         <TextView
             android:id="@+id/tv_data_text"
-            style="@style/TextViewSmall"
+            style="@style/TextSmall"
             android:layout_width="0dp"
             android:layout_height="44dp"
             android:layout_marginStart="16dp"

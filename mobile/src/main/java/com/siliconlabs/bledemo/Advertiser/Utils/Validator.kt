@@ -1,5 +1,7 @@
 package com.siliconlabs.bledemo.Advertiser.Utils
 
+import com.siliconlabs.bledemo.Utils.Converters
+
 class Validator {
     companion object {
         private const val UUID_PATTERN = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
@@ -15,11 +17,11 @@ class Validator {
         private const val MAX_EVENT_LIMIT = 255
 
         fun isCompanyIdentifierValid(text: String): Boolean {
-            return text.length == 4 && Converter.isHexCorrect(text)
+            return text.length == 4 && Converters.isHexCorrect(text)
         }
 
         fun isCompanyDataValid(text: String): Boolean {
-            return (text.length >= 2 && text.length % 2 == 0 && Converter.isHexCorrect(text))
+            return (text.length >= 2 && text.length % 2 == 0 && Converters.isHexCorrect(text))
         }
 
         fun isTxPowerValid(text: String): Boolean {

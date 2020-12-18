@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,7 +16,7 @@
         android:rotation="180" />
 
     <LinearLayout
-        android:id="@+id/search_log_container"
+        android:id="@+id/ll_search_log_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
@@ -36,10 +37,10 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:src="@drawable/ic_search_off"
-                android:tint="#333333" />
+                app:tint="#333333" />
 
             <EditText
-                android:id="@+id/edit_text_search"
+                android:id="@+id/et_search"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -60,7 +61,7 @@
                 android:textSize="@dimen/log_edit_search_text_size" />
 
             <ImageView
-                android:id="@+id/search_log_clear"
+                android:id="@+id/iv_search_log_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -75,30 +76,29 @@
         android:id="@+id/log_separator"
         android:layout_width="match_parent"
         android:layout_height="@dimen/shadow_height"
-        android:layout_below="@id/search_log_container"
+        android:layout_below="@id/ll_search_log_container"
         android:background="@drawable/scanning_bar_shadow"
         android:rotation="180"
         android:visibility="gone" />
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview_log"
+        android:id="@+id/rv_log"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/view_separator"
-        android:layout_below="@id/search_log_container"
+        android:layout_below="@id/ll_search_log_container"
         android:scrollbars="vertical" />
-
 
     <View
         android:id="@+id/view_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_above="@id/relativelayout_bottom"
+        android:layout_above="@id/rl_bottom"
         android:background="@color/silabs_secondary_background" />
 
     <RelativeLayout
-        android:id="@+id/relativelayout_bottom"
+        android:id="@+id/rl_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -111,11 +111,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_toStartOf="@id/imageview_close"
+            android:layout_toStartOf="@id/iv_close"
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button_share"
+                android:id="@+id/btn_share"
                 style="@style/ButtonBlue"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
@@ -125,7 +125,7 @@
                 android:text="@string/button_share" />
 
             <Button
-                android:id="@+id/textview_clear_log"
+                android:id="@+id/btn_clear_log"
                 style="@style/ButtonBorderlessBlue"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
@@ -134,7 +134,7 @@
                 android:text="@string/button_clear_log" />
 
             <Button
-                android:id="@+id/textview_filter_log"
+                android:id="@+id/btn_filter_log"
                 style="@style/ButtonBorderlessBlue"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
@@ -144,7 +144,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageview_close"
+            android:id="@+id/iv_close"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_alignParentEnd="true"
@@ -152,6 +152,4 @@
             android:padding="10dp"
             android:src="@drawable/ic_small_x" />
     </RelativeLayout>
-
-
 </RelativeLayout>

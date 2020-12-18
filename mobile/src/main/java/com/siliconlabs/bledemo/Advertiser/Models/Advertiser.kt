@@ -11,7 +11,6 @@ import com.google.gson.Gson
 import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
 import com.siliconlabs.bledemo.Advertiser.Enums.LimitType
 import kotlinx.android.parcel.Parcelize
-import java.lang.IllegalArgumentException
 import kotlin.math.ceil
 
 @Parcelize

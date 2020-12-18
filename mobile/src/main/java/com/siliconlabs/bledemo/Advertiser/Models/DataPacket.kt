@@ -7,7 +7,7 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class DataPacket(
+data class DataPacket(
         val services16Bit: ArrayList<Service16Bit> = ArrayList(),
         val services128Bit: ArrayList<Service128Bit> = ArrayList(),
         var includeCompleteLocalName: Boolean = false,

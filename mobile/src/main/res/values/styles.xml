@@ -125,25 +125,42 @@
         <item name="textAllCaps">false</item>
     </style>
 
-    <style name="TextViewTitleSmall" parent="android:Widget.TextView">
+    <style name="TitleSmall" parent="android:Widget.TextView">
         <item name="fontFamily">sans-serif-medium</item>
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/silabs_primary_text</item>
     </style>
 
-    <style name="TextViewTitleMedium" parent="android:Widget.TextView">
+    <style name="TitleMedium" parent="android:Widget.TextView">
         <item name="fontFamily">sans-serif-medium</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/silabs_primary_text</item>
     </style>
 
-    <style name="TextViewSmall" parent="android:Widget.TextView">
+    <style name="TitleBig" parent="android:Widget.TextView">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/silabs_primary_text</item>
+    </style>
+
+    <style name="TitleLarge" parent="android:Widget.TextView">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/silabs_primary_text</item>
+    </style>
+
+    <style name="TextSmall" parent="android:Widget.TextView">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/silabs_primary_text</item>
     </style>
 
-    <style name="TextViewMedium" parent="android:Widget.TextView">
+    <style name="TextMedium" parent="android:Widget.TextView">
         <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/silabs_primary_text</item>
+    </style>
+
+    <style name="TextBig" parent="android:Widget.TextView">
+        <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/silabs_primary_text</item>
     </style>
 

@@ -65,7 +65,7 @@
                     android:layout_height="20dp"
                     android:contentDescription="@string/advertiser_label_tx_power"
                     android:src="@drawable/ic_wifi"
-                    android:tint="@color/silabs_dark_gray_icon" />
+                    app:tint="@color/silabs_dark_gray_icon" />
 
                 <TextView
                     android:id="@+id/tv_tx_power"
@@ -90,7 +90,7 @@
                     android:layout_height="20dp"
                     android:contentDescription="@string/advertiser_label_interval"
                     android:src="@drawable/ic_clock"
-                    android:tint="@color/silabs_dark_gray_icon" />
+                    app:tint="@color/silabs_dark_gray_icon" />
 
                 <TextView
                     android:id="@+id/tv_interval"

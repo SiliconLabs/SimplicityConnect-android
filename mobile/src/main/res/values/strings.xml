@@ -27,6 +27,7 @@
     <string name="Request_Priority">Request Priority</string>
     <string name="UUID_colon">UUID:</string>
     <string name="UUID_label">uuid</string>
+    <string name="Value_colon">Value:</string>
     <string name="device_name_label">Device name</string>
     <string name="Change_characteristic_service_name">Change characteristic/service name</string>
     <string name="Enter_new_name">Enter new name</string>
@@ -35,6 +36,7 @@
     <string name="Beacon_Type">Beacon Type</string>
     <string name="Only_Favourites">Only Favourites</string>
     <string name="Only_Connectable">Only Connectable</string>
+    <string name="Only_Bonded">Only Bonded</string>
     <string name="Saved_Searches">Saved Searches</string>
     <string name="Filter_hint">Filter&#8230;</string>
     <string name="Descriptors_colon">Descriptors:</string>
@@ -63,9 +65,18 @@
     <string name="leave_browser_info">Leaving the browser will disconnect all devices!</string>
     <string name="Do_not_give_this_warning_again">Do not give this warning again</string>
     <string name="Leave_Browser">Leave Browser?</string>
+    <string name="device_address_with_bond_state">%s | %s</string>
+    <string name="filter_rssi_not_set">Not Set</string>
+
+    <!-- Sort Fragment -->
+    <string name="sort_title_rssi">RSSI</string>
+    <string name="sort_title_name">Name</string>
+    <string name="sort_label_ascending">Ascending</string>
+    <string name="sort_label_descending">Descending</string>
+    <string name="sort_label_A_to_Z">A \u003E Z</string>
+    <string name="sort_label_Z_to_A">Z \u003E A</string>
 
     <!-- Health Thermometer -->
-
     <string name="connected_to">CONNECTED TO</string>
     <string name="type">Type</string>
     <string name="temperature">TEMPERATURE</string>
@@ -87,9 +98,11 @@
     <string name="Location_disabled">Location disabled.</string>
     <string name="Location_service">Location service</string>
     <string name="location_service_info">On some Android phones you have to enable Location service in order to scan for Bluetooth Low Energy devices. If you can\'t find any Bluetooth devices please ensure you have enabled Location service.</string>
-    <string name="main_menu_description_advertiser">Utilize this device as a BLE peripheral</string>
+    <string name="main_menu_description_advertiser">Utilize this device as a Bluetooth Low Energy peripheral.</string>
     <string name="main_menu_description_thermometer">View readings from the Health Thermometer service.</string>
     <string name="main_menu_description_browser">View info about nearby devices and their properties.</string>
+    <string name="main_menu_description_connected_lighting">Control a Dynamic Multiprotocol application of connected lights and switches.</string>
+    <string name="main_menu_description_range_test">Evaluate the link budget and range of EFR32.</string>
 
     <!-- Messages -->
     <string name="Change_characteristic_name">Change characteristic name</string>
@@ -101,6 +114,8 @@
     <string name="title_Demo">Demo</string>
     <string name="title_Browser">Browser</string>
     <string name="title_Health_Thermometer">Health Thermometer</string>
+    <string name="title_Connected_Lighting">Connected Lighting</string>
+    <string name="title_Range_Test">Range Test</string>
     <string name="title_Advertiser">Advertiser</string>
     <string name="title_Mappings_dictionary">Mappings Dictionary</string>
     <string name="title_Characteristics">Characteristics</string>
@@ -110,6 +125,7 @@
     <string name="title_save">Save</string>
     <string name="title_create_new">Create new</string>
     <string name="title_switch_all_off">Switch all OFF</string>
+    <string name="title_unsaved_changes">Unsaved Changes</string>
 
     <!-- OTA -->
     <string name="Preparing_for_OTA">Preparing for OTA</string>
@@ -165,10 +181,13 @@
     <string name="button_disconnect_all">Disconnect all</string>
     <string name="button_filter">Filter</string>
     <string name="button_log">Log</string>
+    <string name="button_sort">Sort</string>
     <string name="button_stop_scanning">Stop Scanning</string>
     <string name="button_start_scanning">Start Scanning</string>
     <string name="button_connections">Connections</string>
     <string name="button_ok">Ok</string>
+    <string name="button_yes">Yes</string>
+    <string name="button_no">No</string>
 
     <!-- Beacon types -->
     <string name="unspecified">Unspecified</string>
@@ -295,6 +314,14 @@
     <string name="Grant_WRITE_FILES_permission_to_access_OTA">Grant WRITE_FILES permission to have access to OTA!</string>
     <string name="Copied_to_clipboard">Copied to clipboard!</string>
     <string name="Incorrect_data_format">Incorrect data format!</string>
+    <string name="create_bond">Create Bond</string>
+    <string name="delete_bond">Delete Bond</string>
+    <string name="bonded">BONDED</string>
+    <string name="bonding">BONDING…</string>
+    <string name="not_bonded">NOT BONDED</string>
+    <string name="device_services_title_unbond_device">Unbond device?</string>
+    <string name="device_services_note_unbond_device">You have to unbond your device manually in Bluetooth Settings. After unbonding your device will disconnect and this is normal behavior.</string>
+    <string name="device_services_label_read">Read</string>
 
     <!-- Bluetooth Permission Config Dialog -->
     <string name="toast_debug_mode_device_disconnected">DEVICE DISCONNECTED</string>
@@ -408,6 +435,7 @@
     <string name="advertiser_note_x_bytes_available">%d bytes available</string>
     <string name="advertiser_note_company_identifier_exists">Note: Company identifier already exists</string>
     <string name="advertiser_note_x_bytes_beyond">%d byte(s) beyond payload limit, please remove data</string>
+    <string name="advertiser_note_leave_advertiser_config">Your advertisement set has unsaved changes. Do you wish to save them?</string>
     <string name="advertiser_hint_enter_device_name">Enter device name</string>
     <string name="advertiser_hint_data_in_hex_format">Data in hex format</string>
     <string name="advertiser_hint_16bit_company_identifier">16-bit company identifier</string>
@@ -436,23 +464,60 @@
     <string name="unit_value_dbm">%ddBm</string>
     <string name="unit_with_whitespace">&#160;%s</string>
 
-    <!-- ========================================= Delete in the FUTURE=============================================================-->
-
-    <string name="action_settings">Settings</string>
-    <string name="demo_beacon_title">Bluetooth Beaconing</string> <!--JCS 11/23/16 Former Retail Beacon -->
-    <string name="demo_beacon_text">Identify and detect proximity beacons related to retail products.</string>
-    <string name="debug_mode_no_additional_ad_data_for_device">No Additional Advertisement Data</string>
-    <string name="dialog_device_filter_cancel_button">Cancel</string>
-    <string name="dialog_device_filter_rssi_not_set">Not Set</string>
-    <string name="light_header">Light</string>
-    <string name="demo_item_light_title">Light Demo</string>
-    <string name="demo_light_text">Demo for light</string>
-    <string name="demo_light_on">Last Event: Light On</string>
-    <string name="demo_light_off">Last Event: Light Off</string>
-    <string name="demo_light_changed_source">Source: %s</string>
-    <string name="demo_light_toggle_instructions">Press the bulb icon to toggle light</string>
-    <string name="demo_light_changed_source_unknown">Unknown</string>
+    <!-- Connected Lighting -->
+    <string name="light_demo_on">Light On</string>
+    <string name="light_demo_off">Light Off</string>
+    <string name="light_demo_toggle_instructions">Press the bulb icon to toggle light</string>
+    <string name="light_demo_changed_source_unknown">Unknown</string>
     <string name="light_demo_connection_lost">Lost connection to remote device, leaving demo.</string>
     <string name="light_demo_connection_lost_button">OK</string>
+    <string name="light_demo_protocol_bluetooth">Bluetooth</string>
+    <string name="light_demo_protocol_zigbee">Zigbee</string>
+    <string name="light_demo_protocol_thread">Thread</string>
+    <string name="light_demo_protocol_connect">Connect</string>
+    <string name="light_demo_protocol_proprietary">Proprietary</string>
+    <string name="light_demo_protocol_empty" />
+    <string name="light_demo_local_control">Local Control</string>
+    <string name="light_demo_title_last_event">Last Event</string>
+    <string name="light_demo_title_source">Source</string>
+
+    <!-- Range Test -->
+    <string name="demo_item_range_title">Range Test Demo</string>
+    <string name="demo_range_select_mode">Select Device Mode</string>
+    <string name="demo_range_toast_error">Device error! Disconnecting!</string>
+    <string name="demo_range_toast_reconnecting">Reconnecting device…</string>
+
+    <string name="range_device_info">Device Info</string>
+
+    <string name="demo_range_mode_tx">TX Mode</string>
+    <string name="demo_range_mode_rx">RX Mode</string>
+
+    <string name="range_rx_label_rx">RX</string>
+    <string name="range_rx_label_rssi">RSSI</string>
+    <string name="range_rx_label_ma">MA</string>
+    <string name="range_rx_label_per">PER</string>
+
+    <string name="range_tx_transmitted">Transmitted</string>
+    <string name="range_rx_rx">%1$d/%2$d</string>
+    <string name="range_rx_rssi">%1$d dBm</string>
+    <string name="range_rx_ma">0.0%</string>
+    <string name="range_rx_per">0.0%</string>
+    <string name="range_rx_rssi_level">RSSI Level</string>
+
+    <string name="range_config_phy_config">PHY Configuration</string>
+    <string name="range_config_tx_power">TX Power [dBm]</string>
+    <string name="range_config_payload_length">Payload Length</string>
+    <string name="range_config_ma_window_size">MA Window Size</string>
+    <string name="range_config_channel_no">Channel Number</string>
+    <string name="range_config_packet_count">Packet Count</string>
+    <string name="range_config_packet_count_repeat">Repeat</string>
+    <string name="range_config_remote_id">Remote ID</string>
+    <string name="range_config_self_id">Self ID</string>
+    <string name="range_config_uart_log_enable">UART Log Enable</string>
+
+    <string name="range_tx_start">Start TX</string>
+    <string name="range_tx_stop">Stop TX</string>
+    <string name="range_rx_start">Start RX</string>
+    <string name="range_rx_waiting">Waiting for device…</string>
 
 </resources>

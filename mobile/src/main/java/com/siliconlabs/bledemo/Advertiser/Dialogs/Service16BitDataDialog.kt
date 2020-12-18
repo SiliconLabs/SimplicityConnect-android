@@ -12,7 +12,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.*
+import android.widget.AutoCompleteTextView
+import android.widget.Button
 import androidx.fragment.app.DialogFragment
 import com.siliconlabs.bledemo.Advertiser.Adapters.Service16BitAdapter
 import com.siliconlabs.bledemo.Advertiser.Models.Service16Bit

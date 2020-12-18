@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--  --><!-- Bluegiga’s Bluetooth Smart Android SW for Bluegiga BLE modules --><!-- Contact: support@bluegiga.com. --><!--  --><!-- This is free software distributed under the terms of the MIT license reproduced below. --><!--  --><!-- Copyright (c) 2013, Bluegiga Technologies --><!--  --><!-- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files ("Software") --><!-- to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, --><!-- and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: --><!--  --><!-- THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF --><!-- ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT --><!-- NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE. --><!--  --><!-- TODO extract dimens resources--><!-- TODO refactor ui-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -41,7 +42,7 @@
             android:background="@drawable/btn_blue_ripple_effect"
             android:padding="8dp"
             android:src="@drawable/ic_paste"
-            android:tint="@color/silabs_blue" />
+            app:tint="@color/silabs_blue" />
     </LinearLayout>
 
     <LinearLayout
@@ -80,7 +81,7 @@
             android:background="@drawable/btn_blue_ripple_effect"
             android:padding="8dp"
             android:src="@drawable/ic_paste"
-            android:tint="@color/silabs_blue" />
+            app:tint="@color/silabs_blue" />
     </LinearLayout>
 
     <LinearLayout
@@ -109,7 +110,6 @@
             android:digits="1234567890 "
             android:fontFamily="sans-serif"
             android:imeOptions="actionDone"
-            android:inputType="number"
             android:maxLines="1"
             android:singleLine="true"
             android:textSize="@dimen/encoded_value_text_size" />
@@ -121,6 +121,6 @@
             android:background="@drawable/btn_blue_ripple_effect"
             android:padding="8dp"
             android:src="@drawable/ic_paste"
-            android:tint="@color/silabs_blue" />
+            app:tint="@color/silabs_blue" />
     </LinearLayout>
 </LinearLayout>

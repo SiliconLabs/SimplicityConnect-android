@@ -2,16 +2,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
+
     <item
-        android:id="@+id/menu_log"
-        android:orderInCategory="97"
-        android:text="@string/button_log"
-        android:title="@string/button_log"
+        android:id="@+id/bond_manage"
+        android:orderInCategory="96"
+        android:text="@string/create_bond"
+        android:title="@string/create_bond"
         android:visible="false"
-        app:showAsAction="always" /> <!--TODO LOG Invisible-->
+        app:showAsAction="never" />
     <item
         android:id="@+id/refresh_services"
-        android:orderInCategory="98"
+        android:orderInCategory="97"
         android:text="@string/Refresh_Services"
         android:title="@string/Refresh_Services"
         android:visible="true"

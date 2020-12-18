@@ -3,12 +3,10 @@ package com.siliconlabs.bledemo.Advertiser.Presenters
 import android.os.Build
 import com.siliconlabs.bledemo.Advertiser.Activities.IAdvertiserConfigActivityView
 import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
-import com.siliconlabs.bledemo.Advertiser.Models.*
-import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserData
-import com.siliconlabs.bledemo.Advertiser.Models.BluetoothInfo
 import com.siliconlabs.bledemo.Advertiser.Enums.DataMode
 import com.siliconlabs.bledemo.Advertiser.Enums.DataType
 import com.siliconlabs.bledemo.Advertiser.Enums.LimitType
+import com.siliconlabs.bledemo.Advertiser.Models.*
 import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
 
 class AdvertiserConfigActivityPresenter(private val view: IAdvertiserConfigActivityView, private val storage: AdvertiserStorage) : IAdvertiserConfigActivityPresenter {

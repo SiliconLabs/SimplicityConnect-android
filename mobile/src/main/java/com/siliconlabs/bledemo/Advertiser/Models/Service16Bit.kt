@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 @Parcelize
-class Service16Bit(val identifier: Int, val name: String) : Parcelable {
+data class Service16Bit(val identifier: Int, val name: String) : Parcelable {
 
     fun getUUID(): UUID {
         val hexString = String.format("%04X",identifier)

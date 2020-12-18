@@ -7,6 +7,7 @@
     <color name="silabs_blue">#0086D9</color>
     <color name="silabs_red">#D91E2A</color>
     <color name="silabs_white">#FFFFFF</color>
+    <color name="silabs_green">#6BBF01</color>
     <color name="silabs_black">#000000</color>
     <color name="silabs_transparent">#00000000</color>
 
@@ -51,15 +52,7 @@
     <!--============================= DELETE IN THE FUTURE ==============================-->
     <color name="gallery">#FFF1EFEF</color>
     <color name="gallery_light">#FFF8F6F6</color>
-    <color name="key_fob_signal_strength_indicator_light_gray">#FFCCCCCC</color>
-    <color name="key_fob_signal_strength_indicator_medium_gray">#FF888888</color>
-    <color name="key_fob_signal_strength_indicator_dark_gray">#FF7A7878</color>
     <color name="dark_gray_id_text">#FF444444</color>
-    <color name="light_gray_signal_strength_text">#FF555555</color>
-    <color name="other_fobs_header_background">#FFDFDFDF</color>
-    <color name="key_fob_listview_header_text">#FF6F6F6F</color>
-    <color name="hidden_debug_mode_calibration_title_background">#FFDDDDDD</color>
-    <color name="hidden_debug_mode_calibration_section_separator">#FFCCCCCC</color>
     <color name="masala">#FF504E4E</color>
     <color name="masala_50a">#7F504E4E</color>
     <color name="boulder">#FF7A7878</color>

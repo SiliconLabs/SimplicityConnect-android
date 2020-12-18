@@ -43,7 +43,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    style="@style/TextViewSmall"
+                    style="@style/TextSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -51,7 +51,7 @@
                     android:textColor="@color/silabs_dark_gray_text" />
 
                 <TextView
-                    style="@style/TextViewSmall"
+                    style="@style/TextSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/advertiser_label_128_bit_example"

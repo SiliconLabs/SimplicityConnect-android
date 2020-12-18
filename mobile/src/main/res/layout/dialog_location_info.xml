@@ -45,7 +45,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/ok_btn"
+                android:id="@+id/btn_ok"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/btn_red_selector"

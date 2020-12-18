@@ -8,11 +8,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
-import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.Browser.Adapters.ViewPagerAdapter
 import com.siliconlabs.bledemo.Browser.Dialogs.AboutMappingsDictionaryDialog
 import com.siliconlabs.bledemo.Browser.Fragments.CharacteristicMappingsFragment
 import com.siliconlabs.bledemo.Browser.Fragments.ServiceMappingsFragment
+import com.siliconlabs.bledemo.R
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_mappings.*
 

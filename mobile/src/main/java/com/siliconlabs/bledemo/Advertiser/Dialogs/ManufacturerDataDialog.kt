@@ -12,12 +12,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.siliconlabs.bledemo.Advertiser.Models.Manufacturer
-import com.siliconlabs.bledemo.Advertiser.Utils.Converter
 import com.siliconlabs.bledemo.Advertiser.Utils.Validator
 import com.siliconlabs.bledemo.Base.BaseDialogFragment
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.Utils.Converters
 import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.*
-import java.lang.Exception
 
 class ManufacturerDataDialog(private val manufacturers: List<Manufacturer>, val callback: Callback) : BaseDialogFragment() {
 
@@ -88,7 +87,7 @@ class ManufacturerDataDialog(private val manufacturers: List<Manufacturer>, val 
 
     private fun handleSave(etIdentifier: EditText, etData: EditText) {
         val identifier = etIdentifier.text.toString().toInt(16)
-        val data = Converter.getHexStringAsByteArray(etData.text.toString())
+        val data = Converters.hexStringAsByteArray(etData.text.toString())
         val manufacturer = Manufacturer(identifier, data)
         callback.onSave(manufacturer)
     }

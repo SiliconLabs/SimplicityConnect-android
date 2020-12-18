@@ -65,20 +65,6 @@
                     app:layout_constraintTop_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-
-                <TextView
-                    android:id="@+id/device_address"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:text="@string/devices_list_list_item_default_device_name"
-                    android:textColor="@color/silabs_primary_text"
-                    android:textSize="@dimen/device_address_text_size"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
                 <LinearLayout
                     android:id="@+id/linearLayout"
                     android:layout_width="wrap_content"
@@ -98,7 +84,7 @@
                         android:src="@drawable/ic_clock" />
 
                     <TextView
-                        android:id="@+id/text_view_interval"
+                        android:id="@+id/tv_interval"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif"
@@ -148,7 +134,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
-                android:id="@+id/text_view_device_address"
+                android:id="@+id/tv_device_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -180,10 +166,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:src="@drawable/ic_bluetooth_connected"
-                        android:tint="@color/silabs_dark_gray_icon"/>
+                        app:tint="@color/silabs_dark_gray_icon"/>
 
                     <TextView
-                        android:id="@+id/text_view_is_connectable"
+                        android:id="@+id/tv_is_connectable"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif"
@@ -205,7 +191,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="24dp"
                         android:src="@drawable/ic_wifi"
-                        android:tint="@color/silabs_dark_gray_icon"/>
+                        app:tint="@color/silabs_dark_gray_icon"/>
 
                     <TextView
                         android:id="@+id/rssi"
@@ -229,7 +215,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:src="@drawable/ic_beacon"
-                        android:tint="@color/silabs_dark_gray_icon"/>
+                        app:tint="@color/silabs_dark_gray_icon"/>
 
                     <TextView
                         android:id="@+id/device_type"

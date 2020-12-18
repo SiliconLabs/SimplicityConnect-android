@@ -10,7 +10,6 @@ import com.siliconlabs.bledemo.Advertiser.Models.Manufacturer
 import com.siliconlabs.bledemo.Advertiser.Utils.Translator
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.Views.ServiceItemContainerRe
-import java.lang.StringBuilder
 
 class AdvertiserDetails(val context: Context) {
 

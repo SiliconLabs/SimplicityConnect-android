@@ -6,42 +6,41 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.Browser.Adapters.MappingAdapter
-import com.siliconlabs.bledemo.Browser.Model.Mapping
-import com.siliconlabs.bledemo.Browser.Model.MappingType
+import com.siliconlabs.bledemo.Browser.Models.Mapping
+import com.siliconlabs.bledemo.Browser.Models.MappingType
+import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.Utils.SharedPrefUtils
-import kotlinx.android.synthetic.main.fragment_characteristic_mappings.view.*
+import kotlinx.android.synthetic.main.fragment_characteristic_mappings.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 class CharacteristicMappingsFragment : Fragment() {
-    private var map: HashMap<String, Mapping>? = null
-    private var list: List<Mapping>? = null
-    private var sharedPrefUtils: SharedPrefUtils? = null
+    private lateinit var map: HashMap<String, Mapping>
+    private lateinit var list: ArrayList<Mapping>
+    private lateinit var sharedPrefUtils: SharedPrefUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedPrefUtils = SharedPrefUtils(activity)
-        map = sharedPrefUtils?.characteristicNamesMap
-        list = ArrayList(map!!.values)
+        sharedPrefUtils = SharedPrefUtils(requireContext())
+        map = sharedPrefUtils.characteristicNamesMap
+        list = ArrayList(map.values)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_characteristic_mappings, container, false)
-        val adapter = MappingAdapter(list, activity, MappingType.CHARACTERISTIC)
-        view.rv_characteristics.layoutManager = LinearLayoutManager(activity)
-        view.rv_characteristics.adapter = adapter
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_characteristic_mappings, container, false)
+    }
 
-        return view
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        rv_characteristics.layoutManager = LinearLayoutManager(activity)
+        rv_characteristics.adapter = MappingAdapter(list, requireContext(), MappingType.CHARACTERISTIC)
     }
 
     override fun onPause() {
         super.onPause()
-        map?.clear()
-        for (mapping in list!!) {
-            map!![mapping.uuid] = mapping
-        }
-        sharedPrefUtils?.saveCharacteristicNamesMap(map)
+        map.clear()
+        for (mapping in list) map[mapping.uuid] = mapping
+        sharedPrefUtils.saveCharacteristicNamesMap(map)
     }
 }

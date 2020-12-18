@@ -11,7 +11,7 @@
         android:padding="16dp">
 
         <TextView
-            style="@style/TextViewTitleSmall"
+            style="@style/TitleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/advertiser_title_advertising_type" />

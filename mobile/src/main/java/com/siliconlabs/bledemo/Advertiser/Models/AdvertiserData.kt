@@ -2,12 +2,13 @@ package com.siliconlabs.bledemo.Advertiser.Models
 
 import android.bluetooth.le.AdvertiseSettings
 import android.os.Parcelable
+import com.google.gson.Gson
 import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
 import com.siliconlabs.bledemo.Advertiser.Enums.LimitType
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class AdvertiserData(
+data class AdvertiserData(
         var name: String = "New adv",
         var isLegacy: Boolean = true,
         var mode: AdvertisingMode = AdvertisingMode.CONNECTABLE_SCANNABLE,
@@ -51,5 +52,10 @@ class AdvertiserData(
 
     fun isScanRespData(): Boolean {
         return mode == AdvertisingMode.NON_CONNECTABLE_SCANNABLE || mode == AdvertisingMode.CONNECTABLE_SCANNABLE
+    }
+
+    fun deepCopy(): AdvertiserData {
+        val dataCopy = Gson().toJson(this)
+        return Gson().fromJson(dataCopy, AdvertiserData::class.java)
     }
 }

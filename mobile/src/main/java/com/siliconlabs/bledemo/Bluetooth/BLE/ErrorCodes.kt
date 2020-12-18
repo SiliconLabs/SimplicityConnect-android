@@ -1,13 +1,12 @@
 package com.siliconlabs.bledemo.Bluetooth.BLE
 
-import com.siliconlabs.bledemo.Bluetooth.Parsing.Converters
+import com.siliconlabs.bledemo.Utils.Converters
 
 object ErrorCodes {
     private fun getTwoOctetsErrorCodeHexAsString(status: Int): String {
         return "0x" + Converters.getHexValue((status shr 8).toByte()) + Converters.getHexValue(status.toByte())
     }
 
-    @JvmStatic
     fun getOneOctetErrorCodeHexAsString(status: Int): String {
         return "0x" + Converters.getHexValue(status.toByte())
     }
@@ -103,7 +102,6 @@ object ErrorCodes {
         }
     }
 
-    @JvmStatic
     fun getATTHTMLFormattedError(status: Int): String {
         return "<b>Error: </b>" + getOneOctetErrorCodeHexAsString(status) +
                 " (" + getATTErrorFlagAsString(status) + ")" + "<br/><br/>" +
@@ -111,7 +109,6 @@ object ErrorCodes {
     }
 
     //Failed connecting to: <device_name>. Reason: <error code and reason>.
-    @JvmStatic
     fun getFailedConnectingToDeviceMessage(deviceName: String?, status: Int): String {
         return StringBuilder().apply {
             append("Failed connecting to: ")
@@ -123,7 +120,6 @@ object ErrorCodes {
     }
 
     //Device <device name> has disconnected. Reason: <error code and reason>.
-    @JvmStatic
     fun getDeviceDisconnectedMessage(deviceName: String?, status: Int): String {
         return StringBuilder().apply {
             append("Device ")

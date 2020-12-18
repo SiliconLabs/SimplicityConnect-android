@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -29,9 +29,22 @@
         <activity
             android:name=".Browser.Activities.MappingDictionaryActivity"
             android:label="@string/title_Mappings_dictionary" />
+        <activity
+            android:name=".HealthThermometer.Activities.HealthThermometerActivity"
+            android:label="@string/title_Health_Thermometer"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ConnectedLighting.Activities.ConnectedLightingActivity"
+            android:label="@string/title_Connected_Lighting"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".RangeTest.Activities.RangeTestActivity"
+            android:label="@string/title_Range_Test"
+            android:screenOrientation="portrait" />
 
         <service android:name=".Bluetooth.BLE.BlueToothService" />
-        <service android:name=".Advertiser.Services.AdvertiserService"/>
+        <service android:name=".Advertiser.Services.AdvertiserService" />
 
         <receiver android:name=".Bluetooth.BLE.BlueToothService$Receiver">
             <intent-filter>
@@ -43,8 +56,8 @@
         <activity
             android:name=".MainMenu.Activities.MainMenuActivity"
             android:label="@string/app_name_EFR_Connect"
-            android:screenOrientation="portrait"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

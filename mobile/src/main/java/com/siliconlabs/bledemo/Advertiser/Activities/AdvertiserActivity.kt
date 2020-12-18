@@ -15,15 +15,15 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.siliconlabs.bledemo.Advertiser.Adapters.AdvertiserAdapter
-import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserList
 import com.siliconlabs.bledemo.Advertiser.Dialogs.DeviceNameDialog
 import com.siliconlabs.bledemo.Advertiser.Dialogs.RemoveAdvertiserDialog
 import com.siliconlabs.bledemo.Advertiser.Models.Advertiser
 import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserData
+import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserList
 import com.siliconlabs.bledemo.Advertiser.Presenters.AdvertiserActivityPresenter
 import com.siliconlabs.bledemo.Advertiser.Services.AdvertiserService
 import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
-import com.siliconlabs.bledemo.Base.BaseAppCompatActivity
+import com.siliconlabs.bledemo.Base.BaseActivity
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.Views.BluetoothEnableBar
 import com.siliconlabs.bledemo.Views.FullScreenInfo
@@ -31,7 +31,7 @@ import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_advertiser.*
 import kotlinx.android.synthetic.main.bluetooth_enable_bar.*
 
-class AdvertiserActivity : BaseAppCompatActivity(), AdvertiserAdapter.OnItemClickListener, IAdvertiserActivityView {
+class AdvertiserActivity : BaseActivity(), AdvertiserAdapter.OnItemClickListener, IAdvertiserActivityView {
     private lateinit var presenter: AdvertiserActivityPresenter
     private lateinit var advertiserAdapter: AdvertiserAdapter
     private var isBluetoothAdapterEnabled = true
@@ -100,8 +100,8 @@ class AdvertiserActivity : BaseAppCompatActivity(), AdvertiserAdapter.OnItemClic
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
             R.id.device_name -> {
                 DeviceNameDialog(object : DeviceNameDialog.DeviceNameCallback {
                     override fun onDismiss() {
