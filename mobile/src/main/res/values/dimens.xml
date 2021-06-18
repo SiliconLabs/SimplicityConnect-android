@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Styles -->
     <dimen name="text_size_increased_twice">24sp</dimen>
@@ -306,4 +306,13 @@
     <dimen name="toolbar_min_height">60dp</dimen>
     <dimen name="shadow_height">7dp</dimen>
 
+    <dimen name="iop_adapter_spacing">16dp</dimen>
+
+    <!-- Gatt Server dimensions -->
+    <dimen name="edit_gatt_server_adapter_margin">16dp</dimen>
+
+    <!-- Bottom Navigation -->
+    <dimen name="design_bottom_navigation_height" tools:override="true">66dp</dimen>
+    <dimen name="design_bottom_navigation_margin" tools:override="true">15dp</dimen>
+    <dimen name="bottom_navigation_bottom_padding">8dp</dimen>
 </resources>

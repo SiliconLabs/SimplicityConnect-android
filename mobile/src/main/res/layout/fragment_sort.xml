@@ -3,13 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <View
+    <com.siliconlabs.bledemo.views.HorizontalShadow
         android:id="@+id/browser_shadow_top"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
-        android:background="@drawable/scanning_bar_shadow"
-        android:elevation="1dp"
-        android:rotation="180" />
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:id="@+id/ll_content"

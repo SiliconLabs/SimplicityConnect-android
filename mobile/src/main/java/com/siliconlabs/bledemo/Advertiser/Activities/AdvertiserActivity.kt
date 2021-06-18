@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Advertiser.Activities
+package com.siliconlabs.bledemo.advertiser.activities
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -14,19 +14,19 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.siliconlabs.bledemo.Advertiser.Adapters.AdvertiserAdapter
-import com.siliconlabs.bledemo.Advertiser.Dialogs.DeviceNameDialog
-import com.siliconlabs.bledemo.Advertiser.Dialogs.RemoveAdvertiserDialog
-import com.siliconlabs.bledemo.Advertiser.Models.Advertiser
-import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserData
-import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserList
-import com.siliconlabs.bledemo.Advertiser.Presenters.AdvertiserActivityPresenter
-import com.siliconlabs.bledemo.Advertiser.Services.AdvertiserService
-import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
-import com.siliconlabs.bledemo.Base.BaseActivity
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Views.BluetoothEnableBar
-import com.siliconlabs.bledemo.Views.FullScreenInfo
+import com.siliconlabs.bledemo.advertiser.adapters.AdvertiserAdapter
+import com.siliconlabs.bledemo.advertiser.dialogs.DeviceNameDialog
+import com.siliconlabs.bledemo.advertiser.dialogs.RemoveAdvertiserDialog
+import com.siliconlabs.bledemo.advertiser.models.Advertiser
+import com.siliconlabs.bledemo.advertiser.models.AdvertiserData
+import com.siliconlabs.bledemo.advertiser.models.AdvertiserList
+import com.siliconlabs.bledemo.advertiser.presenters.AdvertiserActivityPresenter
+import com.siliconlabs.bledemo.advertiser.services.AdvertiserService
+import com.siliconlabs.bledemo.advertiser.utils.AdvertiserStorage
+import com.siliconlabs.bledemo.base.BaseActivity
+import com.siliconlabs.bledemo.views.BluetoothEnableBar
+import com.siliconlabs.bledemo.views.FullScreenInfo
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_advertiser.*
 import kotlinx.android.synthetic.main.bluetooth_enable_bar.*

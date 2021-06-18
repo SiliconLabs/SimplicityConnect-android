@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
 import android.annotation.TargetApi
 import android.bluetooth.le.ScanRecord

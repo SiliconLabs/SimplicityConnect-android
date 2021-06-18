@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Utils
+package com.siliconlabs.bledemo.utils
 
 import android.app.Service
 import android.content.ComponentName
@@ -8,7 +8,6 @@ import android.content.ServiceConnection
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import timber.log.Timber
 
 /**
  * This class can be the base-class of any service that runs locally, i.e. runs in the
@@ -46,9 +45,8 @@ open class LocalService<S : LocalService<S>> : Service() {
                 boundOK = false
                 try {
                     context.unbindService(connection)
-                    Timber.d("LocalService unbound from %s", context.toString())
+                    Log.d("unbind", "LocalService unbound from $context")
                 } catch (e: Exception) {
-                    Timber.e(e, "LocalService problem unbinding service.")
                     Log.e("unbind", "Problem unbinding service: $e")
                 }
             }
@@ -58,9 +56,9 @@ open class LocalService<S : LocalService<S>> : Service() {
             val serviceIntent = Intent(context, getServiceClass())
             boundOK = context.bindService(serviceIntent, connection, BIND_AUTO_CREATE)
             if (boundOK) {
-                Timber.d("LocalService bound to %s", context.toString())
+                Log.d("bind", "LocalService bound to $context")
             } else {
-                Timber.d("LocalService could not bind to %s", context.toString())
+                Log.d("bind", "LocalService could not bind to $context")
             }
             return boundOK
         }

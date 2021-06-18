@@ -14,12 +14,13 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.Bluetooth.Parsing
+package com.siliconlabs.bledemo.bluetooth.parsing
 
 import android.content.Context
 import android.util.Xml
-import com.siliconlabs.bledemo.Bluetooth.DataTypes.*
-import com.siliconlabs.bledemo.Bluetooth.DataTypes.Enumeration
+import com.siliconlabs.bledemo.bluetooth.data_types.*
+import com.siliconlabs.bledemo.bluetooth.data_types.Enumeration
+import com.siliconlabs.bledemo.utils.UuidUtils
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.File
@@ -32,9 +33,9 @@ import kotlin.collections.ArrayList
 // BluetoothXmlParser - parses Bluetooth xml resources from /assets/xml/ directory
 // It is used only once when application is starting
 class BluetoothXmlParser {
-    private lateinit var characteristics: ConcurrentHashMap<UUID, Characteristic>
-
+    private var characteristics: ConcurrentHashMap<UUID, Characteristic> = ConcurrentHashMap()
     private var appContext: Context? = null
+
     fun init(context: Context?) {
         appContext = context
     }
@@ -120,13 +121,49 @@ class BluetoothXmlParser {
                 continue
             }
             val name = parser.name
-            if (name == Consts.TAG_DESCRIPTORS) {
-                characteristic.descriptors = readDescriptors(parser)
-            } else {
-                skip(parser)
+            when (name) {
+                Consts.TAG_PROPERTIES -> characteristic.properties = readProperties(parser)
+                Consts.TAG_DESCRIPTORS -> characteristic.descriptors = readDescriptors(parser)
+                else -> skip(parser)
             }
         }
         return characteristic
+    }
+
+    @Throws(XmlPullParserException::class, IOException::class)
+    private fun readProperties(parser: XmlPullParser): HashMap<Property, Property.Type> {
+        parser.require(XmlPullParser.START_TAG, ns, Consts.TAG_PROPERTIES)
+        val properties = hashMapOf<Property, Property.Type>()
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.eventType != XmlPullParser.START_TAG) {
+                continue
+            }
+
+            val name = parser.name
+            val text = readText(parser)
+
+            val type = when (text) {
+                Consts.REQUIREMENT_MANDATORY -> Property.Type.MANDATORY
+                Consts.REQUIREMENT_EXCLUDED -> Property.Type.EXCLUDED
+                Consts.REQUIREMENT_OPTIONAL -> Property.Type.OPTIONAL
+                else -> null
+            }
+
+            if (type != null) {
+                when (name) {
+                    Consts.TAG_WRITE -> properties[Property.WRITE] = type
+                    Consts.TAG_READ -> properties[Property.READ] = type
+                    Consts.TAG_WRITE_WITHOUT_RESPONSE -> properties[Property.WRITE_WITHOUT_RESPONSE] = type
+                    Consts.TAG_SIGNED_WRITE -> properties[Property.SIGNED_WRITE] = type
+                    Consts.TAG_RELIABLE_WRITE -> properties[Property.RELIABLE_WRITE] = type
+                    Consts.TAG_NOTIFY -> properties[Property.NOTIFY] = type
+                    Consts.TAG_INDICATE -> properties[Property.INDICATE] = type
+                    Consts.TAG_WRITABLE_AUXILIARIES -> properties[Property.WRITABLE_AUXILIARIES] = type
+                    Consts.TAG_BROADCAST -> properties[Property.BROADCAST] = type
+                }
+            }
+        }
+        return properties
     }
 
     // Reads descriptors
@@ -159,7 +196,12 @@ class BluetoothXmlParser {
             if (parser.eventType != XmlPullParser.START_TAG) {
                 continue
             }
-            skip(parser)
+            val name = parser.name
+            if(name == Consts.TAG_PROPERTIES) {
+                descriptor.properties = readProperties(parser)
+            } else {
+                skip(parser)
+            }
         }
         return descriptor
     }
@@ -202,7 +244,7 @@ class BluetoothXmlParser {
     @Throws(XmlPullParserException::class, IOException::class)
     private fun readUUID(parser: XmlPullParser): UUID {
         val uuid = parser.getAttributeValue(null, Consts.ATTRIBUTE_UUID)
-        return UUID.fromString(Common.convert16to128UUID(uuid))
+        return UUID.fromString(UuidUtils.convert16to128UUID(uuid))
     }
 
     // Reads type
@@ -491,12 +533,12 @@ class BluetoothXmlParser {
 
     // Parse descriptors
     @Throws(IOException::class, XmlPullParserException::class)
-    fun parseDescriptors(): HashMap<UUID?, Descriptor> {
+    fun parseDescriptors(): HashMap<UUID, Descriptor> {
         val descriptorsFiles = appContext?.assets?.list(Consts.DIR_DESCRIPTOR)
         var inStream: InputStream? = null
         val parser = Xml.newPullParser()
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
-        val descriptors = HashMap<UUID?, Descriptor>()
+        val descriptors = HashMap<UUID, Descriptor>()
         for (fileName in descriptorsFiles!!) {
             try {
                 inStream = appContext?.assets?.open(Consts.DIR_DESCRIPTOR + File.separator + fileName)

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Advertiser.Dialogs
+package com.siliconlabs.bledemo.advertiser.dialogs
 
 import android.os.Bundle
 import android.text.Editable
@@ -8,10 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import com.siliconlabs.bledemo.Advertiser.Models.Service128Bit
-import com.siliconlabs.bledemo.Advertiser.Utils.Validator
-import com.siliconlabs.bledemo.Base.BaseDialogFragment
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.advertiser.models.Service128Bit
+import com.siliconlabs.bledemo.advertiser.utils.Validator
+import com.siliconlabs.bledemo.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.dialog_data_128bit_service.view.*
 import java.util.*
 

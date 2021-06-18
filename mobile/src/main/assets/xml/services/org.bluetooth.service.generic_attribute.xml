@@ -7,16 +7,25 @@
         <Characteristic name="Service Changed" type="org.bluetooth.characteristic.gatt.service_changed">
             <Requirement>Optional</Requirement>
             <Properties>
-				<Read>Mandatory</Read>
-				<Write>Excluded</Write>
-				<WriteWithoutResponse>Excluded</WriteWithoutResponse>
-				<SignedWrite>Excluded</SignedWrite>
-				<ReliableWrite>Excluded</ReliableWrite>
-				<Notify>Excluded</Notify>
-				<Indicate>Mandatory</Indicate>
-				<WritableAuxiliaries>Excluded</WritableAuxiliaries>
-				<Broadcast>Excluded</Broadcast>
+                <Read>Excluded</Read>
+                <Write>Excluded</Write>
+                <WriteWithoutResponse>Excluded</WriteWithoutResponse>
+                <SignedWrite>Excluded</SignedWrite>
+                <ReliableWrite>Excluded</ReliableWrite>
+                <Notify>Excluded</Notify>
+                <Indicate>Mandatory</Indicate>
+                <WritableAuxiliaries>Excluded</WritableAuxiliaries>
+                <Broadcast>Excluded</Broadcast>
             </Properties>
+            <Descriptors>
+                <Descriptor name="Client Characteristic Configuration" type="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+                    <Requirement>Mandatory</Requirement>
+                    <Properties>
+                        <Read>Mandatory</Read>
+                        <Write>Mandatory</Write>
+                    </Properties>
+                </Descriptor>
+            </Descriptors>
         </Characteristic>
     </Characteristics>
 </Service>

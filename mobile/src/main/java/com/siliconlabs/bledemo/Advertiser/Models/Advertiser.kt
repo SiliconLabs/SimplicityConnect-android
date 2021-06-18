@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Advertiser.Models
+package com.siliconlabs.bledemo.advertiser.models
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.AdvertiseCallback
@@ -8,8 +8,8 @@ import android.os.Parcelable
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
-import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
-import com.siliconlabs.bledemo.Advertiser.Enums.LimitType
+import com.siliconlabs.bledemo.advertiser.enums.AdvertisingMode
+import com.siliconlabs.bledemo.advertiser.enums.LimitType
 import kotlinx.android.parcel.Parcelize
 import kotlin.math.ceil
 

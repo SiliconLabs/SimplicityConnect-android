@@ -1,8 +1,6 @@
-package com.siliconlabs.bledemo.Browser.Adapters
+package com.siliconlabs.bledemo.browser.adapters
 
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.os.ParcelUuid
 import android.text.Html
@@ -10,23 +8,27 @@ import android.text.TextUtils
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.cardview.widget.CardView
-import com.siliconlabs.bledemo.Adapters.DeviceInfoViewHolder
-import com.siliconlabs.bledemo.Adapters.ScannedDevicesAdapter
-import com.siliconlabs.bledemo.BeaconUtils.BleFormat
-import com.siliconlabs.bledemo.BeaconUtils.altbeacon.AltBeacon
-import com.siliconlabs.bledemo.BeaconUtils.eddystone.*
-import com.siliconlabs.bledemo.BeaconUtils.ibeacon.IBeaconInfo
-import com.siliconlabs.bledemo.Bluetooth.BLE.BlueToothService
-import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
-import com.siliconlabs.bledemo.Bluetooth.BLE.ScanResultCompat
-import com.siliconlabs.bledemo.Bluetooth.Parsing.ScanRecordParser
-import com.siliconlabs.bledemo.Browser.Activities.BrowserActivity
-import com.siliconlabs.bledemo.Browser.DebugModeCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.SharedPrefUtils
-import com.siliconlabs.bledemo.Views.ServiceItemContainerRe
+import com.siliconlabs.bledemo.adapters.DeviceInfoViewHolder
+import com.siliconlabs.bledemo.adapters.ScannedDevicesAdapter
+import com.siliconlabs.bledemo.beacon_utils.BleFormat
+import com.siliconlabs.bledemo.beacon_utils.altbeacon.AltBeacon
+import com.siliconlabs.bledemo.beacon_utils.eddystone.*
+import com.siliconlabs.bledemo.beacon_utils.ibeacon.IBeaconInfo
+import com.siliconlabs.bledemo.bluetooth.ConnectedGatts
+import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.bluetooth.ble.ScanResultCompat
+import com.siliconlabs.bledemo.bluetooth.parsing.ScanRecordParser
+import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
+import com.siliconlabs.bledemo.browser.DebugModeCallback
+import com.siliconlabs.bledemo.browser.activities.BrowserActivity
+import com.siliconlabs.bledemo.utils.SharedPrefUtils
+import com.siliconlabs.bledemo.views.DetailsRow
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToLong
@@ -48,7 +50,7 @@ class DebugModeDeviceAdapter(mContext: Context, generator: DeviceInfoViewHolder.
 
         private var device: BluetoothDeviceInfo? = null
         private var bleFormat: BleFormat? = null
-        private var bluetoothBinding: BlueToothService.Binding? = null
+        private var bluetoothBinding: BluetoothService.Binding? = null
 
         private fun refreshDeviceRowOnUiThread(isConnected: Boolean) {
             if (context is BrowserActivity) {
@@ -78,19 +80,8 @@ class DebugModeDeviceAdapter(mContext: Context, generator: DeviceInfoViewHolder.
         }
 
 
-        private val connectedDevices: List<BluetoothDevice>
-            get() {
-                val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-                return bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
-            }
-
         private fun isConnected(address: String): Boolean {
-            for (d in connectedDevices) {
-                if (d.address == address) {
-                    return true
-                }
-            }
-            return false
+            return ConnectedGatts.isGattWithAddressConnected(address)
         }
 
         override fun setData(info: BluetoothDeviceInfo, position: Int, size: Int) {
@@ -166,17 +157,16 @@ class DebugModeDeviceAdapter(mContext: Context, generator: DeviceInfoViewHolder.
         }
 
         private fun connect() {
-            debugModeCallback.connectToDevice(device)
+            device?.apply {
+                debugModeCallback.connectToDevice(device)
+            }
         }
 
         private fun disconnect() {
-            bluetoothBinding = object : BlueToothService.Binding(context) {
-                override fun onBound(service: BlueToothService?) {
-                    val successDisconnected = service?.disconnectGatt(device?.address!!)
-                    if (!successDisconnected!!) {
-                        Toast.makeText(context, R.string.device_not_from_EFR, Toast.LENGTH_LONG).show()
-                    }
-                    refreshDeviceRowOnUiThread(!successDisconnected)
+            bluetoothBinding = object : BluetoothService.Binding(context) {
+                override fun onBound(service: BluetoothService?) {
+                    service?.disconnectGatt(device?.address!!)
+                    refreshDeviceRowOnUiThread(false)
                 }
             }
             bluetoothBinding?.bind()
@@ -287,7 +277,7 @@ class DebugModeDeviceAdapter(mContext: Context, generator: DeviceInfoViewHolder.
             for (row in advertismentData?.rows!!) {
                 val title = row.title
                 val text = Html.fromHtml(row.body).toString()
-                val serviceItemContainer = ServiceItemContainerRe(context, title, text)
+                val serviceItemContainer = DetailsRow(context, title, text)
                 advertisementContainer.addView(serviceItemContainer, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             }
         }

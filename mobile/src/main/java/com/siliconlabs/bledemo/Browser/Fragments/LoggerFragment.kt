@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Browser.Fragments
+package com.siliconlabs.bledemo.browser.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,12 +13,12 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.siliconlabs.bledemo.Browser.Adapters.LogAdapter
-import com.siliconlabs.bledemo.Browser.Models.Logs.Log
-import com.siliconlabs.bledemo.Browser.Services.ShareLogServices
-import com.siliconlabs.bledemo.Browser.ToolbarCallback
+import com.siliconlabs.bledemo.browser.adapters.LogAdapter
+import com.siliconlabs.bledemo.browser.models.logs.Log
+import com.siliconlabs.bledemo.browser.services.ShareLogServices
+import com.siliconlabs.bledemo.browser.ToolbarCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.Constants
+import com.siliconlabs.bledemo.utils.Constants
 import kotlinx.android.synthetic.main.fragment_log.*
 import java.util.*
 

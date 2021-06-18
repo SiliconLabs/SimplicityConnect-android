@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Browser.Dialogs
+package com.siliconlabs.bledemo.browser.dialogs
 
 import android.content.Context
 import android.graphics.Point
@@ -9,10 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
-import com.siliconlabs.bledemo.Base.BaseDialogFragment
-import com.siliconlabs.bledemo.Browser.MappingCallback
-import com.siliconlabs.bledemo.Browser.Models.Mapping
-import com.siliconlabs.bledemo.Browser.Models.MappingType
+import com.siliconlabs.bledemo.base.BaseDialogFragment
+import com.siliconlabs.bledemo.browser.MappingCallback
+import com.siliconlabs.bledemo.browser.models.Mapping
+import com.siliconlabs.bledemo.browser.models.MappingType
 import com.siliconlabs.bledemo.R
 import kotlinx.android.synthetic.main.dialog_characteristic_service_edit.*
 

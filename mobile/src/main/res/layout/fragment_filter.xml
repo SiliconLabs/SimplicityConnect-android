@@ -4,15 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Browser.Fragments.FilterFragment">
+    tools:context=".browser.fragments.FilterFragment">
 
-    <View
+    <com.siliconlabs.bledemo.views.HorizontalShadow
         android:id="@+id/browser_shadow_top"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
-        android:background="@drawable/scanning_bar_shadow"
-        android:elevation="1dp"
-        android:rotation="180" />
+        android:layout_height="wrap_content" />
 
     <ScrollView
         android:id="@+id/scrollview"

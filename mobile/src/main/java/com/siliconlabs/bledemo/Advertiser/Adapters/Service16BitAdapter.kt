@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Advertiser.Adapters
+package com.siliconlabs.bledemo.advertiser.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Filter
 import android.widget.TextView
-import com.siliconlabs.bledemo.Advertiser.Models.Service16Bit
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.advertiser.models.Service16Bit
 import java.util.*
 import kotlin.collections.ArrayList
 

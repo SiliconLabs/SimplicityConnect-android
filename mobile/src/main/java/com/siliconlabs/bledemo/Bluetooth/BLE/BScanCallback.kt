@@ -1,12 +1,13 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 
-class BScanCallback(private val service: BlueToothService) : BroadcastReceiver() {
+class BScanCallback(private val service: BluetoothService) : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action

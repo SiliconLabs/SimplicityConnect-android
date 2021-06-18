@@ -6,7 +6,7 @@
     android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Browser.Activities.BrowserActivity">
+    tools:context=".browser.activities.BrowserActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -25,21 +25,12 @@
             android:layout_height="36dp"
             android:layout_below="@id/toolbar_browser" />
 
-        <View
-            android:id="@+id/browser_shadow_top"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/shadow_height"
-            android:layout_below="@id/etv_active_filter_bar"
-            android:background="@drawable/scanning_bar_shadow"
-            android:elevation="1dp"
-            android:rotation="180" />
-
-        <com.siliconlabs.bledemo.Browser.Views.ExpandableTextView
+        <com.siliconlabs.bledemo.browser.views.ExpandableTextView
             android:id="@+id/etv_active_filter_bar"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@id/bluetooth_browser_toolbar"
-            android:visibility="gone"
-            android:layout_height="wrap_content"/>
+            android:visibility="gone" />
 
         <RelativeLayout
             android:id="@+id/framelayout_container"
@@ -178,12 +169,18 @@
 
         </RelativeLayout>
 
-        <View
+        <com.siliconlabs.bledemo.views.HorizontalShadow
+            android:id="@+id/browser_shadow_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/etv_active_filter_bar" />
+
+        <com.siliconlabs.bledemo.views.HorizontalShadow
             android:id="@+id/scanning_separator"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/shadow_height"
+            android:layout_height="wrap_content"
             android:layout_above="@id/scanning_gradient_container"
-            android:background="@drawable/scanning_bar_shadow" />
+            android:rotation="180" />
 
         <RelativeLayout
             android:id="@+id/scanning_gradient_container"

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Advertiser.Activities
+package com.siliconlabs.bledemo.advertiser.activities
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -13,17 +13,17 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.Spinner
-import com.siliconlabs.bledemo.Advertiser.Adapters.DataTypeAdapter
-import com.siliconlabs.bledemo.Advertiser.Dialogs.*
-import com.siliconlabs.bledemo.Advertiser.Enums.*
-import com.siliconlabs.bledemo.Advertiser.Models.*
-import com.siliconlabs.bledemo.Advertiser.Presenters.AdvertiserConfigActivityPresenter
-import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
-import com.siliconlabs.bledemo.Advertiser.Utils.HtmlCompat
-import com.siliconlabs.bledemo.Advertiser.Utils.Translator
-import com.siliconlabs.bledemo.Advertiser.Utils.Validator
-import com.siliconlabs.bledemo.Base.BaseActivity
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.advertiser.adapters.DataTypeAdapter
+import com.siliconlabs.bledemo.advertiser.dialogs.*
+import com.siliconlabs.bledemo.advertiser.enums.*
+import com.siliconlabs.bledemo.advertiser.models.*
+import com.siliconlabs.bledemo.advertiser.presenters.AdvertiserConfigActivityPresenter
+import com.siliconlabs.bledemo.advertiser.utils.AdvertiserStorage
+import com.siliconlabs.bledemo.advertiser.utils.HtmlCompat
+import com.siliconlabs.bledemo.advertiser.utils.Translator
+import com.siliconlabs.bledemo.advertiser.utils.Validator
+import com.siliconlabs.bledemo.base.BaseActivity
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.advertiser_config_data.*
 import kotlinx.android.synthetic.main.advertiser_config_name.*

@@ -71,32 +71,23 @@
         android:layout_below="@id/information_bar"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <View
+    <com.siliconlabs.bledemo.views.HorizontalShadow
         android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
-        android:layout_below="@id/information_bar"
-        android:background="@drawable/scanning_bar_shadow"
-        android:elevation="1dp"
-        android:rotation="180" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/information_bar" />
 
-    <View
+    <com.siliconlabs.bledemo.views.HorizontalShadow
         android:id="@+id/view_separator"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
+        android:layout_height="wrap_content"
         android:layout_above="@id/bottom_navigation_view"
-        android:background="@drawable/scanning_bar_shadow" />
+        android:rotation="180" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/white"
-        android:paddingBottom="12dp"
-        app:itemBackground="@drawable/bottom_item_selector"
-        app:itemIconTint="@drawable/nav_bar_selector"
-        app:itemTextAppearanceActive="@style/Widget.BottomNavigationViewActive"
-        app:itemTextAppearanceInactive="@style/Widget.BottomNavigationViewInactive"
         app:menu="@menu/menu_bottom_navigation" />
 
 </RelativeLayout>

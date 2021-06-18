@@ -14,7 +14,7 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.Utils
+package com.siliconlabs.bledemo.utils
 
 import android.text.TextUtils
 import androidx.core.util.Pair
@@ -47,7 +47,7 @@ object Converters {
             if (result > 127) array[i / 2] = (result - 256).toByte()
             else array[i/2] = result.toByte()
         }
-        
+
         return array
     }
 
@@ -55,6 +55,22 @@ object Converters {
         val builder = StringBuilder()
         for(byte in bytes) { builder.append(String.format("%02x",byte))}
         return builder.toString()
+    }
+
+    fun hexToByteArray(hex: String): ByteArray? {
+        var tmpHex = hex
+        if (tmpHex.isNotEmpty() && tmpHex.length % 2 != 0) {
+            tmpHex = "0$tmpHex"
+        }
+        val len = tmpHex.length / 2
+        val byteArr = ByteArray(len)
+        for (i in byteArr.indices) {
+            val init = i * 2
+            val end = init + 2
+            val temp = tmpHex.substring(init, end).toInt(16)
+            byteArr[i] = (temp and 0xFF).toByte()
+        }
+        return byteArr
     }
 
     fun isZeroed(bytes: ByteArray): Boolean {
@@ -91,6 +107,22 @@ object Converters {
         return String(hexChars)
     }
 
+    // Gets value in hexadecimal system
+    fun getHexValue(value: ByteArray?): String {
+        if (value == null) {
+            return ""
+        }
+        val hexChars = CharArray(value.size * 3)
+        var v: Int
+        for (j in value.indices) {
+            v = value[j].toInt() and 0xFF
+            hexChars[j * 3] = HEX_CHARS[v ushr 4]
+            hexChars[j * 3 + 1] = HEX_CHARS[v and 0x0F]
+            hexChars[j * 3 + 2] = ' '
+        }
+        return String(hexChars).trim()
+    }
+
     // Gets value in ascii system
     fun getAsciiValue(value: ByteArray?): String {
         if (value == null) {
@@ -120,6 +152,23 @@ object Converters {
         var result = ""
         result += b.toInt() and 0xff
         return result
+    }
+
+    // Converts string given in decimal system to byte array
+    fun decToByteArray(dec: String): ByteArray {
+        if (dec.isEmpty()) {
+            return byteArrayOf()
+        }
+        val decArray = dec.trim().split(" ")
+        val byteArr = ByteArray(decArray.size)
+        for (i in decArray.indices) {
+            try {
+                byteArr[i] = decArray[i].toInt().toByte()
+            } catch (e: NumberFormatException) {
+                return byteArrayOf(0)
+            }
+        }
+        return byteArr
     }
 
     // Gets value in decimal system for single byte

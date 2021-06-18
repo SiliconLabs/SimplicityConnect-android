@@ -1,9 +1,9 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
 import android.bluetooth.BluetoothDevice
 import android.util.Log
-import com.siliconlabs.bledemo.BeaconUtils.BleFormat
-import com.siliconlabs.bledemo.BeaconUtils.BleFormat.Companion.getFormat
+import com.siliconlabs.bledemo.beacon_utils.BleFormat
+import com.siliconlabs.bledemo.beacon_utils.BleFormat.Companion.getFormat
 import java.util.*
 import kotlin.math.min
 

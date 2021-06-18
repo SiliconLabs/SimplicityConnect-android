@@ -1,3 +1,3 @@
-package com.siliconlabs.bledemo.Browser.Models
+package com.siliconlabs.bledemo.browser.models
 
 class SavedSearch(var searchText: String)

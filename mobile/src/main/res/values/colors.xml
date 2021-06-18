@@ -37,6 +37,10 @@
 
     <color name="silabs_button_inactive">#555555</color>
 
+    <color name="silabs_speedmeter_start">#0086D9</color>
+    <color name="silabs_speedmeter_center">#921084</color>
+    <color name="silabs_speedmeter_end">#D91E2A</color>
+
     <!-- Colors probably to change in the future -->
     <color name="dialog_loading_spinner_center">#FF999999</color>
     <color name="dialog_loading_spinner_end">#FF666666</color>

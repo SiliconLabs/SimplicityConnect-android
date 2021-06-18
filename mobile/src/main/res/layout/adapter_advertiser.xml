@@ -113,7 +113,7 @@
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:background="@drawable/btn_grey_ripple_effect"
-                    android:contentDescription="@string/advertiser_label_copy"
+                    android:contentDescription="@string/label_copy"
                     android:src="@drawable/ic_copy" />
 
                 <ImageButton
@@ -121,7 +121,7 @@
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:background="@drawable/btn_grey_ripple_effect"
-                    android:contentDescription="@string/advertiser_label_edit"
+                    android:contentDescription="@string/label_edit"
                     android:src="@drawable/ic_edit2" />
 
                 <ImageButton
@@ -129,7 +129,7 @@
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:background="@drawable/btn_grey_ripple_effect"
-                    android:contentDescription="@string/advertiser_label_remove"
+                    android:contentDescription="@string/label_remove"
                     android:src="@drawable/ic_trash" />
             </LinearLayout>
         </LinearLayout>
