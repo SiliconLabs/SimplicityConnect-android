@@ -54,8 +54,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="4dp"
-                            android:textAllCaps="true"
-                            tools:text="EFR32MG12P43F1024GL125 - BRD4164A" />
+                            tools:text="EFR32MG12P43F1024GL125 - BRD4164A"
+                            android:textAllCaps="true" />
                     </LinearLayout>
 
                     <include layout="@layout/horizontal_separator" />
@@ -89,8 +89,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="16dp"
-                        android:baselineAligned="false"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -147,8 +147,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="16dp"
-                        android:baselineAligned="false"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -238,8 +238,8 @@
                             android:textColor="@color/silabs_subtle_text" />
 
                         <Spinner
-                            android:id="@+id/sp_phy_config"
                             style="@style/CustomSpinner"
+                            android:id="@+id/sp_phy_config"
                             android:layout_width="0dp"
                             android:layout_weight="1" />
                     </LinearLayout>
@@ -272,8 +272,8 @@
                             android:layout_weight="6" />
 
                         <Spinner
-                            android:id="@+id/sp_tx_power"
                             style="@style/CustomSpinner"
+                            android:id="@+id/sp_tx_power"
                             android:layout_width="0dp"
                             android:layout_weight="2" />
                     </LinearLayout>
@@ -304,8 +304,8 @@
                             android:layout_weight="6" />
 
                         <Spinner
-                            android:id="@+id/sp_payload_length"
                             style="@style/CustomSpinner"
+                            android:id="@+id/sp_payload_length"
                             android:layout_width="0dp"
                             android:layout_weight="2" />
 
@@ -337,8 +337,8 @@
                             android:layout_weight="6" />
 
                         <Spinner
-                            android:id="@+id/sp_ma_window_size"
                             style="@style/CustomSpinner"
+                            android:id="@+id/sp_ma_window_size"
                             android:layout_width="0dp"
                             android:layout_weight="2" />
                     </LinearLayout>
@@ -361,8 +361,8 @@
                             android:textColor="@color/silabs_subtle_text" />
 
                         <Spinner
-                            android:id="@+id/sp_channel_number"
                             style="@style/CustomSpinner"
+                            android:id="@+id/sp_channel_number"
                             android:layout_width="100dp" />
 
                     </LinearLayout>
@@ -384,9 +384,9 @@
                             android:textColor="@color/silabs_subtle_text" />
 
                         <Spinner
-                            android:id="@+id/sp_packet_count"
                             style="@style/CustomSpinner"
-                            android:layout_width="100dp" />
+                            android:id="@+id/sp_packet_count"
+                            android:layout_width="100dp"/>
                     </LinearLayout>
 
                     <CheckBox
@@ -418,9 +418,9 @@
                             android:textColor="@color/silabs_subtle_text" />
 
                         <Spinner
-                            android:id="@+id/sp_remote_id"
                             style="@style/CustomSpinner"
-                            android:layout_width="100dp" />
+                            android:id="@+id/sp_remote_id"
+                            android:layout_width="100dp"/>
 
                     </LinearLayout>
 
@@ -442,8 +442,8 @@
                             android:textColor="@color/silabs_subtle_text" />
 
                         <Spinner
-                            android:id="@+id/sp_self_id"
                             style="@style/CustomSpinner"
+                            android:id="@+id/sp_self_id"
                             android:layout_width="100dp" />
 
                     </LinearLayout>
@@ -475,11 +475,12 @@
         </LinearLayout>
     </ScrollView>
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <View
         android:id="@+id/scanning_separator"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/bottom_pane" />
+        android:layout_height="@dimen/shadow_height"
+        android:layout_above="@id/bottom_pane"
+        android:background="@drawable/scanning_bar_shadow" />
 
     <RelativeLayout
         android:id="@+id/bottom_pane"

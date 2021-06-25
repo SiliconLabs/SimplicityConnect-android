@@ -1,14 +1,13 @@
-package com.siliconlabs.bledemo.bluetooth.ble
+package com.siliconlabs.bledemo.Bluetooth.BLE
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import java.util.*
 
-class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, private val host: BluetoothDiscoveryHost) : BluetoothService.Listener {
+class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, private val host: BluetoothDiscoveryHost) : BlueToothService.Listener {
     interface BluetoothDiscoveryHost {
         fun isReady(): Boolean
         fun reDiscover()
@@ -24,8 +23,8 @@ class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, pri
     private val SERVICES: MutableList<GattService> = ArrayList()
     private val NAMES: MutableList<String> = ArrayList()
 
-    private var bluetoothBinding: BluetoothService.Binding? = null
-    private var bluetoothService: BluetoothService? = null
+    private var bluetoothBinding: BlueToothService.Binding? = null
+    private var blueToothService: BlueToothService? = null
 
     private var executeDiscovery = false
     private var isBluetoothEnabled = false
@@ -34,13 +33,13 @@ class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, pri
     private var isDeviceReady: Boolean? = null
 
     fun connect(context: Context) {
-        bluetoothBinding = object : BluetoothService.Binding(context) {
-            override fun onBound(service: BluetoothService?) {
-                bluetoothService?.removeListener(this@Discovery)
+        bluetoothBinding = object : BlueToothService.Binding(context) {
+            override fun onBound(service: BlueToothService?) {
+                blueToothService?.removeListener(this@Discovery)
 
-                bluetoothService = service
+                blueToothService = service
 
-                bluetoothService?.let {
+                blueToothService?.let {
                     if (executeDiscovery) {
                         executeDiscovery = false
                         discoverDevices(true)
@@ -55,7 +54,7 @@ class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, pri
         stopDiscovery(true)
         bluetoothBinding?.unbind()
         bluetoothBinding = null
-        bluetoothService = null
+        blueToothService = null
     }
 
     fun clearFilters() {
@@ -69,15 +68,11 @@ class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, pri
         }
     }
 
-    fun addFilter(vararg names: String) {
-        NAMES.addAll(arrayOf(*names))
-    }
-
     fun startDiscovery(clearCachedDiscoveries: Boolean) {
         if (clearCachedDiscoveries) {
             container.flushContainer()
         }
-        if (bluetoothService != null) {
+        if (blueToothService != null) {
             executeDiscovery = false
             discoverDevices(false) // Don't clear devices container every time
         } else {
@@ -86,14 +81,14 @@ class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, pri
     }
 
     fun clearDevicesCache() {
-        bluetoothService?.clearCache()
+        blueToothService?.clearCache()
     }
 
     fun stopDiscovery(clearCachedDiscoveries: Boolean) {
-        if (bluetoothService != null) {
+        if (blueToothService != null) {
             isScanning = false
-            bluetoothService?.removeListener(this)
-            bluetoothService?.stopDiscoveringDevices(true)
+            blueToothService?.removeListener(this)
+            blueToothService?.stopDiscoveringDevices(true)
         }
         if (clearCachedDiscoveries) {
             container.flushContainer()
@@ -101,8 +96,8 @@ class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, pri
     }
 
     private fun discoverDevices(clearCache: Boolean) {
-        bluetoothService?.addListener(this@Discovery)
-        isDeviceStarted = bluetoothService?.discoverDevicesOfInterest(clearCache)!!
+        blueToothService?.addListener(this@Discovery)
+        isDeviceStarted = blueToothService?.discoverDevicesOfInterest(clearCache)!!
     }
 
     override fun getScanFilters(): List<ScanFilterCompat> {

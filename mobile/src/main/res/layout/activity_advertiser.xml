@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".advertiser.activities.AdvertiserActivity">
+    tools:context=".Advertiser.Activities.AdvertiserActivity">
 
     <include
         android:id="@+id/toolbar_advertiser"
@@ -18,10 +18,13 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/bluetooth_enable" />
+        android:layout_height="@dimen/shadow_height"
+        android:layout_below="@id/bluetooth_enable"
+        android:background="@drawable/scanning_bar_shadow"
+        android:rotation="180"
+        android:elevation="1dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_advertiser"
@@ -32,7 +35,7 @@
         android:visibility="gone"
         tools:listitem="@layout/adapter_advertiser" />
 
-    <com.siliconlabs.bledemo.views.FullScreenInfo
+    <com.siliconlabs.bledemo.Views.FullScreenInfo
         android:id="@+id/full_screen_info_no_advertisers"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

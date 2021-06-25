@@ -29,7 +29,7 @@
             android:layout_height="44dp"
             android:layout_alignParentEnd="true"
             android:background="@drawable/btn_grey_ripple_effect"
-            android:contentDescription="@string/label_remove"
+            android:contentDescription="@string/advertiser_label_remove"
             android:src="@drawable/ic_trash" />
 
     </RelativeLayout>

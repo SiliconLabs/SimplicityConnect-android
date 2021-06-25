@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.advertiser.enums
+package com.siliconlabs.bledemo.Advertiser.Enums
 
 enum class AdvertisingMode {
     CONNECTABLE_SCANNABLE,

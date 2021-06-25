@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.browser.fragments
+package com.siliconlabs.bledemo.Browser.Fragments
 
 import android.graphics.Typeface
 import android.os.Bundle

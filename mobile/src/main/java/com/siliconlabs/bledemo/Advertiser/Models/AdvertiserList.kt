@@ -1,7 +1,7 @@
-package com.siliconlabs.bledemo.advertiser.models
+package com.siliconlabs.bledemo.Advertiser.Models
 
 import android.content.Context
-import com.siliconlabs.bledemo.advertiser.utils.AdvertiserStorage
+import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
 
 object AdvertiserList {
     private var list: ArrayList<Advertiser>? = null

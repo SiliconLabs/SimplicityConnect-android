@@ -1,9 +1,9 @@
-package com.siliconlabs.bledemo.advertiser.models
+package com.siliconlabs.bledemo.Advertiser.Models
 
 import android.bluetooth.BluetoothAdapter
 import android.os.Build
-import com.siliconlabs.bledemo.advertiser.enums.AdvertisingMode
-import com.siliconlabs.bledemo.advertiser.enums.Phy
+import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
+import com.siliconlabs.bledemo.Advertiser.Enums.Phy
 
 class BluetoothInfo {
 

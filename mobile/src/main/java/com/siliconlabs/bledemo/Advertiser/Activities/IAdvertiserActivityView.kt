@@ -1,6 +1,6 @@
-package com.siliconlabs.bledemo.advertiser.activities
+package com.siliconlabs.bledemo.Advertiser.Activities
 
-import com.siliconlabs.bledemo.advertiser.models.Advertiser
+import com.siliconlabs.bledemo.Advertiser.Models.Advertiser
 
 interface IAdvertiserActivityView {
     fun onAdvertiserPopulated(items: ArrayList<Advertiser>)

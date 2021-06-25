@@ -1,10 +1,10 @@
-package com.siliconlabs.bledemo.advertiser.activities
+package com.siliconlabs.bledemo.Advertiser.Activities
 
-import com.siliconlabs.bledemo.advertiser.enums.AdvertisingMode
-import com.siliconlabs.bledemo.advertiser.enums.DataMode
-import com.siliconlabs.bledemo.advertiser.enums.Phy
-import com.siliconlabs.bledemo.advertiser.models.AdvertiserData
-import com.siliconlabs.bledemo.advertiser.models.DataPacket
+import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
+import com.siliconlabs.bledemo.Advertiser.Enums.DataMode
+import com.siliconlabs.bledemo.Advertiser.Enums.Phy
+import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserData
+import com.siliconlabs.bledemo.Advertiser.Models.DataPacket
 
 interface IAdvertiserConfigActivityView {
     fun onAdvertisingTypesPrepared(isLegacy: Boolean, legacyModes: List<AdvertisingMode>, extendedModes: List<AdvertisingMode>)

@@ -1,6 +1,6 @@
-package com.siliconlabs.bledemo.browser
+package com.siliconlabs.bledemo.Browser
 
-import com.siliconlabs.bledemo.browser.models.Mapping
+import com.siliconlabs.bledemo.Browser.Models.Mapping
 
 interface MappingCallback {
     fun onNameChanged(mapping: Mapping)

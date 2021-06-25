@@ -1,10 +1,10 @@
-package com.siliconlabs.bledemo.utils
+package com.siliconlabs.bledemo.Utils
 
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.siliconlabs.bledemo.browser.models.Mapping
+import com.siliconlabs.bledemo.Browser.Models.Mapping
 import java.util.*
 
 class SharedPrefUtils(context: Context) {
@@ -17,7 +17,7 @@ class SharedPrefUtils(context: Context) {
         private const val LAST_FILTER_KEY = "LAST_FILTER_KEY"
         private const val FAVORITES_DEVICES_KEY = "FAVORITES_DEVICES_KEY"
         private const val TEMPORARY_FAVORITES_DEVICES_KEY = "TEMPORARY_FAVORITES_DEVICES_KEY"
-        private const val DISPLAY_APPLICATION_LEAVE_DIALOG_KEY = "DISPLAY_APPLICATION_LEAVE_DIALOG_KEY"
+        private const val DISPLAY_BROWSER_LEAVE_DIALOG_KEY = "DISPLAY_BROWSER_LEAVE_DIALOG_KEY"
         private const val DISPLAY_UNBOND_DEVICE_DIALOG_KEY = "DISPLAY_UNBOND_DEVICE_DIALOG_KEY"
         private const val CHARACTERISTIC_NAMES_KEY = "CHARACTERISTIC_NAMES_KEY"
         private const val SERVICE_NAMES_KEY = "SERVICE_NAMES_KEY"
@@ -163,12 +163,12 @@ class SharedPrefUtils(context: Context) {
         editor.apply()
     }
 
-    fun shouldDisplayLeaveApplicationDialog(): Boolean {
-        return mPrefs.getBoolean(DISPLAY_APPLICATION_LEAVE_DIALOG_KEY, true)
+    fun shouldDisplayLeaveBrowserDialog(): Boolean {
+        return mPrefs.getBoolean(DISPLAY_BROWSER_LEAVE_DIALOG_KEY, true)
     }
 
-    fun setShouldLeaveApplicationDialog(displayDialog: Boolean) {
-        editor.putBoolean(DISPLAY_APPLICATION_LEAVE_DIALOG_KEY, displayDialog)
+    fun setShouldDisplayLeaveBrowserDialog(displayDialog: Boolean) {
+        editor.putBoolean(DISPLAY_BROWSER_LEAVE_DIALOG_KEY, displayDialog)
         editor.apply()
     }
 

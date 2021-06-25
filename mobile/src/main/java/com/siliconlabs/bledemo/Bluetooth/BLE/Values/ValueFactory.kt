@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.bluetooth.ble.values
+package com.siliconlabs.bledemo.Bluetooth.BLE.Values
 
 import android.bluetooth.BluetoothGattCharacteristic
 

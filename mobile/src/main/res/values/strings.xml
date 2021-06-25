@@ -50,6 +50,7 @@
     <string name="n_dBm">%ddBm</string>
     <string name="Waiting_to_connect">Waiting to connect</string>
     <string name="about_menu_label">License</string>
+    <string name="device_not_from_EFR">Device has not been connected from EFR Connect</string>
     <string name="Search_for_s">Search for %s</string>
     <string name="MTU_colon_n">MTU: %d</string>
     <string name="Preparing_logs_please_wait">Preparing logs, please wait&#8230;</string>
@@ -61,39 +62,11 @@
     <string name="You_cannot_send_empty_value_to_charac">You cannot send an empty value to characteristic!</string>
     <string name="Write_with_response">Write with response (write request)</string>
     <string name="Write_without_response">Write without response (write command)</string>
-    <string name="leave_application_info">Leaving application will disconnect all devices!</string>
+    <string name="leave_browser_info">Leaving the browser will disconnect all devices!</string>
     <string name="Do_not_give_this_warning_again">Do not give this warning again</string>
-    <string name="Leave_Application">Leave Application?</string>
+    <string name="Leave_Browser">Leave Browser?</string>
     <string name="device_address_with_bond_state">%s | %s</string>
     <string name="filter_rssi_not_set">Not Set</string>
-
-    <!-- Browser - custom gatt elements' names -->
-    <string name="ota_service_name">OTA Service</string>
-    <string name="blinky_service_name">Blinky Example</string>
-    <string name="throughput_test_service_name">Throughput Test Service</string>
-    <string name="throughput_information_service_name">Throughput Information Service</string>
-
-    <string name="ota_control_attribute_characteristic_name">OTA Control Attribute</string>
-    <string name="ota_data_characteristic_name">OTA Data</string>
-    <string name="fw_version_characteristic_name">Fw version</string>
-    <string name="ota_version_characteristic_name">OTA Version</string>
-    <string name="bootloader_version_characteristic_name">Bootloader Version</string>
-    <string name="application_version_characteristic_name">Application Version</string>
-
-    <string name="led_control_characteristic_name">LED Control</string>
-    <string name="report_button_characteristic_name">Report Button</string>
-
-    <string name="indications_characteristic_name">Indications</string>
-    <string name="notifications_characteristic_name">Notifications</string>
-    <string name="transmission_on_characteristic_name">Transmission ON</string>
-    <string name="throughput_result_characteristic_name">Throughput Result</string>
-
-    <string name="connection_phy_characteristic_name">Connection PHY</string>
-    <string name="connection_interval_characteristic_name">Connection Interval</string>
-    <string name="slave_latency_characteristic_name">Slave Latency</string>
-    <string name="supervision_timeout_characteristic_name">Supervision Timeout</string>
-    <string name="pdu_size_characteristic_name">PDU Size</string>
-    <string name="mtu_size_characteristic_name">MTU Size</string>
 
     <!-- Sort Fragment -->
     <string name="sort_title_rssi">RSSI</string>
@@ -130,10 +103,6 @@
     <string name="main_menu_description_browser">View info about nearby devices and their properties.</string>
     <string name="main_menu_description_connected_lighting">Control a Dynamic Multiprotocol application of connected lights and switches.</string>
     <string name="main_menu_description_range_test">Evaluate the link budget and range of EFR32.</string>
-    <string name="main_menu_description_blinky">Control LED and receive button presses on a Silabs kit</string>
-    <string name="main_menu_description_throughput">Measure throughput between the mobile device and EFR32.</string>
-    <string name="main_menu_description_iop_test">Exercise common Bluetooth operations with Silicon Labs hardware and software.</string>
-    <string name="main_menu_description_gatt_configurator">Allows you to create a local GATT database.</string>
 
     <!-- Messages -->
     <string name="Change_characteristic_name">Change characteristic name</string>
@@ -147,13 +116,8 @@
     <string name="title_Health_Thermometer">Health Thermometer</string>
     <string name="title_Connected_Lighting">Connected Lighting</string>
     <string name="title_Range_Test">Range Test</string>
-    <string name="title_Throughput">Throughput</string>
     <string name="title_Advertiser">Advertiser</string>
-    <string name="title_Interoperability_Test">Interoperability Test</string>
-    <string name="title_GATT_Configurator">GATT Configurator</string>
-    <string name="title_new_GATT_Server">New GATT Server</string>
     <string name="title_Mappings_dictionary">Mappings Dictionary</string>
-    <string name="title_Blinky">Blinky</string>
     <string name="title_Characteristics">Characteristics</string>
     <string name="title_Services">Services</string>
     <string name="title_Mappings_about">About Mappings Dictionary</string>
@@ -162,8 +126,6 @@
     <string name="title_create_new">Create new</string>
     <string name="title_switch_all_off">Switch all OFF</string>
     <string name="title_unsaved_changes">Unsaved Changes</string>
-    <string name="title_import">Import</string>
-    <string name="title_export">Export</string>
 
     <!-- OTA -->
     <string name="Preparing_for_OTA">Preparing for OTA</string>
@@ -198,18 +160,18 @@
     <string name="Incorrect_file">Incorrect file!</string>
     <string name="Select_Apploader_gbl_file">Select Apploader .gbl file</string>
     <string name="Select_Application_gbl_file">Select Application .gbl file</string>
-    <string name="ota_filename_s">\/%s</string>
 
     <!-- Error dialog -->
     <string name="An_error_occured">An error occured</string>
     <string name="Error">Error</string>
     <string name="Error_colon">Error:</string>
 
-    <!-- Buttons -->
+    <!-- Button title -->
     <string name="button_reset">Reset</string>
     <string name="button_search">Search</string>
     <string name="button_filter_log">Filter Log</string>
     <string name="button_clear_log">Clear Log</string>
+    <string name="button_share">Share</string>
     <string name="button_connect">Connect</string>
     <string name="button_disconnect">Disconnect</string>
     <string name="button_save">Save</string>
@@ -223,22 +185,9 @@
     <string name="button_stop_scanning">Stop Scanning</string>
     <string name="button_start_scanning">Start Scanning</string>
     <string name="button_connections">Connections</string>
-    <string name="button_start">Start</string>
-    <string name="button_stop">Stop</string>
     <string name="button_ok">Ok</string>
     <string name="button_yes">Yes</string>
     <string name="button_no">No</string>
-    <string name="button_run_test">Run Test</string>
-    <string name="button_stop_test">Stop Test</string>
-    <string name="button_run_tests">Run Tests</string>
-    <string name="button_share">Share</string>
-    <string name="button_waiting">Waiting…</string>
-    <string name="button_bluetooth_gatt_services">Bluetooth GATT Services</string>
-    <string name="button_export">Export</string>
-    <string name="button_add_characteristic">Add Characteristic</string>
-    <string name="button_add_descriptor">Add Descriptor</string>
-    <string name="button_add_service">Add Service</string>
-    <string name="button_bluetooth_sig">Bluetooth SIG</string>
 
     <!-- Beacon types -->
     <string name="unspecified">Unspecified</string>
@@ -255,13 +204,13 @@
     <string name="help_text_users_guide_label">EFR Connect User\'s Guide:</string>
     <string name="help_text_support_label">Support:</string>
     <string name="help_text_support_url">silabs.com/support</string>
-    <string name="help_text_release_notes_label">Release notes:</string>
-    <string name="help_text_release_notes_url">silabs.com/documents/public/release-notes/efr-connect-release-notes.pdf</string>
     <string name="help_text_documentation_label">Additional documentation:</string>
     <string name="help_text_documentation_url">docs.silabs.com/bluetooth/latest</string>
     <string name="help_text_pub_label">Additional Apps released by Silicon Labs:</string>
     <string name="help_Google_Play_Store">Google Play Store</string>
+    <string name="help_text_pub_url">https://play.google.com/store/search?q=pub:Silicon Labs Web Team"</string>
     <string name="version_text">Version %s</string>
+    <string name="about_silicon_labs">ABOUT SILICON LABS</string>
     <string name="info">Info</string>
 
     <!-- Key fobs screen -->
@@ -361,7 +310,7 @@
     <string name="devices_list_list_item_default_device_name">Default Device</string>
     <string name="services_list_service_name_default">Name of Service</string>
     <string name="permissions_not_granted">Required permissions were not granted. Please accept permissions or set them using application settings within the system settings.</string>
-    <string name="permissions_granted_successfully">Permissions granted successfully!</string>
+    <string name="Permissions_granted_succesfully">Permissions granted successfully!</string>
     <string name="Grant_WRITE_FILES_permission_to_access_OTA">Grant WRITE_FILES permission to have access to OTA!</string>
     <string name="Copied_to_clipboard">Copied to clipboard!</string>
     <string name="Incorrect_data_format">Incorrect data format!</string>
@@ -373,8 +322,6 @@
     <string name="device_services_title_unbond_device">Unbond device?</string>
     <string name="device_services_note_unbond_device">You have to unbond your device manually in Bluetooth Settings. After unbonding your device will disconnect and this is normal behavior.</string>
     <string name="device_services_label_read">Read</string>
-    <string name="services_nav_remote">Remote (Client)</string>
-    <string name="services_nav_local">Local (Server)</string>
 
     <!-- Bluetooth Permission Config Dialog -->
     <string name="toast_debug_mode_device_disconnected">DEVICE DISCONNECTED</string>
@@ -471,9 +418,13 @@
     <string name="advertiser_button_add_16bit_service">Add 16-bit service</string>
     <string name="advertiser_button_add_128bit_service">Add 128-bit service</string>
     <string name="advertiser_label_company_identifiers">Company identifiers</string>
+    <string name="advertiser_label_bluetooth_gatt_services">Bluetooth GATT Services</string>
     <string name="advertiser_label_128_bit_example">2e05fa88–e3c1–4170–9c94–6c5e6bc4bcf5</string>
     <string name="advertiser_label_no_configured_advertisers">No configured advertisers.</string>
     <string name="advertiser_label_interval">interval</string>
+    <string name="advertiser_label_copy">copy</string>
+    <string name="advertiser_label_edit">edit</string>
+    <string name="advertiser_label_remove">remove</string>
     <string name="advertiser_label_flags_default">"General Discoverable, [Device specific]"</string>
     <string name="advertiser_note_extended_advertising_not_supported">Note: This device does not support extended advertising</string>
     <string name="advertiser_note_tx_power">Note: The stack may override the TX Power selection when the advertisement starts</string>
@@ -499,7 +450,7 @@
     <string name="advertiser_data_type_complete_list_of_128bit_service">Complete List of 128-bit Service</string>
     <string name="advertiser_data_type_complete_list_of_16bit_service">Complete List of 16-bit Service</string>
     <string name="advertiser_url_company_identifiers">bluetooth.com/specifications/assigned-numbers/company-identifiers/</string>
-    <string name="advertiser_url_bluetooth_gatt_services">bluetooth.com/specifications/assigned-numbers/</string>
+    <string name="advertiser_url_bluetooth_gatt_services">bluetooth.com/ specifications/gatt/services/</string>
     <string name="advertiser_prefix_0x">0x</string>
 
     <!-- Advertiser Config -->
@@ -568,115 +519,5 @@
     <string name="range_tx_stop">Stop TX</string>
     <string name="range_rx_start">Start RX</string>
     <string name="range_rx_waiting">Waiting for device…</string>
-
-    <!-- Blinky -->
-    <string name="blinky_note_light">Tap the light to toggle the LED on the kit</string>
-    <string name="blinky_note_button">Press the button on the kit to see the virtual button state changing in sync</string>
-    <string name="blinky_label_light_bulb">light bulb</string>
-    <string name="blinky_label_button">button</string>
-
-    <!-- Throughput -->
-    <string name="throughput_label_notifications">Notifications</string>
-    <string name="throughput_label_indications">Indications</string>
-    <string name="throughput_label_connection_parameters">Connection Parameters</string>
-    <string name="throughput_phy_colon">PHY:</string>
-    <string name="throughput_interval_colon">Interval:</string>
-    <string name="throughput_latency_colon">Latency:</string>
-    <string name="throughput_supervision_timeout_colon">Supervision Timeout:</string>
-    <string name="throughput_pdu_colon">PDU:</string>
-    <string name="throughput_mtu_colon">MTU:</string>
-    <string name="throughput_n_bytes">%d bytes</string>
-    <string name="throughput_ms">ms</string>
-    <string name="throughput_phy_1m">1M</string>
-    <string name="throughput_phy_2m">2M</string>
-    <string name="throughput_phy_coded_125k">Coded 125k</string>
-    <string name="throughput_phy_coded_500k">Coded 500k</string>
-    <string name="throughput_upload_test_message">Sending data from mobile device to EFR is coming soon!</string>
-
-    <!-- Interoperability Test -->
-    <string name="iop_test_toast_bonding">Bonding. Pull down the notification bar to pair if no Dialog is shown</string>
-    <string name="iop_test_toast_press_passkey">Press passkey: 123456. Pull down the notification bar to pair if no Dialog is shown</string>
-    <string name="iop_test_toast_enter_valid_device_name">Please enter a valid device name.</string>
-    <string name="iop_test_label_fw_name">Firmware Name: %1s</string>
-    <string name="iop_test_label_device_name">Device Name: %1s</string>
-    <string name="iop_test_label_progress_count_test">Total: %1s/%2s Test cases</string>
-    <string name="iop_test_message_stop_test">Are you sure you want to stop the test?</string>
-    <string name="iop_test_toast_bluetooth_not_supported">Bluetooth is not supported</string>
-    <string name="iop_test_n_percent">%d %%</string>
-    <string name="iop_test_n_bytes">%d bytes</string>
-    <string name="iop_test_label_resetting">Resetting…</string>
-    <string name="iop_test_label_loading">Loading…</string>
-    <string name="iop_test_label_1_of_1">1 OF 1</string>
-    <string name="iop_test_label_IOP_Test">IOP Test</string>
-    <string name="iop_test_title_device_name">Device Name</string>
-    <string name="iop_test_hint_enter_device_name">Enter device name</string>
-    <string name="iop_test_note_device_name_dialog">This feature will execute a set of Bluetooth operations against a Silicon Labs device to test for Interoperability (IOP). The device name can be read from the display on your Silicon Labs kit where the IOP sample application is running. For more information about IOP and which sample application to use please read:</string>
-    <string name="iop_test_label_interoperability_test">Interoperability Test</string>
-
-    <!-- GATT Configurator -->
-    <string name="gatt_configurator_n_services">%d Services</string>
-    <string name="gatt_configurator_n_characteristics">%d Characteristics</string>
-    <string name="gatt_configurator_label_no_configured_gatt_servers">No Configured GATT Servers</string>
-    <string name="gatt_configurator_label_add_mandatory_service_requirements">Add mandatory service requirements</string>
-    <string name="gatt_configurator_label_read">Read</string>
-    <string name="gatt_configurator_label_write">Write</string>
-    <string name="gatt_configurator_label_write_without_response">Write without response</string>
-    <string name="gatt_configurator_label_reliable_write">Reliable write</string>
-    <string name="gatt_configurator_label_notify">Notify</string>
-    <string name="gatt_configurator_label_indicate">Indicate</string>
-    <string name="gatt_configurator_label_bonded">Bonded</string>
-    <string name="gatt_configurator_label_authenticated_mitm">Authenticated (MITM)</string>
-    <string name="gatt_configurator_label_properties">Properties</string>
-    <string name="gatt_configurator_label_parameters">Parameters</string>
-    <string name="gatt_configurator_label_initial_value">Initial Value</string>
-    <string name="gatt_configurator_label_gatt_server_name">GATT Server Name</string>
-    <string name="gatt_configurator_title_add_a_gatt_service">Add a GATT Service</string>
-    <string name="gatt_configurator_title_add_a_gatt_characteristic">Add a GATT Characteristic</string>
-    <string name="gatt_configurator_title_add_a_gatt_descriptor">Add a GATT Descriptor</string>
-    <string name="gatt_configurator_note_insert_name_and_uuid">Please insert your service name and UUID. 128–bit UUIDs will be automatically formatted as they are entered. Example: 030a590b&#8211;0e24&#8211;4482&#8211;8567&#8211;8434046b5a25</string>
-    <string name="gatt_configurator_hint_service_name">Service name</string>
-    <string name="gatt_configurator_hint_characteristic_name">Characteristic name</string>
-    <string name="gatt_configurator_hint_descriptor_name">Descriptor name</string>
-    <string name="gatt_configurator_hint_16_128_bit_uuid">16/128-bit UUID</string>
-    <string name="gatt_configurator_hint_insert_text">Insert text</string>
-    <string name="gatt_configurator_hint_insert_hex">Insert hex</string>
-    <string name="gatt_configurator_note_full_list_of_16bit_services">A full list of 16-bit service UUIDs is available from the Bluetooth SIG:</string>
-    <string name="gatt_configurator_prefix_0x">0x</string>"
-    <string name="gatt_configurator_primary_service">Primary Service</string>
-    <string name="gatt_configurator_secondary_service">Secondary Service</string>
-    <string name="gatt_configurator_toast_invalid_gatt_server_name">Invalid GATT Server name!</string>
-    <string name="gatt_configurator_leave_config_dialog_content">Your GATT Server has unsaved
-        changes. Do you wish to save them?</string>
-
-    <string-array name="gatt_configurator_initial_value">
-        <item>Empty</item>
-        <item>Text (ascii)</item>
-        <item>Hex</item>
-    </string-array>
-
-    <string-array name="gatt_configurator_service_type">
-        <item>Primary Service</item>
-        <item>Secondary Service</item>
-    </string-array>
-
-    <string name="descriptor">GATT Descriptor</string>
-    <string name="characteristic">GATT Characteristic</string>
-    <string name="server">GATT Server</string>
-    <string name="service">GATT Service</string>
-
-    <!-- Notifications -->
-    <string name="notification_title_device_has_connected">%s has connected</string>
-    <string name="notification_note_debug_connection">Do you want to debug connection?</string>
-    <string name="notification_channel_name">debug connection channel</string>
-    <string name="notification_channel_description">Channel allows to debug connection</string>
-    <string name="notification_button_yes">Yes</string>
-    <string name="notification_button_yes_and_open">Yes and open</string>
-
-    <!-- Common -->
-    <string name="label_copy">copy</string>
-    <string name="label_edit">edit</string>
-    <string name="label_remove">remove</string>
-    <string name="dialog_title_remove">Remove %s?</string>
-    <string name="dialog_description_remove">Are you sure you want to delete %s?</string>
 
 </resources>

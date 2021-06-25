@@ -14,7 +14,7 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.bluetooth.parsing
+package com.siliconlabs.bledemo.Bluetooth.Parsing
 
 import java.io.File
 
@@ -35,7 +35,6 @@ object Consts {
     const val UNKNOWN_SERVICE = "Unknown Service"
     const val REQUIREMENT_MANDATORY = "Mandatory"
     const val REQUIREMENT_OPTIONAL = "Optional"
-    const val REQUIREMENT_EXCLUDED = "Excluded"
 
     const val TAG_SERVICE = "Service"
     const val TAG_CHARACTERISTIC = "Characteristic"
@@ -58,17 +57,6 @@ object Consts {
     const val TAG_CHARACTERISTICS = "Characteristics"
     const val TAG_DESCRIPTORS = "Descriptors"
     const val TAG_DESCRIPTOR = "Descriptor"
-    const val TAG_PROPERTIES = "Properties"
-
-    const val TAG_READ = "Read"
-    const val TAG_WRITE = "Write"
-    const val TAG_WRITE_WITHOUT_RESPONSE = "WriteWithoutResponse"
-    const val TAG_SIGNED_WRITE = "SignedWrite"
-    const val TAG_RELIABLE_WRITE = "ReliableWrite"
-    const val TAG_NOTIFY = "Notify"
-    const val TAG_INDICATE = "Indicate"
-    const val TAG_WRITABLE_AUXILIARIES = "WritableAuxiliaries"
-    const val TAG_BROADCAST = "Broadcast"
 
     const val ATTRIBUTE_UUID = "uuid"
     const val ATTRIBUTE_NAME = "name"

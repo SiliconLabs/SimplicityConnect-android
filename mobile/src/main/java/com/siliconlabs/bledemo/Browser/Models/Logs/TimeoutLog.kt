@@ -1,7 +1,7 @@
-package com.siliconlabs.bledemo.browser.models.logs
+package com.siliconlabs.bledemo.Browser.Models.Logs
 
 import android.bluetooth.BluetoothDevice
-import com.siliconlabs.bledemo.browser.models.LogType
+import com.siliconlabs.bledemo.Browser.Models.LogType
 
 class TimeoutLog : Log {
     constructor(device: BluetoothDevice) {

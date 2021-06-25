@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.browser.adapters
+package com.siliconlabs.bledemo.Browser.Adapters
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager

@@ -14,7 +14,7 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.bluetooth.services
+package com.siliconlabs.bledemo.Bluetooth.Services
 
 import android.app.Service
 import android.bluetooth.*
@@ -22,8 +22,8 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.siliconlabs.bledemo.bluetooth.parsing.Device
-import com.siliconlabs.bledemo.bluetooth.parsing.Engine
+import com.siliconlabs.bledemo.Bluetooth.Parsing.Device
+import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine.Companion.instance
 
 // BluetoothLeService - manages connections and data communication with given Bluetooth LE devices.
 class BluetoothLeService : Service() {
@@ -73,7 +73,7 @@ class BluetoothLeService : Service() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    val device = Engine.getDevice(gatt)
+                    val device = instance?.getDevice(gatt)
                     device?.setConnected(true)
                     connectedDevice = device
                     val updateIntent = Intent(ACTION_GATT_CONNECTED)
@@ -81,7 +81,7 @@ class BluetoothLeService : Service() {
                     sendBroadcast(updateIntent)
                     gatt.discoverServices()
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                    val device = Engine.getDevice(gatt)
+                    val device = instance?.getDevice(gatt)
                     device?.setConnected(false)
                     val updateIntent = Intent(ACTION_GATT_DISCONNECTED)
                     updateIntent.putExtra(DEVICE_ADDRESS, device?.address)
@@ -91,7 +91,7 @@ class BluetoothLeService : Service() {
                     sendBroadcast(updateIntent)
                 }
             } else {
-                val device = Engine.getDevice(gatt)
+                val device = instance?.getDevice(gatt)
                 val updateIntent = Intent(ACTION_GATT_CONNECTION_STATE_ERROR)
                 updateIntent.putExtra(DEVICE_ADDRESS, device?.address)
                 sendBroadcast(updateIntent)
@@ -103,7 +103,7 @@ class BluetoothLeService : Service() {
         // If success broadcast with device address extra is sent
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                val device = Engine.getDevice(gatt)
+                val device = instance?.getDevice(gatt)
                 val updateIntent = Intent(ACTION_GATT_SERVICES_DISCOVERED)
                 updateIntent.putExtra(DEVICE_ADDRESS, device?.address)
                 sendBroadcast(updateIntent)
@@ -135,7 +135,7 @@ class BluetoothLeService : Service() {
         // If success broadcast with device address extra is sent
         override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                val device = Engine.getDevice(gatt)
+                val device = instance?.getDevice(gatt)
                 device?.rssi = rssi
                 val updateIntent = Intent(ACTION_READ_REMOTE_RSSI)
                 updateIntent.putExtra(DEVICE_ADDRESS, device?.address)
@@ -214,7 +214,7 @@ class BluetoothLeService : Service() {
 
     // Close all established connections
     fun close() {
-        for (device in Engine.devices!!) {
+        for (device in instance?.devices!!) {
             device.bluetoothGatt?.close()
             device.bluetoothGatt = null
         }

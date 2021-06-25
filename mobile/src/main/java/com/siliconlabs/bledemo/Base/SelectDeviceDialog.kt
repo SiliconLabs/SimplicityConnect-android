@@ -1,6 +1,7 @@
-package com.siliconlabs.bledemo.base
+package com.siliconlabs.bledemo.Base
 
-import android.bluetooth.*
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothGatt
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -21,17 +22,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
-import com.siliconlabs.bledemo.adapters.DeviceInfoViewHolder
-import com.siliconlabs.bledemo.adapters.ScannedDevicesAdapter
-import com.siliconlabs.bledemo.bluetooth.ble.*
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService.GattConnectType
-import com.siliconlabs.bledemo.bluetooth.ble.Discovery.BluetoothDiscoveryHost
-import com.siliconlabs.bledemo.connected_lighting.activities.ConnectedLightingActivity
-import com.siliconlabs.bledemo.health_thermometer.activities.HealthThermometerActivity
+import com.siliconlabs.bledemo.Adapters.DeviceInfoViewHolder
+import com.siliconlabs.bledemo.Adapters.ScannedDevicesAdapter
+import com.siliconlabs.bledemo.Bluetooth.BLE.*
+import com.siliconlabs.bledemo.Bluetooth.BLE.BlueToothService.GattConnectType
+import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery.BluetoothDiscoveryHost
+import com.siliconlabs.bledemo.ConnectedLighting.Activities.ConnectedLightingActivity
+import com.siliconlabs.bledemo.HealthThermometer.Activities.HealthThermometerActivity
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.blinky.activities.BlinkyActivity
-import com.siliconlabs.bledemo.throughput.activities.ThroughputActivity
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import kotlinx.android.synthetic.main.dialog_select_device.*
 import java.util.*
 import kotlin.math.max
@@ -43,8 +41,8 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
     private lateinit var profilesInfo: ArrayList<Int>
     private lateinit var discovery: Discovery
 
-    private var bluetoothService: BluetoothService? = null
-    private var bluetoothBinding: BluetoothService.Binding? = null
+    private var bluetoothService: BlueToothService? = null
+    private var bluetoothBinding: BlueToothService.Binding? = null
     private var currentDeviceInfo: BluetoothDeviceInfo? = null
     private var connectType: GattConnectType? = null
     private var callback: Callback? = null
@@ -228,12 +226,6 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
             GattConnectType.RANGE_TEST -> {
                 discovery.addFilter(GattService.RangeTestService)
             }
-            GattConnectType.BLINKY -> {
-                discovery.addFilter("Blinky Example")
-            }
-            GattConnectType.THROUGHPUT_TEST -> {
-                discovery.addFilter("Throughput Test")
-            }
         }
 
         discovery.startDiscovery(clearCachedDiscoveries)
@@ -248,19 +240,16 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
         currentDeviceInfo = deviceInfo
         retryAttempts = 0
 
-        bluetoothBinding = object : BluetoothService.Binding(requireContext()) {
-            override fun onBound(service: BluetoothService?) {
-                /*if (connectType == GattConnectType.THROUGHPUT_TEST) {
-                    PeripheralManager.advertiseThroughputServer(service)
-                }*/
+        bluetoothBinding = object : BlueToothService.Binding(activity!!) {
+            override fun onBound(service: BlueToothService?) {
+                bluetoothService = service
 
-                (activity as BaseActivity).showModalDialog(BaseActivity.ConnectionStatus.CONNECTING, DialogInterface.OnCancelListener { service?.clearConnectedGatt() })
+                (activity as BaseActivity).showModalDialog(BaseActivity.ConnectionStatus.CONNECTING, DialogInterface.OnCancelListener { service?.clearGatt() })
                 service?.connectGatt(deviceInfo.device, false, timeoutGattCallback)
             }
         }
         bluetoothBinding?.bind()
     }
-
 
     fun setCallback(callback: Callback) {
         this.callback = callback
@@ -273,12 +262,6 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
             }
             GattConnectType.LIGHT -> {
                 Intent(activity, ConnectedLightingActivity::class.java)
-            }
-            GattConnectType.BLINKY -> {
-                Intent(activity, BlinkyActivity::class.java)
-            }
-            GattConnectType.THROUGHPUT_TEST -> {
-                Intent(activity, ThroughputActivity::class.java)
             }
             else -> null
         }

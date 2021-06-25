@@ -1,6 +1,6 @@
-package com.siliconlabs.bledemo.browser
+package com.siliconlabs.bledemo.Browser
 
-import com.siliconlabs.bledemo.utils.FilterDeviceParams
+import com.siliconlabs.bledemo.Utils.FilterDeviceParams
 
 interface ToolbarCallback {
     fun close()

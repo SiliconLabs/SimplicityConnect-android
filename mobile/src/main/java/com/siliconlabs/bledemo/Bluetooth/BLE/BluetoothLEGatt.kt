@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.bluetooth.ble
+package com.siliconlabs.bledemo.Bluetooth.BLE
 
 import android.bluetooth.*
 import android.content.Context

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.browser.adapters
+package com.siliconlabs.bledemo.Browser.Adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.siliconlabs.bledemo.browser.adapters.LogAdapter.LogViewHolder
-import com.siliconlabs.bledemo.browser.models.LogType
-import com.siliconlabs.bledemo.browser.models.logs.Log
+import com.siliconlabs.bledemo.Browser.Adapters.LogAdapter.LogViewHolder
+import com.siliconlabs.bledemo.Browser.Models.LogType
+import com.siliconlabs.bledemo.Browser.Models.Logs.Log
 import com.siliconlabs.bledemo.R
 
 class LogAdapter(private var logList: List<Log>, private val context: Context) : RecyclerView.Adapter<LogViewHolder>() {

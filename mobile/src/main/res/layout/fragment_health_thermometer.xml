@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.siliconlabs.bledemo.health_thermometer.activities.HealthThermometerActivity">
+    tools:context="com.siliconlabs.bledemo.HealthThermometer.Activities.HealthThermometerActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,9 +38,12 @@
         </LinearLayout>
     </LinearLayout>
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="@dimen/shadow_height"
+        android:background="@drawable/scanning_bar_shadow"
+        android:elevation="1dp"
+        android:rotation="180" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -108,7 +111,7 @@
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp">
 
-                        <com.siliconlabs.bledemo.health_thermometer.views.TemperatureDisplay
+                        <com.siliconlabs.bledemo.HealthThermometer.Views.TemperatureDisplay
                             android:id="@+id/thermo_large_temperature"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

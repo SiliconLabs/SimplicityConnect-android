@@ -1,13 +1,18 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<!--Copyright 2015 Bluetooth SIG, Inc. All rights reserved.-->
-<Service xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/service.xsd"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="org.bluetooth.service.object_transfer" uuid="1825" name="Object Transfer Service" last-modified="2015-11-17" approved="Yes">
+<!--
+Copyright 2015 Bluetooth SIG, Inc. All rights reserved.
+-->
+<Service xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/service.xsd" type="org.bluetooth.service.object_transfer" uuid="1825" name="Object Transfer Service" last-modified="2015-11-17" approved="Yes">
 	<InformativeText>
-		<Abstract>This service provides management and control features supporting bulk data transfers which occur via a separate L2CAP connection oriented channel. The Client is enabled to create and delete objects and to execute an action using the currently selected object. The selected object can be written, updated or read via an Object Transfer Channel opened by the Client. The generation of a checksum covering a part or the whole of the object contents is included as an optional feature. This service provides a general method for a Client to select and initiate the transfer of any type of object.</Abstract>
+		<Abstract>
+			This service provides management and control features supporting bulk data transfers which occur via a separate L2CAP connection oriented channel. The Client is enabled to create and delete objects and to execute an action using the currently selected object. The selected object can be written, updated or read via an Object Transfer Channel opened by the Client. The generation of a checksum covering a part or the whole of the object contents is included as an optional feature. This service provides a general method for a Client to select and initiate the transfer of any type of object.
+		</Abstract>
 		<Summary>.</Summary>
 	</InformativeText>
 	<Dependencies>
-		<Dependency>This service is not dependent upon any other services.</Dependency>
+		<Dependency>
+			This service is not dependent upon any other services.
+		</Dependency>
 	</Dependencies>
 	<GATTRequirements>
 		<Requirement subProcedure="Write Characteristic Value">Mandatory</Requirement>
@@ -18,8 +23,7 @@
 		<Requirement subProcedure="Write Long Characteristic Value">C2</Requirement>
 	</GATTRequirements>
 	<Note>
-		C1: Mandatory if the Server supports an Object Name characteristic value that may exceed (ATT_MTU-1) octets in length, where ATT_MTU is the default size for the transport being used; optional otherwise.
-		C2: Mandatory if the Server supports an Object Name characteristic value that may exceed (ATT_MTU-3) octets in length, where ATT_MTU is the default size for the transport being used, and the characteristic is writable; optional otherwise.
+		C1: Mandatory if the Server supports an Object Name characteristic value that may exceed (ATT_MTU-1) octets in length, where ATT_MTU is the default size for the transport being used; optional otherwise. C2: Mandatory if the Server supports an Object Name characteristic value that may exceed (ATT_MTU-3) octets in length, where ATT_MTU is the default size for the transport being used, and the characteristic is writable; optional otherwise.
 	</Note>
 	<Transports>
 		<Classic>true</Classic>
@@ -53,8 +57,7 @@
 		</Characteristic>
 		<Characteristic type="org.bluetooth.characteristic.object_name" name="Object Name">
 			<InformativeText>
-				C1:Mandatory if the Server is capable of storing more than one object within the context of this instance of the service; optional otherwise.
-				C3:Mandatory if the OACP Create op code is supported; optional otherwise.
+				C1:Mandatory if the Server is capable of storing more than one object within the context of this instance of the service; optional otherwise. C3:Mandatory if the OACP Create op code is supported; optional otherwise.
 			</InformativeText>
 			<Requirement>C1</Requirement>
 			<Properties>
@@ -151,7 +154,6 @@
 				<Security>Encryption is mandatory</Security>
 			</SecuritySettings>
 		</Characteristic>
-
 		<Characteristic type="org.bluetooth.characteristic.object_id" name="Object ID">
 			<InformativeText>
 				C1: Mandatory if the Server is capable of storing more than one object; excluded otherwise.
@@ -251,7 +253,6 @@
 				<Security>Encryption is mandatory</Security>
 			</SecuritySettings>
 		</Characteristic>
-
 		<Characteristic type="org.bluetooth.characteristic.object_changed" name="Object Changed">
 			<Requirement>Optional</Requirement>
 			<Properties>

@@ -1,6 +1,6 @@
-package com.siliconlabs.bledemo.advertiser.presenters
+package com.siliconlabs.bledemo.Advertiser.Presenters
 
-import com.siliconlabs.bledemo.advertiser.models.Advertiser
+import com.siliconlabs.bledemo.Advertiser.Models.Advertiser
 
 interface IAdvertiserActivityPresenter {
     fun populateAdvertiserAdapter()

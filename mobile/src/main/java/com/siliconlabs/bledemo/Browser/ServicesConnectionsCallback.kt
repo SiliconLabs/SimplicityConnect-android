@@ -1,9 +1,8 @@
-package com.siliconlabs.bledemo.browser
+package com.siliconlabs.bledemo.Browser
 
-import android.bluetooth.BluetoothDevice
-import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
 
 interface ServicesConnectionsCallback {
     fun onDisconnectClicked(deviceInfo: BluetoothDeviceInfo?)
-    fun onDeviceClicked(device: BluetoothDevice)
+    fun onDeviceClicked(device: BluetoothDeviceInfo?)
 }

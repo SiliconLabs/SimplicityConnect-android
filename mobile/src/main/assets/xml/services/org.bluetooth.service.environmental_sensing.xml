@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright 2014 Bluetooth SIG, Inc. All rights reserved. -->
 <Service xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/service.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    type="org.bluetooth.service.environmental_sensing" uuid="181A" name="Environmental Sensing" last-modified="2014-11-20" approved="Yes">
+type="org.bluetooth.service.environmental_sensing" uuid="181A" name="Environmental Sensing" last-modified="2014-11-20" approved="Yes">
     <InformativeText>
         <Abstract>This service exposes measurement data from an environmental sensor intended for sports and fitness applications. A wide range of environmental parameters is supported.</Abstract>
         <Summary>The Environmental Sensing Service (ESS) exposes measurement data from an environmental sensor intended for sports and fitness applications. A wide range of environmental parameters is supported.</Summary>
@@ -768,7 +768,7 @@
                 </Descriptor>
             </Descriptors>
         </Characteristic>
-
+        
         <Characteristic type="org.bluetooth.characteristic.true_wind_direction" name="True Wind Direction">
             <InformativeText>
                 C1:

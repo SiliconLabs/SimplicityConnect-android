@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.siliconlabs.bledemo">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -10,62 +9,44 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <!-- to enable release push -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
-
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
 
     <application
-        android:name=".application.SiliconLabsDemoApplication"
+        android:name=".Application.SiliconLabsDemoApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name_EFR_Connect"
         android:requestLegacyExternalStorage="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".gatt_configurator.activities.GattConfiguratorActivity"
-            android:label="@string/title_GATT_Configurator" />
-        <activity
-            android:name=".gatt_configurator.activities.GattServerActivity"
-            android:label="@string/title_new_GATT_Server" />
-        <activity
-            android:name=".advertiser.activities.AdvertiserConfigActivity"
+            android:name=".Advertiser.Activities.AdvertiserConfigActivity"
             android:label="@string/title_Advertiser" />
         <activity
-            android:name=".advertiser.activities.AdvertiserActivity"
+            android:name=".Advertiser.Activities.AdvertiserActivity"
             android:label="@string/title_Advertiser" />
         <activity
-            android:name=".browser.activities.MappingDictionaryActivity"
+            android:name=".Browser.Activities.MappingDictionaryActivity"
             android:label="@string/title_Mappings_dictionary" />
         <activity
-            android:name=".health_thermometer.activities.HealthThermometerActivity"
+            android:name=".HealthThermometer.Activities.HealthThermometerActivity"
             android:label="@string/title_Health_Thermometer"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".blinky.activities.BlinkyActivity"
-            android:label="@string/title_Blinky"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".connected_lighting.activities.ConnectedLightingActivity"
+            android:name=".ConnectedLighting.Activities.ConnectedLightingActivity"
             android:label="@string/title_Connected_Lighting"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".range_test.activities.RangeTestActivity"
+            android:name=".RangeTest.Activities.RangeTestActivity"
             android:label="@string/title_Range_Test"
             android:screenOrientation="portrait" />
 
-        <activity
-            android:name=".throughput.activities.ThroughputActivity"
-            android:label="@string/title_Throughput"
-            android:screenOrientation="portrait" />
+        <service android:name=".Bluetooth.BLE.BlueToothService" />
+        <service android:name=".Advertiser.Services.AdvertiserService" />
 
-        <service android:name=".bluetooth.services.BluetoothService" />
-        <service android:name=".advertiser.services.AdvertiserService" />
-
-        <receiver android:name=".bluetooth.services.BluetoothService$Receiver">
+        <receiver android:name=".Bluetooth.BLE.BlueToothService$Receiver">
             <intent-filter>
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
                 <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED" />
@@ -73,7 +54,7 @@
         </receiver>
 
         <activity
-            android:name=".main_menu.activities.MainMenuActivity"
+            android:name=".MainMenu.Activities.MainMenuActivity"
             android:label="@string/app_name_EFR_Connect"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
@@ -85,37 +66,21 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".bluetooth.services.BluetoothLeService" />
-        <service android:name=".browser.services.ShareLogServices" />
+        <service android:name=".Bluetooth.Services.BluetoothLeService" />
+        <service android:name=".Browser.Services.ShareLogServices" />
 
         <activity
-            android:name=".browser.activities.BrowserActivity"
+            android:name=".Browser.Activities.BrowserActivity"
             android:label="@string/title_Browser"
-            android:parentActivityName=".main_menu.activities.MainMenuActivity"
+            android:parentActivityName=".MainMenu.Activities.MainMenuActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".browser.activities.DeviceServicesActivity"
+            android:name=".Browser.Activities.DeviceServicesActivity"
             android:label="@string/title_Browser"
-            android:parentActivityName=".browser.activities.BrowserActivity"
+            android:parentActivityName=".Browser.Activities.BrowserActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-        <activity
-            android:name=".iop_test.activities.IOPTestActivity"
-            android:label="@string/title_Interoperability_Test"
-            android:parentActivityName=".iop_test.activities.IOPTestActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.siliconlabs.bledemo.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
-        </provider>
         <!--
  ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.

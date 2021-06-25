@@ -14,7 +14,7 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.browser.activities
+package com.siliconlabs.bledemo.Browser.Activities
 
 import android.Manifest
 import android.animation.AnimatorSet
@@ -28,12 +28,12 @@ import android.bluetooth.le.ScanResult
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
 import android.provider.OpenableColumns
-import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
 import android.util.TypedValue
@@ -43,51 +43,60 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.webkit.WebView
 import android.widget.*
+import androidx.annotation.UiThread
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.ViewCompat
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.google.android.gms.appindexing.Action
 import com.google.android.gms.appindexing.AppIndex
 import com.google.android.gms.appindexing.Thing
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.siliconlabs.bledemo.Base.BaseActivity
+import com.siliconlabs.bledemo.Bluetooth.BLE.BlueToothService
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
+import com.siliconlabs.bledemo.Bluetooth.Parsing.Common
+import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine
+import com.siliconlabs.bledemo.Browser.Adapters.ConnectionsAdapter
+import com.siliconlabs.bledemo.Browser.Adapters.LogAdapter
+import com.siliconlabs.bledemo.Browser.Dialogs.ErrorDialog
+import com.siliconlabs.bledemo.Browser.Dialogs.ErrorDialog.OtaErrorCallback
+import com.siliconlabs.bledemo.Browser.Dialogs.MappingsEditDialog
+import com.siliconlabs.bledemo.Browser.Dialogs.UnbondDeviceDialog
+import com.siliconlabs.bledemo.Browser.Fragments.ConnectionsFragment
+import com.siliconlabs.bledemo.Browser.Fragments.FragmentCharacteristicDetail
+import com.siliconlabs.bledemo.Browser.Fragments.LoggerFragment
+import com.siliconlabs.bledemo.Browser.MappingCallback
+import com.siliconlabs.bledemo.Browser.Models.Logs.TimeoutLog
+import com.siliconlabs.bledemo.Browser.Models.Mapping
+import com.siliconlabs.bledemo.Browser.Models.MappingType
+import com.siliconlabs.bledemo.Browser.Models.OtaFileType
+import com.siliconlabs.bledemo.Browser.Models.ToolbarName
+import com.siliconlabs.bledemo.Browser.ServicesConnectionsCallback
+import com.siliconlabs.bledemo.Browser.ToolbarCallback
+import com.siliconlabs.bledemo.Bluetooth.Parsing.DescriptorParser
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.base.BaseActivity
-import com.siliconlabs.bledemo.bluetooth.ConnectedGatts
-import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
-import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes
-import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
-import com.siliconlabs.bledemo.browser.MessageQueue
-import com.siliconlabs.bledemo.browser.ServicesConnectionsCallback
-import com.siliconlabs.bledemo.browser.ToolbarCallback
-import com.siliconlabs.bledemo.browser.adapters.ConnectionsAdapter
-import com.siliconlabs.bledemo.browser.adapters.LogAdapter
-import com.siliconlabs.bledemo.browser.dialogs.ErrorDialog
-import com.siliconlabs.bledemo.browser.dialogs.ErrorDialog.OtaErrorCallback
-import com.siliconlabs.bledemo.browser.dialogs.UnbondDeviceDialog
-import com.siliconlabs.bledemo.browser.fragments.*
-import com.siliconlabs.bledemo.browser.models.OtaFileType
-import com.siliconlabs.bledemo.browser.models.ToolbarName
-import com.siliconlabs.bledemo.browser.models.logs.CommonLog
-import com.siliconlabs.bledemo.browser.models.logs.ServicesDiscoveredLog
-import com.siliconlabs.bledemo.browser.models.logs.TimeoutLog
-import com.siliconlabs.bledemo.utils.*
+import com.siliconlabs.bledemo.Utils.*
+import com.siliconlabs.bledemo.Utils.BLEUtils.Notifications
+import com.siliconlabs.bledemo.Views.ServiceItemContainer
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_device_services.*
 import kotlinx.android.synthetic.main.toolbar_device_services.*
 import java.io.*
 import java.lang.reflect.Method
 import java.util.*
+import kotlin.collections.HashMap
 
 class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
 
     private lateinit var handler: Handler
     private lateinit var connectionsAdapter: ConnectionsAdapter
+    private lateinit var sharedPrefUtils: SharedPrefUtils
 
+    private var currentWriteReadFragment: FragmentCharacteristicDetail? = null
     private lateinit var connectionsFragment: ConnectionsFragment
     private lateinit var loggerFragment: LoggerFragment
 
@@ -96,7 +105,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
     private var boolOTAbegin = false
     private var connected = false
     private var boolOTAdata = false
-    var UICreated = false
+    private var UICreated = false
     private var discoverTimeout = true
     private var ota_mode = false
     private var boolrequest_mtu = false
@@ -122,6 +131,12 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
     private var otafile: ByteArray? = null
     private val delayToConnect: Long = 0
     private var onScanCallback = 0
+    private var generatedId = 10000
+
+    private lateinit var characteristicNamesMap: HashMap<String, Mapping>
+    private lateinit var serviceNamesMap: HashMap<String, Mapping>
+    private val characteristicFragments = HashMap<Int, FragmentCharacteristicDetail?>()
+    private val descriptorsMap = HashMap<BluetoothGattDescriptor, View>()
 
     // OTA progress
     private var otaProgress: Dialog? = null
@@ -166,11 +181,11 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
     private val DFU_OTA_UPLOAD = Runnable { dfuMode("OTAUPLOAD") }
     private val WRITE_OTA_CONTROL_ZERO = Runnable { writeOtaControl(0x00.toByte()) }
 
-    private var bluetoothBinding: BluetoothService.Binding? = null
-    var bluetoothService: BluetoothService? = null
-        private set
+    private var bluetoothBinding: BlueToothService.Binding? = null
+    private var service: BlueToothService? = null
 
     private var kit_descriptor: BluetoothGattDescriptor? = null
+    private var serviceItemContainers: MutableMap<String, ServiceItemContainer>? = null
     private var btToolbarOpenedName: ToolbarName? = null
     private var deviceAddress: String? = null
     private var bluetoothDevice: BluetoothDevice? = null
@@ -179,10 +194,6 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
     var bluetoothGatt: BluetoothGatt? = null
 
     private var retryAttempts = 0
-
-    private val remoteServicesFragment = RemoteServicesFragment()
-    private val localServicesFragment = LocalServicesFragment()
-    private var activeFragment: Fragment = remoteServicesFragment
 
     private var bondMenuItem: MenuItem? = null
     private val bondStateChangeListener = object : BroadcastReceiver() {
@@ -224,22 +235,8 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         }
     }
 
-    private val bluetoothReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val action = intent.action
-            if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
-                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
-                when (state) {
-                    BluetoothAdapter.STATE_OFF -> finish()
-                }
-            }
-        }
-    }
-
     private val gattCallback: TimeoutGattCallback = object : TimeoutGattCallback() {
         override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {
-            Constants.LOGS.add(CommonLog("onReadRemoteRssi, " + "device: " + gatt.device.address + ", status: " + status + ", rssi: " + rssi, gatt.device.address))
-
             if (!otaMode) {
                 super.onReadRemoteRssi(gatt, rssi, status)
                 runOnUiThread {
@@ -256,8 +253,6 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         }
 
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
-            Constants.LOGS.add(CommonLog("onMtuChanged, " + "device: " + gatt.device.address + ", status: " + status + ", mtu: " + mtu, gatt.device.address))
-
             Log.d("onMtuChanged", "MTU: $mtu - status: $status")
             if (status == 0) { //NO ERRORS
                 MTU = mtu
@@ -281,11 +276,6 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
 
         //CALLBACK ON CONNECTION STATUS CHANGES
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            if (newState == BluetoothProfile.STATE_DISCONNECTED && status != 0 && !otaMode) {
-                val deviceName = if (TextUtils.isEmpty(gatt.device.name)) getString(R.string.not_advertising_shortcut) else gatt.device.name
-                MessageQueue.add(ErrorCodes.getDeviceDisconnectedMessage(deviceName, status), Toast.LENGTH_LONG)
-            }
-
             updateCountOfConnectedDevices()
             if (bluetoothGatt != null) {
                 if (bluetoothGatt?.device?.address != gatt.device.address) {
@@ -371,21 +361,11 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         }
 
         //CALLBACK ON CHARACTERISTIC READ
-        override fun onCharacteristicRead(
-            gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic,
-            status: Int
-        ) {
-            remoteServicesFragment.updateCurrentCharacteristicView(characteristic.uuid)
+        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+            currentWriteReadFragment?.onActionDataAvailable(characteristic.uuid.toString())
 
-            Log.i(
-                "Callback",
-                "OnCharacteristicRead: " + Converters.bytesToHexWhitespaceDelimited(characteristic.value) + " Status: " + status
-            )
-            val otaControlCharacteristic = bluetoothGatt
-                ?.getService(UuidConsts.OTA_SERVICE)
-                ?.getCharacteristic(UuidConsts.OTA_CONTROL)
-            if (characteristic === otaControlCharacteristic) {
+            Log.i("Callback", "OnCharacteristicRead: " + Converters.bytesToHexWhitespaceDelimited(characteristic.value) + " Status: " + status)
+            if (characteristic === (bluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_control))) {
                 val value = characteristic.value
                 if (value[2] == 0x05.toByte()) {
                     Log.d("homekit_descriptor", "Insecure Connection")
@@ -413,19 +393,10 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         }
 
         //CALLBACK ON CHARACTERISTIC WRITE (PROPERTY: WHITE)
-        override fun onCharacteristicWrite(
-            gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic,
-            status: Int
-        ) {
-            remoteServicesFragment.updateCurrentCharacteristicView(characteristic.uuid, status)
+        override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+            currentWriteReadFragment?.onActionDataWrite(characteristic.uuid.toString(), status)
 
-            if (characteristic.value.size < 10) Log.d(
-                "OnCharacteristicRead",
-                "Char: " + characteristic.uuid.toString() + " Value: " + Converters.bytesToHexWhitespaceDelimited(
-                    characteristic.value
-                ) + " Status: " + status
-            )
+            if (characteristic.value.size < 10) Log.d("OnCharacteristicRead", "Char: " + characteristic.uuid.toString() + " Value: " + Converters.bytesToHexWhitespaceDelimited(characteristic.value) + " Status: " + status)
             if (status != 0) { // Error Handling
                 Log.d("onCharWrite", "status: " + Integer.toHexString(status))
                 if (errorDialog == null) {
@@ -439,13 +410,10 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                     }
                 }
             } else {
-                if ((characteristic.uuid == UuidConsts.OTA_CONTROL)) { //OTA Control Callback Handling
+                if ((characteristic.uuid == ota_control)) { //OTA Control Callback Handling
                     if (characteristic.value.size == 1) {
                         if (characteristic.value[0] == 0x00.toByte()) {
-                            Log.d(
-                                "Callback",
-                                "Control " + Converters.bytesToHexWhitespaceDelimited(characteristic.value) + "status: " + status
-                            )
+                            Log.d("Callback", "Control " + Converters.bytesToHexWhitespaceDelimited(characteristic.value) + "status: " + status)
                             if (ota_mode && ota_process) {
                                 Log.d("OTAUPLOAD", "Sent")
                                 runOnUiThread(checkbeginrunnable)
@@ -463,19 +431,9 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                         }
                         if (characteristic.value[0] == 0x03.toByte()) {
                             if (ota_process) {
-                                Log.d(
-                                    "Callback",
-                                    "Control " + Converters.bytesToHexWhitespaceDelimited(
-                                        characteristic.value
-                                    ) + "status: " + status
-                                )
+                                Log.d("Callback", "Control " + Converters.bytesToHexWhitespaceDelimited(characteristic.value) + "status: " + status)
                                 runOnUiThread {
-                                    OTAStart?.setBackgroundColor(
-                                        ContextCompat.getColor(
-                                            this@DeviceServicesActivity,
-                                            R.color.silabs_red
-                                        )
-                                    )
+                                    OTAStart?.setBackgroundColor(ContextCompat.getColor(this@DeviceServicesActivity, R.color.silabs_red))
                                     OTAStart?.isClickable = true
                                 }
                                 boolOTAbegin = false
@@ -492,17 +450,14 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                             }
                         }
                     } else {
-                        Log.i(
-                            "OTA_Control",
-                            "Received: " + Converters.bytesToHexWhitespaceDelimited(characteristic.value)
-                        )
+                        Log.i("OTA_Control", "Received: " + Converters.bytesToHexWhitespaceDelimited(characteristic.value))
                         if (characteristic.value[0] == 0x00.toByte() && characteristic.value[1] == 0x02.toByte()) {
                             Log.i("HomeKit", "Reading OTA_Control...")
                             bluetoothGatt?.readCharacteristic(characteristic)
                         }
                     }
                 }
-                if ((characteristic.uuid == UuidConsts.OTA_DATA)) {   //OTA Data Callback Handling
+                if ((characteristic.uuid == ota_data)) {   //OTA Data Callback Handling
                     if (reliable) {
                         if (otaProgress?.isShowing!!) {
                             pack += mtuDivisible
@@ -527,22 +482,16 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
             bluetoothGatt?.readCharacteristic(characteristic)
         }
 
-        override fun onReliableWriteCompleted(gatt: BluetoothGatt, status: Int) {
-            Constants.LOGS.add(CommonLog("onReliableWriteCompleted, " + "device: " + gatt.device.address + ", status: " + status, gatt.device.address))
-        }
-
         //CALLBACK ON DESCRIPTOR WRITE
         override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
-            Constants.LOGS.add(CommonLog("onDescriptorWrite, " + "device: " + gatt.device.address + ", status: " + status, gatt.device.address))
-
             runOnUiThread {
-                remoteServicesFragment.updateDescriptorView(descriptor)
+                updateDescriptorView(descriptor)
             }
         }
 
         //CALLBACK ON DESCRIPTOR READ
         override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
-            if ((descriptor.uuid.toString() == UuidConsts.HOMEKIT_DESCRIPTOR.toString())) {
+            if ((descriptor.uuid.toString() == homekit_descriptor.toString())) {
                 val value = ByteArray(2)
                 value[0] = 0xF2.toByte()
                 value[1] = 0xFF.toByte()
@@ -552,98 +501,114 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                 }
             } else {
                 runOnUiThread {
-                    remoteServicesFragment.updateDescriptorView(descriptor)
+                    updateDescriptorView(descriptor)
                 }
+            }
+        }
+
+        @UiThread
+        private fun updateDescriptorView(descriptor: BluetoothGattDescriptor) {
+            val view = descriptorsMap[descriptor]
+            view?.let {
+                val valueLL = view.findViewById(R.id.ll_value) as LinearLayout
+                val valueTV = view.findViewById(R.id.tv_value) as TextView
+
+                valueLL.visibility = View.VISIBLE
+                valueTV.text = DescriptorParser(descriptor).getFormattedValue()
             }
         }
 
         //CALLBACK ON CHARACTERISTIC CHANGED VALUE (READ - CHARACTERISTIC NOTIFICATION)
         override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
-            remoteServicesFragment.updateCharacteristicView(characteristic)
+            for (key: Int in characteristicFragments.keys) {
+                val fragment = characteristicFragments[key]
+                if (fragment != null && (fragment.mBluetoothCharact?.uuid == characteristic.uuid)) {
+                    fragment.onActionDataAvailable(characteristic.uuid.toString())
+                    break
+                }
+            }
         }
 
         //CALLBACK ON SERVICES DISCOVERED
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             super.onServicesDiscovered(gatt, status)
-            Constants.LOGS.add(ServicesDiscoveredLog(gatt, status))
-
-            bluetoothGatt = gatt
-            discoverTimeout = false
-            /**ERROR IN SERVICE DISCOVERY */
-            if (status != 0) {
-                Log.d("Error status", "" + Integer.toHexString(status))
-                if (errorDialog == null) {
-                    runOnUiThread {
-                        errorDialog = ErrorDialog(status, object : OtaErrorCallback {
-                            override fun onDismiss() {
-                                exit(bluetoothGatt)
-                            }
-                        })
-                        errorDialog?.show(supportFragmentManager, "ota_error_dialog")
-                    }
-                }
+            if (bluetoothGatt != gatt) {
+                bluetoothGatt = gatt
+                refreshServices()
             } else {
-                /**ON SERVICE DISCOVERY WITHOUT ERROR */
-                getServicesInfo(gatt) //SHOW SERVICES IN LOG
-
-                //REFRESH SERVICES UI <- REFRESH SERVICES MENU BUTTON
-                if (boolrefresh_services) {
-                    boolrefresh_services = false
-                    handler.postDelayed({
+                discoverTimeout = false
+                /**ERROR IN SERVICE DISCOVERY */
+                if (status != 0) {
+                    Log.d("Error status", "" + Integer.toHexString(status))
+                    if (errorDialog == null) {
                         runOnUiThread {
-                            onGattFetched()
-                            hideCharacteristicLoadingAnimation()
-                        }
-                    }, GATT_FETCH_ON_SERVICE_DISCOVERED_DELAY.toLong())
-                } else {
-                    //DEFINE IF DEVICE SUPPORT OTA & MODE (NORMAL/DFU)
-                    val otaServiceCheck = gatt.getService(UuidConsts.OTA_SERVICE) != null
-                    if (otaServiceCheck) {
-                        val otaDataCheck = gatt.getService(UuidConsts.OTA_SERVICE).getCharacteristic(
-                            UuidConsts.OTA_DATA
-                        ) != null
-                        if (otaDataCheck) {
-                            val homekitCheck = gatt.getService(UuidConsts.HOMEKIT_SERVICE) != null
-                            if (!homekitCheck) {
-                                ota_mode = true
-                                val otaDataProperty = gatt.getService(UuidConsts.OTA_SERVICE).getCharacteristic(
-                                    UuidConsts.OTA_DATA
-                                ).properties
-                                if ((otaDataProperty == 12) || (otaDataProperty == 8) || (otaDataProperty == 10)) {
-                                    //reliable = true;
-                                } else if (ota_mode && otaDataProperty == 4) {
-                                    //reliable = false;
+                            errorDialog = ErrorDialog(status, object : OtaErrorCallback {
+                                override fun onDismiss() {
+                                    exit(bluetoothGatt)
                                 }
-                            }
-                        } else {
-                            if (boolOTAbegin) onceAgain()
+                            })
+                            errorDialog?.show(supportFragmentManager, "ota_error_dialog")
                         }
                     }
+                } else {
+                    /**ON SERVICE DISCOVERY WITHOUT ERROR */
+                    getServicesInfo(gatt) //SHOW SERVICES IN LOG
 
-                    //REQUEST MTU
-                    if (UICreated && loadingdialog?.isShowing!!) {
-                        bluetoothGatt?.requestMtu(MTU)
-                    }
-
-                    //LAUNCH SERVICES UI
-                    if (!boolFullOTA) {
+                    //REFRESH SERVICES UI <- REFRESH SERVICES MENU BUTTON
+                    if (boolrefresh_services) {
+                        boolrefresh_services = false
                         handler.postDelayed({
                             runOnUiThread {
                                 onGattFetched()
                                 hideCharacteristicLoadingAnimation()
                             }
                         }, GATT_FETCH_ON_SERVICE_DISCOVERED_DELAY.toLong())
-                    }
-
-                    //IF DFU_MODE, LAUNCH OTA SETUP AUTOMATICALLY
-                    if (ota_mode && boolOTAbegin) {
-                        handler.postDelayed({
-                            runOnUiThread {
-                                loadingimage?.visibility = View.GONE
-                                loadingdialog?.dismiss()
-                                showOtaProgress()
+                    } else {
+                        //DEFINE IF DEVICE SUPPORT OTA & MODE (NORMAL/DFU)
+                        val otaServiceCheck = gatt.getService(ota_service) != null
+                        if (otaServiceCheck) {
+                            val otaDataCheck = gatt.getService(ota_service).getCharacteristic(ota_data) != null
+                            if (otaDataCheck) {
+                                val homekitCheck = gatt.getService(homekit_service) != null
+                                if (!homekitCheck) {
+                                    ota_mode = true
+                                    val otaDataProperty = gatt.getService(ota_service).getCharacteristic(ota_data).properties
+                                    if ((otaDataProperty == 12) || (otaDataProperty == 8) || (otaDataProperty == 10)) {
+                                        //reliable = true;
+                                    } else if (ota_mode && otaDataProperty == 4) {
+                                        //reliable = false;
+                                    }
+                                }
+                            } else {
+                                if (boolOTAbegin) onceAgain()
                             }
-                        }, (2.5 * UI_CREATION_DELAY).toLong())
+                        }
+
+                        //REQUEST MTU
+                        if (UICreated && loadingdialog?.isShowing!!) {
+                            bluetoothGatt?.requestMtu(MTU)
+                        }
+
+                        //LAUNCH SERVICES UI
+                        if (!boolFullOTA) {
+                            handler.postDelayed({
+                                runOnUiThread {
+                                    onGattFetched()
+                                    hideCharacteristicLoadingAnimation()
+                                }
+                            }, GATT_FETCH_ON_SERVICE_DISCOVERED_DELAY.toLong())
+                        }
+
+                        //IF DFU_MODE, LAUNCH OTA SETUP AUTOMATICALLY
+                        if (ota_mode && boolOTAbegin) {
+                            handler.postDelayed({
+                                runOnUiThread {
+                                    loadingimage?.visibility = View.GONE
+                                    loadingdialog?.dismiss()
+                                    showOtaProgress()
+                                }
+                            }, (2.5 * UI_CREATION_DELAY).toLong())
+                        }
                     }
                 }
             }
@@ -659,13 +624,15 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_services)
 
-        setupBottomNavigation()
-
-        registerReceivers()
         handler = Handler()
+        sharedPrefUtils = SharedPrefUtils(this@DeviceServicesActivity)
+        characteristicNamesMap = sharedPrefUtils.characteristicNamesMap
+        serviceNamesMap = sharedPrefUtils.serviceNamesMap
 
         setSupportActionBar(toolbar)
         findViewById<View>(R.id.iv_go_back).setOnClickListener { onBackPressed() }
+
+        registerReceiver(bondStateChangeListener, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
 
         if (!resources.getBoolean(R.bool.isTablet)) {
             tv_rssi.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -686,10 +653,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                 onScanCallback = 0
             }
         }
-
-        getDeviceAddress(savedInstanceState)?.let { address ->
-            initDevice(address)
-        }
+        initDevice(getDeviceAddress(savedInstanceState))
 
         client = GoogleApiClient.Builder(this).addApi(AppIndex.API).build()
         fragmentsInit()
@@ -743,45 +707,6 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         closeToolbar()
     }
 
-    private fun setupBottomNavigation() {
-        supportFragmentManager.beginTransaction()
-            .add(R.id.services_fragment_container, localServicesFragment)
-            .hide(localServicesFragment)
-            .add(R.id.services_fragment_container, remoteServicesFragment)
-            .commit()
-
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.services_bottom_nav)
-        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.services_nav_remote -> remoteServicesFragment.let { newFragment ->
-                    supportFragmentManager.beginTransaction()
-                        .hide(activeFragment)
-                        .show(newFragment)
-                        .commit()
-                    activeFragment = newFragment
-                    true
-                }
-                R.id.services_nav_local -> localServicesFragment.let { newFragment ->
-                    supportFragmentManager.beginTransaction()
-                        .hide(activeFragment)
-                        .show(newFragment)
-                        .commit()
-                    activeFragment = newFragment
-                    true
-                }
-                else -> false
-            }
-        }
-    }
-
-    private fun registerReceivers() {
-        registerReceiver(bluetoothReceiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
-        registerReceiver(
-            bondStateChangeListener,
-            IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
-        )
-    }
-
     private fun getDeviceAddress(savedInstanceState: Bundle?): String? {
         val deviceAddress: String? = if (savedInstanceState == null) {
             intent.extras?.getString("DEVICE_SELECTED_ADDRESS")
@@ -799,19 +724,18 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
 
     override fun onResume() {
         super.onResume()
-
-        bluetoothService?.apply {
-            registerGattCallback(gattCallback)
-            if (!isGattConnected()) {
-                showMessage(R.string.toast_debug_connection_failed)
-                finish()
+        if ((serviceHasBeenSet && service == null) || (service != null && !service?.isGattConnected!!)) {
+            showMessage(R.string.toast_debug_connection_failed)
+            if (bluetoothGatt != null) if (service != null) {
+                service?.clearGatt()
             }
         }
     }
 
     override fun onPause() {
         super.onPause()
-        bluetoothService?.unregisterGattCallback()
+        sharedPrefUtils.saveCharacteristicNamesMap(characteristicNamesMap)
+        sharedPrefUtils.saveServiceNamesMap(serviceNamesMap)
     }
 
     override fun onDestroy() {
@@ -820,13 +744,8 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         otaProgress?.dismiss()
         loadingdialog?.dismiss()
 
-        unregisterReceivers()
-        bluetoothBinding?.unbind()
-    }
-
-    private fun unregisterReceivers() {
-        unregisterReceiver(bluetoothReceiver)
         unregisterReceiver(bondStateChangeListener)
+        bluetoothBinding?.unbind()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -879,17 +798,15 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                 val dialog = UnbondDeviceDialog(object : UnbondDeviceDialog.Callback {
                     override fun onOkClicked() {
                         try {
-                            startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
-                        } catch (e: ActivityNotFoundException) {
-                        }
+                            startActivity(Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
+                        } catch (e: ActivityNotFoundException) { }
                     }
                 })
                 dialog.show(supportFragmentManager, "dialog_unbond_device")
             } else {
                 try {
                     startActivity(Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
-                } catch (e: ActivityNotFoundException) {
-                }
+                } catch (e: ActivityNotFoundException) { }
             }
         }
     }
@@ -973,10 +890,447 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         if (bluetoothGatt != null && bluetoothGatt?.device != null) {
             refreshDeviceCache()
             bluetoothGatt?.discoverServices()
-        } else if (bluetoothService != null && bluetoothService?.connectedGatt != null) {
+        } else if (service != null && service?.connectedGatt != null) {
             refreshDeviceCache()
-            bluetoothService?.connectedGatt?.discoverServices()
+            service?.connectedGatt?.discoverServices()
         }
+    }
+
+    /**
+     * INITIATES SERVICES VIEWS
+     */
+    private fun initServicesViews() {
+        serviceItemContainers = HashMap()
+        // iterate through all of the services for the device, inflate and add views to the scrollview
+        val services = bluetoothGatt?.services as ArrayList<BluetoothGattService> //service.getConnectedGatt().getServices();
+        for (position in services.indices) {
+            val serviceItemContainer = ServiceItemContainer(this@DeviceServicesActivity)
+
+            // get information about service at index 'position'
+            val uuid = services[position].uuid
+            val service = Engine.instance?.getService(uuid)
+            var serviceName = Common.getServiceName(uuid, applicationContext)
+            val serviceUuid = Common.getUuidText(uuid)
+            serviceName = Common.checkOTAService(serviceUuid, serviceName)
+
+            // initialize information about services in service item container
+            initServiceItemContainer(serviceItemContainer, position, serviceName, serviceUuid)
+
+            // initialize views for each characteristic of the service, put into characteristics expansion for service's list item
+            val blueToothGattService = if (service == null) services[position] else bluetoothGatt?.getService(service.uuid)
+            val characteristics = blueToothGattService?.characteristics
+            if (characteristics?.size == 0) {
+                serviceItemContainer.cvServiceInfo.setBackgroundColor(Color.LTGRAY)
+                continue
+            }
+            // iterate through the characteristics of this service
+            for (bluetoothGattCharacteristic: BluetoothGattCharacteristic in characteristics!!) {
+                // retrieve relevant bluetooth data for characteristic of service
+                // the engine parses through the data of the btgattcharac and returns a wrapper characteristic
+                // the wrapper characteristic is matched with accepted bt gatt profiles, provides field types/values/units
+                val charact = Engine.instance?.getCharacteristic(bluetoothGattCharacteristic.uuid)
+                var characteristicName: String
+                characteristicName = charact?.name?.trim { it <= ' ' }
+                        ?: getOtaSpecificCharacteristicName(bluetoothGattCharacteristic.uuid.toString())
+                val characteristicUuid = (if (charact != null) Common.getUuidText(charact.uuid!!) else Common.getUuidText(bluetoothGattCharacteristic.uuid))
+
+                if ((characteristicUuid == ota_control.toString())) characteristicName = "OTA Control"
+                if ((characteristicUuid == ota_data.toString())) characteristicName = "OTA Data"
+                if ((characteristicUuid == fw_version.toString())) characteristicName = "FW Version"
+                if ((characteristicUuid == ota_version.toString())) characteristicName = "OTA Version"
+
+                // inflate/create ui elements
+                val characteristicContainer = View.inflate(this, R.layout.list_item_debug_mode_characteristic_of_service, null) as LinearLayout
+                val characteristicExpansion = characteristicContainer.findViewById<LinearLayout>(R.id.characteristic_expansion)
+                val propsContainer = characteristicContainer.findViewById<LinearLayout>(R.id.characteristic_props_container)
+                val characteristicNameTextView = characteristicContainer.findViewById<TextView>(R.id.characteristic_title)
+                val characteristicUuidTextView = characteristicContainer.findViewById<TextView>(R.id.characteristic_uuid)
+                val descriptorsLabelTextView = characteristicContainer.findViewById<TextView>(R.id.text_view_descriptors_label)
+                val descriptorLinearLayout = characteristicContainer.findViewById<LinearLayout>(R.id.linear_layout_descriptor)
+                val characteristicEditNameImageView = characteristicContainer.findViewById<ImageView>(R.id.image_view_edit_charac_name)
+                val characEditNameLinearLayout = characteristicContainer.findViewById<LinearLayout>(R.id.linear_layout_edit_charac_name)
+                val characteristicSeparator = characteristicContainer.findViewById<View>(R.id.characteristics_separator)
+                val id = generateNextId()
+                characteristicExpansion.id = id
+                loadCharacteristicDescriptors(bluetoothGattCharacteristic, descriptorsLabelTextView, descriptorLinearLayout)
+
+                // init/populate ui elements with info from bluetooth data for characteristic of service
+                characteristicNameTextView.text = characteristicName
+                if ((characteristicName == getString(R.string.unknown_characteristic_label))) {
+                    characteristicEditNameImageView.visibility = View.VISIBLE
+                    characEditNameLinearLayout.setOnClickListener {
+                        val dialog: DialogFragment = MappingsEditDialog(characteristicNameTextView.text.toString(),
+                                characteristicUuid,
+                                object : MappingCallback {
+                                    override fun onNameChanged(mapping: Mapping) {
+                                        characteristicNameTextView.text = mapping.name
+                                        characteristicNamesMap[mapping.uuid] = mapping
+                                    }
+                                }, MappingType.CHARACTERISTIC)
+                        dialog.show(supportFragmentManager, "dialog_mappings_edit")
+                    }
+                    if (characteristicNamesMap.containsKey(characteristicUuid)) {
+                        characteristicNameTextView.text = characteristicNamesMap[characteristicUuid]?.name
+                    }
+                }
+                characteristicUuidTextView.text = characteristicUuid
+
+                // hide divider between characteristics if last characteristic of service
+                if (serviceItemContainer.llGroupOfCharacteristicsForService.childCount == characteristics.size - 1) {
+                    characteristicSeparator.visibility = View.GONE
+                    serviceItemContainer.llLastItemDivider.visibility = View.VISIBLE
+                }
+                serviceItemContainer.llGroupOfCharacteristicsForService.addView(characteristicContainer)
+                val finalServiceName = serviceName
+
+                // add properties to characteristic list item in expansion
+                addPropertiesToCharacteristic(bluetoothGattCharacteristic, propsContainer)
+                setPropertyClickListeners(propsContainer, bluetoothGattCharacteristic, blueToothGattService, finalServiceName, characteristicExpansion)
+                serviceItemContainer.setCharacteristicNotificationState(characteristicUuid, Notifications.DISABLED)
+                characteristicContainer.setOnClickListener {
+                    if (characteristicExpansion.visibility == View.VISIBLE) {
+                        characteristicExpansion.visibility = View.GONE
+                    } else {
+                        characteristicExpansion.visibility = View.VISIBLE
+                        if (characteristicFragments.containsKey(id)) {
+                            currentWriteReadFragment = characteristicFragments[id]
+                        } else {
+                            currentWriteReadFragment = initFragmentCharacteristicDetail(bluetoothGattCharacteristic, id, blueToothGattService, characteristicExpansion, false)
+                            characteristicFragments[id] = currentWriteReadFragment
+                        }
+                    }
+                }
+            }
+
+            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            val margin16Dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, resources.displayMetrics).toInt()
+            val margin10Dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
+
+            when (position) {
+                0 -> params.setMargins(margin16Dp, margin16Dp, margin16Dp, margin10Dp)
+                services.size - 1 -> params.setMargins(margin16Dp, margin10Dp, margin16Dp, margin16Dp)
+                else -> params.setMargins(margin16Dp, margin10Dp, margin16Dp, margin10Dp)
+            }
+            serviceItemContainer.cvServiceInfo.layoutParams = params
+            services_container.addView(serviceItemContainer, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            serviceItemContainers!![serviceName] = serviceItemContainer
+        }
+    }
+
+    private fun loadCharacteristicDescriptors(bluetoothGattCharacteristic: BluetoothGattCharacteristic, descriptorsLabelTextView: TextView, descriptorLinearLayout: LinearLayout) {
+        if (bluetoothGattCharacteristic.descriptors.size <= 0) {
+            descriptorsLabelTextView.visibility = View.GONE
+        } else {
+            for (bgd: BluetoothGattDescriptor in bluetoothGattCharacteristic.descriptors) {
+                val descriptor = Engine.instance?.getDescriptorByUUID(bgd.uuid)
+                val view = View.inflate(this, R.layout.descriptor_view, null)
+
+                val nameTV = view.findViewById<TextView>(R.id.tv_name)
+                nameTV.text = if (descriptor != null) descriptor.name else "Unknown"
+
+                val uuidTV = view.findViewById<TextView>(R.id.tv_uuid)
+                uuidTV.text = if (descriptor != null) Common.getUuidText(descriptor.uuid!!) else "Unknown"
+
+                val readIV = view.findViewById<ImageView>(R.id.iv_read)
+                view.setOnClickListener {
+                    readIV.startAnimation(AnimationUtils.loadAnimation(this@DeviceServicesActivity, R.anim.property_image_click))
+                    bluetoothGatt?.readDescriptor(bgd)
+                }
+
+                descriptorLinearLayout.addView(view)
+                descriptorsMap[bgd] = view
+            }
+        }
+    }
+
+    // This is used to refresh from FragmentCharacteristicDetail after a write
+    // refactor into a callback / a more comprehensive mechanism needed
+    private var btnCaretPressed: Button? = null
+    fun refreshCharacteristicExpansion() {
+        btnCaretPressed?.performClick()
+    }
+
+    /**
+     * INITIATES SERVICES ITENS
+     */
+    private fun initServiceItemContainer(serviceItemContainer: ServiceItemContainer, position: Int, serviceName: String, serviceUuid: String) {
+        if (position == 0) {
+            UICreated = true
+            Constants.ota_button?.isVisible = bluetoothGatt?.services?.contains(bluetoothGatt?.getService(ota_service))!!
+        }
+        serviceItemContainer.llGroupOfCharacteristicsForService.visibility = View.GONE
+        serviceItemContainer.llGroupOfCharacteristicsForService.removeAllViews()
+        serviceItemContainer.tvServiceTitle.text = serviceName
+        serviceItemContainer.tvServiceUuid.text = serviceUuid
+        if ((serviceName == getString(R.string.unknown_service))) {
+            serviceItemContainer.ivEditServiceName.visibility = View.VISIBLE
+            serviceItemContainer.llServiceEditName.setOnClickListener {
+                val dialog: DialogFragment = MappingsEditDialog(serviceItemContainer.tvServiceTitle.text.toString(),
+                        serviceItemContainer.tvServiceUuid.text.toString(),
+                        object : MappingCallback {
+                            override fun onNameChanged(mapping: Mapping) {
+                                serviceItemContainer.tvServiceTitle.text = mapping.name
+                                serviceNamesMap[mapping.uuid] = mapping
+                            }
+                        }, MappingType.SERVICE)
+                dialog.show(supportFragmentManager, "dialog_mappings_edit")
+            }
+
+            if (serviceNamesMap.containsKey(serviceUuid)) {
+                serviceItemContainer.tvServiceTitle.text = serviceNamesMap[serviceUuid]?.name
+            }
+        }
+    }
+
+    /**
+     * SHOW CHARACTERISTIC PROPERTIES IN UI: READ, WRITE
+     */
+    private fun addPropertiesToCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic,
+                                              propsContainer: LinearLayout) {
+        val propertiesString = Common.getProperties(this@DeviceServicesActivity, bluetoothGattCharacteristic.properties)
+        var propsExploded: Array<String?> = propertiesString.split(",").toTypedArray()
+        if (propsExploded.contentToString().toLowerCase(Locale.getDefault()).contains("write no response")) {
+            val temp = ArrayList<String?>()
+            var writeAdded = false
+            for (s: String? in propsExploded) {
+                if (s?.toLowerCase(Locale.getDefault())?.contains("write no response")!! && !writeAdded) {
+                    temp.add("Write")
+                    writeAdded = true
+                } else if (!s.toLowerCase(Locale.getDefault()).contains("write")) {
+                    temp.add(s)
+                }
+            }
+            propsExploded = arrayOfNulls(temp.size)
+            for (i in temp.indices) {
+                propsExploded[i] = temp[i]
+            }
+        }
+        for (propertyValue: String? in propsExploded) {
+            val propertyView = TextView(this)
+            var propertyValueTrimmed: String? = propertyValue?.trim { it <= ' ' }
+            propertyValueTrimmed = if (propertyValue?.length!! > 13) propertyValue.substring(0, 13) else propertyValueTrimmed
+            propertyView.text = propertyValueTrimmed
+            propertyView.setBackgroundColor(ContextCompat.getColor(this@DeviceServicesActivity, R.color.silabs_white))
+            propertyView.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.characteristic_property_text_size))
+            propertyView.setTextColor(ContextCompat.getColor(this@DeviceServicesActivity, R.color.silabs_inactive))
+            propertyView.typeface = Typeface.DEFAULT_BOLD
+            propertyView.gravity = Gravity.CENTER_VERTICAL
+            val propertyContainer = LinearLayout(this@DeviceServicesActivity)
+            propertyContainer.orientation = LinearLayout.HORIZONTAL
+            val propertyIcon = ImageView(this@DeviceServicesActivity)
+
+            val iconId: Int = when (propertyValue.trim(' ').toUpperCase(Locale.getDefault())) {
+                Common.PROPERTY_VALUE_BROADCAST -> R.drawable.ic_debug_prop_broadcast
+                Common.PROPERTY_VALUE_READ -> R.drawable.ic_read_off
+                Common.PROPERTY_VALUE_WRITE -> R.drawable.ic_edit_off
+                Common.PROPERTY_VALUE_NOTIFY -> R.drawable.ic_notify_off
+                Common.PROPERTY_VALUE_INDICATE -> R.drawable.ic_indicate_off
+                Common.PROPERTY_VALUE_SIGNED_WRITE -> R.drawable.ic_debug_prop_signed_write
+                Common.PROPERTY_VALUE_EXTENDED_PROPS -> R.drawable.ic_debug_prop_ext
+                else -> R.drawable.ic_debug_prop_ext
+            }
+
+            propertyIcon.setBackgroundResource(iconId)
+            propertyIcon.tag = PROPERTY_ICON_TAG
+            propertyView.tag = PROPERTY_NAME_TAG
+            val paramsText = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            paramsText.gravity = Gravity.CENTER_VERTICAL
+
+            val paramsIcon = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            val d = resources.displayMetrics.density
+            paramsIcon.marginEnd = (8 * d).toInt()
+            paramsIcon.gravity = Gravity.CENTER_VERTICAL
+            propertyContainer.addView(propertyIcon, paramsIcon)
+            propertyContainer.addView(propertyView, paramsText)
+            propertyContainer.tag = propertyValue
+            val paramsTextAndIconContainer = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT)
+            paramsTextAndIconContainer.setMargins(0, (4 * d).toInt(), (10 * d).toInt(), 0)
+            propertyContainer.setPadding((2 * d).toInt(), (8 * d).toInt(), (6 * d).toInt(), (6 * d).toInt())
+            propsContainer.addView(propertyContainer, paramsTextAndIconContainer)
+        }
+    }
+
+    private fun setPropertyClickListeners(propsContainer: LinearLayout, bluetoothGattCharacteristic: BluetoothGattCharacteristic, service: BluetoothGattService, serviceName: String, characteristicExpansion: LinearLayout) {
+        val notificationIcon = getIconWithValue(propsContainer, Common.PROPERTY_VALUE_NOTIFY)
+        val notificationText = getTextViewWithValue(propsContainer, Common.PROPERTY_VALUE_NOTIFY)
+        val indicationIcon = getIconWithValue(propsContainer, Common.PROPERTY_VALUE_INDICATE)
+        val indicationText = getTextViewWithValue(propsContainer, Common.PROPERTY_VALUE_INDICATE)
+        val readIcon = getIconWithValue(propsContainer, Common.PROPERTY_VALUE_READ)
+        val writeIcon = getIconWithValue(propsContainer, Common.PROPERTY_VALUE_WRITE)
+        val id = characteristicExpansion.id
+
+        for (i in 0 until propsContainer.childCount) {
+            if (propsContainer.getChildAt(i).tag == null) continue
+
+            val propertyContainer = propsContainer.getChildAt(i) as LinearLayout
+            when ((propertyContainer.tag as String).trim { it <= ' ' }.toUpperCase(Locale.getDefault())) {
+                Common.PROPERTY_VALUE_READ -> propertyContainer.setOnClickListener {
+                    readIcon?.startAnimation(AnimationUtils.loadAnimation(this@DeviceServicesActivity, R.anim.property_image_click))
+                    if (characteristicFragments.containsKey(id)) {
+                        currentWriteReadFragment = characteristicFragments[id]
+                    } else {
+                        currentWriteReadFragment = initFragmentCharacteristicDetail(bluetoothGattCharacteristic, id, service, characteristicExpansion, false)
+                        characteristicFragments[id] = currentWriteReadFragment
+                    }
+                    characteristicExpansion.visibility = View.VISIBLE
+                    bluetoothGatt?.readCharacteristic(bluetoothGattCharacteristic)
+                }
+                Common.PROPERTY_VALUE_WRITE -> propertyContainer.setOnClickListener {
+                    writeIcon?.startAnimation(AnimationUtils.loadAnimation(this@DeviceServicesActivity, R.anim.property_image_click))
+                    if (characteristicFragments.containsKey(id)) {
+                        currentWriteReadFragment = characteristicFragments[id]
+                        characteristicFragments[id]?.showCharacteristicWriteDialog()
+                    } else {
+                        currentWriteReadFragment = initFragmentCharacteristicDetail(bluetoothGattCharacteristic, id, service, characteristicExpansion, true)
+                        characteristicFragments[id] = currentWriteReadFragment
+                    }
+                    characteristicExpansion.visibility = View.VISIBLE
+                }
+                Common.PROPERTY_VALUE_NOTIFY -> propertyContainer.setOnClickListener {
+                    notificationIcon?.startAnimation(AnimationUtils.loadAnimation(this@DeviceServicesActivity, R.anim.property_image_click))
+                    if (characteristicFragments.containsKey(id)) {
+                        currentWriteReadFragment = characteristicFragments[id]
+                        if (characteristicExpansion.visibility == View.GONE && notificationText?.currentTextColor == ContextCompat.getColor(this@DeviceServicesActivity, R.color.silabs_inactive)) {
+                            characteristicExpansion.visibility = View.VISIBLE
+                        }
+                    } else {
+                        currentWriteReadFragment = initFragmentCharacteristicDetail(bluetoothGattCharacteristic, id, service, characteristicExpansion, false)
+                        characteristicFragments[id] = currentWriteReadFragment
+                    }
+                    setNotifyProperty(bluetoothGattCharacteristic, serviceName, notificationIcon, notificationText, indicationIcon, indicationText)
+                }
+                Common.PROPERTY_VALUE_INDICATE -> propertyContainer.setOnClickListener {
+                    indicationIcon?.startAnimation(AnimationUtils.loadAnimation(this@DeviceServicesActivity, R.anim.property_image_click))
+                    if (characteristicFragments.containsKey(id)) {
+                        currentWriteReadFragment = characteristicFragments[id]
+                        if (characteristicExpansion.visibility == View.GONE && indicationText?.currentTextColor == ContextCompat.getColor(this@DeviceServicesActivity, R.color.silabs_inactive)) {
+                            characteristicExpansion.visibility = View.VISIBLE
+                        }
+                    } else {
+                        currentWriteReadFragment = initFragmentCharacteristicDetail(bluetoothGattCharacteristic, id, service, characteristicExpansion, false)
+                        characteristicFragments[id] = currentWriteReadFragment
+                    }
+                    setIndicateProperty(bluetoothGattCharacteristic, serviceName, indicationIcon, indicationText, notificationIcon, notificationText)
+                }
+                else -> {
+                }
+            }
+        }
+    }
+
+    private fun initFragmentCharacteristicDetail(bluetoothGattCharacteristic: BluetoothGattCharacteristic, expansionId: Int, service: BluetoothGattService, characteristicExpansion: LinearLayout, displayWriteDialog: Boolean): FragmentCharacteristicDetail {
+        val characteristicDetail = FragmentCharacteristicDetail()
+        characteristicDetail.address = bluetoothGatt?.device?.address
+        characteristicDetail.setmService(service)
+        characteristicDetail.setmBluetoothCharact(bluetoothGattCharacteristic)
+        characteristicDetail.displayWriteDialog = displayWriteDialog
+        characteristicExpansion.visibility = View.VISIBLE
+
+        // show characteristic's expansion and add the fragment to view/edit characteristic detail
+        supportFragmentManager
+                .beginTransaction()
+                .add(expansionId, characteristicDetail, CHARACTERISTIC_ADD_FRAGMENT_TRANSACTION_ID)
+                .commit()
+        return characteristicDetail
+    }
+
+    private fun setIndicateProperty(bluetoothGattCharacteristic: BluetoothGattCharacteristic, serviceName: String, indicatePropertyIcon: ImageView?, indicatePropertyName: TextView?, notificationIcon: ImageView?, notificationText: TextView?) {
+        var indicationsEnabled = currentWriteReadFragment?.indicationsEnabled!! // Indication not enabled
+        val submitted = BLEUtils.setNotificationForCharacteristic(bluetoothGatt!!, bluetoothGattCharacteristic, if (indicationsEnabled) Notifications.DISABLED else Notifications.INDICATE) // If indication not enabled -> enable
+
+        if (submitted) {
+            indicationsEnabled = !indicationsEnabled
+        }
+
+        currentWriteReadFragment?.indicationsEnabled = indicationsEnabled
+        indicatePropertyIcon?.setBackgroundResource(if (indicationsEnabled) R.drawable.ic_indicate_on else R.drawable.ic_indicate_off) // enable -> blue, disable -> grey
+        indicatePropertyName?.setTextColor(ContextCompat.getColor(this@DeviceServicesActivity, if (indicationsEnabled) R.color.silabs_blue else R.color.silabs_inactive)) // enable -> blue, disable -> grey
+
+        val characteristicUuid = getUuidFromBluetoothGattCharacteristic(bluetoothGattCharacteristic)
+        serviceItemContainers!![serviceName]?.setCharacteristicNotificationState(characteristicUuid, if (indicationsEnabled) Notifications.INDICATE else Notifications.DISABLED)
+        currentWriteReadFragment?.notificationsEnabled = false
+
+        if (notificationIcon != null) {
+            notificationIcon.setBackgroundResource(R.drawable.ic_notify_off)
+            notificationText?.setTextColor(ContextCompat.getColor(this@DeviceServicesActivity, R.color.silabs_inactive))
+        }
+    }
+
+    private fun setNotifyProperty(bluetoothGattCharacteristic: BluetoothGattCharacteristic, serviceName: String, notifyPropertyIcon: ImageView?, notifyPropertyName: TextView?, indicationIcon: ImageView?, indicationText: TextView?) {
+        var notificationsEnabled = currentWriteReadFragment?.notificationsEnabled!!
+        val submitted = BLEUtils.setNotificationForCharacteristic(bluetoothGatt!!, bluetoothGattCharacteristic, if (notificationsEnabled) Notifications.DISABLED else Notifications.NOTIFY)
+
+        if (submitted) {
+            notificationsEnabled = !notificationsEnabled
+        }
+
+        currentWriteReadFragment?.notificationsEnabled = notificationsEnabled
+        notifyPropertyIcon?.setBackgroundResource(if (notificationsEnabled) R.drawable.ic_notify_on else R.drawable.ic_notify_off)
+        notifyPropertyName?.setTextColor(ContextCompat.getColor(this@DeviceServicesActivity, if (notificationsEnabled) R.color.silabs_blue else R.color.silabs_inactive))
+
+        val characteristicUuid = getUuidFromBluetoothGattCharacteristic(bluetoothGattCharacteristic)
+        serviceItemContainers!![serviceName]?.setCharacteristicNotificationState(characteristicUuid, if (notificationsEnabled) Notifications.NOTIFY else Notifications.DISABLED)
+        currentWriteReadFragment?.indicationsEnabled = false
+
+        if (indicationIcon != null) {
+            indicationIcon.setBackgroundResource(R.drawable.ic_indicate_off)
+            indicationText?.setTextColor(ContextCompat.getColor(this@DeviceServicesActivity, R.color.silabs_inactive))
+        }
+    }
+
+    private fun getTextViewWithValue(propsContainer: LinearLayout, value: String): TextView? {
+        for (i in 0 until propsContainer.childCount) {
+            if (propsContainer.getChildAt(i).tag == null) {
+                continue
+            }
+            val propertyContainer = propsContainer.getChildAt(i) as LinearLayout
+            for (j in 0 until propertyContainer.childCount) {
+                val view = propertyContainer.getChildAt(j)
+                if (view.tag != null && (view.tag == PROPERTY_NAME_TAG)) {
+                    val propertyValue = (propertyContainer.tag as String).trim { it <= ' ' }.toUpperCase(Locale.getDefault())
+                    if ((propertyValue == value)) {
+                        return view as TextView
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    private fun getIconWithValue(propsContainer: LinearLayout, value: String): ImageView? {
+        for (i in 0 until propsContainer.childCount) {
+            if (propsContainer.getChildAt(i).tag == null) {
+                continue
+            }
+            val propertyContainer = propsContainer.getChildAt(i) as LinearLayout
+            for (j in 0 until propertyContainer.childCount) {
+                val view = propertyContainer.getChildAt(j)
+                if (view.tag != null && (view.tag == PROPERTY_ICON_TAG)) {
+                    val propertyValue = (propertyContainer.tag as String).trim { it <= ' ' }.toUpperCase(Locale.getDefault())
+                    if ((propertyValue == value)) {
+                        return view as ImageView
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    private fun getOtaSpecificCharacteristicName(uuid: String): String {
+        return when (uuid.toUpperCase(Locale.getDefault())) {
+            "F7BF3564-FB6D-4E53-88A4-5E37E0326063" -> "OTA Control Attribute"
+            "984227F3-34FC-4045-A5D0-2C581F81A153" -> "OTA Data Attribute"
+            "4F4A2368-8CCA-451E-BFFF-CF0E2EE23E9F" -> "AppLoader version"
+            "4CC07BCF-0868-4B32-9DAD-BA4CC41E5316" -> "OTA version"
+            "25F05C0A-E917-46E9-B2A5-AA2BE1245AFE" -> "Gecko Bootloader version"
+            "0D77CC11-4AC1-49F2-BFA9-CD96AC7A92F8" -> "Application version"
+            else -> getString(R.string.unknown_characteristic_label)
+        }
+    }
+
+    private fun getUuidFromBluetoothGattCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic): String {
+        val characteristic = Engine.instance?.getCharacteristic(bluetoothGattCharacteristic.uuid)
+        return (if (characteristic != null) Common.getUuidText(characteristic.uuid!!) else Common.getUuidText(bluetoothGattCharacteristic.uuid))
     }
 
     /**
@@ -1352,6 +1706,11 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         dialogLicense?.show()
     }
 
+    private fun generateNextId(): Int {
+        generatedId += 1
+        return generatedId
+    }
+
     /**
      * INITILIAZES ALL NECESSARY DIALOGS AND VIEW IN UI - ONCREATE
      */
@@ -1365,8 +1724,8 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         displayBondState(bluetoothGatt?.device)
 
         supportActionBar?.title = deviceName
-        remoteServicesFragment.init()
-        localServicesFragment.init()
+        services_container.removeAllViews()
+        initServicesViews()
         initAboutDialog()
 
         if (!boolOTAbegin) {
@@ -1396,18 +1755,16 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
             for (gattCharacteristic: BluetoothGattCharacteristic in gattCharacteristics) {
                 val characteristicUUID = gattCharacteristic.uuid.toString()
                 Log.i("onServicesDiscovered", "Characteristic UUID " + characteristicUUID + " - Properties: " + gattCharacteristic.properties)
-                if ((gattCharacteristic.uuid.toString() == UuidConsts.OTA_CONTROL.toString())) {
-                    if (gattCharacteristics.contains(bluetoothGatt?.getService(UuidConsts.OTA_SERVICE)?.getCharacteristic(
-                            UuidConsts.OTA_DATA
-                        ))) {
-                        if (!gattServices.contains(bluetoothGatt?.getService(UuidConsts.HOMEKIT_SERVICE))) {
+                if ((gattCharacteristic.uuid.toString() == ota_control.toString())) {
+                    if (gattCharacteristics.contains(bluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data))) {
+                        if (!gattServices.contains(bluetoothGatt?.getService(homekit_service))) {
                             Log.i("onServicesDiscovered", "Device in DFU Mode")
                         } else {
                             Log.i("onServicesDiscovered", "OTA_Control found")
                             val gattDescriptors = gattCharacteristic.descriptors
                             for (gattDescriptor: BluetoothGattDescriptor in gattDescriptors) {
                                 val descriptor = gattDescriptor.uuid.toString()
-                                if ((gattDescriptor.uuid.toString() == UuidConsts.HOMEKIT_DESCRIPTOR.toString())) {
+                                if ((gattDescriptor.uuid.toString() == homekit_descriptor.toString())) {
                                     kit_descriptor = gattDescriptor
                                     Log.i("descriptor", "UUID: $descriptor")
                                     //bluetoothGatt.readDescriptor(gattDescriptor);
@@ -1430,7 +1787,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
 
         //WRITE CHARACTERISTIC FOR HOMEKIT
         val value = byteArrayOf(0x00, 0x02, 0xee.toByte(), instanceID[0], instanceID[1], 0x03, 0x00, 0x01, 0x01, 0x01)
-        writeGenericCharacteristic(UuidConsts.OTA_SERVICE, UuidConsts.OTA_CONTROL, value)
+        writeGenericCharacteristic(ota_service, ota_control, value)
         Log.d("characteristic", "writting: " + Converters.bytesToHexWhitespaceDelimited(value))
     }
 
@@ -1439,10 +1796,8 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
      */
     private fun writeOtaControl(ctrl: Byte): Boolean {
         Log.d("writeOtaControl", "Called")
-        if (bluetoothGatt?.getService(UuidConsts.OTA_SERVICE) != null) {
-            val charac = bluetoothGatt?.getService(UuidConsts.OTA_SERVICE)?.getCharacteristic(
-                UuidConsts.OTA_CONTROL
-            )
+        if (bluetoothGatt?.getService(ota_service) != null) {
+            val charac = bluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_control)
             if (charac != null) {
                 Log.d("Instance ID", "" + charac.instanceId)
                 charac.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
@@ -1496,9 +1851,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                 j++
                 if (j >= MTU - 3 || i >= (datathread.size - 1)) {
                     var wait = System.nanoTime()
-                    val charac = bluetoothGatt?.getService(UuidConsts.OTA_SERVICE)?.getCharacteristic(
-                        UuidConsts.OTA_DATA
-                    )
+                    val charac = bluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data)
                     charac?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
                     val progress = ((i + 1).toFloat() / datathread.size) * 100
                     val bitrate = (((i + 1) * (8.0)).toFloat() / (((wait - start) / 1000000.0).toFloat()))
@@ -1596,7 +1949,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
             pgss = ((pack + mtuDivisible).toFloat() / (otafile?.size!! - 1)) * 100
             Log.d("characte", "pack: " + pack + " / " + (pack + mtuDivisible) + " : " + Converters.bytesToHexWhitespaceDelimited(writearray))
         }
-        val charac = bluetoothGatt?.getService(UuidConsts.OTA_SERVICE)?.getCharacteristic(UuidConsts.OTA_DATA)
+        val charac = bluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data)
         charac?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         charac?.value = writearray
         bluetoothGatt?.writeCharacteristic(charac)
@@ -1662,11 +2015,9 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
             "OTAUPLOAD" -> {
                 Log.d("OTAUPLOAD", "Called")
                 /**Check Services */
-                val mBluetoothGattService = bluetoothGatt?.getService(UuidConsts.OTA_SERVICE)
+                val mBluetoothGattService = bluetoothGatt?.getService(ota_service)
                 if (mBluetoothGattService != null) {
-                    val charac = bluetoothGatt?.getService(UuidConsts.OTA_SERVICE)!!.getCharacteristic(
-                        UuidConsts.OTA_DATA
-                    )
+                    val charac = bluetoothGatt?.getService(ota_service)!!.getCharacteristic(ota_data)
                     if (charac != null) {
                         charac.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
                         Log.d("Instance ID", "" + charac.instanceId)
@@ -1699,11 +2050,11 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                         val fn: String
                         if (stackPath != "" && doubleStepUpload) {
                             val last = stackPath.lastIndexOf(File.separator)
-                            fn = getString(R.string.ota_filename_s, stackPath.substring(last).removePrefix("/"))
+                            fn = stackPath.substring(last)
                             Log.d("CurrentlyUpdating", "apploader")
                         } else {
                             val last = appPath.lastIndexOf(File.separator)
-                            fn = getString(R.string.ota_filename_s, appPath.substring(last).removePrefix("/"))
+                            fn = appPath.substring(last)
                             Log.d("CurrentlyUpdating", "appliaction")
                         }
                         pack = 0
@@ -1759,8 +2110,8 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         val reconnectTimer = Timer()
         reconnectTimer.schedule(object : TimerTask() {
             override fun run() {
-                bluetoothService?.connectGatt(bluetoothDevice!!, false, gattCallback)
-                bluetoothGatt = bluetoothService?.connectedGatt
+                service?.connectGatt(bluetoothDevice!!, false, gattCallback)
+                bluetoothGatt = service?.connectedGatt
             }
         }, delayToConnect)
     }
@@ -1809,7 +2160,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                     if (btGatt.device != null) bluetoothDevice = btGatt.device
                     /**Disconnect gatt */
                     btGatt.disconnect()
-                    bluetoothService?.clearConnectedGatt()
+                    service?.clearGatt()
                     Log.d("disconnectGatt", "gatt disconnect")
                     runOnUiThread {
                         showLoading()
@@ -1843,13 +2194,13 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
      */
     fun exit(gatt: BluetoothGatt?) {
         gatt?.close()
-        bluetoothService?.connectedGatt?.close()
-        bluetoothService?.clearCache()
+        service?.connectedGatt?.close()
+        service?.clearCache()
         disconnect_gatt = false
 
         handler.postDelayed({
             bluetoothGatt = null
-            bluetoothService = null
+            service = null
             if (loadingdialog != null && loadingdialog?.isShowing!!) loadingdialog?.dismiss()
             if (otaProgress != null && otaProgress?.isShowing!!) otaProgress?.dismiss()
             if (otaSetup != null && otaSetup?.isShowing!!) otaSetup?.dismiss()
@@ -1863,9 +2214,9 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
     fun reconnect(delaytoconnect: Long) {
         val reconnectTimer = Timer()
         bluetoothDevice = bluetoothGatt?.device
-        if (bluetoothService?.isGattConnected()!!) {
-            bluetoothService?.clearConnectedGatt()
-            bluetoothService?.clearCache()
+        if (service?.isGattConnected!!) {
+            service?.clearGatt()
+            service?.clearCache()
         }
         bluetoothGatt?.disconnect()
         reconnectTimer.schedule(object : TimerTask() {
@@ -1880,9 +2231,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                         loadingLog?.text = "Attempting connection..."
                     }
                 }
-                bluetoothDevice?.let { device ->
-                    bluetoothService?.connectGatt(device, false, gattCallback)
-                }
+                bluetoothGatt = bluetoothDevice?.connectGatt(applicationContext, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
             }
         }, delaytoconnect)
     }
@@ -2018,17 +2367,22 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
 
             override fun submit(filterDeviceParams: FilterDeviceParams?, close: Boolean) {}
         })
-        connectionsAdapter = ConnectionsAdapter(ConnectedGatts.list, applicationContext)
+        connectionsAdapter = ConnectionsAdapter(getConnectedBluetoothDevices(), applicationContext)
         connectionsFragment.adapter = connectionsAdapter
         connectionsFragment.adapter?.setServicesConnectionsCallback(this)
-        tv_connections.text = getString(R.string.n_Connections, ConnectedGatts.size())
+        tv_connections.text = getString(R.string.n_Connections, getConnectedBluetoothDevices().size)
+    }
+
+    private fun getConnectedBluetoothDevices(): List<BluetoothDevice> {
+        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        return bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == WRITE_EXTERNAL_STORAGE_REQUEST_PERMISSION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showMessage(resources.getString(R.string.permissions_granted_successfully))
+                showMessage(resources.getString(R.string.Permissions_granted_succesfully))
             } else {
                 showMessage(R.string.permissions_not_granted)
             }
@@ -2037,46 +2391,49 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
 
     override fun onDisconnectClicked(deviceInfo: BluetoothDeviceInfo?) {
         val currentDeviceAddress = bluetoothGatt?.device?.address
-        bluetoothService?.disconnectGatt(deviceInfo?.address!!)
+        val success = service?.disconnectGatt(deviceInfo?.address!!)
+        if (!success!!) {
+            showMessage(R.string.device_not_from_EFR)
+        }
 
         updateCountOfConnectedDevices()
         connectionsFragment.adapter?.notifyDataSetChanged()
         if ((currentDeviceAddress == deviceInfo?.address)) {
-            if (ConnectedGatts.isEmpty()) finish() else {
-                val device = ConnectedGatts.list[0].device
+            if (getConnectedBluetoothDevices().isEmpty()) finish() else {
+                val device = getConnectedBluetoothDevices()[0]
                 changeDevice(device.address)
             }
         }
     }
 
-    override fun onDeviceClicked(device: BluetoothDevice) {
+    override fun onDeviceClicked(device: BluetoothDeviceInfo?) {
         boolOTAbegin = false
-        changeDevice(device.address)
+        changeDevice(device?.address)
     }
 
-    private fun initDevice(deviceAddress: String) {
-        bluetoothBinding = object : BluetoothService.Binding(this) {
-            override fun onBound(service: BluetoothService?) {
+    private fun initDevice(deviceAddress: String?) {
+        bluetoothBinding = object : BlueToothService.Binding(this) {
+            override fun onBound(service: BlueToothService?) {
                 serviceHasBeenSet = true
-                this@DeviceServicesActivity.bluetoothService = service
-                service?.registerGattCallback(gattCallback)
+                this@DeviceServicesActivity.service = service
                 if (!service?.isGattConnected(deviceAddress)!!) {
                     showMessage(R.string.toast_debug_connection_failed)
                     disconnectGatt(bluetoothGatt)
                 } else {
-                    bluetoothGatt = service.getConnectedGatt(deviceAddress)
-                    if (bluetoothGatt == null) {
-                        showMessage(R.string.toast_debug_connection_failed)
+                    val bG = service.getConnectedGatt(deviceAddress)
+                    if (bG == null) {
+                        showMessage(R.string.device_not_from_EFR)
                         finish()
-                    } else {
-                        service.registerGattCallback(true, gattCallback)
+                        return
+                    }
 
-                        if (bluetoothGatt?.services != null && bluetoothGatt?.services?.isNotEmpty()!!) {
-                            onGattFetched()
-                        } else {
-                            showCharacteristicLoadingAnimation()
-                            bluetoothGatt?.discoverServices()
-                        }
+                    service.registerGattCallback(true, gattCallback)
+                    if (bG.services != null && bG.services.isNotEmpty()) {
+                        bluetoothGatt = bG
+                        onGattFetched()
+                    } else {
+                        showCharacteristicLoadingAnimation()
+                        bG.discoverServices()
                     }
                 }
             }
@@ -2097,15 +2454,18 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         }
     }
 
-    private fun changeDevice(address: String) {
-        remoteServicesFragment.clear()
+    fun changeDevice(address: String?) {
+        services_container.removeAllViews()
         loggerFragment.adapter?.logByDeviceAddress(address)
         initDevice(address)
     }
 
     fun updateCountOfConnectedDevices() {
+        val connectedBluetoothDevices = getConnectedBluetoothDevices()
+        val size = connectedBluetoothDevices.size
         runOnUiThread {
-            tv_connections.text = resources.getString(R.string.n_Connections, ConnectedGatts.size())
+            tv_connections.text = resources.getString(R.string.n_Connections, size)
+            connectionsFragment.adapter?.connectionsList = connectedBluetoothDevices
             connectionsFragment.adapter?.notifyDataSetChanged()
         }
     }
@@ -2213,18 +2573,24 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
 
     companion object {
         private const val ABOUT_DIALOG_HTML_ASSET_FILE_PATH = "file:///android_asset/about.html"
+        private const val CHARACTERISTIC_ADD_FRAGMENT_TRANSACTION_ID = "characteristicdetail"
         private const val UI_CREATION_DELAY = 0
         private const val GATT_FETCH_ON_SERVICE_DISCOVERED_DELAY = 875
+        private const val PROPERTY_ICON_TAG = "characteristicpropertyicon"
+        private const val PROPERTY_NAME_TAG = "characteristispropertyname"
         private const val WRITE_EXTERNAL_STORAGE_REQUEST_PERMISSION = 300
         private const val FILE_CHOOSER_REQUEST_CODE = 9999
         private const val TOOLBAR_OPEN_PERCENTAGE = 95
         private const val TOOLBAR_CLOSE_PERCENTAGE = 95
         private const val RECONNECTION_RETRIES = 3
 
-        fun startActivity(context: Context, address: String) {
-            val intent = Intent(context, DeviceServicesActivity::class.java)
-            intent.putExtra("DEVICE_SELECTED_ADDRESS", address)
-            startActivity(context, intent, null)
-        }
+        var ota_service = UUID.fromString("1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0")
+        private val ota_control = UUID.fromString("f7bf3564-fb6d-4e53-88a4-5e37e0326063")
+        private val ota_data = UUID.fromString("984227f3-34fc-4045-a5d0-2c581f81a153")
+        private val fw_version = UUID.fromString("4f4a2368-8cca-451e-bfff-cf0e2ee23e9f")
+        private val ota_version = UUID.fromString("4cc07bcf-0868-4b32-9dad-ba4cc41e5316")
+        private val homekit_descriptor = UUID.fromString("dc46f0fe-81d2-4616-b5d9-6abdd796939a")
+        private val homekit_service = UUID.fromString("0000003e-0000-1000-8000-0026bb765291")
+
     }
 }

@@ -4,12 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".browser.fragments.ConnectionsFragment">
+    tools:context=".Browser.Fragments.ConnectionsFragment">
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <View
         android:id="@+id/browser_shadow_top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="@dimen/shadow_height"
+        android:background="@drawable/scanning_bar_shadow"
+        android:rotation="180"
+        android:elevation="1dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_connections"
@@ -36,8 +39,8 @@
         android:layout_marginBottom="8dp">
 
         <Button
-            android:id="@+id/btn_disconnect_all"
             style="@style/ButtonRed"
+            android:id="@+id/btn_disconnect_all"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_alignParentStart="true"

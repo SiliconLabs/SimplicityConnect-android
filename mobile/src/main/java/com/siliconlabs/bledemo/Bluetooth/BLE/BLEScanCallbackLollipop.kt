@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.bluetooth.ble
+package com.siliconlabs.bledemo.Bluetooth.BLE
 
 import android.annotation.TargetApi
 import android.bluetooth.le.ScanCallback
@@ -7,11 +7,10 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.siliconlabs.bledemo.bluetooth.ble.ScanResultCompat.Companion.from
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
+import com.siliconlabs.bledemo.Bluetooth.BLE.ScanResultCompat.Companion.from
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-class BLEScanCallbackLollipop(private val service: BluetoothService) : ScanCallback() {
+class BLEScanCallbackLollipop(private val service: BlueToothService) : ScanCallback() {
     private val handler: Handler = Handler(Looper.getMainLooper())
 
     override fun onScanResult(callbackType: Int, result: ScanResult) {

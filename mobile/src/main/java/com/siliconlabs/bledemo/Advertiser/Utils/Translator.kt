@@ -1,12 +1,12 @@
-package com.siliconlabs.bledemo.advertiser.utils
+package com.siliconlabs.bledemo.Advertiser.Utils
 
 import android.content.Context
+import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
+import com.siliconlabs.bledemo.Advertiser.Enums.DataType
+import com.siliconlabs.bledemo.Advertiser.Enums.Phy
+import com.siliconlabs.bledemo.Advertiser.Models.DataTypeItem
+import com.siliconlabs.bledemo.Advertiser.Models.Service16Bit
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.advertiser.enums.AdvertisingMode
-import com.siliconlabs.bledemo.advertiser.enums.DataType
-import com.siliconlabs.bledemo.advertiser.enums.Phy
-import com.siliconlabs.bledemo.advertiser.models.DataTypeItem
-import com.siliconlabs.bledemo.advertiser.models.Service16Bit
 
 class Translator(val context: Context) {
 

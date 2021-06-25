@@ -1,3 +1,3 @@
-package com.siliconlabs.bledemo.browser.models
+package com.siliconlabs.bledemo.Browser.Models
 
 class Mapping(var uuid: String, var name: String)
