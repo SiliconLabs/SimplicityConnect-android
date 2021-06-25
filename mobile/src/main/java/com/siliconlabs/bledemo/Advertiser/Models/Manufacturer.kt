@@ -1,7 +1,7 @@
-package com.siliconlabs.bledemo.Advertiser.Models
+package com.siliconlabs.bledemo.advertiser.models
 
 import android.os.Parcelable
-import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.utils.Converters
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 

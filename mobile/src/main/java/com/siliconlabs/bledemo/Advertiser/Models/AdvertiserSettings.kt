@@ -1,13 +1,13 @@
-package com.siliconlabs.bledemo.Advertiser.Models
+package com.siliconlabs.bledemo.advertiser.models
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.AdvertisingSetParameters
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
-import com.siliconlabs.bledemo.Advertiser.Enums.LimitType
-import com.siliconlabs.bledemo.Advertiser.Enums.Phy
+import com.siliconlabs.bledemo.advertiser.enums.AdvertisingMode
+import com.siliconlabs.bledemo.advertiser.enums.LimitType
+import com.siliconlabs.bledemo.advertiser.enums.Phy
 
 class AdvertiserSettings(val data: AdvertiserData) {
 

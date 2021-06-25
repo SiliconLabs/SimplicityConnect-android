@@ -1,6 +1,8 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
-import com.siliconlabs.bledemo.Utils.UuidUtils.parseIntFromUuidStart
+import androidx.annotation.StringRes
+import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.utils.UuidUtils.parseIntFromUuidStart
 import java.util.*
 
 /**
@@ -25,7 +27,7 @@ enum class GattService {
             GattCharacteristic.SystemId),
     BatteryService(0x0000180f, "org.bluetooth.service.battery_service", GattCharacteristic.BatteryLevel),
     HudDocking(-0x23fc6ff3, "com.sensedriver.service.hud_docking", GattCharacteristic.DockStatus),
-    OtaService(0x1d14d6ee, "com.silabs.service.ota",
+    OtaService("1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0", "com.silabs.service.ota", R.string.ota_service_name,
             GattCharacteristic.OtaControl,
             GattCharacteristic.OtaData,
             GattCharacteristic.FwVersion,
@@ -62,7 +64,23 @@ enum class GattService {
             GattCharacteristic.RangeTestPayload,
             GattCharacteristic.RangeTestMaSize,
             GattCharacteristic.RangeTestLog,
-            GattCharacteristic.RangeTestIsRunning);
+            GattCharacteristic.RangeTestIsRunning),
+    BlinkyExample("de8a5aac-a99b-c315-0c80-60d4cbb51224", "custom.type", R.string.blinky_service_name,
+            GattCharacteristic.LedControl,
+            GattCharacteristic.ReportButton),
+    ThroughputTestService("bbb99e70-fff7-46cf-abc7-2d32c71820f2", "custom.type", R.string.throughput_test_service_name,
+            GattCharacteristic.ThroughputIndications,
+            GattCharacteristic.ThroughputNotifications,
+            GattCharacteristic.ThroughputTransmissionOn,
+            GattCharacteristic.ThroughputResult),
+    ThroughputInformationService("ba1e0e9f-4d81-bae3-f748-3ad55da38b46", "custom.type", R.string.throughput_information_service_name,
+            GattCharacteristic.ThroughputPhyStatus,
+            GattCharacteristic.ThroughputConnectionInterval,
+            GattCharacteristic.ThroughputSlaveLatency,
+            GattCharacteristic.ThroughputSupervisionTimeout,
+            GattCharacteristic.ThroughputPduSize,
+            GattCharacteristic.ThroughputMtuSize
+    );
 
     /**
      * The so-called "Assigned Number" of this service.
@@ -73,6 +91,12 @@ enum class GattService {
      * The "Type" of this service (fully qualified name).
      */
     val type: String
+
+    /**
+     * Resource ID for custom name
+     */
+    @StringRes
+    var customNameId: Int? = null
 
     /**
      * Available gatt characteristics for this service.
@@ -90,6 +114,15 @@ enum class GattService {
         number = UUID.fromString(uuid)
         this.type = type
         this.availableCharacteristics = arrayOf(*availableCharacteristics)
+        val key = parseIntFromUuidStart(uuid!!)
+        BluetoothLEGatt.GATT_SERVICE_DESCS.put(key, this)
+    }
+
+    constructor(uuid: String?, type: String, customNameId: Int, vararg availableCharacteristics: GattCharacteristic) {
+        number = UUID.fromString(uuid)
+        this.type = type
+        this.availableCharacteristics = arrayOf(*availableCharacteristics)
+        this.customNameId = customNameId
         val key = parseIntFromUuidStart(uuid!!)
         BluetoothLEGatt.GATT_SERVICE_DESCS.put(key, this)
     }

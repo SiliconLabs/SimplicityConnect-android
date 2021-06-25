@@ -1,17 +1,17 @@
-package com.siliconlabs.bledemo.Utils
+package com.siliconlabs.bledemo.utils
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
-import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
-import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
+import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
+import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import java.util.*
 
 object BLEUtils {
     val CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
-    private fun setNotificationForCharacteristic(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic?, gattDescriptor: UUID?, value: Notifications): Boolean {
+    fun setNotificationForCharacteristic(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic?, gattDescriptor: UUID?, value: Notifications): Boolean {
         var written = false
         if (characteristic != null) {
             gatt.setCharacteristicNotification(characteristic, value.isEnabled)
@@ -107,7 +107,9 @@ object BLEUtils {
                               * Storage Field for Enabled bool passed from .CTor
                               */
                              val isEnabled: Boolean) {
-        DISABLED(null, false), NOTIFY(Types.NOTIFICATIONS, true), INDICATE(Types.INDICATIONS, true);
+        DISABLED(null, false),
+        NOTIFY(Types.NOTIFICATIONS, true),
+        INDICATE(Types.INDICATIONS, true);
 
         private enum class Types {
             INDICATIONS, NOTIFICATIONS
@@ -140,7 +142,11 @@ object BLEUtils {
         }
 
         init {
-            descriptorValue = if (isEnabled) if (type == Types.NOTIFICATIONS) BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE else BluetoothGattDescriptor.ENABLE_INDICATION_VALUE else BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
+            descriptorValue =
+                    if (isEnabled)
+                        if (type == Types.NOTIFICATIONS) BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        else BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+                    else BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
         }
     }
 }

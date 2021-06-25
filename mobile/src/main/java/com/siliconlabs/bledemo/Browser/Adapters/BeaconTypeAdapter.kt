@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Browser.Adapters
+package com.siliconlabs.bledemo.browser.adapters
 
 import android.content.Context
 import android.graphics.Typeface
@@ -9,9 +9,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.siliconlabs.bledemo.BeaconUtils.BleFormat
-import com.siliconlabs.bledemo.Browser.Adapters.BeaconTypeAdapter.BeaconTypeViewHolder
-import com.siliconlabs.bledemo.Browser.Models.BeaconType
+import com.siliconlabs.bledemo.beacon_utils.BleFormat
+import com.siliconlabs.bledemo.browser.adapters.BeaconTypeAdapter.BeaconTypeViewHolder
+import com.siliconlabs.bledemo.browser.models.BeaconType
 import com.siliconlabs.bledemo.R
 import kotlinx.android.synthetic.main.name_with_checkmark.view.*
 

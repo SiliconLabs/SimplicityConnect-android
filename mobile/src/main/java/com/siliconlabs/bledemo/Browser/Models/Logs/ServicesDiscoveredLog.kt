@@ -1,7 +1,7 @@
-package com.siliconlabs.bledemo.Browser.Models.Logs
+package com.siliconlabs.bledemo.browser.models.logs
 
 import android.bluetooth.BluetoothGatt
-import com.siliconlabs.bledemo.Browser.Models.LogType
+import com.siliconlabs.bledemo.browser.models.LogType
 
 class ServicesDiscoveredLog(gatt: BluetoothGatt, status: Int) : Log() {
     companion object {

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/toolbar_iop_test"
+        layout="@layout/actionbar" />
+
+    <com.siliconlabs.bledemo.views.HorizontalShadow
+        android:id="@+id/iop_shadow_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_height"
+        android:layout_below="@id/toolbar_iop_test"
+        android:rotation="180" />
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/ll_iop_footer"
+        android:layout_below="@+id/toolbar_iop_test" />
+
+    <com.siliconlabs.bledemo.views.HorizontalShadow
+        android:id="@+id/iop_footer_shadow_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_height"
+        android:layout_above="@id/ll_iop_footer"/>
+
+    <LinearLayout
+        android:id="@+id/ll_iop_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/silabs_white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/item_margin"
+            android:paddingEnd="@dimen/item_margin">
+
+            <TextView
+                android:id="@+id/tv_fw_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/advertisement_details_device_name_padding_top"
+                android:textColor="@color/silabs_black" />
+
+            <TextView
+                android:id="@+id/tv_device_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/advertisement_details_device_name_padding_top"
+                android:textColor="@color/silabs_black" />
+
+            <TextView
+                android:id="@+id/tv_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/advertisement_details_device_name_padding_top"
+                android:textColor="@color/silabs_black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:clipToPadding="false"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_share_test"
+                style="@style/ButtonBlueWithBorders"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginEnd="16dp"
+                android:drawableStart="@drawable/ic_share"
+                android:text="@string/button_share"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btn_start_and_stop_test"
+                style="@style/ButtonBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:text="@string/button_run_tests"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

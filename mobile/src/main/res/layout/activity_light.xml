@@ -15,7 +15,7 @@
 
         <fragment
             android:id="@+id/fragment"
-            android:name="com.siliconlabs.bledemo.ConnectedLighting.Fragments.ConnectedLightingFragment"
+            android:name="com.siliconlabs.bledemo.connected_lighting.fragments.ConnectedLightingFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>

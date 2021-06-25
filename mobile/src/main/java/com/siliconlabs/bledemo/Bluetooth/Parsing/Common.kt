@@ -14,14 +14,15 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.Bluetooth.Parsing
+package com.siliconlabs.bledemo.bluetooth.parsing
 
 import android.content.Context
-import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine.Companion.instance
-import com.siliconlabs.bledemo.Browser.Activities.DeviceServicesActivity
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.Constants
-import com.siliconlabs.bledemo.Utils.Converters.getDecimalValue
+import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
+import com.siliconlabs.bledemo.bluetooth.ble.GattService
+import com.siliconlabs.bledemo.utils.Constants
+import com.siliconlabs.bledemo.utils.Converters.getDecimalValue
+import com.siliconlabs.bledemo.utils.UuidConsts
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -43,9 +44,6 @@ object Common {
     const val MENU_CONNECT = 0
     const val MENU_DISCONNECT = 1
     const val MENU_SCAN_RECORD_DETAILS = 2
-
-    private const val START_INDEX_UUID = 4
-    private const val END_INDEX_UUID = 8
 
     var FLOAT_POSITIVE_INFINITY = 0x007FFFFE
     var FLOAT_NaN = 0x007FFFFF
@@ -73,16 +71,6 @@ object Common {
 
     private val reservedFloatValues = floatArrayOf(FLOAT_POSITIVE_INFINITY.toFloat(), FLOAT_NaN.toFloat(), FLOAT_NaN.toFloat(), FLOAT_NaN.toFloat(),
             FLOAT_NEGATIVE_INFINITY.toFloat())
-
-    // Converts UUID from 16-bit to 128-bit form
-    fun convert16to128UUID(uuid: String): String {
-        return Consts.BLUETOOTH_BASE_UUID_PREFIX + uuid + Consts.BLUETOOTH_BASE_UUID_POSTFIX
-    }
-
-    // Converts UUID from 128-bit to 16-bit form
-    fun convert128to16UUID(uuid: String): String {
-        return uuid.substring(START_INDEX_UUID, END_INDEX_UUID)
-    }
 
     // Compares two uuid objects
     fun equalsUUID(uuida: UUID, uuidb: UUID?): Boolean {
@@ -178,27 +166,24 @@ object Common {
         return ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).double
     }
 
-    // Returns UUID text in 16 bits version if it is standard Bluetooth UUID or
-    // in 128 bits form if not
-    fun getUuidText(uuid: UUID): String {
-        val strUuid = uuid.toString().toUpperCase(Locale.getDefault())
-        return if (strUuid.startsWith(Consts.BLUETOOTH_BASE_UUID_PREFIX)
-                && strUuid.endsWith(Consts.BLUETOOTH_BASE_UUID_POSTFIX)) {
-            "0x" + convert128to16UUID(strUuid)
-        } else {
-            strUuid
-        }
-    }
-
     fun getServiceName(uuid: UUID?, context: Context): String {
-        val service = instance?.getService(uuid)
-        return if (service != null) service.name?.trim { it <= ' ' }!! else context.getString(R.string.unknown_service)
+        val service = Engine.getService(uuid)
+        return service?.name?.trim { it <= ' ' }
+            ?: checkForCustomServiceName(uuid, context)
     }
 
-    fun checkOTAService(serviceUuid: String, serviceName: String): String {
-        return if (serviceUuid.toLowerCase(Locale.getDefault()) == DeviceServicesActivity.ota_service.toString().toLowerCase(Locale.getDefault())) {
-            Constants.OTA_SERVICE
-        } else serviceName
+    fun checkForCustomServiceName(uuid: UUID?, context: Context): String {
+        return context.getString(GattService.values()
+                .find { it.number == uuid }?.
+                customNameId ?: R.string.unknown_service
+        )
+    }
+
+    fun checkForCustomCharacteristicName(uuid: UUID?, context: Context): String {
+        return context.getString(GattCharacteristic.values()
+                .find { it.uuid == uuid }
+                ?.customNameId ?: R.string.unknown_characteristic_label
+        )
     }
 
     enum class PropertyType(val value: Int) {

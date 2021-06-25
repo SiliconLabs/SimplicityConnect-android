@@ -53,13 +53,10 @@
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <View
+    <com.siliconlabs.bledemo.views.HorizontalShadow
         android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
-        android:layout_below="@id/app_bar_layout"
-        android:background="@drawable/scanning_bar_shadow"
-        android:elevation="1dp"
-        android:rotation="180" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/app_bar_layout" />
 
     <FrameLayout
         android:id="@+id/fragment"

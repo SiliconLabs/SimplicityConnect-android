@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Browser.Adapters
+package com.siliconlabs.bledemo.browser.adapters
 
 import android.content.Context
 import android.util.TypedValue
@@ -11,12 +11,12 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
-import com.siliconlabs.bledemo.Browser.Activities.MappingDictionaryActivity
-import com.siliconlabs.bledemo.Browser.Adapters.MappingAdapter.NameMappingViewHolder
-import com.siliconlabs.bledemo.Browser.Dialogs.MappingsEditDialog
-import com.siliconlabs.bledemo.Browser.MappingCallback
-import com.siliconlabs.bledemo.Browser.Models.Mapping
-import com.siliconlabs.bledemo.Browser.Models.MappingType
+import com.siliconlabs.bledemo.browser.activities.MappingDictionaryActivity
+import com.siliconlabs.bledemo.browser.adapters.MappingAdapter.NameMappingViewHolder
+import com.siliconlabs.bledemo.browser.dialogs.MappingsEditDialog
+import com.siliconlabs.bledemo.browser.MappingCallback
+import com.siliconlabs.bledemo.browser.models.Mapping
+import com.siliconlabs.bledemo.browser.models.MappingType
 import com.siliconlabs.bledemo.R
 
 class MappingAdapter(private val list: ArrayList<Mapping>, private val context: Context, private val type: MappingType) : RecyclerView.Adapter<NameMappingViewHolder>() {

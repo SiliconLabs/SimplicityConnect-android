@@ -1,0 +1,164 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_properties"
+        style="@style/TitleMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/gatt_configurator_label_properties"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_parameters"
+        style="@style/TitleMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/gatt_configurator_label_parameters"
+        app:layout_constraintStart_toEndOf="@id/vertical_separator"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_bonded"
+        style="@style/TitleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/gatt_configurator_label_bonded"
+        android:textColor="@color/silabs_dark_gray_text"
+        app:layout_constraintStart_toStartOf="@+id/tv_parameters"
+        app:layout_constraintTop_toBottomOf="@id/tv_parameters" />
+
+    <TextView
+        android:id="@+id/tv_mitm"
+        style="@style/TitleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/gatt_configurator_label_authenticated_mitm"
+        android:textColor="@color/silabs_dark_gray_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tv_bonded"
+        app:layout_constraintTop_toBottomOf="@id/tv_parameters" />
+
+    <View
+        android:id="@+id/horizontal_separator_1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/silabs_divider"
+        app:layout_constraintTop_toBottomOf="@id/tv_bonded" />
+
+    <View
+        android:id="@+id/vertical_separator"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="120dp"
+        android:background="@color/silabs_divider"
+        app:layout_constraintBottom_toTopOf="@id/horizontal_separator_3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/horizontal_separator_1" />
+
+    <TextView
+        android:id="@+id/tv_read"
+        style="@style/TitleSmall"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/gatt_configurator_label_read"
+        app:layout_constraintEnd_toStartOf="@+id/vertical_separator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/horizontal_separator_1" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/sw_read"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:checked="true"
+        android:thumb="@drawable/sw_thumb_small"
+        app:layout_constraintStart_toStartOf="@id/tv_read"
+        app:layout_constraintTop_toBottomOf="@id/tv_read"
+        app:track="@drawable/sw_track_small" />
+
+    <CheckBox
+        android:id="@+id/cb_read_bonded"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/sw_read"
+        app:layout_constraintEnd_toEndOf="@id/tv_bonded"
+        app:layout_constraintStart_toStartOf="@id/tv_bonded"
+        app:layout_constraintTop_toTopOf="@id/tv_read" />
+
+    <CheckBox
+        android:id="@+id/cb_read_mitm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/sw_read"
+        app:layout_constraintEnd_toEndOf="@id/tv_mitm"
+        app:layout_constraintStart_toStartOf="@id/tv_mitm"
+        app:layout_constraintTop_toTopOf="@id/tv_read" />
+
+    <View
+        android:id="@+id/horizontal_separator_2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/silabs_divider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sw_read" />
+
+    <TextView
+        android:id="@+id/tv_write"
+        style="@style/TitleSmall"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/gatt_configurator_label_write"
+        app:layout_constraintEnd_toStartOf="@id/vertical_separator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/horizontal_separator_2" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/sw_write"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:thumb="@drawable/sw_thumb_small"
+        app:layout_constraintStart_toStartOf="@id/tv_write"
+        app:layout_constraintTop_toBottomOf="@id/tv_write"
+        app:track="@drawable/sw_track_small" />
+
+    <CheckBox
+        android:id="@+id/cb_write_bonded"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        app:layout_constraintBottom_toBottomOf="@id/sw_write"
+        app:layout_constraintEnd_toEndOf="@id/tv_bonded"
+        app:layout_constraintStart_toStartOf="@id/tv_bonded"
+        app:layout_constraintTop_toTopOf="@id/tv_write" />
+
+    <CheckBox
+        android:id="@+id/cb_write_mitm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        app:layout_constraintBottom_toBottomOf="@id/sw_write"
+        app:layout_constraintEnd_toEndOf="@id/tv_mitm"
+        app:layout_constraintStart_toStartOf="@id/tv_mitm"
+        app:layout_constraintTop_toTopOf="@id/tv_write" />
+
+    <View
+        android:id="@+id/horizontal_separator_3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/silabs_divider"
+        app:layout_constraintTop_toBottomOf="@id/sw_write" />
+</androidx.constraintlayout.widget.ConstraintLayout>

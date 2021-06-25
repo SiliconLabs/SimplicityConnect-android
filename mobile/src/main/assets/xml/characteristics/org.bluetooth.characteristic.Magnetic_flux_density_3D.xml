@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--Copyright 2014 Bluetooth SIG, Inc. All rights reserved.-->
 <Characteristic xsi:noNamespaceSchemaLocation="http://schemas.bluetooth.org/Documents/characteristic.xsd" 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Magnetic Flux Density - 3D" type="org.bluetooth.characteristic.Magnetic_flux_density_3D" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Magnetic Flux Density - 3D" type="org.bluetooth.characteristic.magnetic_flux_density_3D"
 uuid="2AA1" last-modified="2014-11-20" approved="Yes">
     <Value>
         <Field name="Magnetic Flux Density: X-Axis">

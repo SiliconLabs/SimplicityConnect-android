@@ -1,10 +1,10 @@
-package com.siliconlabs.bledemo.Advertiser.Presenters
+package com.siliconlabs.bledemo.advertiser.presenters
 
-import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
-import com.siliconlabs.bledemo.Advertiser.Enums.DataMode
-import com.siliconlabs.bledemo.Advertiser.Enums.DataType
-import com.siliconlabs.bledemo.Advertiser.Enums.LimitType
-import com.siliconlabs.bledemo.Advertiser.Models.*
+import com.siliconlabs.bledemo.advertiser.enums.AdvertisingMode
+import com.siliconlabs.bledemo.advertiser.enums.DataMode
+import com.siliconlabs.bledemo.advertiser.enums.DataType
+import com.siliconlabs.bledemo.advertiser.enums.LimitType
+import com.siliconlabs.bledemo.advertiser.models.*
 
 interface IAdvertiserConfigActivityPresenter {
     fun prepareAdvertisingTypes()

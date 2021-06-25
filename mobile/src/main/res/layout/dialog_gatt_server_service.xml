@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/silabs_dialog_title_background"
+        android:minWidth="300dp"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/DialogHeaderText"
+            android:layout_width="match_parent"
+            android:text="@string/gatt_configurator_title_add_a_gatt_service" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/silabs_white"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <AutoCompleteTextView
+                    android:id="@+id/actv_service_name"
+                    style="@style/EditTextSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/gatt_configurator_hint_service_name" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/actv_service_uuid"
+                    style="@style/EditTextSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:digits="0123456789ABCDEFabcdef-"
+                    android:hint="@string/gatt_configurator_hint_16_128_bit_uuid"
+                    android:maxLength="36" />
+
+                <CheckBox
+                    android:id="@+id/cb_mandatory_requirements"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:enabled="false"
+                    android:text="@string/gatt_configurator_label_add_mandatory_service_requirements" />
+
+                <Spinner
+                    android:id="@+id/sp_service_type"
+                    style="@style/CustomSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:entries="@array/gatt_configurator_service_type" />
+
+                <TextView
+                    style="@style/TextSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/gatt_configurator_note_insert_name_and_uuid"
+                    android:textColor="@color/silabs_dark_gray_text" />
+
+                <TextView
+                    style="@style/TextSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/gatt_configurator_note_full_list_of_16bit_services"
+                    android:textColor="@color/silabs_dark_gray_text" />
+
+                <Button
+                    android:id="@+id/btn_bluetooth_gatt_services"
+                    style="@style/ButtonBlueWithBorders"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/button_bluetooth_sig" />
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/silabs_white"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <Button
+                android:id="@+id/btn_clear"
+                style="@style/ButtonBorderlessBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/button_clear" />
+
+            <Button
+                android:id="@+id/btn_cancel"
+                style="@style/ButtonBorderlessBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/button_cancel" />
+
+            <Button
+                android:id="@+id/btn_save"
+                style="@style/ButtonBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:enabled="false"
+                android:text="@string/button_save" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

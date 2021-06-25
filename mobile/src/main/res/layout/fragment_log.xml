@@ -5,15 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Browser.Fragments.LoggerFragment">
+    tools:context=".browser.fragments.LoggerFragment">
 
-    <View
+    <com.siliconlabs.bledemo.views.HorizontalShadow
         android:id="@+id/browser_shadow_top"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
-        android:background="@drawable/scanning_bar_shadow"
-        android:elevation="1dp"
-        android:rotation="180" />
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:id="@+id/ll_search_log_container"
@@ -72,13 +69,11 @@
         </LinearLayout>
     </LinearLayout>
 
-    <View
+    <com.siliconlabs.bledemo.views.HorizontalShadow
         android:id="@+id/log_separator"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
+        android:layout_height="wrap_content"
         android:layout_below="@id/ll_search_log_container"
-        android:background="@drawable/scanning_bar_shadow"
-        android:rotation="180"
         android:visibility="gone" />
 
 

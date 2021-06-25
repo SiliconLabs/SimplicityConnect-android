@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Advertiser.Services
+package com.siliconlabs.bledemo.advertiser.services
 
 import android.app.*
 import android.bluetooth.BluetoothAdapter
@@ -10,10 +10,10 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.siliconlabs.bledemo.Advertiser.Activities.AdvertiserActivity
-import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserList
-import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.advertiser.activities.AdvertiserActivity
+import com.siliconlabs.bledemo.advertiser.models.AdvertiserList
+import com.siliconlabs.bledemo.advertiser.utils.AdvertiserStorage
 
 class AdvertiserService : Service() {
     companion object {

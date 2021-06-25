@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Advertiser.Models
+package com.siliconlabs.bledemo.advertiser.models
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.AdvertiseData

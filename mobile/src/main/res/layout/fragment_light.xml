@@ -5,12 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <View
+    <com.siliconlabs.bledemo.views.HorizontalShadow
         android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
-        android:background="@drawable/scanning_bar_shadow"
-        android:elevation="1dp"
-        android:rotation="180" />
+        android:layout_height="wrap_content" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"

@@ -72,7 +72,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="15dp"
                     android:layout_weight="0.65"
-                    android:fontFamily="sans-serif"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:text=""
                     android:textSize="@dimen/advertisement_details_device_name_text_size" />
             </LinearLayout>
@@ -98,7 +99,8 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="15dp"
                     android:layout_weight="0.65"
-                    android:fontFamily="sans-serif"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:text=""
                     android:textSize="@dimen/advertisement_details_device_name_text_size" />
             </LinearLayout>
@@ -126,7 +128,8 @@
                     android:layout_margin="15dp"
                     android:layout_weight="0.65"
                     android:elegantTextHeight="true"
-                    android:fontFamily="sans-serif"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:text=""
                     android:textSize="@dimen/advertisement_details_device_name_text_size" />
             </LinearLayout>
@@ -141,25 +144,25 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="10dp"
-                    android:paddingTop="5dp"
                     android:elegantTextHeight="true"
                     android:fontFamily="sans-serif"
+                    android:paddingTop="5dp"
                     android:text="" />
 
                 <TextView
                     android:id="@+id/datarate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignEnd="@id/otaprogress"
                     android:layout_marginStart="5dp"
-                    android:layout_toEndOf="@id/otasteps"
-                    android:gravity="end"
                     android:layout_marginEnd="5dp"
+                    android:layout_toEndOf="@id/otasteps"
                     android:elegantTextHeight="true"
                     android:fontFamily="sans-serif-medium"
+                    android:gravity="end"
+                    android:maxLength="13"
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
-                    android:maxLength="13"
-                    android:layout_alignEnd="@id/otaprogress"
                     android:text=""
                     android:textSize="@dimen/advertisement_details_device_name_text_size" />
 
@@ -167,10 +170,10 @@
                     android:id="@+id/connecting_spinner"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
-                    android:layout_margin="5dp"
                     android:layout_above="@id/datasize"
                     android:layout_alignStart="@id/datasize"
                     android:layout_alignEnd="@id/datasize"
+                    android:layout_margin="5dp"
                     android:indeterminate="true"
                     android:indeterminateDrawable="@drawable/spinner_connecting_ring"
                     android:visibility="invisible" />
@@ -181,18 +184,18 @@
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/otasteps"
+                    android:layout_alignParentStart="true"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="15dp"
                     android:layout_marginTop="5dp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
                     android:layout_marginEnd="10dp"
-                    android:layout_toStartOf="@id/datasize"
-                    android:layout_alignParentStart="true"
                     android:layout_marginBottom="5dp"
-                    android:layout_below="@id/otasteps"
+                    android:layout_toStartOf="@id/datasize"
                     android:elevation="5dp"
                     android:max="100"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
                     android:progressTint="@color/silabs_red"
                     android:scaleY="5" />
 
@@ -200,17 +203,17 @@
                     android:id="@+id/datasize"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_gravity="center"
+                    android:layout_below="@id/otasteps"
                     android:layout_alignTop="@id/otaprogress"
                     android:layout_alignBottom="@id/otaprogress"
-                    android:layout_below="@id/otasteps"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="10dp"
                     android:elegantTextHeight="true"
                     android:fontFamily="sans-serif-medium"
                     android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
                     android:text="@string/zero_percent" />
             </RelativeLayout>
 

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
 import android.bluetooth.BluetoothAdapter
 import android.content.BroadcastReceiver

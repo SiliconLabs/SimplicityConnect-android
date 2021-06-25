@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Advertiser.Dialogs
+package com.siliconlabs.bledemo.advertiser.dialogs
 
 import android.app.Dialog
 import android.content.Intent
@@ -14,17 +14,17 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.AutoCompleteTextView
 import android.widget.Button
-import androidx.fragment.app.DialogFragment
-import com.siliconlabs.bledemo.Advertiser.Adapters.Service16BitAdapter
-import com.siliconlabs.bledemo.Advertiser.Models.Service16Bit
-import com.siliconlabs.bledemo.Advertiser.Utils.Translator
-import com.siliconlabs.bledemo.Advertiser.Utils.Validator
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.advertiser.adapters.Service16BitAdapter
+import com.siliconlabs.bledemo.advertiser.models.Service16Bit
+import com.siliconlabs.bledemo.advertiser.utils.Translator
+import com.siliconlabs.bledemo.advertiser.utils.Validator
+import com.siliconlabs.bledemo.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.dialog_data_16bit_service.view.*
 import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.btn_cancel
 import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.btn_save
 
-class Service16BitDataDialog(val callback: Callback) : DialogFragment() {
+class Service16BitDataDialog(val callback: Callback) : BaseDialogFragment() {
     private lateinit var predefinedServices: List<Service16Bit>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

@@ -14,26 +14,29 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.Bluetooth.Parsing
+package com.siliconlabs.bledemo.bluetooth.parsing
 
 import android.bluetooth.BluetoothGatt
 import android.content.Context
-import com.siliconlabs.bledemo.Bluetooth.DataTypes.Characteristic
-import com.siliconlabs.bledemo.Bluetooth.DataTypes.Descriptor
-import com.siliconlabs.bledemo.Bluetooth.DataTypes.Service
+import com.siliconlabs.bledemo.bluetooth.data_types.Characteristic
+import com.siliconlabs.bledemo.bluetooth.data_types.Descriptor
+import com.siliconlabs.bledemo.bluetooth.data_types.Service
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.HashMap
 
 // Engine - contains data accessible by each part of application
 // It links data models from xml resources with real Bluetooth classes
-class Engine {
-    private lateinit var units: HashMap<String, Unit>
-    private lateinit var formats: HashMap<String, Int>
-    private var services: HashMap<UUID, Service>? = null
-    private var descriptors: HashMap<UUID?, Descriptor>? = null
-    private var characteristics: ConcurrentHashMap<UUID, Characteristic>? = null
+object Engine {
+    private val units: HashMap<String, Unit> = HashMap()
+    private val formats: HashMap<String, Int> = HashMap()
+    var services: HashMap<UUID, Service> = HashMap()
+    var descriptors: HashMap<UUID, Descriptor> = HashMap()
+    var characteristics: ConcurrentHashMap<UUID, Characteristic> = ConcurrentHashMap()
+    private var descriptorsByTypes: HashMap<String, Descriptor> = HashMap()
+    private var characteristicsByTypes: HashMap<String, Characteristic> = HashMap()
 
     var devices: Vector<Device>? = null
     var isCharacteristicsLoaded = false
@@ -52,7 +55,8 @@ class Engine {
     // Loads descriptors from xml resource
     private fun loadDescriptors() {
         try {
-            descriptors = BluetoothXmlParser.instance?.parseDescriptors()
+            BluetoothXmlParser.instance?.parseDescriptors()?.let { descriptors = it }
+            initDescriptorsByTypes()
         } catch (e: XmlPullParserException) {
             e.printStackTrace()
         } catch (e: IOException) {
@@ -63,7 +67,7 @@ class Engine {
     // Loads services from xml resource
     private fun loadServices() {
         try {
-            services = BluetoothXmlParser.instance?.parseServices()!!
+            BluetoothXmlParser.instance?.parseServices()?.let { services = it }
         } catch (e: XmlPullParserException) {
             e.printStackTrace()
         } catch (e: IOException) {
@@ -75,8 +79,11 @@ class Engine {
     private fun loadCharacteristics() {
         Thread(Runnable {
             try {
-                characteristics = BluetoothXmlParser.instance?.parseCharacteristics()!!
-                isCharacteristicsLoaded = true
+                BluetoothXmlParser.instance?.parseCharacteristics()?.let {
+                    characteristics = it
+                    isCharacteristicsLoaded = true
+                    initCharacteristicsByTypes()
+                }
             } catch (e: XmlPullParserException) {
                 e.printStackTrace()
             } catch (e: IOException) {
@@ -88,7 +95,6 @@ class Engine {
     // List of variables formats from Bluetooth.org
     // https://developer.bluetooth.org/gatt/Pages/FormatTypes.aspx
     private fun loadFormats() {
-        formats = HashMap()
         formats["boolean"] = 1
         formats["2bit"] = 1
         formats["nibble"] = 2
@@ -128,7 +134,6 @@ class Engine {
     // List of units from Bluetooth.org
     // https://developer.bluetooth.org/gatt/units/Pages/default.aspx
     private fun loadUnits() {
-        units = HashMap()
         units["org.bluetooth.unit.unitless"] = Unit("", "")
         units["org.bluetooth.unit.length.metre"] = Unit("m", "metre")
         units["org.bluetooth.unit.mass.kilogram"] = Unit("kg", "kilogram")
@@ -250,6 +255,17 @@ class Engine {
         units["org.bluetooth.unit.irradiance.watt_per_square_metre"] = Unit("", "watt per square metre")
     }
 
+    private fun initDescriptorsByTypes() {
+        for ((_, value) in descriptors) {
+            value.type?.let { descriptorsByTypes[it] = value }
+        }
+    }
+
+    private fun initCharacteristicsByTypes() {
+        for ((_, value) in characteristics) {
+            value.type?.let { characteristicsByTypes[it] = value }
+        }
+    }
 
     // Gets device for given device address
     fun getDevice(address: String): Device? {
@@ -279,16 +295,24 @@ class Engine {
 
     // Gets service for given UUID
     fun getService(uuid: UUID?): Service? {
-        return services!![uuid]
+        return services[uuid]
     }
 
     // Gets characteristic for given UUID
     fun getCharacteristic(uuid: UUID?): Characteristic? {
-        return characteristics!![uuid]
+        return characteristics[uuid]
+    }
+
+    fun getCharacteristicByType(type: String): Characteristic? {
+        return characteristicsByTypes[type]
     }
 
     fun getDescriptorByUUID(uuid: UUID?): Descriptor? {
-        return descriptors!![uuid]
+        return descriptors[uuid]
+    }
+
+    fun getDescriptorByType(type: String): Descriptor? {
+        return descriptorsByTypes[type]
     }
 
     // Gets unit for given UUID
@@ -305,25 +329,9 @@ class Engine {
     // Clears all data lists
     fun close() {
         devices?.clear()
-        characteristics?.clear()
-        services?.clear()
+        characteristics.clear()
+        services.clear()
         units.clear()
         formats.clear()
-    }
-
-    companion object {
-        var instance: Engine? = null
-            get() {
-                if (field == null) {
-                    synchronized(locker) {
-                        if (field == null) {
-                            field = Engine()
-                        }
-                    }
-                }
-                return field
-            }
-            private set
-        private val locker = Any()
     }
 }

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/silabs_dialog_title_background"
+    android:clipToPadding="false">
+
+    <TextView
+        android:id="@+id/tv_characteristic_name"
+        style="@style/TitleMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        app:layout_constraintEnd_toStartOf="@id/ib_copy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Characteristic Name" />
+
+    <ImageButton
+        android:id="@+id/ib_copy"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/btn_grey_ripple_effect"
+        android:contentDescription="@string/label_copy"
+        android:src="@drawable/ic_copy"
+        android:tint="@color/silabs_primary_icon"
+        app:layout_constraintEnd_toStartOf="@id/ib_edit"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/ib_edit"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/btn_grey_ripple_effect"
+        android:contentDescription="@string/label_edit"
+        android:src="@drawable/ic_edit2"
+        android:tint="@color/silabs_primary_icon"
+        app:layout_constraintEnd_toStartOf="@id/ib_remove"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/ib_remove"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/btn_grey_ripple_effect"
+        android:contentDescription="@string/label_remove"
+        android:src="@drawable/ic_trash"
+        android:tint="@color/silabs_primary_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_characteristic_uuid"
+        style="@style/TextMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintEnd_toStartOf="@id/ib_copy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_characteristic_name"
+        tools:text="UUID: 0x2A1E" />
+
+    <LinearLayout
+        android:id="@+id/ll_properties"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_characteristic_uuid">
+
+        <TextView
+            android:id="@+id/tv_property_write"
+            style="@style/TitleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:text="@string/gatt_configurator_label_write"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/ic_edit"
+            app:drawableTint="@color/silabs_primary_icon" />
+
+        <TextView
+            android:id="@+id/tv_property_read"
+            style="@style/TitleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:text="@string/gatt_configurator_label_read"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/ic_read_off"
+            app:drawableTint="@color/silabs_primary_icon" />
+
+        <TextView
+            android:id="@+id/tv_property_indicate"
+            style="@style/TitleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:text="@string/gatt_configurator_label_indicate"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/ic_indicate_off"
+            app:drawableTint="@color/silabs_primary_icon" />
+
+        <TextView
+            android:id="@+id/tv_property_notify"
+            style="@style/TitleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:text="@string/gatt_configurator_label_notify"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/ic_notify_off"
+            app:drawableTint="@color/silabs_primary_icon" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view_descriptors_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/silabs_divider"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_properties" />
+
+    <TextView
+        android:id="@+id/tv_descriptors"
+        style="@style/TitleMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/Descriptors_colon"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view_descriptors_separator" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cv_descriptors"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_descriptors">
+
+        <LinearLayout
+            android:id="@+id/ll_descriptors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_descriptors" />
+    </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/btn_add_descriptor"
+        style="@style/ButtonBlue"
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:layout_marginStart="16dp"
+        android:text="@string/button_add_descriptor"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cv_descriptors" />
+
+    <View
+        android:id="@+id/view_characteristic_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/silabs_divider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_add_descriptor" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

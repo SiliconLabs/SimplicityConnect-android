@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Advertiser.Dialogs
+package com.siliconlabs.bledemo.advertiser.dialogs
 
 import android.bluetooth.BluetoothAdapter
 import android.os.Bundle
@@ -9,8 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import com.siliconlabs.bledemo.Base.BaseDialogFragment
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.dialog_device_name.view.*
 
 class DeviceNameDialog(val callback: DeviceNameCallback) : BaseDialogFragment() {

@@ -1,5 +1,5 @@
-package com.siliconlabs.bledemo.Browser.Models
+package com.siliconlabs.bledemo.browser.models
 
-import com.siliconlabs.bledemo.BeaconUtils.BleFormat
+import com.siliconlabs.bledemo.beacon_utils.BleFormat
 
 class BeaconType(var beaconTypeName: String, var isChecked: Boolean, var bleFormat: BleFormat)

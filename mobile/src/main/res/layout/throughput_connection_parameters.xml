@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cv_connection_parameters"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="8dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+            <RadioGroup
+                android:id="@+id/rl_radio_boxes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                    <RadioButton
+                        android:id="@+id/rb_notifications"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:checked="true"
+                        android:text="@string/throughput_label_notifications" />
+
+                    <View
+                        android:id="@+id/view_horizontal_divider"
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:layout_alignTop="@id/rb_notifications"
+                        android:layout_alignBottom="@id/rb_notifications"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_toEndOf="@id/rb_notifications"
+                        android:background="@color/silabs_divider" />
+
+                    <RadioButton
+                        android:id="@+id/rb_indications"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_toEndOf="@id/view_horizontal_divider"
+                        android:text="@string/throughput_label_indications" />
+
+            </RadioGroup>
+
+        <View
+            android:id="@+id/view_vertical_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/rl_radio_boxes"
+            android:layout_marginTop="6dp"
+            android:background="@color/silabs_divider" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/view_vertical_divider"
+            android:fillViewport="true">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:id="@+id/tv_connection_parameters"
+                    style="@style/TitleLarge"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/throughput_label_connection_parameters"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_phy_label"
+                    style="@style/TextBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/throughput_phy_colon"
+                    android:textColor="@color/silabs_subtle_text"
+                    app:layout_constraintStart_toStartOf="@id/tv_connection_parameters"
+                    app:layout_constraintTop_toBottomOf="@id/tv_connection_parameters" />
+
+                <TextView
+                    android:id="@+id/tv_phy_status_value"
+                    style="@style/TitleBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_phy_label"
+                    app:layout_constraintStart_toEndOf="@id/tv_phy_label"
+                    app:layout_constraintTop_toTopOf="@id/tv_phy_label"
+                    tools:text="0M" />
+
+                <TextView
+                    android:id="@+id/tv_interval_label"
+                    style="@style/TextBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/throughput_interval_colon"
+                    android:textColor="@color/silabs_subtle_text"
+                    app:layout_constraintStart_toStartOf="@id/tv_connection_parameters"
+                    app:layout_constraintTop_toBottomOf="@id/tv_phy_label" />
+
+                <TextView
+                    android:id="@+id/tv_interval_value"
+                    style="@style/TitleBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_interval_label"
+                    app:layout_constraintStart_toEndOf="@id/tv_interval_label"
+                    app:layout_constraintTop_toTopOf="@id/tv_interval_label"
+                    tools:text="0ms" />
+
+                <TextView
+                    android:id="@+id/tv_latency_label"
+                    style="@style/TextBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/throughput_latency_colon"
+                    android:textColor="@color/silabs_subtle_text"
+                    app:layout_constraintStart_toStartOf="@id/tv_connection_parameters"
+                    app:layout_constraintTop_toBottomOf="@id/tv_interval_label" />
+
+                <TextView
+                    android:id="@+id/tv_latency_value"
+                    style="@style/TitleBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_latency_label"
+                    app:layout_constraintStart_toEndOf="@id/tv_latency_label"
+                    app:layout_constraintTop_toTopOf="@id/tv_latency_label"
+                    tools:text="0" />
+
+                <TextView
+                    android:id="@+id/tv_supervision_timeout_label"
+                    style="@style/TextBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/throughput_supervision_timeout_colon"
+                    android:textColor="@color/silabs_subtle_text"
+                    app:layout_constraintStart_toStartOf="@id/tv_connection_parameters"
+                    app:layout_constraintTop_toBottomOf="@id/tv_latency_label" />
+
+                <TextView
+                    android:id="@+id/tv_supervision_timeout_value"
+                    style="@style/TitleBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_supervision_timeout_label"
+                    app:layout_constraintStart_toEndOf="@id/tv_supervision_timeout_label"
+                    app:layout_constraintTop_toTopOf="@id/tv_supervision_timeout_label"
+                    tools:text="0ms" />
+
+                <TextView
+                    android:id="@+id/tv_pdu_label"
+                    style="@style/TextBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/throughput_pdu_colon"
+                    android:textColor="@color/silabs_subtle_text"
+                    app:layout_constraintStart_toStartOf="@id/tv_connection_parameters"
+                    app:layout_constraintTop_toBottomOf="@id/tv_supervision_timeout_label" />
+
+                <TextView
+                    android:id="@+id/tv_pdu_value"
+                    style="@style/TitleBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_pdu_label"
+                    app:layout_constraintStart_toEndOf="@id/tv_pdu_label"
+                    app:layout_constraintTop_toTopOf="@id/tv_pdu_label"
+                    tools:text="0 bytes" />
+
+                <TextView
+                    android:id="@+id/tv_mtu_label"
+                    style="@style/TextBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/throughput_mtu_colon"
+                    android:textColor="@color/silabs_subtle_text"
+                    app:layout_constraintStart_toStartOf="@id/tv_connection_parameters"
+                    app:layout_constraintTop_toBottomOf="@id/tv_pdu_label" />
+
+                <TextView
+                    android:id="@+id/tv_mtu_value"
+                    style="@style/TitleBig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_mtu_label"
+                    app:layout_constraintStart_toEndOf="@id/tv_mtu_label"
+                    app:layout_constraintTop_toTopOf="@id/tv_mtu_label"
+                    tools:text="0 bytes" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Utils
+package com.siliconlabs.bledemo.utils
 
 object StringUtils {
 

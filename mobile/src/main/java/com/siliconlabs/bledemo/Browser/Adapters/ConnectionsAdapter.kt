@@ -1,6 +1,6 @@
-package com.siliconlabs.bledemo.Browser.Adapters
+package com.siliconlabs.bledemo.browser.adapters
 
-import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -11,14 +11,14 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
-import com.siliconlabs.bledemo.Browser.Adapters.ConnectionsAdapter.ConnectionViewHolder
-import com.siliconlabs.bledemo.Browser.ServicesConnectionsCallback
+import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.browser.adapters.ConnectionsAdapter.ConnectionViewHolder
+import com.siliconlabs.bledemo.browser.ServicesConnectionsCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.Constants
+import com.siliconlabs.bledemo.utils.Constants
 import java.util.*
 
-class ConnectionsAdapter(var connectionsList: List<BluetoothDevice>, private val context: Context) : RecyclerView.Adapter<ConnectionViewHolder>() {
+class ConnectionsAdapter(var connectionsList: List<BluetoothGatt>, private val context: Context) : RecyclerView.Adapter<ConnectionViewHolder>() {
     private var servicesConnectionsCallback: ServicesConnectionsCallback? = null
     var selectedDevice: String? = null
 
@@ -28,7 +28,9 @@ class ConnectionsAdapter(var connectionsList: List<BluetoothDevice>, private val
         private var progressBar = itemView.findViewById(R.id.progress_bar_connections) as ProgressBar
         var layout = itemView.findViewById(R.id.connected_device_item) as LinearLayout
 
-        fun bind(device: BluetoothDevice) {
+        fun bind(gatt: BluetoothGatt) {
+            val device = gatt.device
+
             progressBar.visibility = View.GONE
             btnDisconnect.visibility = View.VISIBLE
 
@@ -60,7 +62,7 @@ class ConnectionsAdapter(var connectionsList: List<BluetoothDevice>, private val
                 btnDisconnect.visibility = View.GONE
                 val bluetoothDeviceInfo = BluetoothDeviceInfo()
                 bluetoothDeviceInfo.device = device
-                servicesConnectionsCallback?.onDeviceClicked(bluetoothDeviceInfo)
+                servicesConnectionsCallback?.onDeviceClicked(bluetoothDeviceInfo.device)
             }
 
         }

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Base
+package com.siliconlabs.bledemo.base
 
 import android.app.ProgressDialog
 import android.content.Context

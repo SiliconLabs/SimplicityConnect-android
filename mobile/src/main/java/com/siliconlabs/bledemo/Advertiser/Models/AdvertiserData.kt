@@ -1,10 +1,10 @@
-package com.siliconlabs.bledemo.Advertiser.Models
+package com.siliconlabs.bledemo.advertiser.models
 
 import android.bluetooth.le.AdvertiseSettings
 import android.os.Parcelable
 import com.google.gson.Gson
-import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
-import com.siliconlabs.bledemo.Advertiser.Enums.LimitType
+import com.siliconlabs.bledemo.advertiser.enums.AdvertisingMode
+import com.siliconlabs.bledemo.advertiser.enums.LimitType
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

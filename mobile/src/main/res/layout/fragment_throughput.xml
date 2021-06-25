@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rl_speed_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.siliconlabs.bledemo.throughput.views.SpeedView
+            android:id="@+id/speed_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="64dp"
+            android:layout_marginEnd="64dp" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/scanning_separator"
+        android:layout_below="@id/rl_speed_view"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <include
+            android:id="@+id/view_connection_parameters"
+            layout="@layout/throughput_connection_parameters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp" />
+    </LinearLayout>
+
+    <com.siliconlabs.bledemo.views.HorizontalShadow
+        android:id="@+id/scanning_separator"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shadow_height"
+        android:layout_above="@id/rl_start_stop" />
+
+    <RelativeLayout
+        android:id="@+id/rl_start_stop"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/silabs_white">
+
+        <Button
+            android:id="@+id/btn_start_stop"
+            style="@style/ButtonBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_centerInParent="true"
+            android:paddingHorizontal="10dp"
+            android:text="@string/button_start"
+            android:textSize="18sp" />
+    </RelativeLayout>
+</RelativeLayout>

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusableInTouchMode="true"
-    tools:context=".Advertiser.Activities.AdvertiserConfigActivity">
+    tools:context=".advertiser.activities.AdvertiserConfigActivity">
 
     <include
         android:id="@+id/toolbar_advertiser"
@@ -44,12 +44,9 @@
         </LinearLayout>
     </ScrollView>
 
-    <View
+    <com.siliconlabs.bledemo.views.HorizontalShadow
         android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
-        android:layout_below="@id/toolbar_advertiser"
-        android:background="@drawable/scanning_bar_shadow"
-        android:elevation="1dp"
-        android:rotation="180" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_advertiser" />
 
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Browser.Fragments
+package com.siliconlabs.bledemo.browser.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.siliconlabs.bledemo.Browser.Adapters.MappingAdapter
-import com.siliconlabs.bledemo.Browser.Models.Mapping
-import com.siliconlabs.bledemo.Browser.Models.MappingType
+import com.siliconlabs.bledemo.browser.adapters.MappingAdapter
+import com.siliconlabs.bledemo.browser.models.Mapping
+import com.siliconlabs.bledemo.browser.models.MappingType
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.SharedPrefUtils
+import com.siliconlabs.bledemo.utils.SharedPrefUtils
 import kotlinx.android.synthetic.main.fragment_characteristic_mappings.*
 import java.util.*
 import kotlin.collections.ArrayList

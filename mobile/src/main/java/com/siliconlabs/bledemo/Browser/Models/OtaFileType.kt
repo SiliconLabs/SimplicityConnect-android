@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Browser.Models
+package com.siliconlabs.bledemo.browser.models
 
 enum class OtaFileType {
     APPLICATION,

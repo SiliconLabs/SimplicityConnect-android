@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:minWidth="250dp"
+    app:cardCornerRadius="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/silabs_white"
+        android:minWidth="250dp"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/DialogHeaderText"
+            android:layout_width="match_parent"
+            android:text="@string/iop_test_title_device_name" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/silabs_white"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <EditText
+                android:id="@+id/et_device_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/iop_test_hint_enter_device_name"
+                android:inputType="textCapWords"
+                android:text="@string/iop_test_label_IOP_Test"
+                android:textColor="@color/silabs_subtle_text"
+                android:textSize="14sp" />
+
+            <TextView
+                style="@style/TextSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@color/silabs_white"
+                android:text="@string/iop_test_note_device_name_dialog"
+                android:textColor="@color/silabs_dark_gray_text" />
+
+            <Button
+                android:id="@+id/btn_interoperability_test"
+                style="@style/ButtonBlueWithBorders"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/iop_test_label_interoperability_test" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/silabs_white"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <Button
+                android:id="@+id/btn_cancel"
+                style="@style/ButtonBorderlessBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/button_cancel" />
+
+            <Button
+                android:id="@+id/btn_ok"
+                style="@style/ButtonBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/button_ok" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

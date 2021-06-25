@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/silabs_background"
-    tools:context=".Browser.Activities.DeviceServicesActivity">
+    tools:context=".browser.activities.DeviceServicesActivity">
 
     <include
         android:id="@+id/toolbar_device_services"
@@ -58,14 +58,6 @@
         android:layout_height="36dp"
         android:layout_below="@id/header_services" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
-        android:layout_below="@id/services_toolbar"
-        android:background="@drawable/scanning_bar_shadow"
-        android:elevation="1dp"
-        android:rotation="180" />
-
     <RelativeLayout
         android:id="@+id/framelayout_container"
         android:layout_width="match_parent"
@@ -96,31 +88,20 @@
         android:layout_below="@id/services_toolbar"
         android:background="@color/silabs_transparent">
 
-        <RelativeLayout
-            android:id="@+id/scrollViewWrapper"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/services_fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:id="@+id/services_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:paddingLeft="@dimen/swipe_refresh_devices_horizontal_padding"
-                    android:paddingRight="@dimen/swipe_refresh_devices_horizontal_padding" />
-            </ScrollView>
-        </RelativeLayout>
+            android:layout_height="match_parent"
+            android:layout_above="@id/services_bottom_nav" />
 
         <RelativeLayout
             android:id="@+id/loading_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_above="@+id/services_bottom_nav"
             android:background="@color/silabs_connecting_background"
-            android:visibility="gone">
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <LinearLayout
                 android:id="@+id/device_services_background"
@@ -164,6 +145,13 @@
             </RelativeLayout>
         </RelativeLayout>
 
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/services_bottom_nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            app:menu="@menu/services_bottom_nav" />
+
         <RelativeLayout
             android:id="@+id/log_body_connected"
             android:layout_width="match_parent"
@@ -181,4 +169,10 @@
                 android:background="@color/silabs_red" />
         </RelativeLayout>
     </RelativeLayout>
+
+    <com.siliconlabs.bledemo.views.HorizontalShadow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/services_toolbar" />
+
 </RelativeLayout>

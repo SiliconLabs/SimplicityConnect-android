@@ -15,7 +15,7 @@
             android:id="@+id/tv_dialog_title"
             style="@style/DialogHeaderText"
             android:layout_width="match_parent"
-            android:text="@string/Leave_Browser" />
+            android:text="@string/Leave_Application" />
 
         <View
             android:layout_width="match_parent"
@@ -38,7 +38,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
                     android:padding="24dp"
-                    android:text="@string/leave_browser_info"
+                    android:text="@string/leave_application_info"
                     android:textColor="@color/silabs_primary_text"
                     android:textSize="14sp" />
 

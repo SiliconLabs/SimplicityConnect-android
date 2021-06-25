@@ -1,9 +1,9 @@
-package com.siliconlabs.bledemo.Browser
+package com.siliconlabs.bledemo.browser
 
-import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
+import android.bluetooth.BluetoothDevice
 
 interface DebugModeCallback {
-    fun connectToDevice(device: BluetoothDeviceInfo?)
+    fun connectToDevice(device: BluetoothDevice)
     fun addToFavorite(deviceAddress: String)
     fun removeFromFavorite(deviceAddress: String)
     fun addToTemporaryFavorites(deviceAddress: String)

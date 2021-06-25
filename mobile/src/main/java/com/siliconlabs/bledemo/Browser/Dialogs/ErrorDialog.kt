@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Browser.Dialogs
+package com.siliconlabs.bledemo.browser.dialogs
 
 import android.content.DialogInterface
 import android.os.Bundle
@@ -6,9 +6,9 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.siliconlabs.bledemo.Base.BaseDialogFragment
-import com.siliconlabs.bledemo.Bluetooth.BLE.ErrorCodes.getATTHTMLFormattedError
-import com.siliconlabs.bledemo.Bluetooth.BLE.ErrorCodes.getOneOctetErrorCodeHexAsString
+import com.siliconlabs.bledemo.base.BaseDialogFragment
+import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes.getATTHTMLFormattedError
+import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes.getOneOctetErrorCodeHexAsString
 import com.siliconlabs.bledemo.R
 import kotlinx.android.synthetic.main.dialog_error.*
 

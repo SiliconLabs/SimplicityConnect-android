@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Browser.Views
+package com.siliconlabs.bledemo.browser.views
 
 import android.content.Context
 import android.util.AttributeSet

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Browser.Fragments
+package com.siliconlabs.bledemo.browser.fragments
 
 import android.app.Dialog
 import android.bluetooth.BluetoothGatt
@@ -21,17 +21,18 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.siliconlabs.bledemo.Advertiser.Utils.HtmlCompat
-import com.siliconlabs.bledemo.Bluetooth.DataTypes.*
-import com.siliconlabs.bledemo.Bluetooth.DataTypes.Enumeration
-import com.siliconlabs.bledemo.Bluetooth.Parsing.Common
-import com.siliconlabs.bledemo.Bluetooth.Parsing.Consts
-import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine
-import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothLeService
-import com.siliconlabs.bledemo.Browser.Activities.DeviceServicesActivity
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.Converters
-import com.siliconlabs.bledemo.Utils.StringUtils
+import com.siliconlabs.bledemo.advertiser.utils.HtmlCompat
+import com.siliconlabs.bledemo.bluetooth.data_types.*
+import com.siliconlabs.bledemo.bluetooth.data_types.Enumeration
+import com.siliconlabs.bledemo.bluetooth.parsing.Common
+import com.siliconlabs.bledemo.bluetooth.parsing.Consts
+import com.siliconlabs.bledemo.bluetooth.parsing.Engine
+import com.siliconlabs.bledemo.bluetooth.services.BluetoothLeService
+import com.siliconlabs.bledemo.browser.activities.DeviceServicesActivity
+import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.utils.StringUtils
+import com.siliconlabs.bledemo.utils.UuidUtils
 import java.math.BigInteger
 import java.util.*
 import kotlin.collections.ArrayList
@@ -39,6 +40,7 @@ import kotlin.math.pow
 
 open class FragmentCharacteristicDetail : Fragment() {
 
+    var isRemote: Boolean = true
     private var currRefreshInterval = REFRESH_INTERVAL
 
     lateinit var fieldsInRangeMap: HashMap<Field, Boolean>
@@ -104,15 +106,17 @@ open class FragmentCharacteristicDetail : Fragment() {
         valuesLayout = view.findViewById(R.id.values_layout)
 
         mDevice = (activity as DeviceServicesActivity).bluetoothGatt
-        mCharact = Engine.instance?.getCharacteristic(mBluetoothCharact?.uuid)
-        mService = Engine.instance?.getService(mBluetoothCharact?.service?.uuid)
+        mCharact = Engine.getCharacteristic(mBluetoothCharact?.uuid)
+        mService = Engine.getService(mBluetoothCharact?.service?.uuid)
 
         setProperties()
-        Log.d("Charac", mBluetoothCharact?.uuid.toString() + " " + mBluetoothCharact?.instanceId)
-        mBluetoothCharact?.properties
+        Log.d(
+            TAG,
+            "charac " + mBluetoothCharact?.uuid.toString() + " " + mBluetoothCharact?.instanceId
+        )
 
         configureWriteable()
-        updateBall()
+        setupRefreshInterval()
 
         if (!isRawValue) {
             prepareValueData()
@@ -161,9 +165,12 @@ open class FragmentCharacteristicDetail : Fragment() {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Toast.makeText(activity, getText(R.string.characteristic_write_success), Toast.LENGTH_SHORT).show()
                 editableFieldsDialog?.dismiss()
-                (activity as DeviceServicesActivity).refreshCharacteristicExpansion()
             } else {
-                Toast.makeText(activity, getText(R.string.characteristic_write_fail), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    activity,
+                    getText(R.string.characteristic_write_fail),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -171,34 +178,32 @@ open class FragmentCharacteristicDetail : Fragment() {
     fun onActionDataAvailable(uuidCharacteristic: String) {
         if (currRefreshInterval >= REFRESH_INTERVAL) {
             if (uuidCharacteristic == mBluetoothCharact?.uuid.toString()) {
-                activity?.runOnUiThread {
-                    if (currRefreshInterval >= REFRESH_INTERVAL) {
-                        currRefreshInterval = 0
-                        offset = 0
+                updateValueView()
+            }
+        }
+    }
 
-                        value = if(mBluetoothCharact?.value == null) {
-                            ByteArray(0)
-                        } else {
-                            mBluetoothCharact?.value!!
-                        }
+    private fun updateValueView() {
+        activity?.runOnUiThread {
+            if (currRefreshInterval >= REFRESH_INTERVAL) {
+                currRefreshInterval = 0
+                offset = 0
 
+                value = mBluetoothCharact?.value?.clone() ?: byteArrayOf()
 
-                        if (indicationsEnabled || notificationsEnabled) {
-                            valuesLayout.removeAllViews()
-                            loadValueViews()
-                        } else if (value.contentEquals(previousValue)) {
-                            hideValues()
-                            handler.removeCallbacks(postDisplayValues)
-                            handler.postDelayed(postDisplayValues, 150)
-                        } else {
-                            valuesLayout.removeAllViews()
-                            handler.removeCallbacks(postLoadValueViews)
-                            handler.postDelayed(postLoadValueViews, 150)
-                        }
-                        if (value.isNotEmpty()) previousValue = value.clone()
-
-                    }
+                if (indicationsEnabled || notificationsEnabled) {
+                    valuesLayout.removeAllViews()
+                    loadValueViews()
+                } else if (value.contentEquals(previousValue)) {
+                    hideValues()
+                    handler.removeCallbacks(postDisplayValues)
+                    handler.postDelayed(postDisplayValues, 150)
+                } else {
+                    valuesLayout.removeAllViews()
+                    handler.removeCallbacks(postLoadValueViews)
+                    handler.postDelayed(postLoadValueViews, 150)
                 }
+                if (value.isNotEmpty()) previousValue = value.clone()
             }
         }
     }
@@ -238,29 +243,36 @@ open class FragmentCharacteristicDetail : Fragment() {
     private fun writeValueToCharacteristic() {
         val hexEdit = editableFieldsDialog?.findViewById<EditText>(R.id.hex_edit)
 
-        if (writeWithResponse) mBluetoothCharact?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-        else mBluetoothCharact?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+        mBluetoothCharact?.writeType =
+            if (writeWithResponse) BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            else BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
 
         if (hexEdit != null) {
             val hex = hexEdit.text.toString().replace("\\s+".toRegex(), "")
             val newValue = hexToByteArray(hex)
             try {
-                Log.d("Name", "" + mDevice?.device?.name)
-                Log.d("Address", "" + mDevice?.device?.address)
-                Log.d("Service", "" + mBluetoothCharact?.service?.uuid)
-                Log.d("Charac", "" + mBluetoothCharact?.uuid)
-                mBluetoothCharact?.value = newValue
-                Log.d("hex", "" + Converters.bytesToHexWhitespaceDelimited(mBluetoothCharact?.value))
-                mDevice?.writeCharacteristic(mBluetoothCharact)
+                Log.d(TAG, "name=${mDevice?.device?.name} address=${mDevice?.device?.address} service=${mBluetoothCharact?.service?.uuid} charac=${mBluetoothCharact?.uuid}")
+                Log.d(TAG, "hex = ${Converters.bytesToHexWhitespaceDelimited(newValue)}")
+                saveValueInCharacteristic(newValue)
             } catch (e: Exception) {
-                Log.e("Service", "null$e")
+                Log.e(TAG, "null$e")
             }
         } else {
             if (possibleToSave()) {
-                mBluetoothCharact?.value = value
-                mDevice?.writeCharacteristic(mBluetoothCharact)
-                Log.d("write_val", "Standard Value to write (hex): " + Converters.bytesToHexWhitespaceDelimited(value))
+                saveValueInCharacteristic(value.clone())
+                Log.d(TAG, "write_val: Standard Value to write (hex): " + Converters.bytesToHexWhitespaceDelimited(value))
             }
+        }
+    }
+
+    private fun saveValueInCharacteristic(newValue: ByteArray) {
+        mBluetoothCharact?.value = newValue
+
+        if (isRemote) {
+            mDevice?.writeCharacteristic(mBluetoothCharact)
+        } else {
+            updateValueView()
+            editableFieldsDialog?.dismiss()
         }
     }
 
@@ -313,14 +325,14 @@ open class FragmentCharacteristicDetail : Fragment() {
     }
 
     // Count time that is used to preventing from very fast refreshing view
-    private fun updateBall() {
+    private fun setupRefreshInterval() {
         val timer = Timer()
-        val updateBall: TimerTask = object : TimerTask() {
+        val updateRefreshInterval = object : TimerTask() {
             override fun run() {
                 currRefreshInterval += REFRESH_INTERVAL
             }
         }
-        timer.scheduleAtFixedRate(updateBall, 0, REFRESH_INTERVAL.toLong())
+        timer.scheduleAtFixedRate(updateRefreshInterval, 0, REFRESH_INTERVAL.toLong())
     }
 
     fun getmCharact(): Characteristic? {
@@ -349,8 +361,7 @@ open class FragmentCharacteristicDetail : Fragment() {
                 val field = mCharact?.fields!![i]
                 addField(field)
             } catch (ex: Exception) {
-                Log.i("CharacteristicUI", i.toString())
-                Log.i("Characteristic value", Converters.getDecimalValue(value))
+                Log.i(TAG, "addNormalValue characteristic ui=" + i.toString() + " value=" + Converters.getDecimalValue(value))
                 parsingProblemInfo = prepareParsingProblemInfo(mCharact)
                 parseProblem = true
                 return false
@@ -374,7 +385,7 @@ open class FragmentCharacteristicDetail : Fragment() {
         try {
             for (i in characteristic?.fields?.indices!!) {
                 val field = characteristic.fields!![i]
-                expectedBytes += Engine.instance?.getFormat(field.format)!!
+                expectedBytes += Engine.getFormat(field.format)!!
             }
         } catch (ex: NullPointerException) {
             return builder.toString()
@@ -427,39 +438,25 @@ open class FragmentCharacteristicDetail : Fragment() {
 
     // Initializes byte array with empty characteristic content
     private fun prepareValueData() {
-        val size = characteristicSize()
+        val size = mCharact.size()
         if (size != 0) {
             value = ByteArray(size)
         }
     }
 
     // Returns characteristic size in bytes
-    private fun characteristicSize(): Int {
-        var size = 0
-        for (field in mCharact?.fields.orEmpty()) {
-            size += fieldSize(field)
-        }
-        return size
+    private fun Characteristic?.size(): Int {
+        return this?.fields.orEmpty().sumBy { it.size() }
     }
 
     // Returns only one field size in bytes
-    private fun fieldSize(field: Field): Int {
-        val format = field.format
-        return when {
-            format != null -> Engine.instance?.getFormat(format)!!
-            field.referenceFields?.size!! > 0 -> {
-                var subFieldsSize = 0
-                for (subField in field.referenceFields!!) {
-                    subFieldsSize += fieldSize(subField)
-                }
-                subFieldsSize
-            }
-            else -> 0
-        }
+    private fun Field.size(): Int {
+        return format?.let { Engine.getFormat(it) }
+            ?: referenceFields?.sumBy { it.size() }
+            ?: 0
     }
 
-    // Checks if field is present based on it's requirements and bitfield
-    // settings
+    // Checks if field is present based on it's requirements and bitfield settings
     private fun isFieldPresent(field: Field): Boolean {
         if (parseProblem) {
             return true
@@ -483,7 +480,7 @@ open class FragmentCharacteristicDetail : Fragment() {
 
     // Checks requirement on exactly given bitfield, enumeration and bit
     private fun checkRequirement(bitField: Field, enumeration: Enumeration, bit: Bit): Boolean {
-        val formatLength = Engine.instance?.getFormat(bitField.format)
+        val formatLength = Engine.getFormat(bitField.format)
         val off = getFieldOffset(bitField)
         val tmpVal = readInt(off, formatLength!!)
         val enumVal = readEnumInt(bit.index, bit.size, tmpVal)
@@ -582,7 +579,7 @@ open class FragmentCharacteristicDetail : Fragment() {
         if (value.isEmpty()) {
             return ""
         }
-        val formatLength = Engine.instance?.getFormat(format)
+        val formatLength = Engine.getFormat(format)
 
         // if format is sint16
         if (format.toLowerCase(Locale.getDefault()) == "sint16") {
@@ -595,7 +592,12 @@ open class FragmentCharacteristicDetail : Fragment() {
         val binaryString = StringBuilder()
         try {
             for (i in offset until offset + formatLength!!) {
-                binaryString.append(String.format("%8s", Integer.toBinaryString(value[i].toInt().and(0xFF))).replace(' ', '0'))
+                binaryString.append(
+                    String.format(
+                        "%8s",
+                        Integer.toBinaryString(value[i].toInt().and(0xFF))
+                    ).replace(' ', '0')
+                )
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -604,7 +606,14 @@ open class FragmentCharacteristicDetail : Fragment() {
         // If field length equals 0 then reads from offset to end of characteristic data
         if (formatLength == 0) {
             if (format.toLowerCase(Locale.getDefault()) == "reg-cert-data-list") {
-                result = StringBuilder("0x" + Converters.bytesToHexWhitespaceDelimited(value.copyOfRange(offset, value.size)))
+                result = StringBuilder(
+                    "0x" + Converters.bytesToHexWhitespaceDelimited(
+                        value.copyOfRange(
+                            offset,
+                            value.size
+                        )
+                    )
+                )
                 result = StringBuilder(result.toString().replace(" ", ""))
             } else {
                 result = StringBuilder(String(value.copyOfRange(offset, value.size)))
@@ -626,7 +635,8 @@ open class FragmentCharacteristicDetail : Fragment() {
         // bluegiga code fix, original source code did not check for sint or uint
         if (format.toLowerCase(Locale.getDefault()).startsWith("sint")) {
             try {
-                result = StringBuilder(Converters.getDecimalValueFromTwosComplement(binaryString.toString()))
+                result =
+                    StringBuilder(Converters.getDecimalValueFromTwosComplement(binaryString.toString()))
                 return result.toString()
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -642,7 +652,10 @@ open class FragmentCharacteristicDetail : Fragment() {
                     val byteAsInt: Int = bytes[formatLength - 1 - i].toInt().and(0xff)
                     uintAsLong = uintAsLong or byteAsInt.toLong()
                 }
-                val uintVal = if (formatLength < 9) "" + uintAsLong else BigInteger("0$binaryString", 2).toString(16)
+                val uintVal = if (formatLength < 9) "" + uintAsLong else BigInteger(
+                    "0$binaryString",
+                    2
+                ).toString(16)
                 return "" + uintVal
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -675,9 +688,17 @@ open class FragmentCharacteristicDetail : Fragment() {
 
     // Sets value from offset position
     private fun setValue(off: Int, arr: ByteArray) {
-        for (i in off until off + arr.size) {
-            value[i] = arr[i - off]
+        if (value.isEmpty()) {
+            value = ByteArray(mCharact.size())
         }
+        if (arr.size + off > value.size) {
+            Log.w(
+                TAG,
+                "setValue: Value to set too big (${arr.size} offset=${off}) for the field (${value.size})"
+            )
+            return
+        }
+        arr.copyInto(value, destinationOffset = off)
     }
 
     // Gets field offset in bytes
@@ -685,7 +706,7 @@ open class FragmentCharacteristicDetail : Fragment() {
         foundField = false
         var off = 0
 
-        for (field in mCharact?.fields.orEmpty()) {
+        mCharact?.fields?.forEach { field ->
             off += getOffset(field, searchField)
         }
         foundField = true
@@ -706,7 +727,7 @@ open class FragmentCharacteristicDetail : Fragment() {
                 }
             } else {
                 if (field.format != null) {
-                    off += Engine.instance?.getFormat(field.format)!!
+                    off += Engine.getFormat(field.format)!!
                 }
             }
         }
@@ -911,16 +932,15 @@ open class FragmentCharacteristicDetail : Fragment() {
 
         ivClose?.setOnClickListener { editableFieldsDialog?.dismiss() }
 
-        var serviceName = if (mService != null) mService?.name!!.trim { it <= ' ' } else getString(R.string.unknown_service)
-        serviceName = Common.checkOTAService(mGattService?.uuid.toString(), serviceName)
+        val serviceName =
+                if (mService != null) mService?.name!!.trim { it <= ' ' }
+                else Common.checkForCustomServiceName(mGattService?.uuid!!, requireContext())
 
-        val characteristicName: String = if (mCharact != null) {
-            mCharact?.name!!.trim { it <= ' ' }
-        } else {
-            getOtaSpecificCharacteristicName(mBluetoothCharact?.uuid.toString())
-        }
+        val characteristicName =
+                if (mCharact != null) mCharact?.name!!.trim { it <= ' ' }
+                else Common.checkForCustomCharacteristicName(mBluetoothCharact?.uuid, requireContext())
 
-        val characteristicUuid = if (mCharact != null) Common.getUuidText(mCharact?.uuid!!) else Common.getUuidText(mBluetoothCharact?.uuid!!)
+        val characteristicUuid = if (mCharact != null) UuidUtils.getUuidText(mCharact?.uuid!!) else UuidUtils.getUuidText(mBluetoothCharact?.uuid!!)
         val serviceNameTextView = editableFieldsDialog?.findViewById<TextView>(R.id.picker_dialog_service_name)
         val characteristicTextView = editableFieldsDialog?.findViewById<TextView>(R.id.characteristic_dialog_characteristic_name)
         val uuidTextView = editableFieldsDialog?.findViewById<TextView>(R.id.picker_dialog_characteristic_uuid)
@@ -1213,25 +1233,51 @@ open class FragmentCharacteristicDetail : Fragment() {
     // Adds unit text view
     private fun addValueUnit(field: Field): TextView {
         val fieldUnitView = TextView(context)
-        fieldUnitView.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.characteristic_list_item_value_text_size))
-        context?.let { fieldUnitView.setBackgroundColor(ContextCompat.getColor(it, R.color.silabs_white)) }
+        fieldUnitView.setTextSize(
+            TypedValue.COMPLEX_UNIT_PX,
+            resources.getDimension(R.dimen.characteristic_list_item_value_text_size)
+        )
+        context?.let {
+            fieldUnitView.setBackgroundColor(
+                ContextCompat.getColor(
+                    it,
+                    R.color.silabs_white
+                )
+            )
+        }
         val fieldUnitParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+        )
         fieldUnitView.layoutParams = fieldUnitParams
-        val unit = Engine.instance?.getUnit(field.unit)
+        val unit = Engine.getUnit(field.unit)
         if (unit != null) {
             if (!TextUtils.isEmpty(unit.symbol)) {
-                if (unit.fullName.toLowerCase(Locale.getDefault()) == "celsius" || unit.fullName.toLowerCase(Locale.getDefault()) == "fahrenheit") {
+                if (unit.fullName.toLowerCase(Locale.getDefault()) == "celsius" || unit.fullName.toLowerCase(
+                        Locale.getDefault()
+                    ) == "fahrenheit"
+                ) {
                     // this makes sure that the degrees symbol for temperature is displayed correctly
-                    fieldUnitView.text = context?.getString(R.string.unit_with_whitespace, HtmlCompat.fromHtml(unit.symbol))
+                    fieldUnitView.text = context?.getString(
+                        R.string.unit_with_whitespace,
+                        HtmlCompat.fromHtml(unit.symbol)
+                    )
                 } else {
-                    fieldUnitView.text = context?.getString(R.string.unit_with_whitespace, unit.symbol)
+                    fieldUnitView.text =
+                        context?.getString(R.string.unit_with_whitespace, unit.symbol)
                 }
             } else {
-                fieldUnitView.text = context?.getString(R.string.unit_with_whitespace, unit.fullName)
+                fieldUnitView.text =
+                    context?.getString(R.string.unit_with_whitespace, unit.fullName)
             }
         }
-        context?.let { fieldUnitView.setTextColor(ContextCompat.getColor(it, R.color.silabs_primary_text)) }
+        context?.let {
+            fieldUnitView.setTextColor(
+                ContextCompat.getColor(
+                    it,
+                    R.color.silabs_primary_text
+                )
+            )
+        }
         return fieldUnitView
     }
 
@@ -1248,18 +1294,24 @@ open class FragmentCharacteristicDetail : Fragment() {
         val fieldValueEdit = EditText(context).apply {
             context?.let { setTextColor(it.getColor(R.color.silabs_primary_text)) }
             setSingleLine()
-            setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.characteristic_list_item_value_text_size))
+            setTextSize(
+                TypedValue.COMPLEX_UNIT_PX,
+                resources.getDimension(R.dimen.characteristic_list_item_value_text_size)
+            )
             setText(value)
             setBackgroundResource(R.drawable.et_custom_color)
             setPadding(0, 0, 0, 0)
         }
 
-        val fieldValueParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        val fieldValueParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
         fieldValueParams.gravity = Gravity.CENTER_VERTICAL
         fieldValueParams.leftMargin = FIELD_VALUE_EDIT_LEFT_MARGIN
         fieldValueEdit.layoutParams = fieldValueParams
 
-        var formatLength = Engine.instance?.getFormat(field.format)
+        var formatLength = Engine.getFormat(field.format)
         // Bluegiga code had a bug where formatlength = 0 fields were ignored on write
         if (formatLength == 0) {
             formatLength = value.length
@@ -1283,14 +1335,21 @@ open class FragmentCharacteristicDetail : Fragment() {
                         if (index != -1) {
                             when {
                                 inputValMoved.length - 1 - index > decimalExponentAbs -> {
-                                    inputValMoved = StringBuilder(inputValMoved.toString().replace(".", ""))
-                                    inputValMoved = StringBuilder(inputValMoved.substring(0, index + decimalExponentAbs) + "." + inputValMoved.substring(index + decimalExponentAbs))
+                                    inputValMoved =
+                                        StringBuilder(inputValMoved.toString().replace(".", ""))
+                                    inputValMoved = StringBuilder(
+                                        inputValMoved.substring(0, index + decimalExponentAbs)
+                                                + "."
+                                                + inputValMoved.substring(index + decimalExponentAbs)
+                                    )
                                 }
                                 inputValMoved.length - 1 - index == decimalExponentAbs -> {
-                                    inputValMoved = StringBuilder(inputValMoved.toString().replace(".", ""))
+                                    inputValMoved =
+                                        StringBuilder(inputValMoved.toString().replace(".", ""))
                                 }
                                 else -> {
-                                    inputValMoved = StringBuilder(inputValMoved.toString().replace(".", ""))
+                                    inputValMoved =
+                                        StringBuilder(inputValMoved.toString().replace(".", ""))
                                     for (i in inputValMoved.length - index until decimalExponentAbs) {
                                         inputValMoved.append("0")
                                     }
@@ -1305,7 +1364,12 @@ open class FragmentCharacteristicDetail : Fragment() {
                     val pair = Converters.convertStringTo(inputValMoved.toString(), field.format)
                     val newVal = pair.first
                     val inRange = pair.second
-                    Log.d("write_val", "Value to write from edittext conversion (hex): " + Converters.bytesToHexWhitespaceDelimited(newVal))
+                    Log.d(
+                        TAG,
+                        "write_val: Value to write from edittext conversion (hex): " + Converters.bytesToHexWhitespaceDelimited(
+                            newVal
+                        )
+                    )
                     for (i in valArr.indices) {
                         if (i < newVal!!.size) {
                             valArr[i] = newVal[i]
@@ -1462,7 +1526,7 @@ open class FragmentCharacteristicDetail : Fragment() {
     // Adds views related to bitfield value
     private fun addBitfield(field: Field) {
         if (field.reference == null) {
-            val formatLength = Engine.instance?.getFormat(field.format)
+            val formatLength = Engine.getFormat(field.format)
             val bitsLength = formatLength!! * 8
             var currentBit = 0
             val valueBits = getFieldValueAsLsoMsoBitsString(offset, formatLength)
@@ -1479,30 +1543,56 @@ open class FragmentCharacteristicDetail : Fragment() {
                 for (enumeration in bit.enumerations!!) {
                     enumerations.add(enumeration.value!!)
                 }
-                val nameAndValueParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                val nameAndValueParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
                 nameAndValueParams.setMargins(0, DEFAULT_MARGIN, 0, 12 + DEFAULT_MARGIN / 2)
                 val nameAndValueContainer = LinearLayout(context)
                 nameAndValueContainer.orientation = LinearLayout.VERTICAL
                 nameAndValueContainer.layoutParams = nameAndValueParams
-                val valueText: View = addValueText(enumerations[getValueInStringBitsRange(startBitIndex, endBitIndex, valueBits)])
+                val valueText: View = addValueText(
+                    enumerations[getValueInStringBitsRange(
+                        startBitIndex,
+                        endBitIndex,
+                        valueBits
+                    )]
+                )
                 val nameText = addFieldName(bit.name!!)
                 nameAndValueContainer.addView(valueText)
                 nameAndValueContainer.addView(nameText)
                 valuesLayout.addView(nameAndValueContainer)
                 hidableViews.add(valueText)
                 if (writeable || writeableWithoutResponse) {
-                    var params = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.5f)
+                    var params =
+                        LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.5f)
                     params.gravity = Gravity.CENTER_VERTICAL
                     params.setMargins(8, 0, 0, 0)
                     val spinner = Spinner(context)
-                    context?.let { spinner.adapter = ArrayAdapter(it, R.layout.enumeration_spinner_dropdown_item, enumerations) }
+                    context?.let {
+                        spinner.adapter = ArrayAdapter(
+                            it,
+                            R.layout.enumeration_spinner_dropdown_item,
+                            enumerations
+                        )
+                    }
                     spinner.layoutParams = params
                     val off = offset
                     spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+                        override fun onItemSelected(
+                            parent: AdapterView<*>?,
+                            view: View,
+                            position: Int,
+                            id: Long
+                        ) {
 
                             // After each spinner selection bits are prepared for characteristic write - value array is updated with selected value
-                            setStringBuilderBitsInRange(builder, startBitIndex, endBitIndex, position)
+                            setStringBuilderBitsInRange(
+                                builder,
+                                startBitIndex,
+                                endBitIndex,
+                                position
+                            )
                             val `val` = bitsStringToByteArray(builder.toString(), formatLength)
                             //intToByteArray(Integer.parseInt(builder.toString(), 2), formatLength);
                             setValue(off, `val`)
@@ -1516,7 +1606,10 @@ open class FragmentCharacteristicDetail : Fragment() {
                     params.setMargins(0, 0, 8, 0)
                     fieldName.layoutParams = params
                     val linearLayout = LinearLayout(context)
-                    linearLayout.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                    linearLayout.layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
                     linearLayout.orientation = LinearLayout.HORIZONTAL
                     linearLayout.addView(fieldName)
                     linearLayout.addView(spinner)
@@ -1569,7 +1662,7 @@ open class FragmentCharacteristicDetail : Fragment() {
                 enumerationArray.add(en.value!!)
             }
             if (!parseProblem) {
-                val formatLength = Engine.instance?.getFormat(field.format)
+                val formatLength = Engine.getFormat(field.format)
                 var pos = 0
                 var `val` = 0
                 if (field.format?.toLowerCase(Locale.getDefault()) == "16bit") {
@@ -1611,7 +1704,10 @@ open class FragmentCharacteristicDetail : Fragment() {
                     pos = 0
                 }
 
-                val nameAndValueParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                val nameAndValueParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
                 nameAndValueParams.setMargins(0, DEFAULT_MARGIN, 0, 12 + DEFAULT_MARGIN / 2)
 
                 val nameAndValueContainer = LinearLayout(context)
@@ -1627,17 +1723,29 @@ open class FragmentCharacteristicDetail : Fragment() {
                 valuesLayout.addView(nameAndValueContainer)
 
                 if (writeable || writeableWithoutResponse) {
-                    val params = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.5f)
+                    val params =
+                        LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.5f)
                     params.gravity = Gravity.CENTER_VERTICAL
 
                     val offset = getFieldOffset(field)
                     val spinner = Spinner(context)
-                    context?.let { spinner.adapter = ArrayAdapter(it, R.layout.enumeration_spinner_dropdown_item, enumerationArray) }
+                    context?.let {
+                        spinner.adapter = ArrayAdapter(
+                            it,
+                            R.layout.enumeration_spinner_dropdown_item,
+                            enumerationArray
+                        )
+                    }
                     spinner.layoutParams = params
                     spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+                        override fun onItemSelected(
+                            parent: AdapterView<*>?,
+                            view: View,
+                            position: Int,
+                            id: Long
+                        ) {
                             val key = field.enumerations!![position].key
-                            val tmpFormatLength = Engine.instance?.getFormat(field.format)
+                            val tmpFormatLength = Engine.getFormat(field.format)
                             val tmpVal = intToByteArray(key, tmpFormatLength!!)
                             setValue(offset, tmpVal)
                         }
@@ -1649,7 +1757,10 @@ open class FragmentCharacteristicDetail : Fragment() {
                     fieldName.layoutParams = params
 
                     val linearLayout = LinearLayout(context).apply {
-                        layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
                         orientation = LinearLayout.HORIZONTAL
                         addView(fieldName)
                         addView(spinner)
@@ -1713,19 +1824,9 @@ open class FragmentCharacteristicDetail : Fragment() {
         }
     }
 
-    private fun getOtaSpecificCharacteristicName(uuid: String): String {
-        return when (uuid.toUpperCase(Locale.getDefault())) {
-            "F7BF3564-FB6D-4E53-88A4-5E37E0326063" -> "OTA Control Attribute"
-            "984227F3-34FC-4045-A5D0-2C581F81A153" -> "OTA Data Attribute"
-            "4F4A2368-8CCA-451E-BFFF-CF0E2EE23E9F" -> "AppLoader version"
-            "4CC07BCF-0868-4B32-9DAD-BA4CC41E5316" -> "OTA version"
-            "25F05C0A-E917-46E9-B2A5-AA2BE1245AFE" -> "Gecko Bootloader version"
-            "0D77CC11-4AC1-49F2-BFA9-CD96AC7A92F8" -> "Application version"
-            else -> getString(R.string.unknown_characteristic_label)
-        }
-    }
-
     companion object {
+        private const val TAG = "CharacteristicDetail"
+
         private const val FIELD_CONTAINER_PADDING_TOP = 15
         private const val FIELD_CONTAINER_PADDING_BOTTOM = 15
         private const val FIELD_VALUE_EDIT_LEFT_MARGIN = 15

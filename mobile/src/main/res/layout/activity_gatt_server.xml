@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".gatt_configurator.activities.GattServerActivity">
+
+    <include
+        android:id="@+id/toolbar_edit_gatt_server"
+        layout="@layout/actionbar" />
+
+    <com.siliconlabs.bledemo.views.HorizontalShadow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_edit_gatt_server" />
+
+    <LinearLayout
+        android:id="@+id/ll_gatt_server_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_edit_gatt_server"
+        android:layout_margin="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/TitleMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/gatt_configurator_label_gatt_server_name" />
+
+        <EditText
+            android:id="@+id/et_gatt_server_name"
+            style="@style/EditTextNormal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_edit_gatt_server"
+        android:layout_width="match_parent"
+        android:layout_below="@id/ll_gatt_server_name"
+        android:layout_height="match_parent" />
+</RelativeLayout>

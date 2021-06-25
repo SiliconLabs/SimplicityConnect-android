@@ -1,6 +1,6 @@
-package com.siliconlabs.bledemo.Advertiser.Utils
+package com.siliconlabs.bledemo.advertiser.utils
 
-import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.utils.Converters
 
 class Validator {
     companion object {

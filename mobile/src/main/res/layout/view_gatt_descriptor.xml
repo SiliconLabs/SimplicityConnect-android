@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp">
+
+    <TextView
+        android:id="@+id/tv_descriptor_name"
+        style="@style/TitleMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        app:layout_constraintEnd_toStartOf="@id/ib_copy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Descriptor name" />
+
+    <ImageButton
+        android:id="@+id/ib_copy"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/btn_grey_ripple_effect"
+        android:contentDescription="@string/label_copy"
+        android:src="@drawable/ic_copy"
+        app:layout_constraintEnd_toStartOf="@id/ib_edit"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/ib_edit"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/btn_grey_ripple_effect"
+        android:contentDescription="@string/label_edit"
+        android:src="@drawable/ic_edit2"
+        app:layout_constraintEnd_toStartOf="@id/ib_remove"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/ib_remove"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/btn_grey_ripple_effect"
+        android:contentDescription="@string/label_remove"
+        android:src="@drawable/ic_trash"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_descriptor_uuid"
+        style="@style/TextMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintEnd_toStartOf="@id/ib_copy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_descriptor_name"
+        tools:text="UUID: 0x2A1E" />
+
+    <TextView
+        android:id="@+id/tv_descriptor_value"
+        style="@style/TextMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintEnd_toStartOf="@id/ib_copy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_descriptor_uuid"
+        tools:text="Value: 0x01" />
+
+    <LinearLayout
+        android:id="@+id/ll_properties"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_descriptor_value">
+
+        <TextView
+            android:id="@+id/tv_property_write"
+            style="@style/TitleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:text="@string/gatt_configurator_label_write"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/ic_edit"
+            app:drawableTint="@color/silabs_primary_icon" />
+
+        <TextView
+            android:id="@+id/tv_property_read"
+            style="@style/TitleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:text="@string/gatt_configurator_label_read"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/ic_read_off"
+            app:drawableTint="@color/silabs_primary_icon" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view_descriptor_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/silabs_divider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_properties" />
+</androidx.constraintlayout.widget.ConstraintLayout>

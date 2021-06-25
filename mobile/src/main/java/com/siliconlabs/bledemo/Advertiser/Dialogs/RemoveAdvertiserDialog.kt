@@ -1,12 +1,12 @@
-package com.siliconlabs.bledemo.Advertiser.Dialogs
+package com.siliconlabs.bledemo.advertiser.dialogs
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
-import com.siliconlabs.bledemo.Base.BaseDialogFragment
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.advertiser.utils.AdvertiserStorage
+import com.siliconlabs.bledemo.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.dialog_info_ok_cancel.view.*
 
 class RemoveAdvertiserDialog(val callback: Callback) : BaseDialogFragment() {

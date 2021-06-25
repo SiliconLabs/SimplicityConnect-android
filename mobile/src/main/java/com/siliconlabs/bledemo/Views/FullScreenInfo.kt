@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Views
+package com.siliconlabs.bledemo.views
 
 import android.content.Context
 import android.util.AttributeSet
@@ -20,11 +20,11 @@ class FullScreenInfo @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     fun show() {
-        ll_full_screen_info?.visibility = View.VISIBLE
+        visibility = View.VISIBLE
     }
 
     fun hide() {
-        ll_full_screen_info.visibility = View.INVISIBLE
+        visibility = View.INVISIBLE
     }
 
 }

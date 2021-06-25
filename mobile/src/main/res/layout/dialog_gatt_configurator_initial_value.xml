@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_initial_value"
+        style="@style/TitleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/gatt_configurator_label_initial_value" />
+
+    <Spinner
+        android:id="@+id/sp_initial_value"
+        style="@style/CustomSpinner"
+        android:layout_width="match_parent"
+        android:layout_margin="16dp" />
+
+    <EditText
+        android:id="@+id/et_initial_value_text"
+        style="@style/EditTextNormal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:autofillHints="@null"
+        android:hint="@string/gatt_configurator_hint_insert_text"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/ll_initial_value_hex"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/TitleMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/gatt_configurator_prefix_0x" />
+
+        <EditText
+            android:id="@+id/et_initial_value_hex"
+            style="@style/EditTextNormal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:autofillHints="@null"
+            android:digits="0123456789ABCDEFabcdef"
+            android:hint="@string/gatt_configurator_hint_insert_hex" />
+    </LinearLayout>
+
+</LinearLayout>

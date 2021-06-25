@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/silabs_dialog_title_background"
+        android:minWidth="300dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_header"
+            style="@style/DialogHeaderText"
+            android:layout_width="match_parent"
+            android:text="@string/gatt_configurator_title_add_a_gatt_descriptor" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/silabs_white">
+
+                <LinearLayout
+                    android:id="@+id/ll_descriptor_name_uuid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:orientation="vertical">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/actv_descriptor_name"
+                        style="@style/EditTextSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/gatt_configurator_hint_descriptor_name" />
+
+                    <AutoCompleteTextView
+                        android:id="@+id/actv_descriptor_uuid"
+                        style="@style/EditTextSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:digits="0123456789ABCDEFabcdef-"
+                        android:hint="@string/gatt_configurator_hint_16_128_bit_uuid"
+                        android:maxLength="36" />
+                </LinearLayout>
+
+                <include
+                    android:id="@+id/properties_content"
+                    layout="@layout/dialog_add_descriptor_properties_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/ll_descriptor_name_uuid" />
+
+                <include
+                    android:id="@+id/initial_value"
+                    layout="@layout/dialog_gatt_configurator_initial_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/properties_content" />
+            </RelativeLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/ll_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/silabs_white"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <Button
+                android:id="@+id/btn_clear"
+                style="@style/ButtonBorderlessBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/button_clear" />
+
+            <Button
+                android:id="@+id/btn_cancel"
+                style="@style/ButtonBorderlessBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/button_cancel" />
+
+            <Button
+                android:id="@+id/btn_save"
+                style="@style/ButtonBlue"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:enabled="false"
+                android:text="@string/button_save" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

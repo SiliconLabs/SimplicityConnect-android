@@ -2,6 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     app:cardCornerRadius="16dp"
     app:cardElevation="0dp">
 
@@ -30,20 +31,6 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:text="@string/about_silicon_labs"
-                    android:textSize="@dimen/help_text_size" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@color/silabs_secondary_background" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/help_section_and_body_separation"
                     android:fontFamily="sans-serif"
                     android:text="@string/help_text_moreinfo_label"
                     android:textColor="@color/silabs_primary_text"
@@ -117,6 +104,24 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/help_section_and_body_separation"
                     android:fontFamily="sans-serif"
+                    android:text="@string/help_text_release_notes_label"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="@dimen/help_text_size" />
+
+                <TextView
+                    android:id="@+id/docs_silabs_release_notes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/help_text_release_notes_url"
+                    android:textColor="@color/silabs_blue"
+                    android:textSize="@dimen/help_text_size" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/help_section_and_body_separation"
+                    android:fontFamily="sans-serif"
                     android:text="@string/help_text_documentation_label"
                     android:textColor="@color/silabs_primary_text"
                     android:textSize="@dimen/help_text_size" />
@@ -154,6 +159,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/help_body_and_version_separation"
                     android:fontFamily="sans-serif"
+                    tools:text="Version X.X.X"
                     android:textSize="@dimen/help_text_size" />
             </LinearLayout>
         </ScrollView>

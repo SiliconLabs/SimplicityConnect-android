@@ -1,13 +1,13 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
 import android.annotation.TargetApi
 import android.bluetooth.le.ScanFilter
 import android.os.Build
 import android.os.ParcelUuid
-import com.siliconlabs.bledemo.Utils.Objects.deepEquals
-import com.siliconlabs.bledemo.Utils.Objects.equals
-import com.siliconlabs.bledemo.Utils.Objects.hash
-import com.siliconlabs.bledemo.Utils.Objects.toString
+import com.siliconlabs.bledemo.utils.Objects.deepEquals
+import com.siliconlabs.bledemo.utils.Objects.equals
+import com.siliconlabs.bledemo.utils.Objects.hash
+import com.siliconlabs.bledemo.utils.Objects.toString
 
 /**
  * Represents a compatible version of [ScanFilter] from Lollipop or higher.

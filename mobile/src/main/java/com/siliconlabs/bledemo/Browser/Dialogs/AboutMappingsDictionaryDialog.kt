@@ -1,10 +1,10 @@
-package com.siliconlabs.bledemo.Browser.Dialogs
+package com.siliconlabs.bledemo.browser.dialogs
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.siliconlabs.bledemo.Base.BaseDialogFragment
+import com.siliconlabs.bledemo.base.BaseDialogFragment
 import com.siliconlabs.bledemo.R
 import kotlinx.android.synthetic.main.dialog_about_mappings.*
 

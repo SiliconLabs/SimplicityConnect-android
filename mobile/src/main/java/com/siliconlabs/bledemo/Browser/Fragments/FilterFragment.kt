@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Browser.Fragments
+package com.siliconlabs.bledemo.browser.fragments
 
 import android.os.Bundle
 import android.text.Editable
@@ -14,16 +14,16 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.siliconlabs.bledemo.BeaconUtils.BleFormat
-import com.siliconlabs.bledemo.Browser.Adapters.BeaconTypeAdapter
-import com.siliconlabs.bledemo.Browser.Adapters.SavedSearchesAdapter
-import com.siliconlabs.bledemo.Browser.Adapters.SavedSearchesAdapter.SavedSearchesCallback
-import com.siliconlabs.bledemo.Browser.Models.BeaconType
-import com.siliconlabs.bledemo.Browser.Models.SavedSearch
-import com.siliconlabs.bledemo.Browser.ToolbarCallback
+import com.siliconlabs.bledemo.beacon_utils.BleFormat
+import com.siliconlabs.bledemo.browser.adapters.BeaconTypeAdapter
+import com.siliconlabs.bledemo.browser.adapters.SavedSearchesAdapter
+import com.siliconlabs.bledemo.browser.adapters.SavedSearchesAdapter.SavedSearchesCallback
+import com.siliconlabs.bledemo.browser.models.BeaconType
+import com.siliconlabs.bledemo.browser.models.SavedSearch
+import com.siliconlabs.bledemo.browser.ToolbarCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.FilterDeviceParams
-import com.siliconlabs.bledemo.Utils.SharedPrefUtils
+import com.siliconlabs.bledemo.utils.FilterDeviceParams
+import com.siliconlabs.bledemo.utils.SharedPrefUtils
 import kotlinx.android.synthetic.main.fragment_filter.*
 import java.util.*
 

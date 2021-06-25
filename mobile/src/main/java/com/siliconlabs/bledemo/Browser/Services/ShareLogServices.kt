@@ -1,12 +1,12 @@
-package com.siliconlabs.bledemo.Browser.Services
+package com.siliconlabs.bledemo.browser.services
 
 import android.app.Service
 import android.content.Intent
 import android.os.*
 import android.widget.Toast
-import com.siliconlabs.bledemo.Browser.Fragments.LoggerFragment
+import com.siliconlabs.bledemo.browser.fragments.LoggerFragment
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.Constants
+import com.siliconlabs.bledemo.utils.Constants
 import java.util.*
 
 class ShareLogServices : Service() {
