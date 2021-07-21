@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.base
+package com.siliconlabs.bledemo.Base
 
 import android.app.Activity
 import android.content.DialogInterface
@@ -54,11 +54,11 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun showMessage(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_SHORT).show() }
     }
 
     fun showMessage(stringResId: Int) {
-        Toast.makeText(this, stringResId, Toast.LENGTH_SHORT).show()
+        runOnUiThread { Toast.makeText(this, stringResId, Toast.LENGTH_SHORT).show() }
     }
 
     fun hideKeyboard() {

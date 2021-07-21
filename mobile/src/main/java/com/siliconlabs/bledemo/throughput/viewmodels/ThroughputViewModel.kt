@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
 import com.siliconlabs.bledemo.throughput.models.PhyStatus
 import com.siliconlabs.bledemo.throughput.utils.Converter
 import timber.log.Timber
@@ -30,11 +30,9 @@ class ThroughputViewModel : ViewModel() {
     private var timerTask: TimerTask? = null
     private var timer: Timer? = null
 
-    private val _isDownloadActive: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isDownloadActive: LiveData<Boolean> = _isDownloadActive
-
+    val isDownloadActive: MutableLiveData<Boolean> = MutableLiveData(false)
     var isUploadActive = false
-    var isUploadingNotifications = false
+    var isDownloadingNotifications = true
 
     fun updateDownload(characteristic: BluetoothGattCharacteristic, gattCharacteristic: GattCharacteristic) {
         when (gattCharacteristic) {
@@ -45,53 +43,48 @@ class ThroughputViewModel : ViewModel() {
             GattCharacteristic.ThroughputMtuSize -> updateMtuSize(characteristic)
             GattCharacteristic.ThroughputPduSize -> updatePduSize(characteristic)
 
-            GattCharacteristic.ThroughputTransmissionOn -> switchClock(characteristic, false)
-            GattCharacteristic.ThroughputIndications -> addBitsToCount(characteristic)
-            GattCharacteristic.ThroughputNotifications -> addBitsToCount(characteristic)
-            else -> { }
-        }
-    }
-
-    fun updateUpload(characteristic: BluetoothGattCharacteristic, gattCharacteristic: GattCharacteristic) {
-        when (gattCharacteristic) {
-            GattCharacteristic.ThroughputTransmissionOn -> switchClock(characteristic, true)
-            GattCharacteristic.ThroughputNotifications -> addBitsToCount(characteristic)
-            GattCharacteristic.ThroughputIndications -> addBitsToCount(characteristic)
-            else -> { }
-        }
-    }
-
-    private fun addBitsToCount(characteristic: BluetoothGattCharacteristic) {
-        bitsCounted += characteristic.value.size * 8
-    }
-
-    private fun switchClock(characteristic: BluetoothGattCharacteristic, isUpload: Boolean) {
-
-        when (characteristic.value[0]) {
-            1.toByte() -> {
-                updateConnectionState(true, isUpload)
-                startTimer()
+            GattCharacteristic.ThroughputTransmissionOn -> {
+                val toggleOn = (characteristic.value[0] == 1.toByte())
+                toggleTestState(toggleOn, false)
             }
-            0.toByte() -> {
-                updateConnectionState(false, isUpload)
+            GattCharacteristic.ThroughputIndications -> {
+                isDownloadingNotifications = false
+                addBitsToCount(characteristic.value.size)
+            }
+            GattCharacteristic.ThroughputNotifications -> {
+                isDownloadingNotifications = true
+                addBitsToCount(characteristic.value.size)
+            }
+            else -> { }
+        }
+    }
+
+    fun addBitsToCount(packetSize: Int) {
+        bitsCounted += packetSize*8
+    }
+
+    fun toggleTestState(toggleOn: Boolean, isUpload: Boolean) {
+        Timber.d("Toggle test state. IsActive = %s, isUpload = %s", toggleOn, isUpload)
+        if (toggleOn) {
+            if (isUpload) isUploadActive = true
+            else isDownloadActive.postValue(true)
+        }
+        else {
+            if (isUpload) isUploadActive = false
+            else isDownloadActive.postValue(false)
+        }
+        toggleClock(toggleOn)
+    }
+
+    private fun toggleClock(toggleOn: Boolean) {
+        when (toggleOn) {
+            true -> startTimer()
+            false -> {
                 cancelTimer()
                 updateSpeed(0)
                 bitsCounted = 0
             }
-            else -> { }
         }
-    }
-
-    private fun updateConnectionState(hasStarted: Boolean, isUpload: Boolean) {
-        if (hasStarted) {
-            if (isUpload) isUploadActive = true
-            else          _isDownloadActive.postValue(true)
-        }
-        else {
-            if (isUpload) isUploadActive = false
-            else          _isDownloadActive.postValue(false)
-        }
-
     }
 
     private fun startTimer() {
@@ -143,11 +136,12 @@ class ThroughputViewModel : ViewModel() {
     private inner class PeriodicSpeedUpdate : TimerTask() {
         override fun run() {
             updateSpeed((bitsCounted * 1000 / DISPLAY_REFRESH_PERIOD).toInt())
+            //Timber.d("Timer refresh. Bits counted = %d", bitsCounted)
             bitsCounted = 0
         }
     }
 
     companion object {
-        private const val DISPLAY_REFRESH_PERIOD: Long = 200 // in miliseconds
+        private const val DISPLAY_REFRESH_PERIOD: Long = 200 // in milliseconds
     }
 }

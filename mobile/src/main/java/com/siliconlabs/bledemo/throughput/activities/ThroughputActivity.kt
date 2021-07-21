@@ -8,15 +8,18 @@ import android.content.IntentFilter
 import android.os.*
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
+import com.siliconlabs.bledemo.Base.BaseActivity
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
+import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.base.BaseActivity
-import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
-import com.siliconlabs.bledemo.bluetooth.ble.GattService
-import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
+import com.siliconlabs.bledemo.Utils.BLEUtils
+import com.siliconlabs.bledemo.throughput.models.UpdateTest
+import com.siliconlabs.bledemo.throughput.utils.PeripheralManager
 import com.siliconlabs.bledemo.throughput.viewmodels.ThroughputViewModel
-import com.siliconlabs.bledemo.utils.BLEUtils
 import kotlinx.android.synthetic.main.actionbar.*
+import timber.log.Timber
 import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
@@ -26,9 +29,10 @@ class ThroughputActivity : BaseActivity() {
     private lateinit var viewModel: ThroughputViewModel
     private var service: BluetoothService? = null
     private var processor = GattProcessor()
-    /*private var serverProcessor = GattServerProcessor()*/
+    private var serverProcessor = GattServerProcessor()
     private var setupData = true
-    private var uploadedCharacteristic: GattCharacteristic? = null
+
+    private var updateTest: UpdateTest? = null
 
     private val bluetoothStateChangeListener: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -61,7 +65,7 @@ class ThroughputActivity : BaseActivity() {
                 this@ThroughputActivity.service = service
 
                 service?.apply {
-                    /*PeripheralManager.stopAdvertising(service)*/
+                    PeripheralManager.stopAdvertising(service)
                     if (!isGattConnected()) {
                         showMessage(R.string.toast_htm_gatt_conn_failed)
                         clearConnectedGatt()
@@ -69,8 +73,8 @@ class ThroughputActivity : BaseActivity() {
                         finish()
                     } else {
                         showModalDialog(ConnectionStatus.READING_DEVICE_STATE)
-                        service.registerGattCallback(true, processor)
-                        /*service.registerGattServerCallback(serverProcessor)*/
+                        service.registerGattCallback(false, processor)
+                        service.registerGattServerCallback(serverProcessor)
                         discoverGattServices()
                     }
                 }
@@ -85,7 +89,7 @@ class ThroughputActivity : BaseActivity() {
     }
 
     private class GattCommand(val type: Type, val gatt: BluetoothGatt?, val characteristic: BluetoothGattCharacteristic?) {
-        internal enum class Type {
+        enum class Type {
             Read,
             Write,
             Notify,
@@ -94,78 +98,13 @@ class ThroughputActivity : BaseActivity() {
         }
     }
 
-    fun startTransmitting(isNotificationsChecked: Boolean) {
-        val transmissionOnChar = getLocalThroughputCharacteristic(GattCharacteristic.ThroughputTransmissionOn)!!
-        transmissionOnChar.value = byteArrayOf(1)
-        viewModel.updateUpload(transmissionOnChar, GattCharacteristic.ThroughputTransmissionOn)
-
-        service?.bluetoothGattServer?.notifyCharacteristicChanged(service?.connectedGatt?.device,
-                transmissionOnChar, false)
-
-        uploadedCharacteristic =
-            if (isNotificationsChecked) GattCharacteristic.ThroughputNotifications
-            else {
-                GattCharacteristic.ThroughputIndications
-            }
+    fun startUploadTest(withNotifications: Boolean) {
+        updateTest = UpdateTest(service, viewModel, withNotifications)
     }
 
-    fun stopTransmitting() {
-        val transmissionOnChar = getLocalThroughputCharacteristic(GattCharacteristic.ThroughputTransmissionOn)!!
-        transmissionOnChar.value = byteArrayOf(0)
-        viewModel.updateUpload(transmissionOnChar, GattCharacteristic.ThroughputTransmissionOn)
-
-        service?.bluetoothGattServer?.notifyCharacteristicChanged(service?.connectedGatt?.device,
-                transmissionOnChar, false)
-
-    }
-
-    fun transmitNotifications() {
-        val dataCharacteristic = getLocalThroughputCharacteristic(GattCharacteristic.ThroughputNotifications)
-
-        dataCharacteristic?.let {
-            it.value = ByteArray(calculatePacketSize())
-            it.value[0] = Random().nextInt(128).toByte()
-            for (i in 1 until it.value.size) {
-                it.value[i] = i.rem(128).toByte()
-            }
-
-            service?.bluetoothGattServer?.notifyCharacteristicChanged(service?.connectedGatt?.device,
-                    dataCharacteristic, shouldConfirm(uploadedCharacteristic!!))
-            viewModel.updateUpload(it, uploadedCharacteristic!!)
-        }
-    }
-
-    fun transmitIndications() {
-        /* Board is not receiving anything, so for the purposes of measuring speed a packet is
-        sent once every two connection intervals. */
-        val dataCharacteristic = getLocalThroughputCharacteristic(GattCharacteristic.ThroughputIndications)
-
-        while (viewModel.isUploadActive) {
-            dataCharacteristic?.let {
-                it.value = ByteArray(calculatePacketSize())
-                it.value[0] = Random().nextInt(128).toByte()
-                for (i in 1 until it.value.size) {
-                    it.value[i] = i.rem(128).toByte()
-                }
-
-                service?.bluetoothGattServer?.notifyCharacteristicChanged(service?.connectedGatt?.device,
-                        dataCharacteristic, shouldConfirm(uploadedCharacteristic!!))
-                viewModel.updateUpload(it, uploadedCharacteristic!!)
-            }
-        Thread.sleep(viewModel.connectionInterval.value!!.toLong() * 2)
-        }
-
-    }
-
-    private fun calculatePacketSize() : Int {
-        return when (uploadedCharacteristic) {
-            GattCharacteristic.ThroughputIndications -> viewModel.mtuSize.value!! - GATT_HEADER_SIZE
-            GattCharacteristic.ThroughputNotifications -> {
-                (viewModel.mtuSize.value!! / viewModel.pduSize.value!!) *
-                        viewModel.pduSize.value!! - GATT_HEADER_SIZE - L2CAP_HEADER_SIZE
-            }
-            else -> 0
-        }
+    fun stopUploadTest() {
+        updateTest?.stopTransmitting()
+        updateTest = null
     }
 
     private fun getRemoteThroughputCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
@@ -176,15 +115,6 @@ class ThroughputActivity : BaseActivity() {
     private fun getRemoteThroughputInformationCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
         val gattService = service?.connectedGatt?.getService(GattService.ThroughputInformationService.number)
         return gattService?.getCharacteristic(characteristic.uuid)
-    }
-
-    private fun getLocalThroughputCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        val gattService = service?.bluetoothGattServer?.getService(GattService.ThroughputTestService.number)
-        return gattService?.getCharacteristic(characteristic.uuid)
-    }
-
-    private fun shouldConfirm(characteristic: GattCharacteristic) : Boolean {
-        return characteristic == GattCharacteristic.ThroughputIndications
     }
 
     private inner class GattProcessor : TimeoutGattCallback() {
@@ -250,12 +180,8 @@ class ThroughputActivity : BaseActivity() {
                         BLEUtils.setNotificationForCharacteristic(gatt, gattService, gattCharacteristic, BLEUtils.Notifications.NOTIFY)
                     }
                     GattCommand.Type.PhyUpdate -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            gatt.setPreferredPhy(BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_OPTION_NO_PREFERRED)
-                            handler.postDelayed(phyUpdateTimeoutRunnable, 2000)
-                        } else {
-                            handleCommandProcessed()
-                        }
+                        gatt.setPreferredPhy(BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_OPTION_NO_PREFERRED)
+                        handler.postDelayed(phyUpdateTimeoutRunnable, 2000)
                         true
                     }
                 }
@@ -291,6 +217,13 @@ class ThroughputActivity : BaseActivity() {
                 }
             } finally {
                 lock.unlock()
+            }
+        }
+
+        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+            super.onConnectionStateChange(gatt, status, newState)
+            if (newState == BluetoothGatt.STATE_DISCONNECTED) {
+                runOnUiThread { onDeviceDisconnect() }
             }
         }
 
@@ -348,32 +281,30 @@ class ThroughputActivity : BaseActivity() {
             handleCommandProcessed()
         }
     }
-/*
+
     private inner class GattServerProcessor : BluetoothGattServerCallback() {
 
         override fun onNotificationSent(device: BluetoothDevice, status: Int) {
-            Timber.d("Notification sent")
             if (viewModel.isUploadActive) {
-                when (uploadedCharacteristic) {
-                    GattCharacteristic.ThroughputNotifications -> transmitNotifications()
-                    GattCharacteristic.ThroughputIndications -> transmitIndications()
-                    else -> { }
-                }
+                updateTest?.updateUpload()
             }
         }
     }
-*/
+
+    private fun onDeviceDisconnect() {
+        if (!isFinishing) {
+            showMessage(R.string.device_has_disconnected)
+            finish()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
-        /*PeripheralManager.clearThroughputServer(service)*/
+        PeripheralManager.clearThroughputServer(service)
         unregisterReceiver(bluetoothStateChangeListener)
         service?.clearConnectedGatt()
         bluetoothBinding.unbind()
     }
 
-    companion object {
-        private const val GATT_HEADER_SIZE = 3
-        private const val L2CAP_HEADER_SIZE = 4
-    }
 }

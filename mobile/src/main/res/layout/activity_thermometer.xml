@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="com.siliconlabs.bledemo.health_thermometer.activities.HealthThermometerActivity">
+        tools:context="com.siliconlabs.bledemo.HealthThermometer.Activities.HealthThermometerActivity">
 
         <include
             android:id="@+id/toolbar_thermometer"
@@ -16,7 +16,7 @@
 
         <fragment
             android:id="@+id/fragment"
-            android:name="com.siliconlabs.bledemo.health_thermometer.fragments.HealthThermometerActivityFragment"
+            android:name="com.siliconlabs.bledemo.HealthThermometer.Fragments.HealthThermometerActivityFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>

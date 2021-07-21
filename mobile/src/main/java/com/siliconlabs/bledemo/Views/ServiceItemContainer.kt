@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.views
+package com.siliconlabs.bledemo.Views
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -12,7 +12,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.utils.BLEUtils.Notifications
+import com.siliconlabs.bledemo.Utils.BLEUtils.Notifications
 
 class ServiceItemContainer(context: Context) : LinearLayout(context) {
     private var characteristicNotificationStates: MutableMap<String, Notifications> = HashMap()

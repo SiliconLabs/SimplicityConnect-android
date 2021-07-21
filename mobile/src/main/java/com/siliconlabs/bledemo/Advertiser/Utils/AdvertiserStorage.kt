@@ -1,11 +1,11 @@
-package com.siliconlabs.bledemo.advertiser.utils
+package com.siliconlabs.bledemo.Advertiser.Utils
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
-import com.siliconlabs.bledemo.advertiser.models.Advertiser
+import com.siliconlabs.bledemo.Advertiser.Models.Advertiser
 
 class AdvertiserStorage(val context: Context) {
     companion object {

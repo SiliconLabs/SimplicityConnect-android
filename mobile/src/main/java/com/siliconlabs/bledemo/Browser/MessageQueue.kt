@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.browser
+package com.siliconlabs.bledemo.Browser
 
 import android.content.Context
 import android.os.Handler

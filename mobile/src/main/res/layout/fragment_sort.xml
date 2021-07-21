@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:id="@+id/browser_shadow_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

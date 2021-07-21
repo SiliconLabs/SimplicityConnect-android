@@ -9,7 +9,7 @@
         android:id="@+id/toolbar_gatt_configurator"
         layout="@layout/actionbar" />
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar_gatt_configurator" />
@@ -21,21 +21,21 @@
         android:layout_above="@id/bottom_bar_export"
         android:layout_below="@id/toolbar_gatt_configurator" />
 
-    <com.siliconlabs.bledemo.views.FullScreenInfo
+    <com.siliconlabs.bledemo.Views.FullScreenInfo
         android:id="@+id/full_screen_info_no_gatt_servers"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar_gatt_configurator"
         android:visibility="gone" />
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/bottom_bar_export"
         android:rotation="180"
         android:visibility="gone" />
 
-    <com.siliconlabs.bledemo.views.BottomBarWithButton
+    <com.siliconlabs.bledemo.Views.BottomBarWithButton
         android:id="@+id/bottom_bar_export"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

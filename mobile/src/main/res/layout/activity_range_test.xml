@@ -53,7 +53,7 @@
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/app_bar_layout" />

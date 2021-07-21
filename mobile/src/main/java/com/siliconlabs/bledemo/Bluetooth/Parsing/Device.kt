@@ -14,13 +14,13 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.bluetooth.parsing
+package com.siliconlabs.bledemo.Bluetooth.Parsing
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
-import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
-import com.siliconlabs.bledemo.bluetooth.ble.ScanRecordCompat.Companion.parseFromBytes
-import com.siliconlabs.bledemo.bluetooth.ble.ScanResultCompat
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.Bluetooth.BLE.ScanRecordCompat.Companion.parseFromBytes
+import com.siliconlabs.bledemo.Bluetooth.BLE.ScanResultCompat
 
 // Device - it's wrapper for BLE device object
 class Device : BluetoothDeviceInfo {

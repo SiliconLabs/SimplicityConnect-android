@@ -130,8 +130,8 @@
     <string name="main_menu_description_browser">View info about nearby devices and their properties.</string>
     <string name="main_menu_description_connected_lighting">Control a Dynamic Multiprotocol application of connected lights and switches.</string>
     <string name="main_menu_description_range_test">Evaluate the link budget and range of EFR32.</string>
-    <string name="main_menu_description_blinky">Control LED and receive button presses on a Silabs kit</string>
     <string name="main_menu_description_throughput">Measure throughput between the mobile device and EFR32.</string>
+    <string name="main_menu_description_blinky">Control LED and receive button presses on a Silabs kit</string>
     <string name="main_menu_description_iop_test">Exercise common Bluetooth operations with Silicon Labs hardware and software.</string>
     <string name="main_menu_description_gatt_configurator">Allows you to create a local GATT database.</string>
 
@@ -248,19 +248,13 @@
 
     <!-- Help -->
     <string name="help_text_moreinfo_label">For more information visit:</string>
-    <string name="help_text_moreinfo_url">silabs.com/products/wireless</string>
     <string name="help_text_sourcecode_label">Source code:</string>
-    <string name="help_text_sourcecode_url">github.com/SiliconLabs/EFRConnect-android</string>
-    <string name="help_text_users_guide_url">docs.silabs.com/bluetooth/latest/miscellaneous/mobile/efr-connect-mobile-app</string>
     <string name="help_text_users_guide_label">EFR Connect User\'s Guide:</string>
     <string name="help_text_support_label">Support:</string>
-    <string name="help_text_support_url">silabs.com/support</string>
     <string name="help_text_release_notes_label">Release notes:</string>
-    <string name="help_text_release_notes_url">silabs.com/documents/public/release-notes/efr-connect-release-notes.pdf</string>
     <string name="help_text_documentation_label">Additional documentation:</string>
-    <string name="help_text_documentation_url">docs.silabs.com/bluetooth/latest</string>
     <string name="help_text_pub_label">Additional Apps released by Silicon Labs:</string>
-    <string name="help_Google_Play_Store">Google Play Store</string>
+    <string name="help_Google_Play_Store_label">Google Play Store</string>
     <string name="version_text">Version %s</string>
     <string name="info">Info</string>
 

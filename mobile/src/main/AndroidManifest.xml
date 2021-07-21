@@ -18,7 +18,7 @@
         android:required="true" />
 
     <application
-        android:name=".application.SiliconLabsDemoApplication"
+        android:name=".Application.SiliconLabsDemoApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name_EFR_Connect"
@@ -31,16 +31,16 @@
             android:name=".gatt_configurator.activities.GattServerActivity"
             android:label="@string/title_new_GATT_Server" />
         <activity
-            android:name=".advertiser.activities.AdvertiserConfigActivity"
+            android:name=".Advertiser.Activities.AdvertiserConfigActivity"
             android:label="@string/title_Advertiser" />
         <activity
-            android:name=".advertiser.activities.AdvertiserActivity"
+            android:name=".Advertiser.Activities.AdvertiserActivity"
             android:label="@string/title_Advertiser" />
         <activity
-            android:name=".browser.activities.MappingDictionaryActivity"
+            android:name=".Browser.Activities.MappingDictionaryActivity"
             android:label="@string/title_Mappings_dictionary" />
         <activity
-            android:name=".health_thermometer.activities.HealthThermometerActivity"
+            android:name=".HealthThermometer.Activities.HealthThermometerActivity"
             android:label="@string/title_Health_Thermometer"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
@@ -49,11 +49,11 @@
             android:label="@string/title_Blinky"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".connected_lighting.activities.ConnectedLightingActivity"
+            android:name=".ConnectedLighting.Activities.ConnectedLightingActivity"
             android:label="@string/title_Connected_Lighting"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".range_test.activities.RangeTestActivity"
+            android:name=".RangeTest.Activities.RangeTestActivity"
             android:label="@string/title_Range_Test"
             android:screenOrientation="portrait" />
 
@@ -62,10 +62,10 @@
             android:label="@string/title_Throughput"
             android:screenOrientation="portrait" />
 
-        <service android:name=".bluetooth.services.BluetoothService" />
-        <service android:name=".advertiser.services.AdvertiserService" />
+        <service android:name=".Bluetooth.Services.BluetoothService" />
+        <service android:name=".Advertiser.Services.AdvertiserService" />
 
-        <receiver android:name=".bluetooth.services.BluetoothService$Receiver">
+        <receiver android:name=".Bluetooth.Services.BluetoothService$Receiver">
             <intent-filter>
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
                 <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED" />
@@ -73,7 +73,7 @@
         </receiver>
 
         <activity
-            android:name=".main_menu.activities.MainMenuActivity"
+            android:name=".MainMenu.Activities.MainMenuActivity"
             android:label="@string/app_name_EFR_Connect"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
@@ -85,19 +85,19 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".bluetooth.services.BluetoothLeService" />
-        <service android:name=".browser.services.ShareLogServices" />
+        <service android:name=".Bluetooth.Services.BluetoothLeService" />
+        <service android:name=".Browser.Services.ShareLogServices" />
 
         <activity
-            android:name=".browser.activities.BrowserActivity"
+            android:name=".Browser.Activities.BrowserActivity"
             android:label="@string/title_Browser"
-            android:parentActivityName=".main_menu.activities.MainMenuActivity"
+            android:parentActivityName=".MainMenu.Activities.MainMenuActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".browser.activities.DeviceServicesActivity"
+            android:name=".Browser.Activities.DeviceServicesActivity"
             android:label="@string/title_Browser"
-            android:parentActivityName=".browser.activities.BrowserActivity"
+            android:parentActivityName=".Browser.Activities.BrowserActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.advertiser.enums
+package com.siliconlabs.bledemo.Advertiser.Enums
 
 enum class DataMode {
     ADVERTISING_DATA,

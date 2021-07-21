@@ -13,14 +13,14 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.base.BaseActivity
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
+import com.siliconlabs.bledemo.Base.BaseActivity
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.gatt_configurator.adapters.GattServerAdapter
 import com.siliconlabs.bledemo.gatt_configurator.adapters.GattServerAdapter.OnClickListener
 import com.siliconlabs.bledemo.gatt_configurator.models.GattServer
 import com.siliconlabs.bledemo.gatt_configurator.utils.removeAsking
 import com.siliconlabs.bledemo.gatt_configurator.viewmodels.GattConfiguratorViewModel
-import com.siliconlabs.bledemo.views.BottomBarWithButton
+import com.siliconlabs.bledemo.Views.BottomBarWithButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_gatt_configurator.*

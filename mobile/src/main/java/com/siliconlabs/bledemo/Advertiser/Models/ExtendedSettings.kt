@@ -1,7 +1,7 @@
-package com.siliconlabs.bledemo.advertiser.models
+package com.siliconlabs.bledemo.Advertiser.Models
 
 import android.os.Parcelable
-import com.siliconlabs.bledemo.advertiser.enums.Phy
+import com.siliconlabs.bledemo.Advertiser.Enums.Phy
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

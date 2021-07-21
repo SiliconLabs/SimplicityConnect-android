@@ -14,7 +14,7 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.browser.activities
+package com.siliconlabs.bledemo.Browser.Activities
 
 import android.Manifest
 import android.animation.AnimatorSet
@@ -54,28 +54,29 @@ import com.google.android.gms.appindexing.AppIndex
 import com.google.android.gms.appindexing.Thing
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.siliconlabs.bledemo.Base.BaseActivity
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.Bluetooth.BLE.ErrorCodes
+import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
+import com.siliconlabs.bledemo.Bluetooth.ConnectedGatts
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
+import com.siliconlabs.bledemo.Browser.Adapters.ConnectionsAdapter
+import com.siliconlabs.bledemo.Browser.Adapters.LogAdapter
+import com.siliconlabs.bledemo.Browser.Dialogs.ErrorDialog
+import com.siliconlabs.bledemo.Browser.Dialogs.ErrorDialog.OtaErrorCallback
+import com.siliconlabs.bledemo.Browser.Dialogs.UnbondDeviceDialog
+import com.siliconlabs.bledemo.Browser.Fragment.*
+import com.siliconlabs.bledemo.Browser.MessageQueue
+import com.siliconlabs.bledemo.Browser.Models.Logs.CommonLog
+import com.siliconlabs.bledemo.Browser.Models.Logs.GattOperationWithDataLog
+import com.siliconlabs.bledemo.Browser.Models.Logs.ServicesDiscoveredLog
+import com.siliconlabs.bledemo.Browser.Models.Logs.TimeoutLog
+import com.siliconlabs.bledemo.Browser.Models.OtaFileType
+import com.siliconlabs.bledemo.Browser.Models.ToolbarName
+import com.siliconlabs.bledemo.Browser.ServicesConnectionsCallback
+import com.siliconlabs.bledemo.Browser.ToolbarCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.base.BaseActivity
-import com.siliconlabs.bledemo.bluetooth.ConnectedGatts
-import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
-import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes
-import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
-import com.siliconlabs.bledemo.browser.MessageQueue
-import com.siliconlabs.bledemo.browser.ServicesConnectionsCallback
-import com.siliconlabs.bledemo.browser.ToolbarCallback
-import com.siliconlabs.bledemo.browser.adapters.ConnectionsAdapter
-import com.siliconlabs.bledemo.browser.adapters.LogAdapter
-import com.siliconlabs.bledemo.browser.dialogs.ErrorDialog
-import com.siliconlabs.bledemo.browser.dialogs.ErrorDialog.OtaErrorCallback
-import com.siliconlabs.bledemo.browser.dialogs.UnbondDeviceDialog
-import com.siliconlabs.bledemo.browser.fragments.*
-import com.siliconlabs.bledemo.browser.models.OtaFileType
-import com.siliconlabs.bledemo.browser.models.ToolbarName
-import com.siliconlabs.bledemo.browser.models.logs.CommonLog
-import com.siliconlabs.bledemo.browser.models.logs.ServicesDiscoveredLog
-import com.siliconlabs.bledemo.browser.models.logs.TimeoutLog
-import com.siliconlabs.bledemo.utils.*
+import com.siliconlabs.bledemo.Utils.*
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_device_services.*
 import kotlinx.android.synthetic.main.toolbar_device_services.*
@@ -377,7 +378,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
             status: Int
         ) {
             remoteServicesFragment.updateCurrentCharacteristicView(characteristic.uuid)
-
+            Constants.LOGS.add(GattOperationWithDataLog("onCharacteristicRead", gatt, status, characteristic))
             Log.i(
                 "Callback",
                 "OnCharacteristicRead: " + Converters.bytesToHexWhitespaceDelimited(characteristic.value) + " Status: " + status
@@ -419,6 +420,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
             status: Int
         ) {
             remoteServicesFragment.updateCurrentCharacteristicView(characteristic.uuid, status)
+            Constants.LOGS.add(GattOperationWithDataLog("onCharacteristicWrite", gatt, status, characteristic))
 
             if (characteristic.value.size < 10) Log.d(
                 "OnCharacteristicRead",
@@ -535,14 +537,14 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
             Constants.LOGS.add(CommonLog("onDescriptorWrite, " + "device: " + gatt.device.address + ", status: " + status, gatt.device.address))
 
-            runOnUiThread {
-                remoteServicesFragment.updateDescriptorView(descriptor)
-            }
+            remoteServicesFragment.updateDescriptorView(descriptor)
         }
 
         //CALLBACK ON DESCRIPTOR READ
         override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
-            if ((descriptor.uuid.toString() == UuidConsts.HOMEKIT_DESCRIPTOR.toString())) {
+            Constants.LOGS.add(CommonLog("onDescriptorRead, " + "device: " + gatt.device.address + ", status: " + status, gatt.device.address))
+
+            if (descriptor.uuid == UuidConsts.HOMEKIT_DESCRIPTOR) {
                 val value = ByteArray(2)
                 value[0] = 0xF2.toByte()
                 value[1] = 0xFF.toByte()
@@ -551,14 +553,13 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                     homeKitOTAControl(descriptor.value)
                 }
             } else {
-                runOnUiThread {
-                    remoteServicesFragment.updateDescriptorView(descriptor)
-                }
+                remoteServicesFragment.updateDescriptorView(descriptor)
             }
         }
 
         //CALLBACK ON CHARACTERISTIC CHANGED VALUE (READ - CHARACTERISTIC NOTIFICATION)
         override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+            Constants.LOGS.add(GattOperationWithDataLog("onCharacteristicChanged", gatt, null, characteristic))
             remoteServicesFragment.updateCharacteristicView(characteristic)
         }
 

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.advertiser.adapters
+package com.siliconlabs.bledemo.Advertiser.Adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
+import com.siliconlabs.bledemo.Advertiser.Models.DataTypeItem
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.advertiser.models.DataTypeItem
 import kotlinx.android.synthetic.main.spinner_data_type_item_layout.view.*
 
 class DataTypeAdapter(context: Context,

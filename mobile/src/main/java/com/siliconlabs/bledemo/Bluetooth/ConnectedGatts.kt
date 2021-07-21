@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.bluetooth
+package com.siliconlabs.bledemo.Bluetooth
 
 import android.bluetooth.BluetoothGatt
 

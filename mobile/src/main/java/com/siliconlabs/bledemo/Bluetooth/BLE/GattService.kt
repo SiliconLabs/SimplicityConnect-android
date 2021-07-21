@@ -1,8 +1,8 @@
-package com.siliconlabs.bledemo.bluetooth.ble
+package com.siliconlabs.bledemo.Bluetooth.BLE
 
 import androidx.annotation.StringRes
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.utils.UuidUtils.parseIntFromUuidStart
+import com.siliconlabs.bledemo.Utils.UuidUtils.parseIntFromUuidStart
 import java.util.*
 
 /**
@@ -95,8 +95,7 @@ enum class GattService {
     /**
      * Resource ID for custom name
      */
-    @StringRes
-    var customNameId: Int? = null
+    @StringRes var customNameId: Int? = null
 
     /**
      * Available gatt characteristics for this service.

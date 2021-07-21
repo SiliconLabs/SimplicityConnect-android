@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.advertiser.utils
+package com.siliconlabs.bledemo.Advertiser.Utils
 
 import android.os.Build
 import android.text.Html

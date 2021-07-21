@@ -11,42 +11,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-            <RadioGroup
-                android:id="@+id/rl_radio_boxes"
-                android:layout_width="match_parent"
+        <RadioGroup
+            android:id="@+id/rl_radio_boxes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/rb_notifications"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:checked="true"
+                android:text="@string/throughput_label_notifications" />
 
-                    <RadioButton
-                        android:id="@+id/rb_notifications"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:checked="true"
-                        android:text="@string/throughput_label_notifications" />
+            <View
+                android:id="@+id/view_horizontal_divider"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/silabs_divider" />
 
-                    <View
-                        android:id="@+id/view_horizontal_divider"
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:layout_alignTop="@id/rb_notifications"
-                        android:layout_alignBottom="@id/rb_notifications"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_toEndOf="@id/rb_notifications"
-                        android:background="@color/silabs_divider" />
+            <RadioButton
+                android:id="@+id/rb_indications"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/throughput_label_indications" />
 
-                    <RadioButton
-                        android:id="@+id/rb_indications"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_toEndOf="@id/view_horizontal_divider"
-                        android:text="@string/throughput_label_indications" />
-
-            </RadioGroup>
+        </RadioGroup>
 
         <View
             android:id="@+id/view_vertical_divider"

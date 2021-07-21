@@ -37,9 +37,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
+import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
+import com.siliconlabs.bledemo.Utils.BLEUtils.Notifications
+import com.siliconlabs.bledemo.Utils.BLEUtils.setNotificationForCharacteristic
+import com.siliconlabs.bledemo.Utils.Converters
 import com.siliconlabs.bledemo.iop_test.fragments.IOPTestFragment
 import com.siliconlabs.bledemo.iop_test.fragments.IOPTestFragment.Companion.newInstance
 import com.siliconlabs.bledemo.iop_test.models.ChildrenItemTestInfo
@@ -52,9 +55,6 @@ import com.siliconlabs.bledemo.iop_test.models.IOPTest.Companion.getListItemChil
 import com.siliconlabs.bledemo.iop_test.models.IOPTest.Companion.getSiliconLabsTestInfo
 import com.siliconlabs.bledemo.iop_test.models.ItemTestCaseInfo
 import com.siliconlabs.bledemo.iop_test.utils.ErrorCodes
-import com.siliconlabs.bledemo.utils.BLEUtils.Notifications
-import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
-import com.siliconlabs.bledemo.utils.Converters
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_iop_test.*
 import java.io.*
@@ -706,6 +706,7 @@ class IOPTestActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        super.onDestroy()
         Log.d("onDestroy", "called")
         if (isScanning) {
             scanLeDevice(false)
@@ -718,8 +719,6 @@ class IOPTestActivity : AppCompatActivity() {
 
         mBluetoothService?.clearConnectedGatt()
         unregisterBroadcastReceivers()
-
-        super.onDestroy()
     }
 
     private fun unregisterBroadcastReceivers() {

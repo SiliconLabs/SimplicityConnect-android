@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.browser.adapters
+package com.siliconlabs.bledemo.Browser.Adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,11 +9,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.siliconlabs.bledemo.browser.adapters.SavedSearchesAdapter.SavedSearchesViewHolder
-import com.siliconlabs.bledemo.browser.models.SavedSearch
+import com.siliconlabs.bledemo.Browser.Adapters.SavedSearchesAdapter.SavedSearchesViewHolder
+import com.siliconlabs.bledemo.Browser.Models.SavedSearch
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.utils.FilterDeviceParams
-import com.siliconlabs.bledemo.utils.SharedPrefUtils
+import com.siliconlabs.bledemo.Utils.FilterDeviceParams
+import com.siliconlabs.bledemo.Utils.SharedPrefUtils
 import java.util.*
 
 class SavedSearchesAdapter(private val savedSearchList: ArrayList<SavedSearch>, private val context: Context, private val savedSearchesCallback: SavedSearchesCallback) : RecyclerView.Adapter<SavedSearchesViewHolder>() {

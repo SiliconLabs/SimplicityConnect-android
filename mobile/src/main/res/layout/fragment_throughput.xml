@@ -41,7 +41,7 @@
             android:layout_marginBottom="16dp" />
     </LinearLayout>
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:id="@+id/scanning_separator"
         android:layout_width="match_parent"
         android:layout_height="@dimen/shadow_height"

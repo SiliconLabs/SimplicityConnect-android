@@ -116,11 +116,12 @@ class SpeedView(context: Context, attributeSet: AttributeSet? = null) : View(con
     }
 
     fun updateSpeed(progress: Int, value: String, unit: String, mode: Mode) {
-        if (progress < 0 || progress > 100) {
-            throw IllegalArgumentException("Progress should be in range 0..100")
+        when {
+            progress < 0 -> this.progress = 0
+            progress > 100 -> this.progress = 100
+            else -> this.progress = progress
         }
 
-        this.progress = progress
         this.value = value
         this.unit = unit
         this.mode = mode

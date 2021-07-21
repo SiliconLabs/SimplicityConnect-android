@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.advertiser.presenters
+package com.siliconlabs.bledemo.Advertiser.Presenters
 
 import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseSettings
@@ -6,11 +6,11 @@ import android.bluetooth.le.AdvertisingSet
 import android.bluetooth.le.AdvertisingSetCallback
 import android.os.Build
 import android.os.Handler
-import com.siliconlabs.bledemo.advertiser.activities.IAdvertiserActivityView
-import com.siliconlabs.bledemo.advertiser.models.Advertiser
-import com.siliconlabs.bledemo.advertiser.models.BluetoothInfo
-import com.siliconlabs.bledemo.advertiser.utils.AdvertiserStorage
-import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes
+import com.siliconlabs.bledemo.Advertiser.Activities.IAdvertiserActivityView
+import com.siliconlabs.bledemo.Advertiser.Models.Advertiser
+import com.siliconlabs.bledemo.Advertiser.Models.BluetoothInfo
+import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
+import com.siliconlabs.bledemo.Bluetooth.BLE.ErrorCodes
 
 class AdvertiserActivityPresenter(private val view: IAdvertiserActivityView, private val storage: AdvertiserStorage, private val advertiserItems: ArrayList<Advertiser>) : IAdvertiserActivityPresenter {
     private val handler = Handler()

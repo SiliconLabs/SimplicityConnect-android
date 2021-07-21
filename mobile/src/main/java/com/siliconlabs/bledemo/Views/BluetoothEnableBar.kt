@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.views;
+package com.siliconlabs.bledemo.Views;
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Context

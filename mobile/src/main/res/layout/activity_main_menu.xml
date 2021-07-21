@@ -71,12 +71,12 @@
         android:layout_below="@id/information_bar"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/information_bar" />
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:id="@+id/view_separator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

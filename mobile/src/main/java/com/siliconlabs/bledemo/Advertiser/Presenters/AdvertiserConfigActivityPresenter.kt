@@ -1,13 +1,13 @@
-package com.siliconlabs.bledemo.advertiser.presenters
+package com.siliconlabs.bledemo.Advertiser.Presenters
 
 import android.os.Build
-import com.siliconlabs.bledemo.advertiser.activities.IAdvertiserConfigActivityView
-import com.siliconlabs.bledemo.advertiser.enums.AdvertisingMode
-import com.siliconlabs.bledemo.advertiser.enums.DataMode
-import com.siliconlabs.bledemo.advertiser.enums.DataType
-import com.siliconlabs.bledemo.advertiser.enums.LimitType
-import com.siliconlabs.bledemo.advertiser.models.*
-import com.siliconlabs.bledemo.advertiser.utils.AdvertiserStorage
+import com.siliconlabs.bledemo.Advertiser.Activities.IAdvertiserConfigActivityView
+import com.siliconlabs.bledemo.Advertiser.Enums.AdvertisingMode
+import com.siliconlabs.bledemo.Advertiser.Enums.DataMode
+import com.siliconlabs.bledemo.Advertiser.Enums.DataType
+import com.siliconlabs.bledemo.Advertiser.Enums.LimitType
+import com.siliconlabs.bledemo.Advertiser.Utils.AdvertiserStorage
+import com.siliconlabs.bledemo.Advertiser.Models.*
 
 class AdvertiserConfigActivityPresenter(private val view: IAdvertiserConfigActivityView, private val storage: AdvertiserStorage) : IAdvertiserConfigActivityPresenter {
     private lateinit var data: AdvertiserData

@@ -14,15 +14,13 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.bluetooth.parsing
+package com.siliconlabs.bledemo.Bluetooth.Parsing
 
 import android.content.Context
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
-import com.siliconlabs.bledemo.bluetooth.ble.GattService
-import com.siliconlabs.bledemo.utils.Constants
-import com.siliconlabs.bledemo.utils.Converters.getDecimalValue
-import com.siliconlabs.bledemo.utils.UuidConsts
+import com.siliconlabs.bledemo.Utils.Converters.getDecimalValue
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -168,18 +166,24 @@ object Common {
 
     fun getServiceName(uuid: UUID?, context: Context): String {
         val service = Engine.getService(uuid)
-        return service?.name?.trim { it <= ' ' }
-            ?: checkForCustomServiceName(uuid, context)
+        return if (service != null) service.name?.trim { it <= ' ' }!! else
+            checkForCustomServiceName(uuid, context)
     }
 
-    fun checkForCustomServiceName(uuid: UUID?, context: Context): String {
+    fun getCharacteristicName(uuid: UUID?, context: Context): String {
+        val characteristic = Engine.getCharacteristic(uuid)
+        return if (characteristic != null) characteristic.name?.trim { it <= ' ' }!! else
+            checkForCustomCharacteristicName(uuid, context)
+    }
+
+    private fun checkForCustomServiceName(uuid: UUID?, context: Context): String {
         return context.getString(GattService.values()
                 .find { it.number == uuid }?.
                 customNameId ?: R.string.unknown_service
         )
     }
 
-    fun checkForCustomCharacteristicName(uuid: UUID?, context: Context): String {
+    private fun checkForCustomCharacteristicName(uuid: UUID?, context: Context): String {
         return context.getString(GattCharacteristic.values()
                 .find { it.uuid == uuid }
                 ?.customNameId ?: R.string.unknown_characteristic_label
@@ -190,7 +194,8 @@ object Common {
         BROADCAST(1),
         READ(2),
         WRITE_NO_RESPONSE(4),
-        WRITE(8), NOTIFY(16),
+        WRITE(8),
+        NOTIFY(16),
         INDICATE(32),
         SIGNED_WRITE(64),
         EXTENDED_PROPS(128);

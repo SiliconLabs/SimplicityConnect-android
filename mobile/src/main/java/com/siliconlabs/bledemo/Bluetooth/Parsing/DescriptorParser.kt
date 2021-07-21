@@ -1,8 +1,8 @@
-package com.siliconlabs.bledemo.bluetooth.parsing
+package com.siliconlabs.bledemo.Bluetooth.Parsing
 
 import android.bluetooth.BluetoothGattDescriptor
-import com.siliconlabs.bledemo.utils.Converters
-import com.siliconlabs.bledemo.utils.StringUtils.removeWhitespaceAndCommaIfNeeded
+import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.Utils.StringUtils.removeWhitespaceAndCommaIfNeeded
 import java.lang.StringBuilder
 import java.util.*
 

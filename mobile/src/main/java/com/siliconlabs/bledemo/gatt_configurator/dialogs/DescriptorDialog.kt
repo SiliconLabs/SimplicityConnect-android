@@ -12,7 +12,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.CheckBox
 import androidx.appcompat.widget.SwitchCompat
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.base.BaseDialogFragment
+import com.siliconlabs.bledemo.Base.BaseDialogFragment
 import com.siliconlabs.bledemo.gatt_configurator.adapters.Descriptor16BitAdapter
 import com.siliconlabs.bledemo.gatt_configurator.models.*
 import com.siliconlabs.bledemo.gatt_configurator.utils.GattUtils

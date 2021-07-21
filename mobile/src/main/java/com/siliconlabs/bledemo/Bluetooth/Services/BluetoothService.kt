@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.bluetooth.services
+package com.siliconlabs.bledemo.Bluetooth.Services
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -14,18 +14,20 @@ import android.os.Build
 import android.os.Handler
 import android.preference.PreferenceManager
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.bluetooth.ConnectedGatts
-import com.siliconlabs.bledemo.bluetooth.ble.*
-import com.siliconlabs.bledemo.bluetooth.parsing.ScanRecordParser
-import com.siliconlabs.bledemo.browser.activities.BrowserActivity
-import com.siliconlabs.bledemo.browser.models.logs.*
+import com.siliconlabs.bledemo.Bluetooth.ConnectedGatts
+import com.siliconlabs.bledemo.Bluetooth.BLE.*
+import androidx.annotation.RequiresApi
+import com.siliconlabs.bledemo.Bluetooth.Parsing.ScanRecordParser
+import com.siliconlabs.bledemo.Browser.Activities.BrowserActivity
+import com.siliconlabs.bledemo.Browser.Models.Logs.*
 import com.siliconlabs.bledemo.gatt_configurator.utils.BluetoothGattServicesCreator
 import com.siliconlabs.bledemo.gatt_configurator.utils.GattConfiguratorStorage
-import com.siliconlabs.bledemo.utils.Constants
-import com.siliconlabs.bledemo.utils.LocalService
+import com.siliconlabs.bledemo.Browser.Models.Logs.ConnectionStateChangeLog
+import com.siliconlabs.bledemo.Browser.Models.Logs.DisconnectByButtonLog
+import com.siliconlabs.bledemo.Utils.Constants
+import com.siliconlabs.bledemo.Utils.LocalService
 import timber.log.Timber
 import java.lang.reflect.Method
 import java.util.*
@@ -746,7 +748,6 @@ class BluetoothService : LocalService<BluetoothService>() {
     }
 
     fun registerGattCallback(requestRssiUpdates: Boolean, callback: TimeoutGattCallback?) {
-        Timber.d("Register Gatt Callback")
         handler.removeCallbacks(rssiUpdate)
         if (requestRssiUpdates) {
             handler.post(rssiUpdate)
@@ -784,7 +785,7 @@ class BluetoothService : LocalService<BluetoothService>() {
             extraGattCallback = callback
         }
 
-        connectedGatt = if (useBLE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        connectedGatt = if (useBLE) {
             device.connectGatt(this, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
         } else {
             device.connectGatt(this, false, gattCallback)
@@ -816,10 +817,8 @@ class BluetoothService : LocalService<BluetoothService>() {
     private val gattCallback: BluetoothGattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
-            Timber.d(
-                "onConnectionStateChange(): gatt device = %s, status = %d, newState = %d",
-                gatt.device.address, status, newState
-            )
+            Timber.d("onConnectionStateChange(): gatt device = %s, status = %d, newState = %d",
+                    gatt.device.address, status, newState)
             Constants.LOGS.add(ConnectionStateChangeLog(gatt, status, newState))
             handler.removeCallbacks(connectionTimeout)
 
@@ -838,67 +837,43 @@ class BluetoothService : LocalService<BluetoothService>() {
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             super.onServicesDiscovered(gatt, status)
-            Timber.d(
-                "onServicesDiscovered(): gatt device = %s, status = %d",
-                gatt.device.address, status
-            )
+            Timber.d("onServicesDiscovered(): gatt device = %s, status = %d",
+                    gatt.device.address, status)
             extraGattCallback?.onServicesDiscovered(gatt, status)
         }
 
-        override fun onCharacteristicWrite(
-            gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic,
-            status: Int
-        ) {
+        override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
             super.onCharacteristicWrite(gatt, characteristic, status)
-            Timber.d(
-                "onCharacteristicWrite(): gatt device = %s, characteristic uuid = %s",
-                gatt.device.address, characteristic.uuid
-            )
+            Timber.d("onCharacteristicWrite(): gatt device = %s, characteristic uuid = %s",
+                    gatt.device.address, characteristic.uuid)
             extraGattCallback?.onCharacteristicWrite(gatt, characteristic, status)
         }
 
-        override fun onDescriptorRead(
-            gatt: BluetoothGatt,
-            descriptor: BluetoothGattDescriptor,
-            status: Int
-        ) {
+        override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
             super.onDescriptorRead(gatt, descriptor, status)
-            Timber.d(
-                "onDescriptorRead(): gatt device = %s, descriptor uuid = %s",
-                gatt.device.address, descriptor.uuid
-            )
+            Timber.d("onDescriptorRead(): gatt device = %s, descriptor uuid = %s",
+                    gatt.device.address, descriptor.uuid)
             extraGattCallback?.onDescriptorRead(gatt, descriptor, status)
         }
 
-        override fun onDescriptorWrite(
-            gatt: BluetoothGatt,
-            descriptor: BluetoothGattDescriptor,
-            status: Int
-        ) {
+        override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
             super.onDescriptorWrite(gatt, descriptor, status)
-            Timber.d(
-                "onDescriptorWrite(): gatt device = %s, descriptor uuid = %s",
-                gatt.device.address, descriptor.uuid
-            )
+            Timber.d("onDescriptorWrite(): gatt device = %s, descriptor uuid = %s",
+                    gatt.device.address, descriptor.uuid)
             extraGattCallback?.onDescriptorWrite(gatt, descriptor, status)
         }
 
         override fun onReliableWriteCompleted(gatt: BluetoothGatt, status: Int) {
             super.onReliableWriteCompleted(gatt, status)
-            Timber.d(
-                "onReliableWriteCompleted(): gatt device = %s, status = %d",
-                gatt.device.address, status
-            )
+            Timber.d("onReliableWriteCompleted(): gatt device = %s, status = %d",
+                    gatt.device.address, status)
             extraGattCallback?.onReliableWriteCompleted(gatt, status)
         }
 
         override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {
             super.onReadRemoteRssi(gatt, rssi, status)
-            Timber.v(
-                "onReadRemoteRssi(): gatt device = %s, rssi = %d",
-                gatt.device.address, rssi
-            )
+            Timber.d("onReadRemoteRssi(): gatt device = %s, rssi = %d",
+                    gatt.device.address, rssi)
             extraGattCallback?.onReadRemoteRssi(gatt, rssi, status)
         }
 
@@ -908,39 +883,26 @@ class BluetoothService : LocalService<BluetoothService>() {
             extraGattCallback?.onMtuChanged(gatt, mtu, status)
         }
 
-        override fun onCharacteristicRead(
-            gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic,
-            status: Int
-        ) {
+        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
             super.onCharacteristicRead(gatt, characteristic, status)
-            Timber.d(
-                "onCharacteristicRead(): gatt device = %s, status = %d",
-                gatt.device.address, status
-            ) //todo characteristic value ?
+            Timber.d("onCharacteristicRead(): gatt device = %s, status = %d",
+                    gatt.device.address, status) //todo characteristic value ?
 
             extraGattCallback?.onCharacteristicRead(gatt, characteristic, status)
         }
 
-        override fun onCharacteristicChanged(
-            gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic
-        ) {
+        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
             super.onCharacteristicChanged(gatt, characteristic)
-            Timber.d(
-                "onCharacteristicChanged(): gatt device = %s, uuid = %s",
-                gatt.device.address, characteristic.uuid
-            )
+            Timber.d("onCharacteristicChanged(): gatt device = %s, uuid = %s",
+                gatt.device.address, characteristic.uuid)
+
             extraGattCallback?.onCharacteristicChanged(gatt, characteristic)
         }
 
-        @RequiresApi(Build.VERSION_CODES.O)
         override fun onPhyUpdate(gatt: BluetoothGatt?, txPhy: Int, rxPhy: Int, status: Int) {
             super.onPhyUpdate(gatt, txPhy, rxPhy, status)
-            Timber.d(
-                "onPhyUpdate(): gatt device = %s, txPhy = %d, rxPhy = %d, status = %d",
-                gatt?.device?.address, txPhy, rxPhy, status
-            )
+            Timber.d("onPhyUpdate(): gatt device = %s, txPhy = %d, rxPhy = %d, status = %d",
+                    gatt?.device?.address, txPhy, rxPhy, status)
             extraGattCallback?.onPhyUpdate(gatt, txPhy, rxPhy, status)
         }
     }
@@ -1007,6 +969,7 @@ class BluetoothService : LocalService<BluetoothService>() {
             gattServerCallback?.onNotificationSent(device, status)
         }
     }
+
     private fun getYesPendingIntent(device: BluetoothDevice): PendingIntent {
         val intent = Intent(ACTION_GATT_SERVER_DEBUG_CONNECTION)
         intent.putExtra(EXTRA_BLUETOOTH_DEVICE, device)

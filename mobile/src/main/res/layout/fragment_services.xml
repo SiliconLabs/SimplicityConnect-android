@@ -4,7 +4,7 @@
     android:id="@+id/scrollViewWrapper"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".browser.fragments.ServicesFragment">
+    tools:context=".Browser.Fragment.ServicesFragment">
 
     <LinearLayout
         android:id="@+id/services_container"

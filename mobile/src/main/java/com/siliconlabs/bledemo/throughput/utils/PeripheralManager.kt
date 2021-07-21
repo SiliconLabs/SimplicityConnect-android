@@ -5,12 +5,12 @@ import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.le.*
 import android.os.ParcelUuid
-import com.siliconlabs.bledemo.advertiser.models.AdvertiserData
-import com.siliconlabs.bledemo.advertiser.models.AdvertiserSettings
-import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
-import com.siliconlabs.bledemo.bluetooth.ble.GattService
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
-import com.siliconlabs.bledemo.utils.BLEUtils
+import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserData
+import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserSettings
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
+import com.siliconlabs.bledemo.Utils.BLEUtils
 import timber.log.Timber
 
 object PeripheralManager {
@@ -42,11 +42,11 @@ object PeripheralManager {
                 BluetoothGattCharacteristic.PROPERTY_NOTIFY,
                 BluetoothGattCharacteristic.PERMISSION_READ)
         val transmissionOnChar = BluetoothGattCharacteristic(GattCharacteristic.ThroughputTransmissionOn.uuid,
-            BluetoothGattCharacteristic.PROPERTY_READ or
-                    BluetoothGattCharacteristic.PROPERTY_WRITE or
-                    BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-            BluetoothGattCharacteristic.PERMISSION_READ or
-                    BluetoothGattCharacteristic.PERMISSION_WRITE
+                BluetoothGattCharacteristic.PROPERTY_READ or
+                        BluetoothGattCharacteristic.PROPERTY_WRITE or
+                        BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+                BluetoothGattCharacteristic.PERMISSION_READ or
+                        BluetoothGattCharacteristic.PERMISSION_WRITE
         )
 
         indicationsChar.addDescriptor(getConfigDescriptor())
@@ -63,7 +63,7 @@ object PeripheralManager {
     private fun getConfigDescriptor() : BluetoothGattDescriptor {
         return BluetoothGattDescriptor(BLEUtils.CLIENT_CHARACTERISTIC_CONFIG_UUID,
                 BluetoothGattDescriptor.PERMISSION_READ or
-                           BluetoothGattDescriptor.PERMISSION_WRITE)
+                        BluetoothGattDescriptor.PERMISSION_WRITE)
     }
 
     /* Advertiser fields */

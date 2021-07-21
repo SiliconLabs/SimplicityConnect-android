@@ -37,7 +37,7 @@ class Converter {
             return value.toInt() and 0xFF
         }
 
-        fun byteArrayToInt(bytes: ByteArray): Int {
+        private fun byteArrayToInt(bytes: ByteArray): Int {
             var result = 0
             for (i in bytes.indices) {
                 result = result or ((bytes[i].toInt() and 0xFF) shl 8 * i)

@@ -7,7 +7,7 @@
         android:id="@+id/toolbar_throughput"
         layout="@layout/actionbar" />
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:layout_width="match_parent"
         android:layout_height="@dimen/shadow_height"
         android:layout_below="@id/toolbar_throughput"

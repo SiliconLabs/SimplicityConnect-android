@@ -1,11 +1,11 @@
-package com.siliconlabs.bledemo.utils
+package com.siliconlabs.bledemo.Utils
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
-import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
-import com.siliconlabs.bledemo.bluetooth.ble.GattService
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
 import java.util.*
 
 object BLEUtils {

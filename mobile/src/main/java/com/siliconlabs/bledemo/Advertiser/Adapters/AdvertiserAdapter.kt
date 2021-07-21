@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.advertiser.adapters
+package com.siliconlabs.bledemo.Advertiser.Adapters
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
@@ -13,10 +13,10 @@ import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.siliconlabs.bledemo.Advertiser.Models.Advertiser
+import com.siliconlabs.bledemo.Advertiser.Utils.Translator
+import com.siliconlabs.bledemo.Advertiser.Views.AdvertiserDetails
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.advertiser.models.Advertiser
-import com.siliconlabs.bledemo.advertiser.utils.Translator
-import com.siliconlabs.bledemo.advertiser.views.AdvertiserDetails
 import kotlinx.android.synthetic.main.adapter_advertiser.view.*
 
 class AdvertiserAdapter(val items: ArrayList<Advertiser>, val context: Context, private val itemClickListener: OnItemClickListener) : RecyclerView.Adapter<AdvertiserAdapter.ViewHolder>() {

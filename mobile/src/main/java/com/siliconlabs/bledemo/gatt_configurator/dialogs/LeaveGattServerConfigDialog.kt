@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.base.BaseDialogFragment
+import com.siliconlabs.bledemo.Base.BaseDialogFragment
 import com.siliconlabs.bledemo.gatt_configurator.utils.GattConfiguratorStorage
 import kotlinx.android.synthetic.main.dialog_info_ok_cancel.*
 

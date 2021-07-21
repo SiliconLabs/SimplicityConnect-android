@@ -14,7 +14,7 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.bluetooth.parsing
+package com.siliconlabs.bledemo.Bluetooth.Parsing
 
 import java.io.File
 

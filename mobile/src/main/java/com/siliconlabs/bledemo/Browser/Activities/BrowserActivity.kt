@@ -14,7 +14,7 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.browser.activities
+package com.siliconlabs.bledemo.Browser.Activities
 
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
@@ -51,32 +51,32 @@ import com.google.android.gms.appindexing.Action
 import com.google.android.gms.appindexing.AppIndex
 import com.google.android.gms.appindexing.Thing
 import com.google.android.gms.common.api.GoogleApiClient
-import com.siliconlabs.bledemo.bluetooth.ConnectedGatts
-import com.siliconlabs.bledemo.adapters.DeviceInfoViewHolder
-import com.siliconlabs.bledemo.base.BaseActivity
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
-import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
-import com.siliconlabs.bledemo.bluetooth.ble.Discovery
-import com.siliconlabs.bledemo.bluetooth.ble.Discovery.BluetoothDiscoveryHost
-import com.siliconlabs.bledemo.bluetooth.ble.Discovery.DeviceContainer
-import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes.getDeviceDisconnectedMessage
-import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes.getFailedConnectingToDeviceMessage
-import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
-import com.siliconlabs.bledemo.browser.adapters.ConnectionsAdapter
-import com.siliconlabs.bledemo.browser.adapters.DebugModeDeviceAdapter
-import com.siliconlabs.bledemo.browser.adapters.LogAdapter
-import com.siliconlabs.bledemo.browser.DebugModeCallback
-import com.siliconlabs.bledemo.browser.models.logs.TimeoutLog
-import com.siliconlabs.bledemo.browser.models.ToolbarName
-import com.siliconlabs.bledemo.browser.ServicesConnectionsCallback
-import com.siliconlabs.bledemo.browser.ToolbarCallback
-import com.siliconlabs.bledemo.browser.views.ExpandableTextView
+import com.siliconlabs.bledemo.Bluetooth.ConnectedGatts
+import com.siliconlabs.bledemo.Adapters.DeviceInfoViewHolder
+import com.siliconlabs.bledemo.Base.BaseActivity
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery
+import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery.BluetoothDiscoveryHost
+import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery.DeviceContainer
+import com.siliconlabs.bledemo.Bluetooth.BLE.ErrorCodes.getDeviceDisconnectedMessage
+import com.siliconlabs.bledemo.Bluetooth.BLE.ErrorCodes.getFailedConnectingToDeviceMessage
+import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
+import com.siliconlabs.bledemo.Browser.Adapters.ConnectionsAdapter
+import com.siliconlabs.bledemo.Browser.Adapters.DebugModeDeviceAdapter
+import com.siliconlabs.bledemo.Browser.Adapters.LogAdapter
+import com.siliconlabs.bledemo.Browser.DebugModeCallback
+import com.siliconlabs.bledemo.Browser.Models.Logs.TimeoutLog
+import com.siliconlabs.bledemo.Browser.Models.ToolbarName
+import com.siliconlabs.bledemo.Browser.ServicesConnectionsCallback
+import com.siliconlabs.bledemo.Browser.ToolbarCallback
+import com.siliconlabs.bledemo.Browser.Views.ExpandableTextView
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.browser.MessageQueue
-import com.siliconlabs.bledemo.utils.Constants
-import com.siliconlabs.bledemo.utils.FilterDeviceParams
-import com.siliconlabs.bledemo.utils.SharedPrefUtils
-import com.siliconlabs.bledemo.browser.fragments.*
+import com.siliconlabs.bledemo.Browser.MessageQueue
+import com.siliconlabs.bledemo.Utils.Constants
+import com.siliconlabs.bledemo.Utils.FilterDeviceParams
+import com.siliconlabs.bledemo.Utils.SharedPrefUtils
+import com.siliconlabs.bledemo.Browser.Fragment.*
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.android.synthetic.main.toolbar_browser.*

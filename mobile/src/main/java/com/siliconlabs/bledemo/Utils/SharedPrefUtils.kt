@@ -1,10 +1,10 @@
-package com.siliconlabs.bledemo.utils
+package com.siliconlabs.bledemo.Utils
 
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.siliconlabs.bledemo.browser.models.Mapping
+import com.siliconlabs.bledemo.Browser.Models.Mapping
 import java.util.*
 
 class SharedPrefUtils(context: Context) {

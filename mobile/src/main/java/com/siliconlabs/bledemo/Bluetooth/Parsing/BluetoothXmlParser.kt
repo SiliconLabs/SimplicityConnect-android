@@ -14,13 +14,13 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.bluetooth.parsing
+package com.siliconlabs.bledemo.Bluetooth.Parsing
 
 import android.content.Context
 import android.util.Xml
-import com.siliconlabs.bledemo.bluetooth.data_types.*
-import com.siliconlabs.bledemo.bluetooth.data_types.Enumeration
-import com.siliconlabs.bledemo.utils.UuidUtils
+import com.siliconlabs.bledemo.Bluetooth.DataTypes.*
+import com.siliconlabs.bledemo.Bluetooth.DataTypes.Enumeration
+import com.siliconlabs.bledemo.Utils.UuidUtils
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.File

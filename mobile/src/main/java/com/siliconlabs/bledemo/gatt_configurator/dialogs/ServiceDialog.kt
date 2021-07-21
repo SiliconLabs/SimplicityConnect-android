@@ -11,13 +11,14 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.base.BaseDialogFragment
-import com.siliconlabs.bledemo.bluetooth.parsing.Engine
+import com.siliconlabs.bledemo.Base.BaseDialogFragment
+import com.siliconlabs.bledemo.Bluetooth.Parsing.Common
+import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine
+import com.siliconlabs.bledemo.Utils.UuidUtils
 import com.siliconlabs.bledemo.gatt_configurator.adapters.Service16BitAdapter
 import com.siliconlabs.bledemo.gatt_configurator.models.*
 import com.siliconlabs.bledemo.gatt_configurator.utils.GattUtils
 import com.siliconlabs.bledemo.gatt_configurator.utils.Validator
-import com.siliconlabs.bledemo.utils.UuidUtils
 import kotlinx.android.synthetic.main.dialog_gatt_server_service.*
 import java.util.*
 

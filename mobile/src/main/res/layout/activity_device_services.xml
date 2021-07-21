@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/silabs_background"
-    tools:context=".browser.activities.DeviceServicesActivity">
+    tools:context=".Browser.Activities.DeviceServicesActivity">
 
     <include
         android:id="@+id/toolbar_device_services"
@@ -170,7 +170,7 @@
         </RelativeLayout>
     </RelativeLayout>
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/services_toolbar" />

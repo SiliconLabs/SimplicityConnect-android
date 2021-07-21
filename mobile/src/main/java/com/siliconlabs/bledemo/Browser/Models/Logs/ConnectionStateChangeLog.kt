@@ -1,8 +1,8 @@
-package com.siliconlabs.bledemo.browser.models.logs
+package com.siliconlabs.bledemo.Browser.Models.Logs
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothProfile
-import com.siliconlabs.bledemo.browser.models.LogType
+import com.siliconlabs.bledemo.Browser.Models.LogType
 
 class ConnectionStateChangeLog(gatt: BluetoothGatt, status: Int, newState: Int) : Log() {
     private fun parseNewState(newState: Int): String {

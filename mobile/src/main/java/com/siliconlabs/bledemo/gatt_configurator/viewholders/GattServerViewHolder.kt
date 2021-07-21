@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.siliconlabs.bledemo.gatt_configurator.models.GattServer
 import com.siliconlabs.bledemo.gatt_configurator.adapters.GattServerAdapter.OnClickListener
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.views.DetailsRow
+import com.siliconlabs.bledemo.Views.DetailsRow
 import kotlinx.android.synthetic.main.adapter_gatt_server.view.*
 
 class GattServerViewHolder(view: View, private val list: List<GattServer>, private val listener: OnClickListener) : RecyclerView.ViewHolder(view), View.OnClickListener {

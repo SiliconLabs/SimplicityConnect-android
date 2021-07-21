@@ -14,7 +14,7 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.bluetooth.services
+package com.siliconlabs.bledemo.Bluetooth.Services
 
 import android.app.Service
 import android.bluetooth.*
@@ -22,8 +22,8 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.siliconlabs.bledemo.bluetooth.parsing.Device
-import com.siliconlabs.bledemo.bluetooth.parsing.Engine
+import com.siliconlabs.bledemo.Bluetooth.Parsing.Device
+import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine
 
 // BluetoothLeService - manages connections and data communication with given Bluetooth LE devices.
 class BluetoothLeService : Service() {

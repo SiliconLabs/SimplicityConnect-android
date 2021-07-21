@@ -1,6 +1,6 @@
-package com.siliconlabs.bledemo.utils
+package com.siliconlabs.bledemo.Utils
 
-import com.siliconlabs.bledemo.bluetooth.parsing.Consts
+import com.siliconlabs.bledemo.Bluetooth.Parsing.Consts
 import java.util.*
 
 object UuidUtils {
@@ -16,8 +16,7 @@ object UuidUtils {
     fun getUuidText(uuid: UUID): String {
         val strUuid = uuid.toString().toUpperCase(Locale.getDefault())
         return if (strUuid.startsWith(Consts.BLUETOOTH_BASE_UUID_PREFIX)
-            && strUuid.endsWith(Consts.BLUETOOTH_BASE_UUID_POSTFIX)
-        ) {
+                && strUuid.endsWith(Consts.BLUETOOTH_BASE_UUID_POSTFIX)) {
             "0x" + convert128to16UUID(strUuid)
         } else {
             strUuid

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.adapters
+package com.siliconlabs.bledemo.Adapters
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -7,12 +7,12 @@ import android.os.Handler
 import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
-import com.siliconlabs.bledemo.bluetooth.ble.Discovery.DeviceContainer
-import com.siliconlabs.bledemo.browser.fragments.SortMode
-import com.siliconlabs.bledemo.utils.FilterDeviceParams
-import com.siliconlabs.bledemo.utils.SharedPrefUtils
-import com.siliconlabs.bledemo.utils.StringUtils.getStringWithoutColons
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery.DeviceContainer
+import com.siliconlabs.bledemo.Browser.Fragment.SortMode
+import com.siliconlabs.bledemo.Utils.FilterDeviceParams
+import com.siliconlabs.bledemo.Utils.SharedPrefUtils
+import com.siliconlabs.bledemo.Utils.StringUtils.getStringWithoutColons
 import java.util.*
 
 open class ScannedDevicesAdapter(private val generator: DeviceInfoViewHolder.Generator, context: Context) : RecyclerView.Adapter<DeviceInfoViewHolder>(), DeviceContainer<BluetoothDeviceInfo> {

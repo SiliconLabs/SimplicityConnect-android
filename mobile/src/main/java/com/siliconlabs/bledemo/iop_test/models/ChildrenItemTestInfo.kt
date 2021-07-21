@@ -1,8 +1,8 @@
 package com.siliconlabs.bledemo.iop_test.models
 
 import android.bluetooth.BluetoothGattCharacteristic
+import com.siliconlabs.bledemo.Utils.Converters
 import com.siliconlabs.bledemo.iop_test.utils.ErrorCodes
-import com.siliconlabs.bledemo.utils.Converters
 import java.util.*
 
 class ChildrenItemTestInfo(val id: Int, val typeTestCase: String, val nameTest: String, val properties: String) {

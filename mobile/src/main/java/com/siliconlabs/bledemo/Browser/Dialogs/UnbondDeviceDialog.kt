@@ -1,12 +1,12 @@
-package com.siliconlabs.bledemo.browser.dialogs
+package com.siliconlabs.bledemo.Browser.Dialogs
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.siliconlabs.bledemo.base.BaseDialogFragment
+import com.siliconlabs.bledemo.Base.BaseDialogFragment
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.utils.SharedPrefUtils
+import com.siliconlabs.bledemo.Utils.SharedPrefUtils
 import kotlinx.android.synthetic.main.dialog_info_ok_cancel.view.*
 
 class UnbondDeviceDialog(val callback: Callback) : BaseDialogFragment() {

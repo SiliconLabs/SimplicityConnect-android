@@ -1,11 +1,11 @@
-package com.siliconlabs.bledemo.bluetooth.ble
+package com.siliconlabs.bledemo.Bluetooth.BLE
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import java.util.*
 
 class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, private val host: BluetoothDiscoveryHost) : BluetoothService.Listener {

@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.browser.adapters
+package com.siliconlabs.bledemo.Browser.Adapters
 
 import android.bluetooth.BluetoothGatt
 import android.content.Context
@@ -11,11 +11,11 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
-import com.siliconlabs.bledemo.browser.adapters.ConnectionsAdapter.ConnectionViewHolder
-import com.siliconlabs.bledemo.browser.ServicesConnectionsCallback
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.Browser.Adapters.ConnectionsAdapter.ConnectionViewHolder
+import com.siliconlabs.bledemo.Browser.ServicesConnectionsCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.utils.Constants
+import com.siliconlabs.bledemo.Utils.Constants
 import java.util.*
 
 class ConnectionsAdapter(var connectionsList: List<BluetoothGatt>, private val context: Context) : RecyclerView.Adapter<ConnectionViewHolder>() {

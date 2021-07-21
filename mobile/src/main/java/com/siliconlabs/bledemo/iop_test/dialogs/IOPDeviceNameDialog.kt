@@ -1,14 +1,16 @@
 package com.siliconlabs.bledemo.iop_test.dialogs
 
 import android.bluetooth.BluetoothAdapter
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.siliconlabs.bledemo.Base.BaseDialogFragment
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.base.BaseDialogFragment
 import com.siliconlabs.bledemo.iop_test.activities.IOPTestActivity
 import com.siliconlabs.bledemo.iop_test.models.IOPTest
 import kotlinx.android.synthetic.main.dialog_iop_device_name.*
@@ -57,9 +59,12 @@ class IOPDeviceNameDialog : BaseDialogFragment() {
     }
 
     private fun handleClickOnInteroperabilityTest() {
-        Toast.makeText(requireContext(),"TODO",Toast.LENGTH_SHORT).show()
-        //val uriUrl = Uri.parse("https://" + "TODO")
-        //val launchBrowser = Intent(Intent.ACTION_VIEW, uriUrl)
-        //startActivity(launchBrowser)
+        val url = Uri.parse(IOP_LINK)
+        val launchBrowser = Intent(Intent.ACTION_VIEW, url)
+        startActivity(launchBrowser)
+    }
+
+    companion object {
+        private const val IOP_LINK = "https://www.silabs.com/documents/public/application-notes/an1346-running-ble-iop-test.pdf"
     }
 }

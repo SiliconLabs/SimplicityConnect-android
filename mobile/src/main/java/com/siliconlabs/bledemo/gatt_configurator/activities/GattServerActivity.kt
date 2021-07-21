@@ -14,7 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.base.BaseActivity
+import com.siliconlabs.bledemo.Base.BaseActivity
 import com.siliconlabs.bledemo.gatt_configurator.adapters.EditGattServerAdapter
 import com.siliconlabs.bledemo.gatt_configurator.adapters.EditGattServerAdapter.AddServiceListener
 import com.siliconlabs.bledemo.gatt_configurator.adapters.EditGattServerAdapter.ServiceListener

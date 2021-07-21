@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -7,7 +8,7 @@
         android:id="@+id/toolbar_iop_test"
         layout="@layout/actionbar" />
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:id="@+id/iop_shadow_top"
         android:layout_width="match_parent"
         android:layout_height="@dimen/shadow_height"
@@ -21,11 +22,11 @@
         android:layout_above="@id/ll_iop_footer"
         android:layout_below="@+id/toolbar_iop_test" />
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:id="@+id/iop_footer_shadow_top"
         android:layout_width="match_parent"
         android:layout_height="@dimen/shadow_height"
-        android:layout_above="@id/ll_iop_footer"/>
+        android:layout_above="@id/ll_iop_footer" />
 
     <LinearLayout
         android:id="@+id/ll_iop_footer"

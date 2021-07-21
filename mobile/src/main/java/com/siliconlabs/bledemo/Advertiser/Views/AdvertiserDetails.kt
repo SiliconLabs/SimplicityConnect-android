@@ -1,15 +1,15 @@
-package com.siliconlabs.bledemo.advertiser.views
+package com.siliconlabs.bledemo.Advertiser.Views
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.widget.LinearLayout
+import com.siliconlabs.bledemo.Advertiser.Models.Advertiser
+import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserData
+import com.siliconlabs.bledemo.Advertiser.Models.DataPacket
+import com.siliconlabs.bledemo.Advertiser.Models.Manufacturer
+import com.siliconlabs.bledemo.Advertiser.Utils.Translator
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.advertiser.models.Advertiser
-import com.siliconlabs.bledemo.advertiser.models.AdvertiserData
-import com.siliconlabs.bledemo.advertiser.models.DataPacket
-import com.siliconlabs.bledemo.advertiser.models.Manufacturer
-import com.siliconlabs.bledemo.advertiser.utils.Translator
-import com.siliconlabs.bledemo.views.DetailsRow
+import com.siliconlabs.bledemo.Views.DetailsRow
 
 class AdvertiserDetails(val context: Context) {
 

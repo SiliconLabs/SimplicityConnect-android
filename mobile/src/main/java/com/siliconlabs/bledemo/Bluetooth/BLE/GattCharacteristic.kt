@@ -1,12 +1,12 @@
-package com.siliconlabs.bledemo.bluetooth.ble
+package com.siliconlabs.bledemo.Bluetooth.BLE
 
 import android.bluetooth.BluetoothGattCharacteristic
 import androidx.annotation.StringRes
+import com.siliconlabs.bledemo.Bluetooth.BLE.Values.ByteArrayValue
+import com.siliconlabs.bledemo.Bluetooth.BLE.Values.TemperatureValue
+import com.siliconlabs.bledemo.Bluetooth.BLE.Values.ValueFactory
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.bluetooth.ble.values.ByteArrayValue
-import com.siliconlabs.bledemo.bluetooth.ble.values.TemperatureValue
-import com.siliconlabs.bledemo.bluetooth.ble.values.ValueFactory
-import com.siliconlabs.bledemo.utils.UuidUtils.parseIntFromUuidStart
+import com.siliconlabs.bledemo.Utils.UuidUtils.parseIntFromUuidStart
 import java.util.*
 
 /**
@@ -72,6 +72,7 @@ enum class GattCharacteristic {
     ThroughputSupervisionTimeout("67e2c4f2-2f50-914c-a611-adb3727b056d", "custom.type", customNameId = R.string.supervision_timeout_characteristic_name),
     ThroughputPduSize("30cc364a-0739-268c-4926-36f112631e0c", "custom.type", customNameId = R.string.pdu_size_characteristic_name),
     ThroughputMtuSize("3816df2f-d974-d915-d26e-78300f25e86e", "custom.type", customNameId = R.string.mtu_size_characteristic_name);
+
     /**
      * The so-called "Assigned Number" of this characteristic.
      */

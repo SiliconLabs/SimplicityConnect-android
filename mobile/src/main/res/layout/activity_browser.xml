@@ -6,7 +6,7 @@
     android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".browser.activities.BrowserActivity">
+    tools:context=".Browser.Activities.BrowserActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -25,7 +25,7 @@
             android:layout_height="36dp"
             android:layout_below="@id/toolbar_browser" />
 
-        <com.siliconlabs.bledemo.browser.views.ExpandableTextView
+        <com.siliconlabs.bledemo.Browser.Views.ExpandableTextView
             android:id="@+id/etv_active_filter_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -169,13 +169,13 @@
 
         </RelativeLayout>
 
-        <com.siliconlabs.bledemo.views.HorizontalShadow
+        <com.siliconlabs.bledemo.Views.HorizontalShadow
             android:id="@+id/browser_shadow_top"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/etv_active_filter_bar" />
 
-        <com.siliconlabs.bledemo.views.HorizontalShadow
+        <com.siliconlabs.bledemo.Views.HorizontalShadow
             android:id="@+id/scanning_separator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

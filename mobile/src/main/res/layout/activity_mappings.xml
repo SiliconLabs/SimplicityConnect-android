@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".browser.activities.MappingDictionaryActivity">
+    tools:context=".Browser.Activities.MappingDictionaryActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout"
@@ -61,7 +61,7 @@
         android:layout_below="@id/app_bar_layout"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <com.siliconlabs.bledemo.views.HorizontalShadow
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/app_bar_layout" />

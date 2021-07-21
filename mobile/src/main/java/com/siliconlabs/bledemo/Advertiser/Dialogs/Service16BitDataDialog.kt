@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.advertiser.dialogs
+package com.siliconlabs.bledemo.Advertiser.Dialogs
 
 import android.app.Dialog
 import android.content.Intent
@@ -14,12 +14,12 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import com.siliconlabs.bledemo.Advertiser.Adapters.Service16BitAdapter
+import com.siliconlabs.bledemo.Advertiser.Models.Service16Bit
+import com.siliconlabs.bledemo.Advertiser.Utils.Translator
+import com.siliconlabs.bledemo.Advertiser.Utils.Validator
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.advertiser.adapters.Service16BitAdapter
-import com.siliconlabs.bledemo.advertiser.models.Service16Bit
-import com.siliconlabs.bledemo.advertiser.utils.Translator
-import com.siliconlabs.bledemo.advertiser.utils.Validator
-import com.siliconlabs.bledemo.base.BaseDialogFragment
+import com.siliconlabs.bledemo.Base.BaseDialogFragment
 import kotlinx.android.synthetic.main.dialog_data_16bit_service.view.*
 import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.btn_cancel
 import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.btn_save

@@ -1,6 +1,7 @@
-package com.siliconlabs.bledemo.base
+package com.siliconlabs.bledemo.Base
 
-import android.bluetooth.*
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothGatt
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -21,17 +22,18 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
-import com.siliconlabs.bledemo.adapters.DeviceInfoViewHolder
-import com.siliconlabs.bledemo.adapters.ScannedDevicesAdapter
-import com.siliconlabs.bledemo.bluetooth.ble.*
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService.GattConnectType
-import com.siliconlabs.bledemo.bluetooth.ble.Discovery.BluetoothDiscoveryHost
-import com.siliconlabs.bledemo.connected_lighting.activities.ConnectedLightingActivity
-import com.siliconlabs.bledemo.health_thermometer.activities.HealthThermometerActivity
+import com.siliconlabs.bledemo.Adapters.DeviceInfoViewHolder
+import com.siliconlabs.bledemo.Adapters.ScannedDevicesAdapter
+import com.siliconlabs.bledemo.Bluetooth.BLE.*
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService.GattConnectType
+import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery.BluetoothDiscoveryHost
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
+import com.siliconlabs.bledemo.ConnectedLighting.Activities.ConnectedLightingActivity
+import com.siliconlabs.bledemo.HealthThermometer.Activities.HealthThermometerActivity
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.blinky.activities.BlinkyActivity
 import com.siliconlabs.bledemo.throughput.activities.ThroughputActivity
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
+import com.siliconlabs.bledemo.throughput.utils.PeripheralManager
 import kotlinx.android.synthetic.main.dialog_select_device.*
 import java.util.*
 import kotlin.math.max
@@ -250,9 +252,9 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
 
         bluetoothBinding = object : BluetoothService.Binding(requireContext()) {
             override fun onBound(service: BluetoothService?) {
-                /*if (connectType == GattConnectType.THROUGHPUT_TEST) {
+                if (connectType == GattConnectType.THROUGHPUT_TEST) {
                     PeripheralManager.advertiseThroughputServer(service)
-                }*/
+                }
 
                 (activity as BaseActivity).showModalDialog(BaseActivity.ConnectionStatus.CONNECTING, DialogInterface.OnCancelListener { service?.clearConnectedGatt() })
                 service?.connectGatt(deviceInfo.device, false, timeoutGattCallback)
@@ -260,7 +262,6 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
         }
         bluetoothBinding?.bind()
     }
-
 
     fun setCallback(callback: Callback) {
         this.callback = callback
