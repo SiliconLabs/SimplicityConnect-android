@@ -14,7 +14,7 @@
             style="@style/DialogHeaderText"
             android:id="@+id/error_title"
             android:layout_width="match_parent"
-            android:text="@string/Error" />
+            android:text="@string/error" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -32,7 +32,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:text="@string/An_error_occured"
+                    android:text="@string/error_occurred"
                     android:textAllCaps="true"
                     android:textColor="@color/silabs_red"
                     android:textSize="@dimen/dialog_error_text_size" />

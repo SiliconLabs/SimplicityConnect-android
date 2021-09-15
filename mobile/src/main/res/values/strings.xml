@@ -199,11 +199,15 @@
     <string name="Select_Apploader_gbl_file">Select Apploader .gbl file</string>
     <string name="Select_Application_gbl_file">Select Application .gbl file</string>
     <string name="ota_filename_s">\/%s</string>
+    <string name="ota_loading_text">Loading…</string>
+    <string name="ota_rebooting_text">Rebooting…</string>
+    <string name="ota_waiting_text">Waiting…</string>
+    <string name="ota_resetting_text">Resetting…</string>
 
     <!-- Error dialog -->
-    <string name="An_error_occured">An error occured</string>
-    <string name="Error">Error</string>
-    <string name="Error_colon">Error:</string>
+    <string name="error_occurred">An error occurred</string>
+    <string name="error">Error</string>
+    <string name="error_colon">Error:</string>
 
     <!-- Buttons -->
     <string name="button_reset">Reset</string>
@@ -215,6 +219,8 @@
     <string name="button_save">Save</string>
     <string name="button_send">Send</string>
     <string name="button_cancel">Cancel</string>
+    <string name="button_indicate">Indicate</string>
+    <string name="button_notify">Notify</string>
     <string name="button_clear">Clear</string>
     <string name="button_disconnect_all">Disconnect all</string>
     <string name="button_filter">Filter</string>
@@ -295,8 +301,9 @@
     <string name="loading_ellipsis">Loading…</string>
     <string name="temp_large_placeholder">00.</string>
 
-    <string name="unknown_characteristic_label">Unknown Characteristic</string>
+    <string name="unknown_characteristic_label">Unknown characteristic</string>
     <string name="unknown_characteristic_uuid_label">Unknown</string>
+    <string name="unknown_descriptor_label">Unknown descriptor</string>
     <string name="default_uuid_of_service">uuid</string>
     <string name="characteristic_default_name">Name of Characteristic</string>
     <string name="no_devices_found_title_copy">No devices found</string>
@@ -639,8 +646,17 @@
     <string name="gatt_configurator_primary_service">Primary Service</string>
     <string name="gatt_configurator_secondary_service">Secondary Service</string>
     <string name="gatt_configurator_toast_invalid_gatt_server_name">Invalid GATT Server name!</string>
-    <string name="gatt_configurator_leave_config_dialog_content">Your GATT Server has unsaved
-        changes. Do you wish to save them?</string>
+    <string name="gatt_configurator_leave_config_dialog_content">Your GATT Server has unsaved changes. Do you wish to save them?</string>
+    <string name="gatt_configurator_toast_export_location_choice">Choose location for your files</string>
+    <string name="gatt_configurator_toast_export_wrong_location_chosen">Chosen export location is forbidden</string>
+    <string name="gatt_configurator_toast_export_successful">Export successful</string>
+    <string name="gatt_configurator_toast_import_file_not_found">File not found</string>
+    <string name="gatt_configurator_popup_import_successful_title">Successful import</string>
+    <string name="gatt_configurator_popup_import_successful_content">Created 1 configuration from the XML file</string>
+    <string name="gatt_configurator_popup_import_unsuccessful_title">Import with error</string>
+    <string name="gatt_configurator_popup_import_unsuccessful_content_forbidden_value">Provided: \"%s\", expected: %s. </string>
+    <string name="gatt_configurator_popup_import_unsuccessful_content_occurrence_error">Specifically: \"%s\".</string>
+    <string name="gatt_configurator_popup_import_unsuccessful_content_regex_mismatch">Provided: \"%s\", expected regex pattern: %s.</string>
 
     <string-array name="gatt_configurator_initial_value">
         <item>Empty</item>

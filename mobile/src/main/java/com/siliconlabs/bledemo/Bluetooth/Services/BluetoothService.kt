@@ -14,20 +14,20 @@ import android.os.Build
 import android.os.Handler
 import android.preference.PreferenceManager
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Bluetooth.ConnectedGatts
-import com.siliconlabs.bledemo.Bluetooth.BLE.*
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import com.siliconlabs.bledemo.Bluetooth.BLE.*
+import com.siliconlabs.bledemo.Bluetooth.ConnectedGatts
 import com.siliconlabs.bledemo.Bluetooth.Parsing.ScanRecordParser
 import com.siliconlabs.bledemo.Browser.Activities.BrowserActivity
 import com.siliconlabs.bledemo.Browser.Models.Logs.*
+import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.gatt_configurator.utils.BluetoothGattServicesCreator
 import com.siliconlabs.bledemo.gatt_configurator.utils.GattConfiguratorStorage
-import com.siliconlabs.bledemo.Browser.Models.Logs.ConnectionStateChangeLog
-import com.siliconlabs.bledemo.Browser.Models.Logs.DisconnectByButtonLog
-import com.siliconlabs.bledemo.Utils.Constants
-import com.siliconlabs.bledemo.Utils.LocalService
+import com.siliconlabs.bledemo.utils.Constants
+import com.siliconlabs.bledemo.utils.LocalService
+import com.siliconlabs.bledemo.utils.Notifications
+import com.siliconlabs.bledemo.utils.UuidConsts
 import timber.log.Timber
 import java.lang.reflect.Method
 import java.util.*
@@ -193,6 +193,8 @@ class BluetoothService : LocalService<BluetoothService>() {
         private set
 
     private var gattServerServicesToAdd: LinkedList<BluetoothGattService>? = null
+    private val devicesToNotify = mutableMapOf<UUID, MutableSet<BluetoothDevice>>()
+    private val devicesToIndicate = mutableMapOf<UUID, MutableSet<BluetoothDevice>>()
 
     private val scanTimeout = Runnable {
         stopScanning()
@@ -872,7 +874,7 @@ class BluetoothService : LocalService<BluetoothService>() {
 
         override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {
             super.onReadRemoteRssi(gatt, rssi, status)
-            Timber.d("onReadRemoteRssi(): gatt device = %s, rssi = %d",
+            Timber.v("onReadRemoteRssi(): gatt device = %s, rssi = %d",
                     gatt.device.address, rssi)
             extraGattCallback?.onReadRemoteRssi(gatt, rssi, status)
         }
@@ -950,6 +952,7 @@ class BluetoothService : LocalService<BluetoothService>() {
 
         override fun onCharacteristicWriteRequest(device: BluetoothDevice?, requestId: Int, characteristic: BluetoothGattCharacteristic?, preparedWrite: Boolean, responseNeeded: Boolean, offset: Int, value: ByteArray?) {
             super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite, responseNeeded, offset, value)
+            Timber.i("onCharacteristicWriteRequest")
             characteristic?.value = value
             if (responseNeeded) {
                 bluetoothGattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
@@ -957,10 +960,50 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
 
         override fun onDescriptorWriteRequest(device: BluetoothDevice?, requestId: Int, descriptor: BluetoothGattDescriptor?, preparedWrite: Boolean, responseNeeded: Boolean, offset: Int, value: ByteArray?) {
-            super.onDescriptorWriteRequest(device, requestId, descriptor, preparedWrite, responseNeeded, offset, value)
+            super.onDescriptorWriteRequest(
+                device,
+                requestId,
+                descriptor,
+                preparedWrite,
+                responseNeeded,
+                offset,
+                value
+            )
+            Timber.i("onDescriptorWriteRequest")
             descriptor?.value = value
+            if (
+                descriptor != null && device != null && value != null
+                && descriptor.uuid == UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR
+            ) {
+                val characteristicUuid = descriptor.characteristic.uuid
+
+                when (value.asList()) {
+                    Notifications.DISABLED.descriptorValue.asList() -> {
+                        devicesToNotify[characteristicUuid]?.remove(device)
+                        devicesToIndicate[characteristicUuid]?.remove(device)
+                    }
+                    Notifications.NOTIFY.descriptorValue.asList() -> {
+                        devicesToNotify
+                                .getOrPut(characteristicUuid) { mutableSetOf() }
+                                .add(device)
+                        devicesToIndicate[characteristicUuid]?.remove(device)
+                    }
+                    Notifications.INDICATE.descriptorValue.asList() -> {
+                        devicesToIndicate
+                                .getOrPut(characteristicUuid) { mutableSetOf() }
+                                .add(device)
+                        devicesToNotify[characteristicUuid]?.remove(device)
+                    }
+                }
+            }
             if (responseNeeded) {
-                bluetoothGattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
+                bluetoothGattServer?.sendResponse(
+                    device,
+                    requestId,
+                    BluetoothGatt.GATT_SUCCESS,
+                    offset,
+                    value
+                )
             }
         }
 
@@ -970,15 +1013,33 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
     }
 
+    fun getClientsToNotify(characteristicUuid: UUID): Collection<BluetoothDevice> {
+        return devicesToNotify[characteristicUuid] ?: emptySet()
+    }
+
+    fun getClientsToIndicate(characteristicUuid: UUID) : Collection<BluetoothDevice> {
+        return devicesToIndicate[characteristicUuid] ?: emptySet()
+    }
+
     private fun getYesPendingIntent(device: BluetoothDevice): PendingIntent {
         val intent = Intent(ACTION_GATT_SERVER_DEBUG_CONNECTION)
         intent.putExtra(EXTRA_BLUETOOTH_DEVICE, device)
-        return PendingIntent.getBroadcast(this, GATT_SERVER_DEBUG_CONNECTION_REQUEST_CODE, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        return PendingIntent.getBroadcast(
+            this,
+            GATT_SERVER_DEBUG_CONNECTION_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_CANCEL_CURRENT
+        )
     }
 
     private fun getNoPendingIntent(): PendingIntent {
         val intent = Intent(ACTION_GATT_SERVER_REMOVE_NOTIFICATION)
-        return PendingIntent.getBroadcast(this, GATT_SERVER_REMOVE_NOTIFICATION_REQUEST_CODE, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        return PendingIntent.getBroadcast(
+            this,
+            GATT_SERVER_REMOVE_NOTIFICATION_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_CANCEL_CURRENT
+        )
     }
 
     private fun getYesAndOpenPendingIntent(device: BluetoothDevice): PendingIntent {
@@ -999,7 +1060,8 @@ class BluetoothService : LocalService<BluetoothService>() {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(getString(R.string.notification_title_device_has_connected, deviceName))
                 .setContentText(getString(R.string.notification_note_debug_connection))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setVibrate(LongArray(0))
                 .addAction(0, getString(R.string.button_yes), getYesPendingIntent(device))
                 .addAction(0, getString(R.string.notification_button_yes_and_open), getYesAndOpenPendingIntent(device))
                 .addAction(0, getString(R.string.button_no), getNoPendingIntent())
@@ -1010,17 +1072,15 @@ class BluetoothService : LocalService<BluetoothService>() {
     }
 
     private fun createNotificationChannel(channelId: String) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.notification_channel_name)
-            val descriptionText = getString(R.string.notification_channel_description)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelId, name, importance).apply {
-                description = descriptionText
-            }
-
-            val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+        val name = getString(R.string.notification_channel_name)
+        val descriptionText = getString(R.string.notification_channel_description)
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel(channelId, name, importance).apply {
+            description = descriptionText
         }
+
+        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 
     private val gattServerBroadcastReceiver = object : BroadcastReceiver() {

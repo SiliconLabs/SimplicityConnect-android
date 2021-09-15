@@ -3,7 +3,7 @@ package com.siliconlabs.bledemo.Browser.Models.Logs
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import com.siliconlabs.bledemo.Browser.Models.LogType
-import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.utils.Converters
 import java.lang.StringBuilder
 
 class GattOperationWithDataLog(operationName: String, gatt: BluetoothGatt, status: Int? = null, characteristic: BluetoothGattCharacteristic) : Log() {

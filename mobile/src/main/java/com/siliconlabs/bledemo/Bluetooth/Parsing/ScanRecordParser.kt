@@ -16,7 +16,7 @@
  */
 package com.siliconlabs.bledemo.Bluetooth.Parsing
 
-import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.utils.Converters
 import java.util.*
 
 // ScanRecordParser - parses advertise data from BLE device

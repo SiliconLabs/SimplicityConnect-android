@@ -6,7 +6,7 @@ import com.siliconlabs.bledemo.Bluetooth.BLE.Values.ByteArrayValue
 import com.siliconlabs.bledemo.Bluetooth.BLE.Values.TemperatureValue
 import com.siliconlabs.bledemo.Bluetooth.BLE.Values.ValueFactory
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.UuidUtils.parseIntFromUuidStart
+import com.siliconlabs.bledemo.utils.UuidUtils.parseIntFromUuidStart
 import java.util.*
 
 /**
@@ -28,12 +28,12 @@ enum class GattCharacteristic {
     BatteryLevel(0x00002a19, "org.bluetooth.characteristic.battery_level", BluetoothGattCharacteristic.FORMAT_UINT8),
     DockStatus(-0x4885305b, "com.sensedriver.characteristic.hud.dock_status"),
 
-    OtaControl("f7bf3564-fb6d-4e53-88a4-5e37e0326063", "com.silabs.characteristic.ota_control", R.string.ota_control_attribute_characteristic_name, BluetoothGattCharacteristic.FORMAT_UINT8),
-    OtaData("984227f3-34fc-4045-a5d0-2c581f81a153", "com.silabs.characteristic.ota_data", R.string.ota_data_characteristic_name, BluetoothGattCharacteristic.FORMAT_UINT8),
-    FwVersion("4f4a2368-8cca-451e-bfff-cf0e2ee23e9f", "com.silabs.characteristic.fw_version", R.string.fw_version_characteristic_name, BluetoothGattCharacteristic.FORMAT_UINT8),
-    OtaVersion("4cc07bcf-0868-4b32-9dad-ba4cc41e5316", "com.silabs.characteristic.ota_version", R.string.ota_version_characteristic_name, BluetoothGattCharacteristic.FORMAT_UINT8),
-    BootloaderVersion("25f05c0a-e917-46e9-b2a5-aa2be1245afe", "com.silabs.characteristic.ota_version", R.string.bootloader_version_characteristic_name, BluetoothGattCharacteristic.FORMAT_UINT8),
-    ApplicationVersion("0d77cc11-4ac1-49f2-bfa9-cd96ac7a92f8", "com.silabs.characteristic.ota_version", R.string.application_version_characteristic_name, BluetoothGattCharacteristic.FORMAT_UINT8),
+    OtaControl("f7bf3564-fb6d-4e53-88a4-5e37e0326063", "com.silabs.characteristic.ota_control", BluetoothGattCharacteristic.FORMAT_UINT8, R.string.ota_control_attribute_characteristic_name),
+    OtaData("984227f3-34fc-4045-a5d0-2c581f81a153", "com.silabs.characteristic.ota_data", BluetoothGattCharacteristic.FORMAT_UINT8, R.string.ota_data_characteristic_name),
+    FwVersion("4f4a2368-8cca-451e-bfff-cf0e2ee23e9f", "com.silabs.characteristic.fw_version", BluetoothGattCharacteristic.FORMAT_UINT8, R.string.fw_version_characteristic_name),
+    OtaVersion("4cc07bcf-0868-4b32-9dad-ba4cc41e5316", "com.silabs.characteristic.ota_version", BluetoothGattCharacteristic.FORMAT_UINT8, R.string.ota_version_characteristic_name),
+    BootloaderVersion("25f05c0a-e917-46e9-b2a5-aa2be1245afe", "com.silabs.characteristic.ota_version", BluetoothGattCharacteristic.FORMAT_UINT8, R.string.bootloader_version_characteristic_name),
+    ApplicationVersion("0d77cc11-4ac1-49f2-bfa9-cd96ac7a92f8", "com.silabs.characteristic.ota_version", BluetoothGattCharacteristic.FORMAT_UINT8, R.string.application_version_characteristic_name),
 
     Light("76e137ac-b15f-49d7-9c4c-e278e6492ad9", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT8),
     TriggerSource("2f16ee52-0bfd-4597-85d4-a5141fdbae15", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT8),
@@ -114,7 +114,7 @@ enum class GattCharacteristic {
         BluetoothLEGatt.GATT_CHARACTER_DESCS.put(number, this)
     }
 
-    constructor(uuid: String?, type: String, customNameId: Int? = null, format: Int = 0) {
+    constructor(uuid: String?, type: String, format: Int = 0, customNameId: Int? = null) {
         number = parseIntFromUuidStart(uuid!!)
         this.type = type
         this.format = format

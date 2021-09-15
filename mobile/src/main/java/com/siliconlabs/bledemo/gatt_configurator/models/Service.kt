@@ -4,13 +4,15 @@ import android.bluetooth.BluetoothGattService
 import android.os.Parcelable
 import com.google.gson.Gson
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.gatt_configurator.import_export.data.ServiceImportData
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Service(var name: String = "",
                    var uuid: Uuid? = null,
                    var type: Type = Type.PRIMARY,
-                   val characteristics: ArrayList<Characteristic> = arrayListOf()) : Parcelable
+                   val characteristics: ArrayList<Characteristic> = arrayListOf(),
+                   var importedData: ServiceImportData = ServiceImportData()) : Parcelable
 {
 
     fun getUuidWithName(): String {

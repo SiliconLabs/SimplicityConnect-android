@@ -1,6 +1,6 @@
 package com.siliconlabs.bledemo.Bluetooth.BLE
 
-import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.utils.Converters
 
 object ErrorCodes {
     private fun getTwoOctetsErrorCodeHexAsString(status: Int): String {

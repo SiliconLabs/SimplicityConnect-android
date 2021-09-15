@@ -31,12 +31,15 @@ class GattConfiguratorViewModel @ViewModelInject constructor(val gattConfigurato
         _areAnyGattServers.value = _gattServers.value?.size!! > 0
     }
 
-    fun createGattServer() {
+    fun createGattServer(gattServer: GattServer? = null) {
         _gattServers.value?.apply {
-            add(GattServer("New GATT server"))
+            gattServer?.let {
+                 add(gattServer)
+            } ?: add(GattServer("New GATT server"))
             _insertedPosition.value = size - 1
         }
         areAnyGattServers()
+        saveGattDatabase()
     }
 
     fun copyGattServer(gattServer: GattServer) {
@@ -44,6 +47,7 @@ class GattConfiguratorViewModel @ViewModelInject constructor(val gattConfigurato
             add(gattServer.deepCopy())
             _insertedPosition.value = size - 1
         }
+        saveGattDatabase()
     }
 
     fun removeGattServerAt(position: Int) {
@@ -52,6 +56,7 @@ class GattConfiguratorViewModel @ViewModelInject constructor(val gattConfigurato
             _removedPosition.value = position
         }
         areAnyGattServers()
+        saveGattDatabase()
     }
 
     fun replaceGattServerAt(position: Int, gattServer: GattServer) {
@@ -59,20 +64,21 @@ class GattConfiguratorViewModel @ViewModelInject constructor(val gattConfigurato
             set(position, gattServer)
             _changedPosition.value = position
         }
+        saveGattDatabase()
     }
 
     fun switchGattServerOnAt(position: Int) {
         _gattServers.value?.let { servers ->
-            for (i in 0 until servers.size) {
-                val gattServer = servers[i]
-                if (gattServer.isSwitchedOn) {
-                    gattServer.isSwitchedOn = false
-                    _switchedOffPosition.value = i
+            servers.forEachIndexed { index, server ->
+                if (server.isSwitchedOn) {
+                    server.isSwitchedOn = false
+                    _switchedOffPosition.value = index
                 }
             }
             servers[position].isSwitchedOn = true
             gattConfiguratorStorage.saveActiveGattServer(servers[position])
         }
+        saveGattDatabase()
     }
 
     fun switchGattServerOffAt(position: Int) {
@@ -83,6 +89,7 @@ class GattConfiguratorViewModel @ViewModelInject constructor(val gattConfigurato
                 gattConfiguratorStorage.saveActiveGattServer(null)
             }
         }
+        saveGattDatabase()
     }
 
     fun isAnyGattServerSwitchedOn(): Boolean {
@@ -92,7 +99,14 @@ class GattConfiguratorViewModel @ViewModelInject constructor(val gattConfigurato
         return false
     }
 
-    fun persistGattServers() {
+    fun isAnyGattServerCheckedForExport() : Boolean {
+        _gattServers.value?.let { servers ->
+            return servers.any { it.isCheckedForExport }
+        }
+        return false
+    }
+
+    private fun saveGattDatabase() {
         _gattServers.value?.apply {
             gattConfiguratorStorage.saveGattServerList(this)
         }

@@ -27,8 +27,11 @@ import com.siliconlabs.bledemo.Browser.MappingCallback
 import com.siliconlabs.bledemo.Browser.Models.Mapping
 import com.siliconlabs.bledemo.Browser.Models.MappingType
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.*
+import com.siliconlabs.bledemo.utils.*
+import com.siliconlabs.bledemo.Views.CharacteristicItemContainer
 import com.siliconlabs.bledemo.Views.ServiceItemContainer
+import com.siliconlabs.bledemo.utils.Notifications
+import com.siliconlabs.bledemo.iop_test.models.CommonUUID
 import java.util.*
 
 abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layout.fragment_services) {
@@ -38,10 +41,10 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
 
     protected val bluetoothGatt get() = (activity as DeviceServicesActivity).bluetoothGatt
 
-    private var serviceItemContainers = mutableMapOf<String, ServiceItemContainer>()
+    protected var serviceItemContainers = mutableMapOf<String, ServiceItemContainer>()
     private lateinit var servicesContainerView: ViewGroup
-    private val characteristicFragments = mutableMapOf<Int, FragmentCharacteristicDetail?>()
-    private var currentWriteReadFragment: FragmentCharacteristicDetail? = null
+    protected val characteristicFragments = mutableMapOf<Int, FragmentCharacteristicDetail?>()
+    protected var currentWriteReadFragment: FragmentCharacteristicDetail? = null
     private val descriptorsMap = mutableMapOf<BluetoothGattDescriptor, View>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -75,11 +78,11 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
     fun updateCharacteristicView(characteristic: BluetoothGattCharacteristic) {
         characteristicFragments.values
             .find { it != null && it.mBluetoothCharact?.uuid == characteristic.uuid }
-            ?.onActionDataAvailable(characteristic.uuid.toString())
+            ?.onActionDataAvailable(characteristic.uuid.toString(), true)
     }
 
     fun updateCurrentCharacteristicView(uuid: UUID) {
-        currentWriteReadFragment?.onActionDataAvailable(uuid.toString())
+        currentWriteReadFragment?.onActionDataAvailable(uuid.toString(), false)
     }
 
     fun updateCurrentCharacteristicView(uuid: UUID, status: Int) {
@@ -93,125 +96,77 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
         services.forEachIndexed forEach@{ position, service ->
             val serviceItemContainer = ServiceItemContainer(requireContext())
 
-            // get information about service at index 'position'
-            val uuid = service.uuid
-            val serviceName = Common.getServiceName(uuid, requireContext())
-            val serviceUuid = UuidUtils.getUuidText(uuid)
+            val engineService = getEngineService(service.uuid, service)
+            val systemMandatoryService = isMandatorySystemServices(service.uuid)
+            var serviceNameText = Common.getServiceName(engineService.uuid, requireContext())
+            if (systemMandatoryService) {
+                serviceNameText += " (System)"
+            }
+            val serviceUuidText = UuidUtils.getUuidText(engineService.uuid)
 
-            // initialize information about services in service item container
-            initServiceItemContainer(serviceItemContainer, position, serviceName, serviceUuid)
+            populateServiceContainerWithValues(serviceItemContainer, position, serviceNameText, serviceUuidText)
 
-            // initialize views for each characteristic of the service, put into characteristics expansion for service's list item
-            val bluetoothGattService = getEditableService(uuid, service)
-            val characteristics = bluetoothGattService.characteristics.orEmpty()
+            val characteristics = engineService.characteristics.orEmpty()
             if (characteristics.isEmpty()) {
                 serviceItemContainer.cvServiceInfo.setBackgroundColor(Color.LTGRAY)
                 return@forEach
             }
-            // iterate through the characteristics of this service
+            // iterate through the characteristics of this service to initialize views
             for (bluetoothGattCharacteristic in characteristics) {
                 // retrieve relevant bluetooth data for characteristic of service
                 // the engine parses through the data of the btgattcharac and returns a wrapper characteristic
                 // the wrapper characteristic is matched with accepted bt gatt profiles, provides field types/values/units
-                val localCharacteristic =
-                    Engine.getCharacteristic(bluetoothGattCharacteristic.uuid)
-                val characteristicUuid = localCharacteristic?.uuid
-                    ?: bluetoothGattCharacteristic.uuid
-                val characteristicName = Common.getCharacteristicName(characteristicUuid, requireContext())
+                val engineCharacteristic = getEngineCharacteristic(bluetoothGattCharacteristic.uuid, engineService, bluetoothGattCharacteristic)
+                val characteristicNameText = Common.getCharacteristicName(engineCharacteristic.uuid, requireContext())
+                val characteristicUuidText = UuidUtils.getUuidText(engineCharacteristic.uuid)
 
-                val characteristicUuidText = UuidUtils.getUuidText(characteristicUuid)
+                val characteristicContainer = CharacteristicItemContainer(requireContext())
 
-                // inflate/create ui elements
-                val characteristicContainer = View.inflate(
-                    requireContext(),
-                    R.layout.list_item_debug_mode_characteristic_of_service,
-                    null
-                ) as LinearLayout
-                val characteristicExpansion =
-                    characteristicContainer.findViewById<LinearLayout>(R.id.characteristic_expansion)
-                val propsContainer =
-                    characteristicContainer.findViewById<LinearLayout>(R.id.characteristic_props_container)
-                val characteristicNameTextView =
-                    characteristicContainer.findViewById<TextView>(R.id.characteristic_title)
-                val characteristicUuidTextView =
-                    characteristicContainer.findViewById<TextView>(R.id.characteristic_uuid)
-                val descriptorsLabelTextView =
-                    characteristicContainer.findViewById<TextView>(R.id.text_view_descriptors_label)
-                val descriptorLinearLayout =
-                    characteristicContainer.findViewById<LinearLayout>(R.id.linear_layout_descriptor)
-                val characteristicEditNameImageView =
-                    characteristicContainer.findViewById<ImageView>(R.id.image_view_edit_charac_name)
-                val characEditNameLinearLayout =
-                    characteristicContainer.findViewById<LinearLayout>(R.id.linear_layout_edit_charac_name)
-                val characteristicSeparator =
-                    characteristicContainer.findViewById<View>(R.id.characteristics_separator)
-                val id = View.generateViewId()
-                characteristicExpansion.id = id
                 loadCharacteristicDescriptors(
                     bluetoothGattCharacteristic,
-                    descriptorsLabelTextView,
-                    descriptorLinearLayout
+                    characteristicContainer.descriptorsLabel,
+                    characteristicContainer.descriptorContainer
                 )
 
-                // init/populate ui elements with info from bluetooth data for characteristic of service
-                characteristicNameTextView.text = characteristicName
-                if (characteristicName == getString(R.string.unknown_characteristic_label)) {
-                    characteristicEditNameImageView.visibility = View.VISIBLE
-                    characEditNameLinearLayout.setOnClickListener {
-                        MappingsEditDialog(
-                            characteristicNameTextView.text.toString(),
-                            characteristicUuidText,
-                            object : MappingCallback {
-                                override fun onNameChanged(mapping: Mapping) {
-                                    characteristicNameTextView.text = mapping.name
-                                    characteristicNamesMap[mapping.uuid] = mapping
-                                }
-                            }, MappingType.CHARACTERISTIC
-                        ).show(parentFragmentManager, "dialog_mappings_edit")
-                    }
-                    if (characteristicNamesMap.containsKey(characteristicUuidText)) {
-                        characteristicNameTextView.text =
-                            characteristicNamesMap[characteristicUuidText]?.name
-                    }
-                }
-                characteristicUuidTextView.text = characteristicUuidText
+                populateCharacteristicContainerWithValues(characteristicContainer, characteristicNameText, characteristicUuidText)
 
                 // hide divider between characteristics if last characteristic of service
                 if (serviceItemContainer.llGroupOfCharacteristicsForService.childCount == characteristics.size - 1) {
-                    characteristicSeparator.visibility = View.GONE
+                    characteristicContainer.characteristicSeparator.visibility = View.GONE
                     serviceItemContainer.llLastItemDivider.visibility = View.VISIBLE
                 }
                 serviceItemContainer.llGroupOfCharacteristicsForService.addView(
                     characteristicContainer
                 )
-                val finalServiceName = serviceName
 
                 // add properties to characteristic list item in expansion
-                addPropertiesToCharacteristic(bluetoothGattCharacteristic, propsContainer)
-                setPropertyClickListeners(
-                    propsContainer,
-                    bluetoothGattCharacteristic,
-                    bluetoothGattService,
-                    finalServiceName,
-                    characteristicExpansion
-                )
+                addPropertiesToCharacteristic(bluetoothGattCharacteristic, characteristicContainer.propsContainer)
+                if (!systemMandatoryService) {
+                    setPropertyClickListeners(
+                            characteristicContainer.propsContainer,
+                            bluetoothGattCharacteristic,
+                            engineService,
+                            serviceNameText,
+                            characteristicContainer.characteristicExpansion
+                    )
+                }
                 serviceItemContainer.setCharacteristicNotificationState(
                     characteristicUuidText,
-                    BLEUtils.Notifications.DISABLED
+                    Notifications.DISABLED
                 )
                 characteristicContainer.setOnClickListener {
-                    if (characteristicExpansion.visibility == View.VISIBLE) {
-                        characteristicExpansion.visibility = View.GONE
+                    if (characteristicContainer.characteristicExpansion.visibility == View.VISIBLE) {
+                        characteristicContainer.characteristicExpansion.visibility = View.GONE
                     } else {
-                        characteristicExpansion.visibility = View.VISIBLE
+                        characteristicContainer.characteristicExpansion.visibility = View.VISIBLE
                         if (characteristicFragments.containsKey(id)) {
                             currentWriteReadFragment = characteristicFragments[id]
                         } else {
                             currentWriteReadFragment = initFragmentCharacteristicDetail(
                                 bluetoothGattCharacteristic,
                                 id,
-                                bluetoothGattService,
-                                characteristicExpansion,
+                                service,
+                                characteristicContainer.characteristicExpansion,
                                 false
                             )
                             characteristicFragments[id] = currentWriteReadFragment
@@ -226,14 +181,20 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            serviceItemContainers[serviceName] = serviceItemContainer
+            serviceItemContainers[serviceNameText] = serviceItemContainer
         }
     }
 
-    protected abstract fun getEditableService(
+    protected abstract fun getEngineService(
         uuid: UUID?,
         service: BluetoothGattService
     ): BluetoothGattService
+
+    protected abstract fun getEngineCharacteristic(
+        uuid: UUID?,
+        service: BluetoothGattService,
+        characteristic: BluetoothGattCharacteristic
+    ): BluetoothGattCharacteristic
 
     private fun ServiceItemContainer.setMargins(position: Int, lastIndex: Int) {
         val outerMargin = TypedValue.applyDimension(
@@ -259,26 +220,29 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
         }
     }
 
-    private fun initFragmentCharacteristicDetail(
-        bluetoothGattCharacteristic: BluetoothGattCharacteristic,
-        expansionId: Int,
-        service: BluetoothGattService,
-        characteristicExpansion: LinearLayout,
-        displayWriteDialog: Boolean
+    protected fun initFragmentCharacteristicDetail(
+            bluetoothGattCharacteristic: BluetoothGattCharacteristic,
+            expansionId: Int,
+            service: BluetoothGattService,
+            characteristicExpansion: LinearLayout,
+            displayWriteDialog: Boolean = false,
+            writeType: FragmentCharacteristicDetail.WriteType = FragmentCharacteristicDetail.WriteType.REMOTE_WRITE
     ): FragmentCharacteristicDetail {
-        val characteristicDetail = FragmentCharacteristicDetail()
-        characteristicDetail.isRemote = isRemote
-        characteristicDetail.address = bluetoothGatt?.device?.address
-        characteristicDetail.setmService(service)
-        characteristicDetail.setmBluetoothCharact(bluetoothGattCharacteristic)
-        characteristicDetail.displayWriteDialog = displayWriteDialog
-        characteristicExpansion.visibility = View.VISIBLE
-
+        val characteristicDetail = FragmentCharacteristicDetail().apply {
+            isRemote = this@ServicesFragment.isRemote
+            address = bluetoothGatt?.device?.address
+            setmService(service)
+            setmBluetoothCharact(bluetoothGattCharacteristic)
+            this.displayWriteDialog = displayWriteDialog
+            characteristicExpansion.visibility = View.VISIBLE
+            this.writeType = writeType
+        }
         // show characteristic's expansion and add the fragment to view/edit characteristic detail
         parentFragmentManager
-            .beginTransaction()
-            .add(expansionId, characteristicDetail, CHARACTERISTIC_ADD_FRAGMENT_TRANSACTION_ID)
-            .commitNow()
+                .beginTransaction()
+                .add(expansionId, characteristicDetail, CHARACTERISTIC_ADD_FRAGMENT_TRANSACTION_ID)
+                .commitNow()
+
         return characteristicDetail
     }
 
@@ -414,8 +378,7 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
                             bluetoothGattCharacteristic,
                             id,
                             service,
-                            characteristicExpansion,
-                            false
+                            characteristicExpansion
                         )
                         characteristicFragments[id] = currentWriteReadFragment
                     }
@@ -423,85 +386,67 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
                     readCharacteristic(bluetoothGattCharacteristic)
                 }
                 Common.PROPERTY_VALUE_WRITE -> propertyContainer.setOnClickListener {
-                    writeIcon?.startAnimation(
-                        AnimationUtils.loadAnimation(requireContext(), R.anim.property_image_click)
+                    val writeType =
+                            if (this is RemoteServicesFragment) FragmentCharacteristicDetail.WriteType.REMOTE_WRITE
+                            else FragmentCharacteristicDetail.WriteType.LOCAL_WRITE
+                    openWriteDialog(
+                        writeIcon,
+                        id,
+                        bluetoothGattCharacteristic,
+                        service,
+                        characteristicExpansion,
+                        writeType
                     )
-                    if (characteristicFragments.containsKey(id)) {
-                        currentWriteReadFragment = characteristicFragments[id]
-                        characteristicFragments[id]?.showCharacteristicWriteDialog()
-                    } else {
-                        currentWriteReadFragment = initFragmentCharacteristicDetail(
-                            bluetoothGattCharacteristic,
-                            id,
-                            service,
-                            characteristicExpansion,
-                            true
-                        )
-                        characteristicFragments[id] = currentWriteReadFragment
-                    }
-                    characteristicExpansion.visibility = View.VISIBLE
                 }
                 Common.PROPERTY_VALUE_NOTIFY -> propertyContainer.setOnClickListener {
-                    notificationIcon?.startAnimation(
-                        AnimationUtils.loadAnimation(requireContext(), R.anim.property_image_click)
-                    )
-                    if (characteristicFragments.containsKey(id)) {
-                        currentWriteReadFragment = characteristicFragments[id]
-                        if (characteristicExpansion.visibility == View.GONE &&
-                            notificationText?.currentTextColor ==
-                            ContextCompat.getColor(requireContext(), R.color.silabs_inactive)
-                        ) {
-                            characteristicExpansion.visibility = View.VISIBLE
-                        }
-                    } else {
-                        currentWriteReadFragment = initFragmentCharacteristicDetail(
-                            bluetoothGattCharacteristic,
+                    if (this is RemoteServicesFragment) {
+                        enableNotifications(
+                            notificationIcon,
                             id,
+                            characteristicExpansion,
+                            notificationText,
+                            bluetoothGattCharacteristic,
+                            service,
+                            serviceName,
+                            indicationIcon,
+                            indicationText
+                        )
+                    }
+                    else {
+                        openWriteDialog(
+                            notificationIcon,
+                            id,
+                            bluetoothGattCharacteristic,
                             service,
                             characteristicExpansion,
-                            false
+                            FragmentCharacteristicDetail.WriteType.LOCAL_NOTIFY
                         )
-                        characteristicFragments[id] = currentWriteReadFragment
                     }
-                    setNotifyProperty(
-                        bluetoothGattCharacteristic,
-                        serviceName,
-                        notificationIcon,
-                        notificationText,
-                        indicationIcon,
-                        indicationText
-                    )
                 }
                 Common.PROPERTY_VALUE_INDICATE -> propertyContainer.setOnClickListener {
-                    indicationIcon?.startAnimation(
-                        AnimationUtils.loadAnimation(requireContext(), R.anim.property_image_click)
-                    )
-                    if (characteristicFragments.containsKey(id)) {
-                        currentWriteReadFragment = characteristicFragments[id]
-                        if (characteristicExpansion.visibility == View.GONE
-                            && indicationText?.currentTextColor ==
-                            ContextCompat.getColor(requireContext(), R.color.silabs_inactive)
-                        ) {
-                            characteristicExpansion.visibility = View.VISIBLE
-                        }
-                    } else {
-                        currentWriteReadFragment = initFragmentCharacteristicDetail(
-                            bluetoothGattCharacteristic,
+                    if (this is RemoteServicesFragment) {
+                        enableIndications(
+                            indicationIcon,
                             id,
+                            characteristicExpansion,
+                            indicationText,
+                            bluetoothGattCharacteristic,
+                            service,
+                            serviceName,
+                            notificationText,
+                            notificationIcon
+                        )
+                    }
+                    else {
+                        openWriteDialog(
+                            indicationIcon,
+                            id,
+                            bluetoothGattCharacteristic,
                             service,
                             characteristicExpansion,
-                            false
+                            FragmentCharacteristicDetail.WriteType.LOCAL_INDICATE
                         )
-                        characteristicFragments[id] = currentWriteReadFragment
                     }
-                    setIndicateProperty(
-                        bluetoothGattCharacteristic,
-                        serviceName,
-                        indicationIcon,
-                        indicationText,
-                        notificationIcon,
-                        notificationText
-                    )
                 }
                 else -> {
                 }
@@ -509,102 +454,43 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
         }
     }
 
-    protected abstract fun readCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic)
-
-    private fun setIndicateProperty(
-        bluetoothGattCharacteristic: BluetoothGattCharacteristic,
-        serviceName: String,
-        indicatePropertyIcon: ImageView?,
-        indicatePropertyName: TextView?,
-        notificationIcon: ImageView?,
-        notificationText: TextView?
+    private fun openWriteDialog(
+        icon: ImageView?,
+        id: Int,
+        characteristic: BluetoothGattCharacteristic,
+        service: BluetoothGattService,
+        characteristicExpansion: LinearLayout,
+        writeType: FragmentCharacteristicDetail.WriteType
     ) {
-        var indicationsEnabled =
-            currentWriteReadFragment?.indicationsEnabled!! // Indication not enabled
-        val submitted = BLEUtils.setNotificationForCharacteristic(
-            bluetoothGatt!!,
-            bluetoothGattCharacteristic,
-            if (indicationsEnabled) BLEUtils.Notifications.DISABLED else BLEUtils.Notifications.INDICATE
-        ) // If indication not enabled -> enable
-
-        if (submitted) {
-            indicationsEnabled = !indicationsEnabled
-        }
-
-        currentWriteReadFragment?.indicationsEnabled = indicationsEnabled
-        indicatePropertyIcon?.setBackgroundResource(
-            if (indicationsEnabled) R.drawable.ic_indicate_on else R.drawable.ic_indicate_off
-        ) // enable -> blue, disable -> grey
-        indicatePropertyName?.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                if (indicationsEnabled) R.color.silabs_blue else R.color.silabs_inactive
-            )
-        ) // enable -> blue, disable -> grey
-
-        val characteristicUuid = getUuidFromBluetoothGattCharacteristic(bluetoothGattCharacteristic)
-        serviceItemContainers[serviceName]?.setCharacteristicNotificationState(
-            characteristicUuid,
-            if (indicationsEnabled) BLEUtils.Notifications.INDICATE else BLEUtils.Notifications.DISABLED
+        icon?.startAnimation(
+            AnimationUtils.loadAnimation(requireContext(), R.anim.property_image_click)
         )
-        currentWriteReadFragment?.notificationsEnabled = false
-
-        if (notificationIcon != null) {
-            notificationIcon.setBackgroundResource(R.drawable.ic_notify_off)
-            notificationText?.setTextColor(
-                ContextCompat.getColor(requireContext(), R.color.silabs_inactive)
+        if (characteristicFragments.containsKey(id)) {
+            currentWriteReadFragment = characteristicFragments[id]
+            characteristicFragments[id]?.showCharacteristicWriteDialog(writeType)
+        } else {
+            currentWriteReadFragment = initFragmentCharacteristicDetail(
+                characteristic,
+                id,
+                service,
+                characteristicExpansion,
+                displayWriteDialog = true,
+                writeType = writeType
             )
+            characteristicFragments[id] = currentWriteReadFragment
         }
+        characteristicExpansion.visibility = View.VISIBLE
     }
 
-    private fun getUuidFromBluetoothGattCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic): String {
+    protected abstract fun readCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic)
+
+    protected fun getUuidFromBluetoothGattCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic): String {
         val characteristic = Engine.getCharacteristic(bluetoothGattCharacteristic.uuid)
         return (characteristic?.uuid ?: bluetoothGattCharacteristic.uuid)
             .let { UuidUtils.getUuidText(it) }
     }
 
-    private fun setNotifyProperty(
-        bluetoothGattCharacteristic: BluetoothGattCharacteristic,
-        serviceName: String,
-        notifyPropertyIcon: ImageView?,
-        notifyPropertyName: TextView?,
-        indicationIcon: ImageView?,
-        indicationText: TextView?
-    ) {
-        var notificationsEnabled = currentWriteReadFragment?.notificationsEnabled!!
-        val submitted = BLEUtils.setNotificationForCharacteristic(
-            bluetoothGatt!!,
-            bluetoothGattCharacteristic,
-            if (notificationsEnabled) BLEUtils.Notifications.DISABLED else BLEUtils.Notifications.NOTIFY
-        )
 
-        if (submitted) {
-            notificationsEnabled = !notificationsEnabled
-        }
-
-        currentWriteReadFragment?.notificationsEnabled = notificationsEnabled
-        notifyPropertyIcon?.setBackgroundResource(if (notificationsEnabled) R.drawable.ic_notify_on else R.drawable.ic_notify_off)
-        notifyPropertyName?.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                if (notificationsEnabled) R.color.silabs_blue else R.color.silabs_inactive
-            )
-        )
-
-        val characteristicUuid = getUuidFromBluetoothGattCharacteristic(bluetoothGattCharacteristic)
-        serviceItemContainers[serviceName]?.setCharacteristicNotificationState(
-            characteristicUuid,
-            if (notificationsEnabled) BLEUtils.Notifications.NOTIFY else BLEUtils.Notifications.DISABLED
-        )
-        currentWriteReadFragment?.indicationsEnabled = false
-
-        if (indicationIcon != null) {
-            indicationIcon.setBackgroundResource(R.drawable.ic_indicate_off)
-            indicationText?.setTextColor(
-                ContextCompat.getColor(requireContext(), R.color.silabs_inactive)
-            )
-        }
-    }
 
     private fun getTextViewWithValue(propsContainer: LinearLayout, value: String): TextView? {
         for (i in 0 until propsContainer.childCount) {
@@ -683,7 +569,7 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
 
     abstract fun readDescriptor(descriptor: BluetoothGattDescriptor)
 
-    private fun initServiceItemContainer(
+    private fun populateServiceContainerWithValues(
         serviceItemContainer: ServiceItemContainer,
         position: Int,
         serviceName: String,
@@ -698,7 +584,7 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
         serviceItemContainer.llGroupOfCharacteristicsForService.removeAllViews()
         serviceItemContainer.tvServiceTitle.text = serviceName
         serviceItemContainer.tvServiceUuid.text = serviceUuid
-        if ((serviceName == getString(R.string.unknown_service))) {
+        if (serviceName == getString(R.string.unknown_service)) {
             serviceItemContainer.ivEditServiceName.visibility = View.VISIBLE
             serviceItemContainer.llServiceEditName.setOnClickListener {
                 val dialog: DialogFragment =
@@ -719,6 +605,40 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
                 serviceItemContainer.tvServiceTitle.text = serviceNamesMap[serviceUuid]?.name
             }
         }
+    }
+
+    private fun populateCharacteristicContainerWithValues(
+            characteristicContainer: CharacteristicItemContainer,
+            characteristicNameText: String,
+            characteristicUuidText: String) {
+
+        characteristicContainer.characteristicName.text = characteristicNameText
+        if (characteristicNameText == getString(R.string.unknown_characteristic_label)) {
+            characteristicContainer.characteristicEditNameIcon.visibility = View.VISIBLE
+            characteristicContainer.characteristicEditNameLayout.setOnClickListener {
+                MappingsEditDialog(
+                        characteristicContainer.characteristicName.text.toString(),
+                        characteristicUuidText,
+                        object : MappingCallback {
+                            override fun onNameChanged(mapping: Mapping) {
+                                characteristicContainer.characteristicName.text = mapping.name
+                                characteristicNamesMap[mapping.uuid] = mapping
+                            }
+                        }, MappingType.CHARACTERISTIC
+                ).show(parentFragmentManager, "dialog_mappings_edit")
+            }
+            if (characteristicNamesMap.containsKey(characteristicUuidText)) {
+                characteristicContainer.characteristicName.text =
+                        characteristicNamesMap[characteristicUuidText]?.name
+            }
+        }
+        characteristicContainer.characteristicUuid.text = characteristicUuidText
+    }
+
+    private fun isMandatorySystemServices(uuid: UUID): Boolean {
+        return (this is LocalServicesFragment
+                && (uuid == UUID.fromString(CommonUUID.Service.UUID_GENERIC_ACCESS.toString())
+                || uuid == UUID.fromString(CommonUUID.Service.UUID_GENERIC_ATTRIBUTE.toString())))
     }
 
     override fun onPause() {

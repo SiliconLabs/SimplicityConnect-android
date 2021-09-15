@@ -14,10 +14,11 @@ import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
 import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.BLEUtils
+import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.throughput.models.UpdateTest
 import com.siliconlabs.bledemo.throughput.utils.PeripheralManager
 import com.siliconlabs.bledemo.throughput.viewmodels.ThroughputViewModel
+import com.siliconlabs.bledemo.utils.Notifications
 import kotlinx.android.synthetic.main.actionbar.*
 import timber.log.Timber
 import java.util.*
@@ -172,12 +173,12 @@ class ThroughputActivity : BaseActivity() {
                     GattCommand.Type.Indicate -> {
                         val gattCharacteristic = GattCharacteristic.fromUuid(characteristic!!.uuid)
                         val gattService = GattService.fromUuid(characteristic.service.uuid)
-                        BLEUtils.setNotificationForCharacteristic(gatt, gattService, gattCharacteristic, BLEUtils.Notifications.INDICATE)
+                        BLEUtils.setNotificationForCharacteristic(gatt, gattService, gattCharacteristic, Notifications.INDICATE)
                     }
                     GattCommand.Type.Notify -> {
                         val gattCharacteristic = GattCharacteristic.fromUuid(characteristic!!.uuid)
                         val gattService = GattService.fromUuid(characteristic.service.uuid)
-                        BLEUtils.setNotificationForCharacteristic(gatt, gattService, gattCharacteristic, BLEUtils.Notifications.NOTIFY)
+                        BLEUtils.setNotificationForCharacteristic(gatt, gattService, gattCharacteristic, Notifications.NOTIFY)
                     }
                     GattCommand.Type.PhyUpdate -> {
                         gatt.setPreferredPhy(BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_LE_2M_MASK, BluetoothDevice.PHY_OPTION_NO_PREFERRED)

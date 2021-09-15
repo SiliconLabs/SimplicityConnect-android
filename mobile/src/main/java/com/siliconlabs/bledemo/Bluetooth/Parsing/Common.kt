@@ -20,7 +20,7 @@ import android.content.Context
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.Converters.getDecimalValue
+import com.siliconlabs.bledemo.utils.Converters.getDecimalValue
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*

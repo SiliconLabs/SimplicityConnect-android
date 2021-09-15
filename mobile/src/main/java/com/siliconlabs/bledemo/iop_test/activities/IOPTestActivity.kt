@@ -16,6 +16,7 @@
  */
 package com.siliconlabs.bledemo.iop_test.activities
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.bluetooth.*
 import android.bluetooth.le.BluetoothLeScanner
@@ -40,21 +41,19 @@ import androidx.core.content.FileProvider
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.BLEUtils.Notifications
-import com.siliconlabs.bledemo.Utils.BLEUtils.setNotificationForCharacteristic
-import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.utils.Notifications
+import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
+import com.siliconlabs.bledemo.utils.Converters
 import com.siliconlabs.bledemo.iop_test.fragments.IOPTestFragment
 import com.siliconlabs.bledemo.iop_test.fragments.IOPTestFragment.Companion.newInstance
-import com.siliconlabs.bledemo.iop_test.models.ChildrenItemTestInfo
-import com.siliconlabs.bledemo.iop_test.models.Common
+import com.siliconlabs.bledemo.iop_test.models.*
 import com.siliconlabs.bledemo.iop_test.models.Common.Companion.isSetProperty
-import com.siliconlabs.bledemo.iop_test.models.CommonUUID
 import com.siliconlabs.bledemo.iop_test.models.IOPTest.Companion.createDataTest
 import com.siliconlabs.bledemo.iop_test.models.IOPTest.Companion.getItemTestCaseInfo
 import com.siliconlabs.bledemo.iop_test.models.IOPTest.Companion.getListItemChildrenTest
 import com.siliconlabs.bledemo.iop_test.models.IOPTest.Companion.getSiliconLabsTestInfo
-import com.siliconlabs.bledemo.iop_test.models.ItemTestCaseInfo
 import com.siliconlabs.bledemo.iop_test.utils.ErrorCodes
+import com.siliconlabs.bledemo.utils.UuidConsts
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_iop_test.*
 import java.io.*
@@ -63,6 +62,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
 
+@SuppressLint("LogNotTimber")
 class IOPTestActivity : AppCompatActivity() {
     private var reconnectTimer: Timer? = Timer()
     private var handler: Handler? = null
@@ -74,7 +74,6 @@ class IOPTestActivity : AppCompatActivity() {
     private var isTestRunning = false
     private var isConnected = false
     private var isTestFinished = false
-    private var areParameters = false
     private var readScannerStartTime = true
 
     private var mStartTimeScanner: Long = 0
@@ -87,7 +86,7 @@ class IOPTestActivity : AppCompatActivity() {
     private var countReTest = 0
     private var iopPhase3IndexStartChildrenTest = -1
 
-    private var mBluetoothGattServiceParameters: BluetoothGattService? = null
+    private var testParametersService: BluetoothGattService? = null
     private var characteristicIOPPhase3Control: BluetoothGattCharacteristic? = null
     private var characteristicIOPPhase3Throughput: BluetoothGattCharacteristic? = null
     private var characteristicIOPPhase3ClientSupportedFeatures: BluetoothGattCharacteristic? = null
@@ -104,8 +103,6 @@ class IOPTestActivity : AppCompatActivity() {
     private var mListener: Listener? = null
     private var mBluetoothEnableDialog: Dialog? = null
 
-    private val listValuesPlatformBoard: ArrayList<String> = ArrayList()
-    private val listValuesParameters = ArrayList<String>()
     private val mListCharacteristics: MutableList<BluetoothGattCharacteristic> = ArrayList()
     private val characteristicsPhase3Security: MutableList<BluetoothGattCharacteristic> = ArrayList()
 
@@ -408,9 +405,9 @@ class IOPTestActivity : AppCompatActivity() {
     }
 
     private fun runnable(gatt: BluetoothGatt) {
-        Thread(Runnable {
+        Thread {
             getServicesInfo(gatt) //SHOW SERVICES
-        }).start()
+        }.start()
     }
 
     /**
@@ -422,7 +419,7 @@ class IOPTestActivity : AppCompatActivity() {
                 if (itemChildrenTest.characteristic?.uuid.toString() == characteristic.uuid.toString()) {
                     itemChildrenTest.statusRunTest = 1 // 0 running, 1 finish test
                     itemChildrenTest.valueMtu = mtu
-                    if (itemChildrenTest.characteristic?.uuid.toString() == CommonUUID.Characteristic.NOTIFICATION_LENGTH_1.showUUID() || itemChildrenTest.characteristic?.uuid.toString() == CommonUUID.Characteristic.INDICATE_LENGTH_1.showUUID() || itemChildrenTest.characteristic?.uuid.toString() == CommonUUID.Characteristic.NOTIFICATION_LENGTH_MTU_3.showUUID() || itemChildrenTest.characteristic?.uuid.toString() == CommonUUID.Characteristic.INDICATE_LENGTH_MTU_3.showUUID()) {
+                    if (itemChildrenTest.characteristic?.uuid.toString() == CommonUUID.Characteristic.NOTIFICATION_LENGTH_1.toString() || itemChildrenTest.characteristic?.uuid.toString() == CommonUUID.Characteristic.INDICATE_LENGTH_1.toString() || itemChildrenTest.characteristic?.uuid.toString() == CommonUUID.Characteristic.NOTIFICATION_LENGTH_MTU_3.toString() || itemChildrenTest.characteristic?.uuid.toString() == CommonUUID.Characteristic.INDICATE_LENGTH_MTU_3.toString()) {
                         itemChildrenTest.endTimeTest = System.currentTimeMillis()
                     }
                     when (type) {
@@ -692,7 +689,6 @@ class IOPTestActivity : AppCompatActivity() {
         mStartTimeScanner = 0
         mStartTimeConnection = 0
         mByteNumReceived = 0
-        listValuesPlatformBoard.clear()
         if (isConnected) {
             isConnected = false
             mBluetoothGatt?.disconnect()
@@ -766,16 +762,14 @@ class IOPTestActivity : AppCompatActivity() {
     }
 
     private fun checkBluetoothExtendedSettings() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (bluetoothAdapter.isLe2MPhySupported) {
-                Log.d(TAG, "2M PHY supported!")
-            }
-            if (bluetoothAdapter.isLeExtendedAdvertisingSupported) {
-                Log.d(TAG, "LE Extended Advertising supported!")
-            }
-            val maxDataLength = bluetoothAdapter.leMaximumAdvertisingDataLength
-            Log.d(TAG, "maxDataLength $maxDataLength")
+        if (bluetoothAdapter.isLe2MPhySupported) {
+            Log.d(TAG, "2M PHY supported!")
         }
+        if (bluetoothAdapter.isLeExtendedAdvertisingSupported) {
+            Log.d(TAG, "LE Extended Advertising supported!")
+        }
+        val maxDataLength = bluetoothAdapter.leMaximumAdvertisingDataLength
+        Log.d(TAG, "maxDataLength $maxDataLength")
     }
 
     private fun registerBroadcastReceivers() {
@@ -882,14 +876,24 @@ class IOPTestActivity : AppCompatActivity() {
      * Enable indicate by characteristics
      */
     private fun setIndicationProperty(characteristic: BluetoothGattCharacteristic?, indicate: Notifications) {
-        setNotificationForCharacteristic(mBluetoothGatt!!, characteristic, CLIENT_CHARACTERISTIC_CONFIG_UUID, indicate)
+        setNotificationForCharacteristic(
+            mBluetoothGatt!!,
+            characteristic,
+            UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR,
+            indicate
+        )
     }
 
     /**
      * Enable notification by characteristics
      */
     private fun setNotificationForCharacteristic(characteristic: BluetoothGattCharacteristic?, notifications: Notifications) {
-        setNotificationForCharacteristic(mBluetoothGatt!!, characteristic, CLIENT_CHARACTERISTIC_CONFIG_UUID, notifications)
+        setNotificationForCharacteristic(
+            mBluetoothGatt!!,
+            characteristic,
+            UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR,
+            notifications
+        )
     }
 
     /**
@@ -943,86 +947,97 @@ class IOPTestActivity : AppCompatActivity() {
         for (gattService: BluetoothGattService in gattServices) {
             val serviceUUID = gattService.uuid.toString()
             Log.d(TAG, "getServicesInfo(), add Characteristic of ServiceUUID $serviceUUID")
-            if (serviceUUID == CommonUUID.Service.UUID_GENERIC_ATTRIBUTE.toString()) {
-                val gattCharacteristics = gattService.characteristics
-                for (item: BluetoothGattCharacteristic in gattCharacteristics) {
-                    Log.d(TAG, "mBluetoothGattServiceGenericAttribute " + item.uuid.toString())
-                    when {
-                        CommonUUID.Characteristic.IOP_TEST_PHASE3_SERVICE_CHANGED.showUUID() == item.uuid.toString() -> {
-                            characteristicIOPPhase3ServiceChanged = item
-                        }
-                        CommonUUID.Characteristic.IOP_TEST_PHASE3_CLIENT_SUPPORT_FEATURES.showUUID() == item.uuid.toString() -> {
-                            characteristicIOPPhase3ClientSupportedFeatures = item
-                        }
-                        CommonUUID.Characteristic.IOP_TEST_PHASE3_DATABASE_HASH.showUUID() == item.uuid.toString() -> {
-                            characteristicIOPPhase3DatabaseHash = item
-                        }
-                    }
-                }
-            } else if (serviceUUID == CommonUUID.Service.UUID_GENERIC_ACCESS.toString()) {
-                val gattCharacteristics = gattService.characteristics
-                for (item: BluetoothGattCharacteristic in gattCharacteristics) {
-                    if (CommonUUID.Characteristic.IOP_DEVICE_NAME.showUUID() == item.uuid.toString()) {
-                        Log.d(TAG, "characteristicIOPPhase3DeviceName " + item.uuid.toString())
-                        characteristicIOPPhase3DeviceName = item
-                    }
-                }
-            } else if (serviceUUID == CommonUUID.Service.UUID_CHARACTERISTICS_PARAMETERS_SERVICE.toString()) {
-                count++
-                mBluetoothGattServiceParameters = gattService
-            } else if (CommonUUID.Service.UUID_PROPERTIES_SERVICE.toString() == serviceUUID || CommonUUID.Service.UUID_CHARACTERISTICS_SERVICE.toString() == serviceUUID) {
-                count++
-                val gattCharacteristics = gattService.characteristics
-                for (item: BluetoothGattCharacteristic in gattCharacteristics) {
-                    mListCharacteristics.add(item)
-                }
-            } else if (CommonUUID.Service.UUID_PHASE3_SERVICE.toString() == serviceUUID) {
-                Log.d(TAG, "mBluetoothGattServicePhase3 " + gattService.uuid.toString())
-                val gattCharacteristicsIOPPhase3 = gattService.characteristics
-                for (item: BluetoothGattCharacteristic in gattCharacteristicsIOPPhase3) {
-                    val charUUID = item.uuid.toString()
-                    when {
-                        charUUID == CommonUUID.Characteristic.IOP_TEST_PHASE3_CONTROL.showUUID() -> {
-                            characteristicIOPPhase3Control = item
-                        }
-                        charUUID == CommonUUID.Characteristic.IOP_TEST_THROUGHPUT.showUUID() -> {
-                            characteristicIOPPhase3Throughput = item
-                        }
-                        charUUID == CommonUUID.Characteristic.IOP_TEST_GATT_CATCHING.showUUID() -> {
-                            characteristicIOPPhase3IOPTestCaching = item
-                            Log.d(TAG, "characteristicIOPPhase3IOPTestCaching " + characteristicIOPPhase3IOPTestCaching?.uuid.toString())
-                        }
-                        charUUID == CommonUUID.Characteristic.IOP_TEST_SERVICE_CHANGED_INDICATION.showUUID() -> {
-                            characteristicIOPPhase3IOPTestServiceChangedIndication = item
-                            Log.d(TAG, "characteristicIOPPhase3IOPTestServiceChangedIndication " + characteristicIOPPhase3IOPTestServiceChangedIndication?.uuid.toString())
-                        }
-                        charUUID == CommonUUID.Characteristic.IOP_TEST_SECURITY_PAIRING.showUUID() || charUUID == CommonUUID.Characteristic.IOP_TEST_SECURITY_AUTHENTICATION.showUUID() || charUUID == CommonUUID.Characteristic.IOP_TEST_SECURITY_BONDING.showUUID() -> {
-                            Log.d(TAG, "characteristicsPhase3Security $charUUID")
-                            characteristicsPhase3Security.add(item)
+
+            when (serviceUUID) {
+                CommonUUID.Service.UUID_GENERIC_ATTRIBUTE.toString() -> {
+                    val gattCharacteristics = gattService.characteristics
+                    for (item: BluetoothGattCharacteristic in gattCharacteristics) {
+                        Log.d(TAG, "mBluetoothGattServiceGenericAttribute " + item.uuid.toString())
+                        when {
+                            CommonUUID.Characteristic.IOP_TEST_PHASE3_SERVICE_CHANGED.toString() == item.uuid.toString() -> {
+                                characteristicIOPPhase3ServiceChanged = item
+                            }
+                            CommonUUID.Characteristic.IOP_TEST_PHASE3_CLIENT_SUPPORT_FEATURES.toString() == item.uuid.toString() -> {
+                                characteristicIOPPhase3ClientSupportedFeatures = item
+                            }
+                            CommonUUID.Characteristic.IOP_TEST_PHASE3_DATABASE_HASH.toString() == item.uuid.toString() -> {
+                                characteristicIOPPhase3DatabaseHash = item
+                            }
                         }
                     }
                 }
-            } else if (CommonUUID.Service.UUID_BLE_OTA.toString() == serviceUUID) {
-                val gattCharacteristics = gattService.characteristics
-                for (gattCharacteristic: BluetoothGattCharacteristic in gattCharacteristics) {
-                    val characteristicUUID = gattCharacteristic.uuid.toString()
-                    Log.i(TAG, "onServicesDiscovered Characteristic UUID " + characteristicUUID + " - Properties: " + gattCharacteristic.properties)
-                    if (gattCharacteristic.uuid.toString() == ota_control.toString()) {
-                        if (gattCharacteristics.contains(mBluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data))) {
-                            if (!gattServices.contains(mBluetoothGatt?.getService(homekit_service))) {
-                                Log.i(TAG, "onServicesDiscovered Device in DFU Mode")
-                                mBluetoothGatt?.requestMtu(247)
-                            } else {
-                                Log.i(TAG, "onServicesDiscovered OTA_Control found")
-                                val gattDescriptors = gattCharacteristic.descriptors
-                                for (gattDescriptor: BluetoothGattDescriptor in gattDescriptors) {
-                                    val descriptor = gattDescriptor.uuid.toString()
-                                    if (gattDescriptor.uuid.toString() == homekit_descriptor.toString()) {
-                                        kitDescriptor = gattDescriptor
-                                        Log.i(TAG, "descriptor, UUID: $descriptor")
-                                        val stable = byteArrayOf(0x00.toByte(), 0x00.toByte())
-                                        homeKitOTAControl(stable)
-                                        homekit = true
+                CommonUUID.Service.UUID_GENERIC_ACCESS.toString() -> {
+                    val gattCharacteristics = gattService.characteristics
+                    for (item: BluetoothGattCharacteristic in gattCharacteristics) {
+                        if (CommonUUID.Characteristic.IOP_DEVICE_NAME.toString() == item.uuid.toString()) {
+                            Log.d(TAG, "characteristicIOPPhase3DeviceName " + item.uuid.toString())
+                            characteristicIOPPhase3DeviceName = item
+                        }
+                    }
+                }
+                CommonUUID.Service.TEST_PARAMETERS.toString() -> {
+                    count++
+                    testParametersService = gattService
+                }
+                CommonUUID.Service.UUID_PROPERTIES_SERVICE.toString(),
+                CommonUUID.Service.UUID_CHARACTERISTICS_SERVICE.toString() -> {
+                    count++
+                    val gattCharacteristics = gattService.characteristics
+                    for (item: BluetoothGattCharacteristic in gattCharacteristics) {
+                        mListCharacteristics.add(item)
+                    }
+                }
+                CommonUUID.Service.UUID_PHASE3_SERVICE.toString() -> {
+                    Log.d(TAG, "mBluetoothGattServicePhase3 " + gattService.uuid.toString())
+                    val gattCharacteristicsIOPPhase3 = gattService.characteristics
+                    for (item: BluetoothGattCharacteristic in gattCharacteristicsIOPPhase3) {
+                        val charUUID = item.uuid.toString()
+                        when (charUUID) {
+                            CommonUUID.Characteristic.IOP_TEST_PHASE3_CONTROL.toString() -> {
+                                characteristicIOPPhase3Control = item
+                            }
+                            CommonUUID.Characteristic.IOP_TEST_THROUGHPUT.toString() -> {
+                                characteristicIOPPhase3Throughput = item
+                            }
+                            CommonUUID.Characteristic.IOP_TEST_GATT_CATCHING.toString() -> {
+                                characteristicIOPPhase3IOPTestCaching = item
+                                Log.d(TAG, "characteristicIOPPhase3IOPTestCaching " + characteristicIOPPhase3IOPTestCaching?.uuid.toString())
+                            }
+                            CommonUUID.Characteristic.IOP_TEST_SERVICE_CHANGED_INDICATION.toString() -> {
+                                characteristicIOPPhase3IOPTestServiceChangedIndication = item
+                                Log.d(TAG, "characteristicIOPPhase3IOPTestServiceChangedIndication " + characteristicIOPPhase3IOPTestServiceChangedIndication?.uuid.toString())
+                            }
+                            CommonUUID.Characteristic.IOP_TEST_SECURITY_PAIRING.toString(),
+                            CommonUUID.Characteristic.IOP_TEST_SECURITY_AUTHENTICATION.toString(),
+                            CommonUUID.Characteristic.IOP_TEST_SECURITY_BONDING.toString() -> {
+                                Log.d(TAG, "characteristicsPhase3Security $charUUID")
+                                characteristicsPhase3Security.add(item)
+                            }
+                        }
+                    }
+                }
+                CommonUUID.Service.UUID_BLE_OTA.toString() -> {
+                    val gattCharacteristics = gattService.characteristics
+                    for (gattCharacteristic: BluetoothGattCharacteristic in gattCharacteristics) {
+                        val characteristicUUID = gattCharacteristic.uuid.toString()
+                        Log.i(TAG, "onServicesDiscovered Characteristic UUID " + characteristicUUID + " - Properties: " + gattCharacteristic.properties)
+                        if (gattCharacteristic.uuid.toString() == ota_control.toString()) {
+                            if (gattCharacteristics.contains(mBluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data))) {
+                                if (!gattServices.contains(mBluetoothGatt?.getService(homekit_service))) {
+                                    Log.i(TAG, "onServicesDiscovered Device in DFU Mode")
+                                    mBluetoothGatt?.requestMtu(247)
+                                } else {
+                                    Log.i(TAG, "onServicesDiscovered OTA_Control found")
+                                    val gattDescriptors = gattCharacteristic.descriptors
+                                    for (gattDescriptor: BluetoothGattDescriptor in gattDescriptors) {
+                                        val descriptor = gattDescriptor.uuid.toString()
+                                        if (gattDescriptor.uuid.toString() == homekit_descriptor.toString()) {
+                                            kitDescriptor = gattDescriptor
+                                            Log.i(TAG, "descriptor, UUID: $descriptor")
+                                            val stable = byteArrayOf(0x00.toByte(), 0x00.toByte())
+                                            homeKitOTAControl(stable)
+                                            homekit = true
+                                        }
                                     }
                                 }
                             }
@@ -1043,65 +1058,80 @@ class IOPTestActivity : AppCompatActivity() {
                 break
             }
         }
-        if (mIndexRunning == POSITION_TEST_DISCOVER_SERVICE) {
-            if (mBluetoothGattServiceParameters != null) {
-                handler?.postDelayed({ getConnectionParameters(mBluetoothGattServiceParameters, 0) }, 5000)
-            }
-        } else if (mIndexRunning == POSITION_TEST_IOP3_OTA_WITHOUT_ACK || mIndexRunning == POSITION_TEST_IOP3_OTA_ACK) {
-            if (!otaProcess) {
-                handler?.postDelayed({
-                    Log.d(TAG, "read device name")
-                    readCharacteristic(characteristicIOPPhase3DeviceName)
-                }, 5000)
-            }
-        } else if (mIndexRunning == POSITION_TEST_IOP3_THROUGHPUT) {
-            mEndThroughputNotification = false
-            finishItemTest(POSITION_TEST_IOP3_THROUGHPUT, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_THROUGHPUT])
-        } else if (mIndexRunning == POSITION_TEST_IOP3_SECURITY) {
-            iopPhase3RunTestCaseSecurity(iopPhase3IndexStartChildrenTest, 0)
-        } else if (mIndexRunning == POSITION_TEST_IOP3_CACHING) {
-            if (characteristicIOPPhase3IOPTestCaching != null) {
-                getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![0].characteristic = characteristicIOPPhase3IOPTestCaching
-                readCharacteristic(characteristicIOPPhase3IOPTestCaching)
-            } else if (characteristicIOPPhase3IOPTestServiceChangedIndication != null) {
-                getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![1].characteristic = characteristicIOPPhase3IOPTestServiceChangedIndication
-                readCharacteristic(characteristicIOPPhase3IOPTestServiceChangedIndication)
-            }
-        }
-    }
 
-    /**
-     * Get Parameters and platform information
-     */
-    private fun getConnectionParameters(gattService: BluetoothGattService?, index: Int) {
-        areParameters = true
-        readCharacteristic(gattService!!.characteristics[index])
-        Log.d(TAG, "getConnectionParameters(), areParameters = true")
-    }
-
-    /**
-     * Convert byte value to hex value
-     */
-    private fun convertValuesParameters(characteristic: BluetoothGattCharacteristic) {
-        if (CommonUUID.Characteristic.IOP_TEST_VERSION.showUUID() == characteristic.uuid.toString()) {
-            listValuesPlatformBoard.add(Converters.getDecimalValue(characteristic.value))
-            getConnectionParameters(mBluetoothGattServiceParameters, 1)
-        } else {
-            val values = characteristic.value
-            for (i in values.indices) {
-                if (i == 0) {
-                    listValuesPlatformBoard.add(Converters.getDecimalValue(values[i]))
-                } else if (i % 2 == 0) {
-                    listValuesParameters.add(Converters.getDecimalValue(Arrays.copyOfRange(values, i, i + 1)))
+        when (mIndexRunning) {
+            POSITION_TEST_DISCOVER_SERVICE -> {
+                testParametersService?.let {
+                    handler?.postDelayed({ readCharacteristic(it.characteristics[0]) }, 5000)
                 }
             }
-            areParameters = false
-            getSiliconLabsTestInfo().setLstValuesParameters(listValuesParameters)
-            getSiliconLabsTestInfo().setLstValuesPlatform(listValuesPlatformBoard)
-            mIndexStartChildrenTest = 0
-            finishItemTest(POSITION_TEST_DISCOVER_SERVICE, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_DISCOVER_SERVICE])
-            Log.d(TAG, "convertValuesParameters(), finishItemTest(POSITION_TEST_DISCOVER_SERVICE)")
+            POSITION_TEST_IOP3_OTA_WITHOUT_ACK,
+            POSITION_TEST_IOP3_OTA_ACK -> {
+                if (!otaProcess) {
+                    handler?.postDelayed({
+                        Log.d(TAG, "read device name")
+                        readCharacteristic(characteristicIOPPhase3DeviceName)
+                    }, 5000)
+                }
+            }
+            POSITION_TEST_IOP3_THROUGHPUT -> {
+                mEndThroughputNotification = false
+                finishItemTest(POSITION_TEST_IOP3_THROUGHPUT, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_THROUGHPUT])
+            }
+            POSITION_TEST_IOP3_SECURITY -> {
+                iopPhase3RunTestCaseSecurity(iopPhase3IndexStartChildrenTest, 0)
+            }
+            POSITION_TEST_IOP3_CACHING -> {
+                if (characteristicIOPPhase3IOPTestCaching != null) {
+                    getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![0].characteristic = characteristicIOPPhase3IOPTestCaching
+                    readCharacteristic(characteristicIOPPhase3IOPTestCaching)
+                } else if (characteristicIOPPhase3IOPTestServiceChangedIndication != null) {
+                    getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![1].characteristic = characteristicIOPPhase3IOPTestServiceChangedIndication
+                    readCharacteristic(characteristicIOPPhase3IOPTestServiceChangedIndication)
+                }
+            }
         }
+    }
+
+    private fun readParameters(characteristic: BluetoothGattCharacteristic) {
+        when (characteristic.uuid.toString()) {
+            CommonUUID.Characteristic.FIRMWARE_VERSION.toString() -> {
+                getSiliconLabsTestInfo().firmwareVersion = parseFirmwareVersion(characteristic.value)
+                readCharacteristic(testParametersService?.characteristics?.get(1))
+            }
+            CommonUUID.Characteristic.CONNECTION_PARAMETERS.toString() -> {
+                getSiliconLabsTestInfo().iopBoard = IopBoard.fromBoardCode(characteristic.value[0])
+                getSiliconLabsTestInfo().connectionParameters = ConnectionParameters(
+                        mtu = Converters.calculateDecimalValue(
+                                characteristic.value.copyOfRange(2, 4), isBigEndian = false),
+                        pdu = Converters.calculateDecimalValue(
+                                characteristic.value.copyOfRange(4, 6), isBigEndian = false),
+                        interval = Converters.calculateDecimalValue(
+                                characteristic.value.copyOfRange(6, 8), isBigEndian = false).toDouble()
+                                .times(1.25), // Conversion of sent int representation to actual double value in ms
+                        slaveLatency = Converters.calculateDecimalValue(
+                                characteristic.value.copyOfRange(8, 10), isBigEndian = false),
+                        supervisionTimeout = Converters.calculateDecimalValue(
+                                characteristic.value.copyOfRange(10, 12), isBigEndian = false)
+                                .times(10) // Conversion of sent int representation to actual value in ms
+                )
+                mIndexStartChildrenTest = 0
+                finishItemTest(POSITION_TEST_DISCOVER_SERVICE, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_DISCOVER_SERVICE])
+                Log.d(TAG, "convertValuesParameters(), finishItemTest(POSITION_TEST_DISCOVER_SERVICE)")
+            }
+            else -> { }
+        }
+    }
+
+    private fun parseFirmwareVersion(payload: ByteArray) : String {
+        return if (payload.size < 8) payload[0].toString()
+        else StringBuilder().apply {
+            append(Converters.calculateDecimalValue(payload.copyOfRange(0, 2), isBigEndian = false))
+            append(".")
+            append(Converters.calculateDecimalValue(payload.copyOfRange(2, 4), isBigEndian = false))
+            append(".")
+            append(Converters.calculateDecimalValue(payload.copyOfRange(4, 6), isBigEndian = false))
+        }.toString()
     }
 
     /**
@@ -1126,11 +1156,10 @@ class IOPTestActivity : AppCompatActivity() {
      * Get Path of log file in ExternalStorage
      */
     private fun getPathOfLogFile(): String {
-        val name = getSiliconLabsTestInfo().getValuesPlatform(1)
-        val nameDevice = getSiliconLabsTestInfo().getIopBoard(name).icName.text
+        val boardName = getSiliconLabsTestInfo().iopBoard.icName.text
         val pathFile = getSiliconLabsTestInfo().phoneName
         pathFile.replace(" ", "")
-        return pathFile + "_" + nameDevice + "_" + getDate() + ".txt"
+        return pathFile + "_" + boardName + "_" + getDate() + ".txt"
     }
 
     /**
@@ -1224,9 +1253,9 @@ class IOPTestActivity : AppCompatActivity() {
         }
         var matchChar = -1
         for (i in uuids.indices) {
-            if (cUuid.equals(uuids[i].showUUID(), ignoreCase = true)) {
+            if (cUuid.equals(uuids[i].toString(), ignoreCase = true)) {
                 matchChar = uuids[i].id
-                Log.d(TAG, "Run TestCase [" + (matchChar + 3) + "] at characteristic " + uuids[i].showUUID())
+                Log.d(TAG, "Run TestCase [" + (matchChar + 3) + "] at characteristic " + uuids[i].toString())
                 break
             }
         }
@@ -1304,13 +1333,13 @@ class IOPTestActivity : AppCompatActivity() {
                     } else if (type == 2) {
                         itemChildrenTest.isWriteCharacteristic = true
                     }
-                    if (CommonUUID.Characteristic.IOP_TEST_LENGTH_1.showUUID() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_LENGTH_255.showUUID() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_CONST_LENGTH_1.showUUID() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_CONST_LENGTH_255.showUUID() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_USER_LEN_1.showUUID() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_USER_LEN_255.showUUID() == characteristic.uuid.toString()) {
+                    if (CommonUUID.Characteristic.IOP_TEST_LENGTH_1.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_LENGTH_255.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_CONST_LENGTH_1.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_CONST_LENGTH_255.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_USER_LEN_1.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_USER_LEN_255.toString() == characteristic.uuid.toString()) {
                         mIndexStartChildrenTest = if (itemChildrenTest.isReadCharacteristic && itemChildrenTest.isWriteCharacteristic) {
                             getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest) + 1
                         } else {
                             getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest)
                         }
-                    } else if (CommonUUID.Characteristic.NOTIFICATION_LENGTH_1.showUUID() == characteristic.uuid.toString()) {
+                    } else if (CommonUUID.Characteristic.NOTIFICATION_LENGTH_1.toString() == characteristic.uuid.toString()) {
                         if (isDisabled) {
                             mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest)
                             isDisabled = false
@@ -1332,7 +1361,7 @@ class IOPTestActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                    } else if (CommonUUID.Characteristic.INDICATE_LENGTH_1.showUUID() == characteristic.uuid.toString()) {
+                    } else if (CommonUUID.Characteristic.INDICATE_LENGTH_1.toString() == characteristic.uuid.toString()) {
                         if (isDisabled) {
                             mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest)
                             isDisabled = false
@@ -1354,10 +1383,10 @@ class IOPTestActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                    } else if (CommonUUID.Characteristic.IOP_TEST_LENGTH_VARIABLE_4.showUUID() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_USER_LEN_VARIABLE_4.showUUID() == characteristic.uuid.toString()) {
+                    } else if (CommonUUID.Characteristic.IOP_TEST_LENGTH_VARIABLE_4.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_USER_LEN_VARIABLE_4.toString() == characteristic.uuid.toString()) {
                         if (itemChildrenTest.getLstValueItemTest().size > 1 && itemChildrenTest.isReadCharacteristic) {
                             mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest) + 1
-                            if ((CommonUUID.Characteristic.IOP_TEST_USER_LEN_VARIABLE_4.showUUID() == characteristic.uuid.toString())) {
+                            if ((CommonUUID.Characteristic.IOP_TEST_USER_LEN_VARIABLE_4.toString() == characteristic.uuid.toString())) {
                                 finishItemTest(POSITION_TEST_SERVICE, getItemTestCaseInfo(POSITION_TEST_SERVICE))
                             }
                         } else {
@@ -1376,7 +1405,7 @@ class IOPTestActivity : AppCompatActivity() {
                         if (type == 1) {
                             itemChildrenTest.isReadCharacteristic = true
                         }
-                        if (CommonUUID.Characteristic.IOP_TEST_SECURITY_BONDING.showUUID() != (characteristic.uuid.toString())) {
+                        if (CommonUUID.Characteristic.IOP_TEST_SECURITY_BONDING.toString() != (characteristic.uuid.toString())) {
                             iopPhase3IndexStartChildrenTest++
                             Log.d(TAG, "iopPhase3IndexStartChildrenTest $iopPhase3IndexStartChildrenTest")
                             showDetailInformationTest(testCaseCount++, false)
@@ -1433,9 +1462,9 @@ class IOPTestActivity : AppCompatActivity() {
         val uuids = CommonUUID.Characteristic.values()
         var matchChar = -1
         for (i in uuids.indices) {
-            if (cUuid.equals(uuids[i].showUUID(), ignoreCase = true)) {
+            if (cUuid.equals(uuids[i].toString(), ignoreCase = true)) {
                 matchChar = uuids[i].id
-                Log.d(TAG, "Run TestCase [7." + (matchChar - CommonUUID.ID_IOP_TEST_PHASE3_THROUGHPUT) + "] at Characteristic " + uuids[i].showUUID())
+                Log.d(TAG, "Run TestCase [7." + (matchChar - CommonUUID.ID_IOP_TEST_PHASE3_THROUGHPUT) + "] at Characteristic " + uuids[i].toString())
                 break
             }
         }
@@ -1598,12 +1627,15 @@ class IOPTestActivity : AppCompatActivity() {
     }
 
     private fun getOtaFilename(): String {
-        val board = getSiliconLabsTestInfo().getIopBoard(getSiliconLabsTestInfo().getValuesPlatform(1))
+        val board = getSiliconLabsTestInfo().iopBoard
         return if(iopPhase3IndexStartChildrenTest == 0) board.ota1FileName else board.ota2FileName
     }
 
     private fun openOtaFileInputStream(): InputStream {
-        return assets.open("iop/" + getOtaFilename())
+        val firmwareVersion =
+            if (getSiliconLabsTestInfo().firmwareVersion == "2") "3.2.1"
+            else getSiliconLabsTestInfo().firmwareVersion
+        return assets.open("iop/" + firmwareVersion + "/" + getOtaFilename())
     }
 
     private fun startOtaProcess() {
@@ -1726,13 +1758,13 @@ class IOPTestActivity : AppCompatActivity() {
                             animateLoading()
                         }
                         //Start OTA_data Upload in another thread
-                        val otaUpload = Thread(Runnable {
+                        val otaUpload = Thread {
                             if (reliable) {
                                 otaWriteDataReliable()
                             } else {
                                 whiteOtaData(datathread)
                             }
-                        })
+                        }
                         otaUpload.start()
                     }
                 }
@@ -2205,10 +2237,11 @@ class IOPTestActivity : AppCompatActivity() {
         override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
             super.onCharacteristicRead(gatt, characteristic, status)
             Log.d(TAG, "onCharacteristicRead: " + characteristic.uuid.toString() + " status " + status)
-            if (areParameters) {
+
+            if (characteristic.service.uuid.toString() == CommonUUID.Service.TEST_PARAMETERS.toString()) {
                 if (status == 0) {
-                    convertValuesParameters(characteristic)
-                    Log.d(TAG, "onCharacteristicRead convertValuesParameters")
+                    readParameters(characteristic)
+                    Log.d(TAG, "onCharacteristicRead convertTestParameters")
                 } else {
                     nrTries = 0
                     Log.d(TAG, "onCharacteristicRead retryCommand")
@@ -2377,10 +2410,8 @@ class IOPTestActivity : AppCompatActivity() {
             Log.d(TAG, "onMtuChanged: $mtu")
             this@IOPTestActivity.mtu = mtu
             mStartTimeDiscover = System.currentTimeMillis()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Log.d(TAG, "setPreferredPhy 1M")
-                mBluetoothGatt?.setPreferredPhy(BluetoothDevice.PHY_LE_1M_MASK, BluetoothDevice.PHY_LE_1M_MASK, BluetoothDevice.PHY_OPTION_NO_PREFERRED)
-            }
+            Log.d(TAG, "setPreferredPhy 1M")
+            mBluetoothGatt?.setPreferredPhy(BluetoothDevice.PHY_LE_1M_MASK, BluetoothDevice.PHY_LE_1M_MASK, BluetoothDevice.PHY_OPTION_NO_PREFERRED)
             if (mIndexRunning == POSITION_TEST_DISCOVER_SERVICE || mIndexRunning == POSITION_TEST_IOP3_THROUGHPUT) {
                 mListCharacteristics.clear()
                 characteristicsPhase3Security.clear()
@@ -2483,7 +2514,6 @@ class IOPTestActivity : AppCompatActivity() {
         private const val FOLDER_NAME = "SiliconLabs_App"
         private const val TAG = "IOPTest"
 
-        private val CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
         private val ota_service = UUID.fromString("1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0")
         private val ota_data = UUID.fromString("984227f3-34fc-4045-a5d0-2c581f81a153")
         private val ota_control = UUID.fromString("f7bf3564-fb6d-4e53-88a4-5e37e0326063")

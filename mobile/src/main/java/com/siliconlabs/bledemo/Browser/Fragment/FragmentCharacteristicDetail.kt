@@ -1,6 +1,7 @@
 package com.siliconlabs.bledemo.Browser.Fragment
 
 import android.app.Dialog
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
@@ -29,10 +30,12 @@ import com.siliconlabs.bledemo.Bluetooth.Parsing.Common
 import com.siliconlabs.bledemo.Bluetooth.Parsing.Consts
 import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothLeService
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.Browser.Activities.DeviceServicesActivity
-import com.siliconlabs.bledemo.Utils.Converters
-import com.siliconlabs.bledemo.Utils.StringUtils
-import com.siliconlabs.bledemo.Utils.UuidUtils
+import com.siliconlabs.bledemo.Browser.Dialogs.CharacteristicWriteDialog
+import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.utils.StringUtils
+import com.siliconlabs.bledemo.utils.UuidUtils
 import java.math.BigInteger
 import java.util.*
 import kotlin.collections.ArrayList
@@ -41,6 +44,7 @@ import kotlin.math.pow
 open class FragmentCharacteristicDetail : Fragment() {
 
     var isRemote: Boolean = true
+    var writeType = WriteType.REMOTE_WRITE
     private var currRefreshInterval = REFRESH_INTERVAL
 
     lateinit var fieldsInRangeMap: HashMap<Field, Boolean>
@@ -89,11 +93,7 @@ open class FragmentCharacteristicDetail : Fragment() {
     private lateinit var valuesLayout: LinearLayout
 
     var address: String? = null
-    private var editableFieldsDialog: Dialog? = null
-    private var writableFieldsContainer: LinearLayout? = null
-    private var saveValueBtn: Button? = null
-    private var btnClear: Button? = null
-    private var ivClose: ImageView? = null
+    private var editableFieldsDialog: CharacteristicWriteDialog? = null
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -110,10 +110,7 @@ open class FragmentCharacteristicDetail : Fragment() {
         mService = Engine.getService(mBluetoothCharact?.service?.uuid)
 
         setProperties()
-        Log.d(
-            TAG,
-            "charac " + mBluetoothCharact?.uuid.toString() + " " + mBluetoothCharact?.instanceId
-        )
+        Log.d(TAG, "charac " + mBluetoothCharact?.uuid.toString() + " " + mBluetoothCharact?.instanceId)
 
         configureWriteable()
         setupRefreshInterval()
@@ -125,7 +122,7 @@ open class FragmentCharacteristicDetail : Fragment() {
         loadValueViews()
 
         if (displayWriteDialog) {
-            showCharacteristicWriteDialog()
+            showCharacteristicWriteDialog(writeType)
         }
     }
 
@@ -153,7 +150,12 @@ open class FragmentCharacteristicDetail : Fragment() {
     // Configures characteristic if it is writeable
     private fun configureWriteable() {
         if (writeable || writeableWithoutResponse) {
-            initCharacteristicWriteDialog()
+            context?.let { editableFieldsDialog = CharacteristicWriteDialog(
+                    it,
+                    writeDialogListener,
+                    writeType
+            ) }
+            initWriteModeView(editableFieldsDialog ?: return)
         }
     }
 
@@ -175,36 +177,39 @@ open class FragmentCharacteristicDetail : Fragment() {
         }
     }
 
-    fun onActionDataAvailable(uuidCharacteristic: String) {
-        if (currRefreshInterval >= REFRESH_INTERVAL) {
-            if (uuidCharacteristic == mBluetoothCharact?.uuid.toString()) {
-                updateValueView()
-            }
+    fun onActionDataAvailable(uuidCharacteristic: String, withNotification: Boolean) {
+        if (uuidCharacteristic == mBluetoothCharact?.uuid.toString()) {
+            updateValueView(withNotification)
         }
     }
 
-    private fun updateValueView() {
+    private fun updateValueView(withNotification: Boolean) {
         activity?.runOnUiThread {
-            if (currRefreshInterval >= REFRESH_INTERVAL) {
-                currRefreshInterval = 0
+
+            if (withNotification) {
                 offset = 0
-
                 value = mBluetoothCharact?.value?.clone() ?: byteArrayOf()
-
-                if (indicationsEnabled || notificationsEnabled) {
-                    valuesLayout.removeAllViews()
-                    loadValueViews()
-                } else if (value.contentEquals(previousValue)) {
-                    hideValues()
-                    handler.removeCallbacks(postDisplayValues)
-                    handler.postDelayed(postDisplayValues, 150)
-                } else {
-                    valuesLayout.removeAllViews()
-                    handler.removeCallbacks(postLoadValueViews)
-                    handler.postDelayed(postLoadValueViews, 150)
-                }
-                if (value.isNotEmpty()) previousValue = value.clone()
+                valuesLayout.removeAllViews()
+                loadValueViews()
             }
+            else {
+                if (currRefreshInterval >= REFRESH_INTERVAL) {
+                    currRefreshInterval = 0
+                    offset = 0
+                    value = mBluetoothCharact?.value?.clone() ?: byteArrayOf()
+
+                    if (value.contentEquals(previousValue)) {
+                        hideValues()
+                        handler.removeCallbacks(postDisplayValues)
+                        handler.postDelayed(postDisplayValues, 50)
+                    } else {
+                        valuesLayout.removeAllViews()
+                        handler.removeCallbacks(postLoadValueViews)
+                        handler.postDelayed(postLoadValueViews, 50)
+                    }
+                }
+            }
+            if (value.isNotEmpty()) previousValue = value.clone()
         }
     }
 
@@ -271,9 +276,29 @@ open class FragmentCharacteristicDetail : Fragment() {
         if (isRemote) {
             mDevice?.writeCharacteristic(mBluetoothCharact)
         } else {
-            updateValueView()
+            updateValueView(false)
             editableFieldsDialog?.dismiss()
         }
+    }
+
+    private fun notifyClients(characteristic: BluetoothGattCharacteristic, confirm: Boolean) {
+        (activity as DeviceServicesActivity).bluetoothService?.let {
+            getClients(it, characteristic, confirm).forEach { device ->
+                it.bluetoothGattServer?.notifyCharacteristicChanged(
+                        device,
+                        characteristic,
+                        confirm)
+            }
+        }
+    }
+
+    private fun getClients(service: BluetoothService,
+                           characteristic: BluetoothGattCharacteristic,
+                           confirm: Boolean
+    ) : Collection<BluetoothDevice> {
+        return if (confirm)
+            service.getClientsToIndicate(characteristic.uuid)
+        else service.getClientsToNotify(characteristic.uuid)
     }
 
     private fun hideValues() {
@@ -354,7 +379,7 @@ open class FragmentCharacteristicDetail : Fragment() {
     // Build activity UI based on characteristic content and also take account
     // of field requirements
     private fun addNormalValue(): Boolean {
-        writableFieldsContainer?.removeAllViews()
+        editableFieldsDialog?.writableFieldsContainer?.removeAllViews()
 
         for (i in mCharact?.fields?.indices!!) {
             try {
@@ -830,8 +855,8 @@ open class FragmentCharacteristicDetail : Fragment() {
             setPasteListener(decimalEdit, decimalPasteIV, DECIMAL_ID)
 
             updateSaveButtonState()
-            writableFieldsContainer?.removeAllViews()
-            writableFieldsContainer?.addView(writableFieldsForDialog)
+            editableFieldsDialog?.writableFieldsContainer?.removeAllViews()
+            editableFieldsDialog?.writableFieldsContainer?.addView(writableFieldsForDialog)
         }
     }
 
@@ -885,24 +910,6 @@ open class FragmentCharacteristicDetail : Fragment() {
         return true
     }
 
-    private fun initCharacteristicWriteDialog() {
-        context?.let { editableFieldsDialog = Dialog(it) }
-
-        editableFieldsDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        editableFieldsDialog?.setContentView(R.layout.dialog_characteristic_write)
-        editableFieldsDialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        writableFieldsContainer = editableFieldsDialog?.findViewById(R.id.characteristic_writable_fields_container)
-
-        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
-
-        editableFieldsDialog?.window?.setLayout(width, LinearLayout.LayoutParams.WRAP_CONTENT)
-        editableFieldsDialog?.let { initWriteModeView(it) }
-
-        saveValueBtn = editableFieldsDialog?.findViewById(R.id.save_btn)
-        btnClear = editableFieldsDialog?.findViewById(R.id.clear_btn)
-        ivClose = editableFieldsDialog?.findViewById(R.id.image_view_close)
-    }
-
     private fun isAnyWriteFieldEmpty(): Boolean {
         for (e in editTexts) {
             if (e.id == EDIT_NOT_CLEAR_ID) continue
@@ -911,39 +918,17 @@ open class FragmentCharacteristicDetail : Fragment() {
         return false
     }
 
-    fun showCharacteristicWriteDialog() {
+    fun showCharacteristicWriteDialog(writeType: WriteType) {
         // if any textfields are empty, save btn_rounded_red will be initialized to be disabled
+        this.writeType = writeType
         updateSaveButtonState()
-        saveValueBtn?.setOnClickListener {
-            if (!isAnyWriteFieldEmpty()) {
-                writeValueToCharacteristic()
-            } else {
-                Toast.makeText(activity, getString(R.string.You_cannot_send_empty_value_to_charac), Toast.LENGTH_SHORT).show()
-            }
-        }
 
-        btnClear?.setOnClickListener {
-            for (et in editTexts) {
-                if (et.id != EDIT_NOT_CLEAR_ID) {
-                    et.setText("")
-                }
-            }
-        }
-
-        ivClose?.setOnClickListener { editableFieldsDialog?.dismiss() }
-
-        val serviceName = Common.getServiceName(mGattService?.uuid!!, requireContext())
-        val characteristicName = Common.getCharacteristicName(mBluetoothCharact?.uuid, requireContext())
-
-        val characteristicUuid = if (mCharact != null) UuidUtils.getUuidText(mCharact?.uuid!!)
-                                 else UuidUtils.getUuidText(mBluetoothCharact?.uuid!!)
-        val serviceNameTextView = editableFieldsDialog?.findViewById<TextView>(R.id.picker_dialog_service_name)
-        val characteristicTextView = editableFieldsDialog?.findViewById<TextView>(R.id.characteristic_dialog_characteristic_name)
-        val uuidTextView = editableFieldsDialog?.findViewById<TextView>(R.id.picker_dialog_characteristic_uuid)
-
-        serviceNameTextView?.text = serviceName
-        characteristicTextView?.text = characteristicName
-        uuidTextView?.text = characteristicUuid
+        editableFieldsDialog?.fillViewsWithValues(
+                mGattService,
+                mBluetoothCharact,
+                mCharact,
+                writeType
+        )
 
         val propertiesContainer = editableFieldsDialog?.findViewById<LinearLayout>(R.id.picker_dialog_properties_container)
         propertiesContainer?.let { initPropertiesForEditableFieldsDialog(it) }
@@ -1195,7 +1180,7 @@ open class FragmentCharacteristicDetail : Fragment() {
                 fieldContainer.addView(fieldValueEdit)
                 fieldContainer.setPadding(0, FIELD_CONTAINER_PADDING_TOP, 0, FIELD_CONTAINER_PADDING_BOTTOM)
 
-                writableFieldsContainer?.addView(fieldContainer)
+                editableFieldsDialog?.writableFieldsContainer?.addView(fieldContainer)
             } else {
                 val fieldValueView = addValueText(tmpVal)
                 fieldValueView.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.characteristic_list_item_value_text_size))
@@ -1400,8 +1385,8 @@ open class FragmentCharacteristicDetail : Fragment() {
     }
 
     private fun updateSaveButtonState() {
-        saveValueBtn?.isEnabled = true
-        saveValueBtn?.isClickable = true
+        editableFieldsDialog?.btnSave?.isEnabled = true
+        editableFieldsDialog?.btnSave?.isClickable = true
     }
 
     // Adds value text view
@@ -1609,7 +1594,7 @@ open class FragmentCharacteristicDetail : Fragment() {
                     linearLayout.orientation = LinearLayout.HORIZONTAL
                     linearLayout.addView(fieldName)
                     linearLayout.addView(spinner)
-                    writableFieldsContainer?.addView(linearLayout)
+                    editableFieldsDialog?.writableFieldsContainer?.addView(linearLayout)
                 }
                 currentBit += bit.size
             }
@@ -1620,7 +1605,7 @@ open class FragmentCharacteristicDetail : Fragment() {
     private fun initWriteModeView(dialog: Dialog) {
         val writeWithResponseRB = dialog.findViewById<RadioButton>(R.id.write_with_resp_radio_button)
         val writeWithoutResponseRB = dialog.findViewById<RadioButton>(R.id.write_without_resp_radio_button)
-        val writeMethodLL = dialog.findViewById<LinearLayout>(R.id.write_method_linear_layout)
+        val writeMethodLL = dialog.findViewById<LinearLayout>(R.id.write_method_radio_group)
 
         if (writeable) {
             writeWithResponseRB.isChecked = true
@@ -1762,7 +1747,7 @@ open class FragmentCharacteristicDetail : Fragment() {
                         addView(spinner)
                     }
 
-                    writableFieldsContainer?.addView(linearLayout)
+                    editableFieldsDialog?.writableFieldsContainer?.addView(linearLayout)
                 }
             }
         }
@@ -1818,6 +1803,35 @@ open class FragmentCharacteristicDetail : Fragment() {
         } catch (e: NumberFormatException) {
             false
         }
+    }
+
+    private val writeDialogListener = object : CharacteristicWriteDialog.ButtonClickListener {
+        override fun onSaveClicked(writeType: WriteType) {
+            if (!isAnyWriteFieldEmpty()) {
+                writeValueToCharacteristic()
+                when (this@FragmentCharacteristicDetail.writeType) {
+                    WriteType.LOCAL_INDICATE -> notifyClients(mBluetoothCharact!!, true)
+                    WriteType.LOCAL_NOTIFY -> notifyClients(mBluetoothCharact!!, false)
+                    else -> { }
+                }
+            } else {
+                Toast.makeText(activity, getString(R.string.You_cannot_send_empty_value_to_charac), Toast.LENGTH_SHORT).show()
+            }
+        }
+        override fun onClearClicked() {
+            for (et in editTexts) {
+                if (et.id != EDIT_NOT_CLEAR_ID) {
+                    et.setText("")
+                }
+            }
+        }
+    }
+
+    enum class WriteType {
+        REMOTE_WRITE,
+        LOCAL_WRITE,
+        LOCAL_INDICATE, /* Write locally and and indicate clients */
+        LOCAL_NOTIFY /* Write locally and notify clients */
     }
 
     companion object {

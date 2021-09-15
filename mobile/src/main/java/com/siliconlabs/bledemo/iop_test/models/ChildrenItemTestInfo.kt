@@ -1,7 +1,7 @@
 package com.siliconlabs.bledemo.iop_test.models
 
 import android.bluetooth.BluetoothGattCharacteristic
-import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.utils.Converters
 import com.siliconlabs.bledemo.iop_test.utils.ErrorCodes
 import java.util.*
 
@@ -47,7 +47,7 @@ class ChildrenItemTestInfo(val id: Int, val typeTestCase: String, val nameTest: 
         val cUuid = characteristic.uuid.toString()
         var uuid = -1
         for (i in uuids.indices) {
-            if (cUuid.equals(uuids[i].showUUID(), ignoreCase = true)) {
+            if (cUuid.equals(uuids[i].toString(), ignoreCase = true)) {
                 uuid = uuids[i].id
                 break
             }

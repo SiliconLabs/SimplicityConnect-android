@@ -18,9 +18,10 @@ import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
 import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.BLEUtils
+import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.blinky.models.LightState
 import com.siliconlabs.bledemo.blinky.viewmodels.BlinkyViewModel
+import com.siliconlabs.bledemo.utils.Notifications
 import kotlinx.android.synthetic.main.actionbar.*
 import java.util.*
 import java.util.concurrent.locks.Lock
@@ -170,7 +171,7 @@ class BlinkyActivity : BaseActivity() {
                     GattCommand.Type.Notify -> {
                         val gattCharacteristic = GattCharacteristic.fromUuid(characteristic.uuid)
                         val gattService = GattService.fromUuid(characteristic.service.uuid)
-                        BLEUtils.setNotificationForCharacteristic(gatt, gattService, gattCharacteristic, BLEUtils.Notifications.NOTIFY)
+                        BLEUtils.setNotificationForCharacteristic(gatt, gattService, gattCharacteristic, Notifications.NOTIFY)
                     }
                 }
             }

@@ -15,7 +15,7 @@ import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
 import com.siliconlabs.bledemo.Browser.Adapters.ConnectionsAdapter.ConnectionViewHolder
 import com.siliconlabs.bledemo.Browser.ServicesConnectionsCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.Constants
+import com.siliconlabs.bledemo.utils.Constants
 import java.util.*
 
 class ConnectionsAdapter(var connectionsList: List<BluetoothGatt>, private val context: Context) : RecyclerView.Adapter<ConnectionViewHolder>() {

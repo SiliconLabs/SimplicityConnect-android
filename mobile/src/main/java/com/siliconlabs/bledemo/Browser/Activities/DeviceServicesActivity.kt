@@ -76,10 +76,11 @@ import com.siliconlabs.bledemo.Browser.Models.ToolbarName
 import com.siliconlabs.bledemo.Browser.ServicesConnectionsCallback
 import com.siliconlabs.bledemo.Browser.ToolbarCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.*
+import com.siliconlabs.bledemo.utils.*
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_device_services.*
 import kotlinx.android.synthetic.main.toolbar_device_services.*
+import timber.log.Timber
 import java.io.*
 import java.lang.reflect.Method
 import java.util.*
@@ -200,7 +201,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                                     bondMenuItem?.title = getString(R.string.create_bond)
                                 }
                             }
-                            Log.d("DeviceServicesActivity", "Bond state changed: NONE")
+                            Timber.d("Bond state changed: NONE")
                         }
                         BluetoothDevice.BOND_BONDING -> {
                             runOnUiThread {
@@ -208,7 +209,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                                     tv_bond_state.text = getString(R.string.bonding)
                                 }
                             }
-                            Log.d("DeviceServicesActivity", "Bond state changed: BONDING")
+                            Timber.d("Bond state changed: BONDING")
                         }
                         BluetoothDevice.BOND_BONDED -> {
                             runOnUiThread {
@@ -217,7 +218,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                                     bondMenuItem?.title = getString(R.string.delete_bond)
                                 }
                             }
-                            Log.d("DeviceServicesActivity", "Bond state changed: BONDED")
+                            Timber.d("Bond state changed: BONDED")
                         }
                     }
                 }
@@ -244,7 +245,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
             if (!otaMode) {
                 super.onReadRemoteRssi(gatt, rssi, status)
                 runOnUiThread {
-                    Log.d("onReadRemoteRssi", "RSSI: $rssi")
+                    Timber.d("onReadRemoteRssi: RSSI = %d", rssi)
                     tv_rssi.text = resources.getString(R.string.n_dBm, rssi)
                 }
             }
@@ -253,13 +254,13 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         override fun onTimeout() {
             Constants.LOGS.add(TimeoutLog())
             super.onTimeout()
-            Log.d("gattCallback", "onTimeout")
+            Timber.d("onTimeout")
         }
 
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
             Constants.LOGS.add(CommonLog("onMtuChanged, " + "device: " + gatt.device.address + ", status: " + status + ", mtu: " + mtu, gatt.device.address))
 
-            Log.d("onMtuChanged", "MTU: $mtu - status: $status")
+            Timber.d("onMtuChanged: MTU = %d, status = %d", mtu, status)
             if (status == 0) { //NO ERRORS
                 MTU = mtu
                 bluetoothGatt?.requestConnectionPriority(priority)
@@ -274,7 +275,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                     }
                 }
             } else { //ERROR HANDLING
-                Log.d("RequestMTU", "Error: $status")
+                Timber.d("onMtuChanged: error = %d", status)
                 handler.post { runOnUiThread { showMessage("ERROR REQUESTING MTU: $status") } }
                 handler.postDelayed({ disconnectGatt(bluetoothGatt) }, 2000)
             }
@@ -294,23 +295,23 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                 }
             }
             super.onConnectionStateChange(gatt, status, newState)
-            Log.d("onConnectionStateChange", "status = $status - newState = $newState")
+            Timber.d("onConnectionStateChange: status = %d, newState = %d", status, newState)
             when (newState) {
                 BluetoothGatt.STATE_CONNECTED -> {
                     connected = true
-                    Log.d("onConnectionStateChange", "CONNECTED")
+                    Timber.d("onConnectionStateChange: CONNECTED")
                     runOnUiThread {
                         if (!loadingdialog?.isShowing!!) {
                             showMessage("DEVICE CONNECTED")
                         }
                     }
                     if (ota_process) { //After OTA process started
-                        Log.d("Address", "" + gatt.device)
-                        Log.d("Name", "" + gatt.device.name)
+                        Timber.d("Address = %s", gatt.device.address)
+                        Timber.d("Name = %s", gatt.device.name)
                         if (gatt.services.isEmpty()) {
                             handler.postDelayed({
                                 bluetoothGatt = null //It's going to be equal gatt in Discover Services Callback...
-                                Log.d("onConnected", "Start Services Discovery: " + gatt.discoverServices())
+                                Timber.d("onConnected; Start Services Discovery: %s", gatt.discoverServices())
                             }, 250)
                             discoverTimeout = true
                             val timeout = Runnable {
@@ -328,7 +329,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                 BluetoothGatt.STATE_DISCONNECTED -> {
                     if (status == 133 && otaMode && retryAttempts < RECONNECTION_RETRIES) {
                         retryAttempts++
-                        Log.d("onConnectionStateChange", "[DeviceServices]: Reconnect due to 0x85 (133) error")
+                        Timber.d("onConnectionStateChange: [DeviceServices]: Reconnect due to 0x85 (133) error")
                         reconnect(1000)
                         return
                     }
@@ -351,8 +352,9 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                         if (ota_process || boolOTAbegin || boolFullOTA) {
                             runOnUiThread {
                                 if (loadingdialog?.isShowing!!) {
-                                    loadingLog?.text = "Rebooting..."
-                                    handler.postDelayed({ runOnUiThread { loadingLog?.text = "Waiting..." } }, 1500)
+                                    loadingLog?.text = getString(R.string.ota_rebooting_text)
+                                    handler.postDelayed(
+                                        { runOnUiThread { loadingLog?.text = getString(R.string.ota_loading_text) } }, 1500)
                                 }
                             }
                         }
@@ -367,7 +369,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                         }
                     }
                 }
-                BluetoothGatt.STATE_CONNECTING -> Log.d("onConnectionStateChange", "Connecting...")
+                BluetoothGatt.STATE_CONNECTING -> Timber.d("onConnectionStateChange: Connecting...")
             }
         }
 
@@ -379,30 +381,29 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         ) {
             remoteServicesFragment.updateCurrentCharacteristicView(characteristic.uuid)
             Constants.LOGS.add(GattOperationWithDataLog("onCharacteristicRead", gatt, status, characteristic))
-            Log.i(
-                "Callback",
-                "OnCharacteristicRead: " + Converters.bytesToHexWhitespaceDelimited(characteristic.value) + " Status: " + status
-            )
+            Timber.i("onCharacteristicRead: value = %s, status = %s",
+                    Converters.bytesToHexWhitespaceDelimited(characteristic.value), status)
+
             val otaControlCharacteristic = bluetoothGatt
                 ?.getService(UuidConsts.OTA_SERVICE)
                 ?.getCharacteristic(UuidConsts.OTA_CONTROL)
             if (characteristic === otaControlCharacteristic) {
                 val value = characteristic.value
                 if (value[2] == 0x05.toByte()) {
-                    Log.d("homekit_descriptor", "Insecure Connection")
+                    Timber.d("homekit_descriptor: Insecure Connection")
                     runOnUiThread { showMessage("Error: Not a Homekit Secure Connection") }
                 } else if (value[2] == 0x04.toByte()) {
-                    Log.d("homekit_descriptor", "Wrong Address")
+                    Timber.d("homekit_descriptor: Wrong Address")
                 } else if (value[2] == 0x00.toByte()) {
-                    Log.d("homekit_descriptor", "Entering in DFU_Mode...")
+                    Timber.d("homekit_descriptor: Entering in DFU_Mode...")
                     if (ota_mode && ota_process) {
-                        Log.d("OTAUPLOAD", "Sent")
+                        Timber.d("OTAUPLOAD: Sent")
                         runOnUiThread(checkbeginrunnable)
                         handler.removeCallbacks(DFU_OTA_UPLOAD)
                         handler.postDelayed(DFU_OTA_UPLOAD, 500)
                     } else if (!ota_mode && ota_process) {
                         runOnUiThread {
-                            loadingLog?.text = "Resetting..."
+                            loadingLog?.text = getString(R.string.ota_resetting_text)
                             showLoading()
                             animaloading()
                             Constants.ota_button?.isVisible = true
@@ -422,14 +423,12 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
             remoteServicesFragment.updateCurrentCharacteristicView(characteristic.uuid, status)
             Constants.LOGS.add(GattOperationWithDataLog("onCharacteristicWrite", gatt, status, characteristic))
 
-            if (characteristic.value.size < 10) Log.d(
-                "OnCharacteristicRead",
-                "Char: " + characteristic.uuid.toString() + " Value: " + Converters.bytesToHexWhitespaceDelimited(
-                    characteristic.value
-                ) + " Status: " + status
-            )
+            if (characteristic.value.size < 10) {
+                Timber.d("OnCharacteristicWrite: Char = %s, Value = %s, Status = %s",
+                        characteristic.uuid.toString(), Converters.bytesToHexWhitespaceDelimited(characteristic.value), status)
+            }
             if (status != 0) { // Error Handling
-                Log.d("onCharWrite", "status: " + Integer.toHexString(status))
+                Timber.d("onCharWrite: status = %s", Integer.toHexString(status))
                 if (errorDialog == null) {
                     runOnUiThread {
                         errorDialog = ErrorDialog(status, object : OtaErrorCallback {
@@ -444,18 +443,16 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                 if ((characteristic.uuid == UuidConsts.OTA_CONTROL)) { //OTA Control Callback Handling
                     if (characteristic.value.size == 1) {
                         if (characteristic.value[0] == 0x00.toByte()) {
-                            Log.d(
-                                "Callback",
-                                "Control " + Converters.bytesToHexWhitespaceDelimited(characteristic.value) + "status: " + status
-                            )
+                            Timber.d("Callback: Control %s, status = %d",
+                                    Converters.bytesToHexWhitespaceDelimited(characteristic.value), status)
                             if (ota_mode && ota_process) {
-                                Log.d("OTAUPLOAD", "Sent")
+                                Timber.d("OTAUPLOAD: Sent")
                                 runOnUiThread(checkbeginrunnable)
                                 handler.removeCallbacks(DFU_OTA_UPLOAD)
                                 handler.postDelayed(DFU_OTA_UPLOAD, 500)
                             } else if (!ota_mode && ota_process) {
                                 runOnUiThread {
-                                    loadingLog?.text = "Resetting..."
+                                    loadingLog?.text = getString(R.string.ota_resetting_text)
                                     showLoading()
                                     animaloading()
                                     Constants.ota_button?.isVisible = true
@@ -465,12 +462,8 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                         }
                         if (characteristic.value[0] == 0x03.toByte()) {
                             if (ota_process) {
-                                Log.d(
-                                    "Callback",
-                                    "Control " + Converters.bytesToHexWhitespaceDelimited(
-                                        characteristic.value
-                                    ) + "status: " + status
-                                )
+                                Timber.d("Callback: Control %s, status = %d",
+                                        Converters.bytesToHexWhitespaceDelimited(characteristic.value), status)
                                 runOnUiThread {
                                     OTAStart?.setBackgroundColor(
                                         ContextCompat.getColor(
@@ -485,7 +478,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                                     stackPath = ""
                                     runOnUiThread {
                                         otaProgress?.dismiss()
-                                        loadingLog?.text = "Loading"
+                                        loadingLog?.text = getString(R.string.ota_loading_text)
                                         showLoading()
                                         animaloading()
                                     }
@@ -494,12 +487,11 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                             }
                         }
                     } else {
-                        Log.i(
-                            "OTA_Control",
-                            "Received: " + Converters.bytesToHexWhitespaceDelimited(characteristic.value)
+                        Timber.i("OTA_Control: received: %s",
+                                Converters.bytesToHexWhitespaceDelimited(characteristic.value)
                         )
                         if (characteristic.value[0] == 0x00.toByte() && characteristic.value[1] == 0x02.toByte()) {
-                            Log.i("HomeKit", "Reading OTA_Control...")
+                            Timber.i("HomeKit: reading OTA_Control...")
                             bluetoothGatt?.readCharacteristic(characteristic)
                         }
                     }
@@ -549,7 +541,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                 value[0] = 0xF2.toByte()
                 value[1] = 0xFF.toByte()
                 if (descriptor.value[0] == value[0] && descriptor.value[1] == value[1]) {
-                    Log.i("descriptor", "getValue " + Converters.bytesToHexWhitespaceDelimited(descriptor.value))
+                    Timber.i("onDescriptorRead:Value = %s", Converters.bytesToHexWhitespaceDelimited(descriptor.value))
                     homeKitOTAControl(descriptor.value)
                 }
             } else {
@@ -572,7 +564,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
             discoverTimeout = false
             /**ERROR IN SERVICE DISCOVERY */
             if (status != 0) {
-                Log.d("Error status", "" + Integer.toHexString(status))
+                Timber.d("Error status = %s", Integer.toHexString(status))
                 if (errorDialog == null) {
                     runOnUiThread {
                         errorDialog = ErrorDialog(status, object : OtaErrorCallback {

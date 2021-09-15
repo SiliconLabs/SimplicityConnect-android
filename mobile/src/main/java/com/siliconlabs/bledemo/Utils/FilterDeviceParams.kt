@@ -1,8 +1,8 @@
-package com.siliconlabs.bledemo.Utils
+package com.siliconlabs.bledemo.utils
 
 import android.content.Context
 import com.siliconlabs.bledemo.BeaconUtils.BleFormat
-import com.siliconlabs.bledemo.Utils.StringUtils.removeWhitespaceAndCommaIfNeeded
+import com.siliconlabs.bledemo.utils.StringUtils.removeWhitespaceAndCommaIfNeeded
 import java.lang.StringBuilder
 
 class FilterDeviceParams(var filterName: String, var name: String?, var advertising: String?, var rssiValue: Int, var isRssiFlag: Boolean,

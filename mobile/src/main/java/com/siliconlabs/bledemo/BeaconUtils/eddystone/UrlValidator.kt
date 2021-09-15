@@ -2,7 +2,7 @@ package com.siliconlabs.bledemo.BeaconUtils.eddystone
 
 import android.util.Log
 import com.siliconlabs.bledemo.BeaconUtils.eddystone.UrlUtils.decodeUrl
-import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.utils.Converters
 import java.util.*
 
 // Copyright 2015 Google Inc. All rights reserved.

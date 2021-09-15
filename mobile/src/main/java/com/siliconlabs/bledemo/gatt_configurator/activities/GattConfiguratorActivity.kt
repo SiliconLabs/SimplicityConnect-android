@@ -1,7 +1,9 @@
 package com.siliconlabs.bledemo.gatt_configurator.activities
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.*
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -9,6 +11,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,10 +23,16 @@ import com.siliconlabs.bledemo.gatt_configurator.adapters.GattServerAdapter.OnCl
 import com.siliconlabs.bledemo.gatt_configurator.models.GattServer
 import com.siliconlabs.bledemo.gatt_configurator.utils.removeAsking
 import com.siliconlabs.bledemo.gatt_configurator.viewmodels.GattConfiguratorViewModel
-import com.siliconlabs.bledemo.Views.BottomBarWithButton
+import com.siliconlabs.bledemo.Views.ExportBar
+import com.siliconlabs.bledemo.gatt_configurator.import_export.GattServerExporter
+import com.siliconlabs.bledemo.gatt_configurator.import_export.GattServerImporter
+import com.siliconlabs.bledemo.gatt_configurator.import_export.ImportException
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_gatt_configurator.*
+import kotlinx.android.synthetic.main.view_export_bar.view.*
+import java.io.*
+import java.util.*
 
 @AndroidEntryPoint
 class GattConfiguratorActivity : BaseActivity(), OnClickListener {
@@ -40,7 +49,7 @@ class GattConfiguratorActivity : BaseActivity(), OnClickListener {
         prepareToolbar()
         observeChanges()
         initFullScreenInfo()
-        initBottomBar()
+        initExportBar()
         initAdapter()
         bindBluetoothService()
     }
@@ -89,17 +98,17 @@ class GattConfiguratorActivity : BaseActivity(), OnClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.create_new -> {
+                toggleExportMode(false)
                 viewModel.createGattServer()
                 true
             }
             R.id.import_xml -> {
-                adapter.setExportMode(false)
-                Toast.makeText(this, "Import .xml file", Toast.LENGTH_SHORT).show()
+                toggleExportMode(false)
+                openFileChooser()
                 true
             }
             R.id.export_xml -> {
-                adapter.setExportMode(true)
-                //Toast.makeText(this, "Export .xml file", Toast.LENGTH_SHORT).show()
+                toggleExportMode(true)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -138,10 +147,38 @@ class GattConfiguratorActivity : BaseActivity(), OnClickListener {
         rv_gatt_servers.visibility = View.VISIBLE
     }
 
-    private fun initBottomBar() {
-        bottom_bar_export.init(getString(R.string.button_export), object : BottomBarWithButton.Listener {
-            override fun onClick() {
-                Toast.makeText(this@GattConfiguratorActivity, "Export", Toast.LENGTH_SHORT).show()
+    private fun toggleExportMode(enable: Boolean) {
+        adapter.setExportMode(enable)
+        toggleExportBarVisibility(enable)
+        if (!enable) {
+            viewModel.gattServers.value?.forEach { it.isCheckedForExport = false }
+        }
+        bottom_bar_export.export_bar.isEnabled = viewModel.isAnyGattServerCheckedForExport()
+    }
+
+    private fun toggleExportBarVisibility(makeVisible: Boolean) {
+        if (makeVisible) {
+            bottom_bar_export_shadow.visibility = View.VISIBLE
+            bottom_bar_export.show()
+        }
+        else {
+            bottom_bar_export_shadow.visibility = View.INVISIBLE
+            bottom_bar_export.hide()
+        }
+    }
+
+    private fun initExportBar() {
+        bottom_bar_export.init(object : ExportBar.Listener {
+            override fun onExportClick() {
+                openLocationChooser()
+                Toast.makeText(
+                        this@GattConfiguratorActivity,
+                        getString(R.string.gatt_configurator_toast_export_location_choice),
+                        Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onCancelClick() {
+                toggleExportMode(false)
             }
         })
     }
@@ -169,36 +206,113 @@ class GattConfiguratorActivity : BaseActivity(), OnClickListener {
 
     override fun switchItemOn(position: Int) {
         viewModel.switchGattServerOnAt(position)
+        service?.setGattServer()
     }
 
     override fun switchItemOff(position: Int) {
         viewModel.switchGattServerOffAt(position)
-    }
-
-    override fun onBackPressed() {
-        if (viewModel.isAnyGattServerSwitchedOn()) {
-            service?.setGattServer()
-        } else {
+        if (!viewModel.isAnyGattServerSwitchedOn()) {
             service?.clearGattServer()
         }
-        super.onBackPressed()
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.persistGattServers()
+    override fun onExportBoxClick() {
+        bottom_bar_export.export_bar.isEnabled = viewModel.isAnyGattServerCheckedForExport()
+    }
+
+    private fun openFileChooser() {
+        val requestFileIntent = Intent(ACTION_GET_CONTENT)
+        requestFileIntent.type = "text/xml"
+        startActivityForResult(requestFileIntent, IMPORT_GATT_SERVER_CODE)
+    }
+
+    private fun openLocationChooser() {
+        val requestLocationIntent = Intent(ACTION_OPEN_DOCUMENT_TREE)
+        startActivityForResult(requestLocationIntent, EXPORT_GATT_SERVER_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
-
-        if (resultCode == RESULT_OK && requestCode == GattServerActivity.REQUEST_CODE_EDIT_GATT_SERVER) {
-            val position = intent?.getIntExtra(GattServerActivity.EXTRA_GATT_SERVER_POSITION, -1)
-            val gattServer = intent?.getParcelableExtra<GattServer>(GattServerActivity.EXTRA_GATT_SERVER)
-
-            if (position != -1 && gattServer != null) {
-                viewModel.replaceGattServerAt(position!!, gattServer)
+        if (resultCode == RESULT_OK) {
+            when (requestCode) {
+                GattServerActivity.REQUEST_CODE_EDIT_GATT_SERVER -> refreshGattServerInfo(intent)
+                IMPORT_GATT_SERVER_CODE -> onImportFileChosen(intent)
+                EXPORT_GATT_SERVER_CODE -> onExportLocationChosen(intent)
             }
+        }
+    }
+
+    private fun refreshGattServerInfo(intent: Intent?) {
+        val position = intent?.getIntExtra(GattServerActivity.EXTRA_GATT_SERVER_POSITION, -1)
+        val gattServer = intent?.getParcelableExtra<GattServer>(GattServerActivity.EXTRA_GATT_SERVER)
+
+        if (position != -1 && gattServer != null) {
+            viewModel.replaceGattServerAt(position!!, gattServer)
+        }
+    }
+
+    private fun onImportFileChosen(intent: Intent?) {
+        getFileDescriptorFromIntent(intent)?.let {
+            try {
+                val importedServer = GattServerImporter(BufferedReader(FileReader(it))).readFile()
+                viewModel.createGattServer(importedServer)
+                showImportDialog(true)
+            } catch (err: ImportException) {
+                showImportDialog(false, err)
+            }
+        } ?: showFileNotFoundToast()
+    }
+
+    private fun onExportLocationChosen(intent: Intent?) {
+        intent?.data?.let {
+            DocumentFile.fromTreeUri(applicationContext, it)?.let { location ->
+                GattServerExporter().export(
+                        viewModel.gattServers.value?.filter { it.isCheckedForExport }!!
+                ).forEach { server ->
+                    location.createFile("text/xml", server.key)?.let { singleFile ->
+                        contentResolver.openOutputStream(singleFile.uri)?.write(server.value.toByteArray())
+                    }
+                }
+                Toast.makeText(this, getString(R.string
+                        .gatt_configurator_toast_export_successful), Toast.LENGTH_LONG).show()
+            } ?: showWrongLocationToast()
+        } ?: showWrongLocationToast()
+
+        toggleExportMode(false)
+    }
+
+    private fun showFileNotFoundToast() {
+        Toast.makeText(this, getString(R.string.gatt_configurator_toast_import_file_not_found), Toast.LENGTH_LONG).show()
+    }
+
+    private fun showWrongLocationToast() {
+        Toast.makeText(this, getString(R.string
+                .gatt_configurator_toast_export_wrong_location_chosen), Toast.LENGTH_LONG).show()
+    }
+
+    private fun getFileDescriptorFromIntent(intent: Intent?) : FileDescriptor? {
+        return intent?.data?.let {
+            try {
+                contentResolver.openFileDescriptor(it, "r")
+            } catch (err: FileNotFoundException) {
+                showFileNotFoundToast()
+                null
+            }?.fileDescriptor
+        }
+    }
+
+    private fun showImportDialog(isSuccessful: Boolean, err: ImportException? = null) {
+        AlertDialog.Builder(this).let {
+            if (isSuccessful) {
+                it.setTitle(R.string.gatt_configurator_popup_import_successful_title)
+                  .setMessage(R.string.gatt_configurator_popup_import_successful_content)
+
+            } else {
+                it.setTitle(R.string.gatt_configurator_popup_import_unsuccessful_title)
+                  .setMessage(convertImportErrorMessage(err))
+            }
+            it.setNeutralButton(R.string.button_ok) { dialog, _ -> dialog.dismiss() }
+              .show()
         }
     }
 
@@ -207,5 +321,46 @@ class GattConfiguratorActivity : BaseActivity(), OnClickListener {
             val intent = Intent(context, GattConfiguratorActivity::class.java)
             startActivity(context, intent, null)
         }
+
+        private const val IMPORT_GATT_SERVER_CODE = 3012
+        private const val EXPORT_GATT_SERVER_CODE = 3013
+    }
+
+    private fun convertImportErrorMessage(err: ImportException?) : String {
+        val message = StringBuffer()
+        message.append(err?.errorType.toString().first())
+        message.append(err?.errorType.toString().substring(1)
+                .toLowerCase(Locale.getDefault()).replace("_", " "))
+        message.append(". ")
+
+        when (err?.errorType) {
+            ImportException.ErrorType.WRONG_TAG_NAME,
+            ImportException.ErrorType.WRONG_ATTRIBUTE_NAME,
+            ImportException.ErrorType.WRONG_ATTRIBUTE_VALUE,
+            ImportException.ErrorType.WRONG_CAPABILITY_LISTED,
+            ImportException.ErrorType.WRONG_INCLUDE_ID_DECLARED,
+            ImportException.ErrorType.PROPERTY_NOT_SUPPORTED_BY_DESCRIPTOR -> {
+                message.append(getString(
+                        R.string.gatt_configurator_popup_import_unsuccessful_content_forbidden_value,
+                        err.provided, err.expected))
+            }
+
+            ImportException.ErrorType.ATTRIBUTE_NAME_DUPLICATED,
+            ImportException.ErrorType.TAG_MAXIMUM_OCCURRENCE_EXCEEDED,
+            ImportException.ErrorType.MANDATORY_ATTRIBUTE_MISSING -> {
+                message.append(getString(
+                        R.string.gatt_configurator_popup_import_unsuccessful_content_occurrence_error,
+                        err.provided))
+            }
+
+            ImportException.ErrorType.WRONG_TAG_VALUE -> {
+                message.append(getString(
+                        R.string.gatt_configurator_popup_import_unsuccessful_content_regex_mismatch,
+                        err.provided, err.expected))
+            }
+
+            else -> { }
+        }
+        return message.toString()
     }
 }

@@ -7,9 +7,10 @@ import java.util.*
 @Parcelize
 data class Uuid(val uuid: String) : Parcelable {
 
-    fun getAsFormattedText(): String {
+    fun getAsFormattedText(withHexPrefix: Boolean = true): String {
         return if (uuid.matches(UUID_16BIT_PATTERN.toRegex())) {
-            "0x".plus(uuid.toUpperCase(Locale.ROOT))
+            if (withHexPrefix) "0x".plus(uuid.toUpperCase(Locale.ROOT))
+            else uuid.toUpperCase(Locale.ROOT)
         } else {
             uuid.toLowerCase(Locale.ROOT)
         }

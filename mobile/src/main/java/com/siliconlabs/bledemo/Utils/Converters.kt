@@ -14,13 +14,15 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.Utils
+package com.siliconlabs.bledemo.utils
 
 import android.text.TextUtils
 import androidx.core.util.Pair
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.util.*
+import kotlin.math.abs
+import kotlin.math.pow
 
 object Converters {
     val HEX_CHARS: CharArray = "0123456789ABCDEF".toCharArray()
@@ -145,6 +147,21 @@ object Converters {
             result.append(b.toInt() and 0xff).append(" ")
         }
         return result.toString()
+    }
+
+    fun calculateDecimalValue(array: ByteArray, isBigEndian: Boolean) : Int {
+        val byteBasis = 256.0
+        var value = 0
+
+        if (isBigEndian) array.reverse()
+        array.forEachIndexed { index, byteValue ->
+            value += getIntFromTwosComplement(byteValue) * byteBasis.pow(index).toInt()
+        }
+        return value
+    }
+
+    private fun getIntFromTwosComplement(value: Byte) : Int {
+        return if (value < 0) 256 - abs(value.toInt()) else value.toInt()
     }
 
     // Gets value in decimal system for single byte

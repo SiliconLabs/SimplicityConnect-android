@@ -20,8 +20,8 @@ import com.siliconlabs.bledemo.HealthThermometer.Fragments.HealthThermometerActi
 import com.siliconlabs.bledemo.HealthThermometer.Models.TemperatureReading
 import com.siliconlabs.bledemo.HealthThermometer.Models.TemperatureReading.HtmType
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.BLEUtils
-import com.siliconlabs.bledemo.Utils.BLEUtils.setNotificationForCharacteristic
+import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
+import com.siliconlabs.bledemo.utils.Notifications
 import kotlinx.android.synthetic.main.actionbar.*
 
 class HealthThermometerActivity : BaseActivity() {
@@ -69,7 +69,7 @@ class HealthThermometerActivity : BaseActivity() {
             if (startNotificationForCharacteristicFromHere) {
                 setNotificationForCharacteristic(gatt, GattService.HealthThermometer,
                         GattCharacteristic.Temperature,
-                        BLEUtils.Notifications.INDICATE)
+                        Notifications.INDICATE)
             }
         }
 
@@ -96,7 +96,7 @@ class HealthThermometerActivity : BaseActivity() {
                 htmType = HtmType.values()[characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)]
                 setNotificationForCharacteristic(gatt, GattService.HealthThermometer,
                         GattCharacteristic.Temperature,
-                        BLEUtils.Notifications.INDICATE)
+                        Notifications.INDICATE)
             }
         }
     }

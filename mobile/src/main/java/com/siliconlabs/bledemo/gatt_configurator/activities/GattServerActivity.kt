@@ -102,7 +102,7 @@ class GattServerActivity : BaseActivity(), ServiceListener, AddServiceListener {
     private fun prepareToolbar() {
         setSupportActionBar(toolbar)
         title = viewModel.getGattServerName()
-        findViewById<View>(R.id.iv_go_back).setOnClickListener { onBackPressed() }
+        findViewById<View>(R.id.iv_go_back).setOnClickListener { exitServerConfigView() }
     }
 
     private fun exitServerConfigView() {
@@ -110,13 +110,11 @@ class GattServerActivity : BaseActivity(), ServiceListener, AddServiceListener {
                 GattConfiguratorStorage(this).shouldDisplayLeaveGattServerConfigDialog()) {
             LeaveGattServerConfigDialog(object : LeaveGattServerConfigDialog.Callback {
                 override fun onYesClicked() {
-                    saveGattServer()
+                    viewModel.validateGattServer(et_gatt_server_name.text.toString())
                 }
-
                 override fun onNoClicked() {
                     super@GattServerActivity.onBackPressed()
                 }
-
             }).show(supportFragmentManager, "dialog_leave_gatt_server_config")
         }
         else super@GattServerActivity.onBackPressed()

@@ -31,5 +31,6 @@ class GattServerAdapter(private val list: List<GattServer>, private val listener
         fun onRemoveClick(position: Int)
         fun switchItemOn(position: Int)
         fun switchItemOff(position: Int)
+        fun onExportBoxClick()
     }
 }

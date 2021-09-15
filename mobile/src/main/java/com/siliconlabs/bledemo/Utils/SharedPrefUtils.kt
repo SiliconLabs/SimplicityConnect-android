@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Utils
+package com.siliconlabs.bledemo.utils
 
 import android.content.Context
 import android.content.SharedPreferences

@@ -1,6 +1,6 @@
 package com.siliconlabs.bledemo.BeaconUtils.ibeacon
 
-import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.utils.Converters
 import java.util.*
 
 

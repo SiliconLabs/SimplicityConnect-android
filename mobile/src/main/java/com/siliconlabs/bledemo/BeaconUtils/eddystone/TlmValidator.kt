@@ -1,7 +1,7 @@
 package com.siliconlabs.bledemo.BeaconUtils.eddystone
 
 import android.util.Log
-import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.utils.Converters
 import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.TimeUnit

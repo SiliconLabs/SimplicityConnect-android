@@ -21,7 +21,8 @@ import com.siliconlabs.bledemo.ConnectedLighting.Presenters.ConnectedLightingPre
 import com.siliconlabs.bledemo.ConnectedLighting.Presenters.ConnectedLightingPresenter.BluetoothController
 import com.siliconlabs.bledemo.ConnectedLighting.Models.TriggerSource
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.BLEUtils
+import com.siliconlabs.bledemo.utils.BLEUtils
+import com.siliconlabs.bledemo.utils.Notifications
 import kotlinx.android.synthetic.main.actionbar.*
 
 class ConnectedLightingActivity : BaseActivity(), BluetoothController {
@@ -89,7 +90,7 @@ class ConnectedLightingActivity : BaseActivity(), BluetoothController {
                 val success: Boolean = BLEUtils.setNotificationForCharacteristic(gatt,
                         gattService,
                         GattCharacteristic.Light,
-                        BLEUtils.Notifications.INDICATE)
+                        Notifications.INDICATE)
                 if (!success) {
                     disconnectWithModal()
                 }
@@ -102,7 +103,7 @@ class ConnectedLightingActivity : BaseActivity(), BluetoothController {
                 val success: Boolean = BLEUtils.setNotificationForCharacteristic(gatt,
                         gattService,
                         GattCharacteristic.TriggerSource,
-                        BLEUtils.Notifications.INDICATE)
+                        Notifications.INDICATE)
                 if (!success) {
                     disconnectWithModal()
                 }
@@ -110,7 +111,7 @@ class ConnectedLightingActivity : BaseActivity(), BluetoothController {
                 val success: Boolean = BLEUtils.setNotificationForCharacteristic(gatt,
                         gattService,
                         GattCharacteristic.SourceAddress,
-                        BLEUtils.Notifications.INDICATE)
+                        Notifications.INDICATE)
                 if (!success) {
                     disconnectWithModal()
                 }

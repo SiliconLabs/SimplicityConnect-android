@@ -10,7 +10,7 @@ import com.siliconlabs.bledemo.Browser.Adapters.MappingAdapter
 import com.siliconlabs.bledemo.Browser.Models.Mapping
 import com.siliconlabs.bledemo.Browser.Models.MappingType
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.SharedPrefUtils
+import com.siliconlabs.bledemo.utils.SharedPrefUtils
 import kotlinx.android.synthetic.main.fragment_characteristic_mappings.*
 import java.util.*
 import kotlin.collections.ArrayList

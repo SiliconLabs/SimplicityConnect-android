@@ -1,20 +1,20 @@
-package com.siliconlabs.bledemo.Utils
+package com.siliconlabs.bledemo.utils
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
 import java.util.*
 
 object BLEUtils {
-    val CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
     fun setNotificationForCharacteristic(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic?, gattDescriptor: UUID?, value: Notifications): Boolean {
         var written = false
         if (characteristic != null) {
-            gatt.setCharacteristicNotification(characteristic, value.isEnabled)
+            if (!gatt.setCharacteristicNotification(characteristic, value.isEnabled)) {
+                return false
+            }
             val descriptor = characteristic.getDescriptor(gattDescriptor)
             if (descriptor != null) {
                 //writing this descriptor causes the device to send updates
@@ -27,7 +27,12 @@ object BLEUtils {
     }
 
     fun setNotificationForCharacteristic(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic?, value: Notifications): Boolean {
-        return setNotificationForCharacteristic(gatt, characteristic, CLIENT_CHARACTERISTIC_CONFIG_UUID, value)
+        return setNotificationForCharacteristic(
+            gatt,
+            characteristic,
+            UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR,
+            value
+        )
     }
 
     /**
@@ -69,7 +74,13 @@ object BLEUtils {
      * @return Whether the instruction to write passed or failed.
      */
     fun setNotificationForCharacteristic(gatt: BluetoothGatt, service: GattService?, characteristic: GattCharacteristic?, value: Notifications): Boolean {
-        return setNotificationForCharacteristic(gatt, service, characteristic, CLIENT_CHARACTERISTIC_CONFIG_UUID, value)
+        return setNotificationForCharacteristic(
+            gatt,
+            service,
+            characteristic,
+            UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR,
+            value
+        )
     }
 
     /**
@@ -99,54 +110,4 @@ object BLEUtils {
         return null
     }
 
-    /**
-     * Enumerated Notification State Handler
-     */
-    enum class Notifications(private val type: Types?,
-                             /**
-                              * Storage Field for Enabled bool passed from .CTor
-                              */
-                             val isEnabled: Boolean) {
-        DISABLED(null, false),
-        NOTIFY(Types.NOTIFICATIONS, true),
-        INDICATE(Types.INDICATIONS, true);
-
-        private enum class Types {
-            INDICATIONS, NOTIFICATIONS
-        }
-
-        /**
-         * Does this Value represent an Indications in an Enabled State?
-         *
-         * @return Boolean, True = Enabled, False = Disabled
-         */
-
-        /**
-         * Get the BluetoothGattDescriptor Value for This State.
-         *
-         * @return BluetoothGattDescriptor value as Byte Array
-         */
-        /**
-         * Storage Field for BluetoothGattDescriptor value based on Boolean
-         */
-        val descriptorValue: ByteArray
-
-        override fun toString(): String {
-            return if (!isEnabled) {
-                "disabled"
-            } else if (type == Types.NOTIFICATIONS) {
-                "notify"
-            } else {
-                "indicate"
-            }
-        }
-
-        init {
-            descriptorValue =
-                    if (isEnabled)
-                        if (type == Types.NOTIFICATIONS) BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                        else BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-                    else BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
-        }
-    }
 }

@@ -15,7 +15,7 @@ import com.siliconlabs.bledemo.Advertiser.Models.Manufacturer
 import com.siliconlabs.bledemo.Advertiser.Utils.Validator
 import com.siliconlabs.bledemo.Base.BaseDialogFragment
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.Converters
+import com.siliconlabs.bledemo.utils.Converters
 import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.*
 
 class ManufacturerDataDialog(private val manufacturers: List<Manufacturer>, val callback: Callback) : BaseDialogFragment() {

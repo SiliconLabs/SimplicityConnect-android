@@ -36,9 +36,10 @@ import com.siliconlabs.bledemo.Bluetooth.ConnectedGatts
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.Browser.Dialogs.LeaveApplicationDialog
 import com.siliconlabs.bledemo.Browser.Dialogs.LeaveApplicationDialog.Callback
-import com.siliconlabs.bledemo.Utils.Constants
-import com.siliconlabs.bledemo.Utils.SharedPrefUtils
+import com.siliconlabs.bledemo.utils.Constants
+import com.siliconlabs.bledemo.utils.SharedPrefUtils
 import com.siliconlabs.bledemo.Views.BluetoothEnableBar
+import com.siliconlabs.bledemo.gatt_configurator.import_export.migration.Migrator
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_main_menu.*
 import kotlinx.android.synthetic.main.bluetooth_enable_bar.*
@@ -109,6 +110,7 @@ class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
 
         initHelpDialog()
         initViewPager()
+        migrateGattDatabaseIfNeeded()
     }
 
     override fun onDestroy() {
@@ -273,7 +275,7 @@ class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_PERMISION_REQUEST_CODE
+                LOCATION_PERMISSION_REQUEST_CODE
             )
             false
         } else {
@@ -284,7 +286,7 @@ class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            LOCATION_PERMISION_REQUEST_CODE -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            LOCATION_PERMISSION_REQUEST_CODE -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showMessage(R.string.permissions_granted_successfully)
             } else {
                 showMessage(R.string.permissions_not_granted)
@@ -297,8 +299,14 @@ class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
         }
     }
 
+    private fun migrateGattDatabaseIfNeeded() {
+        if (BuildConfig.VERSION_CODE <= IMPORT_EXPORT_CODE_VERSION - 1) {
+            Migrator(this).migrate()
+        }
+    }
+
     companion object {
-        private const val LOCATION_PERMISION_REQUEST_CODE = 200
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 200
         private const val WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 300
 
         private const val LINK_MORE_INFO = "silabs.com/products/wireless"
@@ -308,5 +316,7 @@ class MainMenuActivity : BaseActivity(), MenuAdapter.OnMenuItemClickListener {
         private const val LINK_RELEASE_NOTES = "silabs.com/documents/public/release-notes/efr-connect-release-notes.pdf"
         private const val LINK_DOCUMENTATION = "docs.silabs.com/bluetooth/latest"
         private const val LINK_GOOGLE_PLAY_STORE = "play.google.com/store/apps/developer?id=Silicon+Laboratories"
+
+        private const val IMPORT_EXPORT_CODE_VERSION = 20
     }
 }

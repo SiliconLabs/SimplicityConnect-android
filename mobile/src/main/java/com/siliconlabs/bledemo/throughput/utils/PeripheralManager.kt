@@ -10,7 +10,9 @@ import com.siliconlabs.bledemo.Advertiser.Models.AdvertiserSettings
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
-import com.siliconlabs.bledemo.Utils.BLEUtils
+import com.siliconlabs.bledemo.utils.BLEUtils
+import com.siliconlabs.bledemo.utils.UuidConsts
+import com.siliconlabs.bledemo.utils.UuidUtils
 import timber.log.Timber
 
 object PeripheralManager {
@@ -61,7 +63,7 @@ object PeripheralManager {
     }
 
     private fun getConfigDescriptor() : BluetoothGattDescriptor {
-        return BluetoothGattDescriptor(BLEUtils.CLIENT_CHARACTERISTIC_CONFIG_UUID,
+        return BluetoothGattDescriptor(UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR,
                 BluetoothGattDescriptor.PERMISSION_READ or
                         BluetoothGattDescriptor.PERMISSION_WRITE)
     }

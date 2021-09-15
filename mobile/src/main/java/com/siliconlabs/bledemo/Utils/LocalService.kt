@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Utils
+package com.siliconlabs.bledemo.utils
 
 import android.app.Service
 import android.content.ComponentName

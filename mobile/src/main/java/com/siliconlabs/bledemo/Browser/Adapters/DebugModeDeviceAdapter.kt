@@ -22,7 +22,7 @@ import com.siliconlabs.bledemo.Bluetooth.Parsing.ScanRecordParser
 import com.siliconlabs.bledemo.Browser.Activities.BrowserActivity
 import com.siliconlabs.bledemo.Browser.DebugModeCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.SharedPrefUtils
+import com.siliconlabs.bledemo.utils.SharedPrefUtils
 import com.siliconlabs.bledemo.Views.DetailsRow
 import com.siliconlabs.bledemo.BeaconUtils.eddystone.*
 import com.siliconlabs.bledemo.Bluetooth.ConnectedGatts

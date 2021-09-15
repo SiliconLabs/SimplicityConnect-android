@@ -200,7 +200,7 @@ class CharacteristicDialog(val listener: CharacteristicChangeListener, val chara
                 characteristic.value = Value(
                         value = et_initial_value_hex.text.toString(),
                         type = Value.Type.HEX,
-                        length = et_initial_value_text.length() / 2
+                        length = et_initial_value_hex.length() / 2
                 )
             }
         }

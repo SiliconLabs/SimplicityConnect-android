@@ -232,7 +232,11 @@ class GattUtils {
                     Characteristic16Bit(0x2A98, "Weight"),
                     Characteristic16Bit(0x2A9D, "Weight Measurement"),
                     Characteristic16Bit(0x2A9E, "Weight Scale Feature"),
-                    Characteristic16Bit(0x2A79, "Wind Chill")
+                    Characteristic16Bit(0x2A79, "Wind Chill"),
+                    Characteristic16Bit(0x2ADB, "Mesh Provisioning Data In"),
+                    Characteristic16Bit(0x2ADC, "Mesh Provisioning Data Out"),
+                    Characteristic16Bit(0x2ADD, "Mesh Proxy Data In"),
+                    Characteristic16Bit(0x2ADE, "Mesh Proxy Data Out")
             )
         }
 
@@ -262,7 +266,9 @@ class GattUtils {
                     name = "Client Characteristic Configuration",
                     uuid = Uuid("2902"),
                     value = Value("0000", Value.Type.HEX, 2),
-                    isPredefined = true)
+                    isPredefined = true,
+                    properties = setOf(Property.READ, Property.WRITE)
+            )
         }
 
         fun getReliableWriteDescriptor(): Descriptor {

@@ -22,8 +22,8 @@ import com.siliconlabs.bledemo.Browser.Models.BeaconType
 import com.siliconlabs.bledemo.Browser.Models.SavedSearch
 import com.siliconlabs.bledemo.Browser.ToolbarCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.FilterDeviceParams
-import com.siliconlabs.bledemo.Utils.SharedPrefUtils
+import com.siliconlabs.bledemo.utils.FilterDeviceParams
+import com.siliconlabs.bledemo.utils.SharedPrefUtils
 import kotlinx.android.synthetic.main.fragment_filter.*
 import java.util.*
 

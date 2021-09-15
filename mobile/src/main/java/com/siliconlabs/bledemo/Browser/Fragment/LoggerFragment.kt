@@ -18,7 +18,7 @@ import com.siliconlabs.bledemo.Browser.Models.Logs.Log
 import com.siliconlabs.bledemo.Browser.Services.ShareLogServices
 import com.siliconlabs.bledemo.Browser.ToolbarCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.Utils.Constants
+import com.siliconlabs.bledemo.utils.Constants
 import kotlinx.android.synthetic.main.fragment_log.*
 import java.util.*
 

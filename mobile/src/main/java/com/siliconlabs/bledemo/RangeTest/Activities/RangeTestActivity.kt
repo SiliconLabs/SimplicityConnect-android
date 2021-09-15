@@ -25,10 +25,10 @@ import com.siliconlabs.bledemo.RangeTest.Models.RangeTestValues
 import com.siliconlabs.bledemo.RangeTest.Presenters.RangeTestPresenter
 import com.siliconlabs.bledemo.RangeTest.Presenters.RangeTestPresenter.Controller
 import com.siliconlabs.bledemo.RangeTest.Presenters.RangeTestPresenter.RangeTestView
-import com.siliconlabs.bledemo.Utils.BLEUtils
-import com.siliconlabs.bledemo.Utils.BLEUtils.setNotificationForCharacteristic
+import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
 import com.siliconlabs.bledemo.Bluetooth.BLE.*
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
+import com.siliconlabs.bledemo.utils.Notifications
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_range_test.*
 import java.nio.ByteBuffer
@@ -642,7 +642,7 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
                     GattCommand.Type.Subscribe -> {
                         val gattCharacteristic = GattCharacteristic.fromUuid(characteristic.uuid)
                         val gattService = GattService.fromUuid(characteristic.service.uuid)
-                        setNotificationForCharacteristic(gatt, gattService, gattCharacteristic, BLEUtils.Notifications.INDICATE)
+                        setNotificationForCharacteristic(gatt, gattService, gattCharacteristic, Notifications.INDICATE)
                     }
                     GattCommand.Type.ReadDescriptor -> gatt.readDescriptor(command.descriptor)
                 }

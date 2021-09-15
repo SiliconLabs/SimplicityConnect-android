@@ -3,6 +3,7 @@ package com.siliconlabs.bledemo.gatt_configurator.models
 import android.bluetooth.BluetoothGattCharacteristic
 import android.os.Parcelable
 import com.google.gson.Gson
+import com.siliconlabs.bledemo.gatt_configurator.import_export.data.CharacteristicImportData
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
@@ -11,8 +12,9 @@ data class Characteristic(
         var name: String = "",
         var uuid: Uuid? = null,
         val descriptors: ArrayList<Descriptor> = arrayListOf(),
-        val properties: HashMap<Property, HashSet<Property.Type>> = hashMapOf(Pair(Property.READ, hashSetOf())),
-        var value: Value? = null
+        var properties: HashMap<Property, HashSet<Property.Type>> = hashMapOf(Pair(Property.READ, hashSetOf())),
+        var value: Value? = null,
+        var importedData: CharacteristicImportData = CharacteristicImportData()
 ) : Parcelable {
 
     fun getBluetoothGattProperties(): Int {

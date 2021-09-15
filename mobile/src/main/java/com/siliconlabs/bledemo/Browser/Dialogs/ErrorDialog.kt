@@ -26,7 +26,7 @@ class ErrorDialog(private val errorCode: Int, private val otaErrorCallback: OtaE
             otaErrorCallback.onDismiss()
         }
 
-        error_title.text = getString(R.string.Error_colon) + " " + getOneOctetErrorCodeHexAsString(errorCode)
+        error_title.text = getString(R.string.error_colon) + " " + getOneOctetErrorCodeHexAsString(errorCode)
         error_description.text = Html.fromHtml(getATTHTMLFormattedError(errorCode))
     }
 

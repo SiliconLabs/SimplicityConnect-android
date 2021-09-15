@@ -4,8 +4,8 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import android.os.Build
 import com.siliconlabs.bledemo.Bluetooth.Parsing.ScanRecordParser
-import com.siliconlabs.bledemo.Utils.Constants.NA
-import com.siliconlabs.bledemo.Utils.Objects.toString
+import com.siliconlabs.bledemo.utils.Constants.NA
+import com.siliconlabs.bledemo.utils.Objects.toString
 import java.util.*
 
 /**

@@ -20,7 +20,7 @@ import android.content.Context
 import android.util.Xml
 import com.siliconlabs.bledemo.Bluetooth.DataTypes.*
 import com.siliconlabs.bledemo.Bluetooth.DataTypes.Enumeration
-import com.siliconlabs.bledemo.Utils.UuidUtils
+import com.siliconlabs.bledemo.utils.UuidUtils
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.File

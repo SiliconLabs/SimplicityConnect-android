@@ -1,33 +1,19 @@
 package com.siliconlabs.bledemo.iop_test.models
 
-import android.util.Log
 import com.siliconlabs.bledemo.iop_test.utils.Utils
 import java.text.SimpleDateFormat
 import java.util.*
 
 class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTestCaseInfo>) {
-    private var mLstValuesParameters: ArrayList<String>? = null
-    private var mLstValuesPlatform: ArrayList<String>? = null
+    var connectionParameters: ConnectionParameters? = null
+    var firmwareVersion: String = ""
+    var iopBoard: IopBoard = IopBoard.UNKNOWN
     private var phoneOs: String = Utils.getAndroidVersion()
     var phoneName: String = Utils.getDeviceName()
     var totalTestCase: Int
 
     init {
         this.totalTestCase = getTotalTestCase(listItemTest)
-    }
-
-    fun setLstValuesPlatform(mLstValuesPlatform: ArrayList<String>?) {
-        this.mLstValuesPlatform = mLstValuesPlatform
-        val connection_parameters_tag = "connection_parameters"
-        Log.d(connection_parameters_tag, "mtu_size " + getValuesParameters(0))
-        Log.d(connection_parameters_tag, "pdu_size " + getValuesParameters(1))
-        Log.d(connection_parameters_tag, "interval " + getValuesParameters(2))
-        Log.d(connection_parameters_tag, "latency " + getValuesParameters(3))
-        Log.d(connection_parameters_tag, "supervision_timeout " + getValuesParameters(4))
-    }
-
-    fun setLstValuesParameters(mLstValuesParameters: ArrayList<String>) {
-        this.mLstValuesParameters = mLstValuesParameters
     }
 
     private fun getTotalTestCase(listItemTest: ArrayList<ItemTestCaseInfo>): Int {
@@ -123,55 +109,7 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
         }.toString()
     }
 
-    /**
-     * Get values parameters by index
-     * 0: MTU
-     * 1: PDU
-     * 2: interval
-     * 3: latency
-     * 4: supervision_timeout
-     */
-    private fun getValuesParameters(index: Int): String {
-        mLstValuesParameters?.let {
-            if (index < it.size) {
-                return it[index].trim()
-            }
-        }
-        return ""
-    }
-
-    /**
-     * Get values platform by index
-     * 0: Minor version(firmware stack version)
-     * 1: ic name
-     *
-     * @param index
-     * @return
-     */
-    fun getValuesPlatform(index: Int): String {
-        mLstValuesPlatform?.let {
-            if (index < it.size) {
-                return it[index].trim()
-            }
-        }
-        return ""
-    }
-
-    fun getIopBoard(name: String): IopBoard {
-        return when (name) {
-            "0" -> IopBoard.UNKNOWN
-            "1" -> IopBoard.BRD_4104A
-            "2" -> IopBoard.BRD_4181A
-            "3" -> IopBoard.BRD_4181B
-            "4" -> IopBoard.BRD_4182A
-            else -> IopBoard.UNKNOWN
-        }
-    }
-
     override fun toString(): String {
-        val fInterval: Float
-        val sInterval = getValuesParameters(2)
-        fInterval = sInterval.toFloat() * 1.25f
         return StringBuilder().apply {
             append("<timestamp>").append(getDate()).append("</timestamp>").append("\n")
             append("<phone_informations>").append("\n")
@@ -179,16 +117,16 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
             append("\t").append("<phone_os_version>").append(phoneOs).append("</phone_os_version>").append("\n")
             append("</phone_informations>").append("\n")
             append("<firmware_informations>").append("\n")
-            append("\t").append("<firmware_version>").append(getValuesPlatform(0)).append("</firmware_version>").append("\n")
-            append("\t").append("<firmware_ic_name>").append(getIopBoard(getValuesPlatform(1)).icName.text).append("</firmware_ic_name>").append("\n")
+            append("\t").append("<firmware_version>").append(firmwareVersion).append("</firmware_version>").append("\n")
+            append("\t").append("<firmware_ic_name>").append(iopBoard.icName.text).append("</firmware_ic_name>").append("\n")
             append("\t").append("<firmware_name>").append(fwName).append("</firmware_name>").append("\n")
             append("</firmware_informations>").append("\n")
             append("<connection_parameters>").append("\n")
-            append("\t").append("<mtu_size>").append(getValuesParameters(0)).append("</mtu_size>").append("\n")
-            append("\t").append("<pdu_size>").append(getValuesParameters(1)).append("</pdu_size>").append("\n")
-            append("\t").append("<interval>").append(fInterval).append("</interval>").append("\n")
-            append("\t").append("<latency>").append(getValuesParameters(3)).append("</latency>").append("\n")
-            append("\t").append("<supervision_timeout>").append(getValuesParameters(4)).append("</supervision_timeout>").append("\n")
+            append("\t").append("<mtu_size>").append(connectionParameters?.mtu).append("</mtu_size>").append("\n")
+            append("\t").append("<pdu_size>").append(connectionParameters?.pdu).append("</pdu_size>").append("\n")
+            append("\t").append("<interval>").append(connectionParameters?.interval).append("</interval>").append("\n")
+            append("\t").append("<latency>").append(connectionParameters?.slaveLatency).append("</latency>").append("\n")
+            append("\t").append("<supervision_timeout>").append(connectionParameters?.supervisionTimeout).append("</supervision_timeout>").append("\n")
             append("</connection_parameters>").append("\n")
             append("<test_results>").append("\n")
             append(logDataTest())

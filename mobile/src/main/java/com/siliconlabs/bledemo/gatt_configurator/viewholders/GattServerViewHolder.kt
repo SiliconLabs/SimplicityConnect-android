@@ -4,6 +4,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
 import com.siliconlabs.bledemo.gatt_configurator.models.GattServer
 import com.siliconlabs.bledemo.gatt_configurator.adapters.GattServerAdapter.OnClickListener
@@ -43,12 +44,19 @@ class GattServerViewHolder(view: View, private val list: List<GattServer>, priva
 
         val layoutParams = rlGattServer.layoutParams as ViewGroup.MarginLayoutParams
         if (isExportMode) {
+            toggleImageButton(ibCopy, false)
+            toggleImageButton(ibEdit, false)
+            toggleImageButton(ibRemove, false)
             when (adapterPosition) {
                 0 -> layoutParams.setMargins(0, margin8Dp, margin8Dp, 0)
                 list.size - 1 -> layoutParams.setMargins(0, 0, margin8Dp, margin8Dp)
                 else -> layoutParams.setMargins(0, 0, margin8Dp, 0)
             }
         } else {
+            cbExport.isChecked = false
+            toggleImageButton(ibCopy, true)
+            toggleImageButton(ibEdit, true)
+            toggleImageButton(ibRemove, true)
             when (adapterPosition) {
                 0 -> layoutParams.setMargins(margin8Dp, margin8Dp, margin8Dp, 0)
                 list.size - 1 -> layoutParams.setMargins(margin8Dp, 0, margin8Dp, margin8Dp)
@@ -73,6 +81,15 @@ class GattServerViewHolder(view: View, private val list: List<GattServer>, priva
         ibRemove.setOnClickListener {
             if (adapterPosition != RecyclerView.NO_POSITION) {
                 listener.onRemoveClick(adapterPosition)
+            }
+        }
+
+        cbExport.setOnClickListener {
+            if (adapterPosition != RecyclerView.NO_POSITION) {
+                list[adapterPosition].let {
+                    it.isCheckedForExport = !it.isCheckedForExport
+                    listener.onExportBoxClick()
+                }
             }
         }
     }
@@ -113,6 +130,13 @@ class GattServerViewHolder(view: View, private val list: List<GattServer>, priva
             View.VISIBLE
         } else {
             View.GONE
+        }
+    }
+
+    private fun toggleImageButton(ib: ImageButton, isEnabled: Boolean) {
+        ib.let {
+            it.isEnabled = isEnabled
+            it.imageAlpha = if (isEnabled) 0xFF else 0x3F
         }
     }
 

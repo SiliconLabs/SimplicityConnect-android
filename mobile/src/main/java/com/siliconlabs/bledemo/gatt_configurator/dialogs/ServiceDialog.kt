@@ -12,9 +12,8 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.Base.BaseDialogFragment
-import com.siliconlabs.bledemo.Bluetooth.Parsing.Common
 import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine
-import com.siliconlabs.bledemo.Utils.UuidUtils
+import com.siliconlabs.bledemo.utils.UuidUtils
 import com.siliconlabs.bledemo.gatt_configurator.adapters.Service16BitAdapter
 import com.siliconlabs.bledemo.gatt_configurator.models.*
 import com.siliconlabs.bledemo.gatt_configurator.utils.GattUtils
@@ -103,8 +102,10 @@ class ServiceDialog(val listener: ServiceChangeListener, var service: Service = 
                 val characteristicType =
                     Engine.getCharacteristicByType(characteristicRes.type!!)
                 val characteristic = Characteristic().apply {
-                    name = characteristicType?.name!!
-                    uuid = Uuid(UuidUtils.convert128to16UUID(characteristicType.uuid!!.toString()))
+                    name = characteristicType?.name ?: getString(R.string.unknown_characteristic_label)
+                    uuid = characteristicType?.let { charType ->
+                        Uuid(UuidUtils.convert128to16UUID(charType.uuid.toString()))
+                    }
                     value = Value()
 
                     if (characteristicRes.isReadPropertyMandatory()) properties[Property.READ] =
@@ -124,8 +125,10 @@ class ServiceDialog(val listener: ServiceChangeListener, var service: Service = 
                 for (descriptorRes in characteristicRes.descriptors!!) {
                     val descriptorType = Engine.getDescriptorByType(descriptorRes.type!!)
                     val descriptor = Descriptor().apply {
-                        name = descriptorType?.name!!
-                        uuid = Uuid(UuidUtils.convert128to16UUID(descriptorType.uuid!!.toString()))
+                        name = descriptorType?.name ?: getString(R.string.unknown_descriptor_label)
+                        uuid = descriptorType?.let { descType ->
+                            Uuid(UuidUtils.convert128to16UUID(descType.uuid.toString()))
+                        }
                         value = Value()
 
                         if (descriptorRes.isReadPropertyMandatory()) properties[Property.READ] =
