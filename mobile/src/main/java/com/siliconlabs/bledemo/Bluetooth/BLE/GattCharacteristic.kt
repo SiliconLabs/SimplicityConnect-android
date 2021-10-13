@@ -58,8 +58,8 @@ enum class GattCharacteristic {
     RangePhyConfig("8a354244-c1ff-4318-8834-0e86efac1067", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT8),
     RangePhyList("05dca698-76e2-4c30-8e22-2ce22e81b968", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT8),
 
-    LedControl("5b026510-4088-c297-46d8-be6c736a087a", "custom.type", R.string.led_control_characteristic_name),
-    ReportButton("61a885a4-41c3-60d0-9a53-6d652a70d29c", "custom.type", R.string.report_button_characteristic_name),
+    LedControl("5b026510-4088-c297-46d8-be6c736a087a", "custom.type", customNameId = R.string.led_control_characteristic_name),
+    ReportButton("61a885a4-41c3-60d0-9a53-6d652a70d29c", "custom.type", customNameId = R.string.report_button_characteristic_name),
 
     ThroughputIndications("6109b631-a643-4a51-83d2-2059700ad49f", "custom.type", customNameId = R.string.indications_characteristic_name),
     ThroughputNotifications("47b73dd6-dee3-4da1-9be0-f5c539a9a4be", "custom.type", customNameId = R.string.notifications_characteristic_name),
