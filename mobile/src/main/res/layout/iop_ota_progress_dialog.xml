@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/silabs_white">
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/silabs_red"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/otaprogress_header"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingStart="@dimen/advertisement_details_title_padding_left"
+                    android:paddingTop="@dimen/advertisement_details_title_padding_top"
+                    android:paddingEnd="0dp"
+                    android:text="@string/OTA_Progress"
+                    android:textColor="@android:color/background_light"
+                    android:textSize="@dimen/advertisement_details_title_text_size" />
+
+                <TextView
+                    android:id="@+id/device_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:paddingStart="@dimen/advertisement_details_device_name_padding_left"
+                    android:paddingTop="@dimen/advertisement_details_device_name_padding_top"
+                    android:paddingEnd="0dp"
+                    android:paddingBottom="@dimen/advertisement_details_device_name_padding_bottom"
+                    android:text="@string/debug_mode_advertising_details_dialog_device_name"
+                    android:textColor="@android:color/background_light"
+                    android:textSize="@dimen/advertisement_details_device_name_text_size" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/separator_title_ad_data"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/silabs_divider" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/filetext"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:layout_weight="0.35"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/File_Name_colon"
+                    android:textSize="@dimen/advertisement_details_device_name_text_size" />
+
+                <TextView
+                    android:id="@+id/filename"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:layout_weight="0.65"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text=""
+                    android:textSize="@dimen/advertisement_details_device_name_text_size" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/sizetext"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:layout_weight="0.35"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/File_Size_colon"
+                    android:textSize="@dimen/advertisement_details_device_name_text_size" />
+
+                <TextView
+                    android:id="@+id/sizename"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:layout_weight="0.65"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text=""
+                    android:textSize="@dimen/advertisement_details_device_name_text_size" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/otasteps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="10dp"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="sans-serif"
+                    android:paddingTop="5dp"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/datarate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignEnd="@id/otaprogress"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_toEndOf="@id/otasteps"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="end"
+                    android:maxLength="13"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text=""
+                    android:textSize="@dimen/advertisement_details_device_name_text_size" />
+
+                <ProgressBar
+                    android:id="@+id/connecting_spinner"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_above="@id/datasize"
+                    android:layout_alignStart="@id/datasize"
+                    android:layout_alignEnd="@id/datasize"
+                    android:layout_margin="5dp"
+                    android:indeterminate="true"
+                    android:indeterminateDrawable="@drawable/spinner_connecting_ring"
+                    android:visibility="invisible" />
+
+
+                <ProgressBar
+                    android:id="@+id/otaprogress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/otasteps"
+                    android:layout_alignParentStart="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_toStartOf="@id/datasize"
+                    android:elevation="5dp"
+                    android:max="100"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:progressTint="@color/silabs_red"
+                    android:scaleY="5" />
+
+                <TextView
+                    android:id="@+id/datasize"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/otasteps"
+                    android:layout_alignTop="@id/otaprogress"
+                    android:layout_alignBottom="@id/otaprogress"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="10dp"
+                    android:elegantTextHeight="true"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/zero_percent" />
+            </RelativeLayout>
+
+            <Chronometer
+                android:id="@+id/chrono"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:elegantTextHeight="true"
+                android:gravity="center_horizontal"
+                android:textSize="@dimen/advertisement_details_title_text_size"
+                android:textStyle="bold" />
+
+            <View
+                android:id="@+id/separator_start_button"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/silabs_divider" />
+
+            <Button
+                android:id="@+id/otabutton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/silabs_button_inactive"
+                android:clickable="false"
+                android:elegantTextHeight="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/End"
+                android:textColor="@color/silabs_white"
+                android:textSize="@dimen/browser_button_text_size" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

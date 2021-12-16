@@ -2119,7 +2119,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
                     }
 
                     if (!hasOtaFileCorrectExtension(filename)) {
-                        showMessage(resources.getString(R.string.Incorrect_file))
+                        showMessage(resources.getString(R.string.incorrect_file))
                         return
                     }
 
@@ -2145,11 +2145,11 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
     }
 
     private fun areFullOTAFilesCorrect(): Boolean {
-        return appFileButton?.text != getString(R.string.Select_Application_gbl_file) && appLoaderFileButton?.text != getString(R.string.Select_Apploader_gbl_file)
+        return appFileButton?.text != getString(R.string.select_application_gbl_file) && appLoaderFileButton?.text != getString(R.string.Select_Apploader_gbl_file)
     }
 
     private fun arePartialOTAFilesCorrect(): Boolean {
-        return appFileButton?.text != getString(R.string.Select_Application_gbl_file)
+        return appFileButton?.text != getString(R.string.select_application_gbl_file)
     }
 
     private fun getFileName(uri: Uri?): String? {
@@ -2180,7 +2180,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
         try {
             val inStream = contentResolver.openInputStream(uri!!)
             if (inStream == null) {
-                showMessage(resources.getString(R.string.There_was_a_problem_while_preparing_the_file))
+                showMessage(resources.getString(R.string.problem_while_preparing_the_file))
                 return
             }
             val file = File(cacheDir, filename)
@@ -2200,7 +2200,7 @@ class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
             output.flush()
         } catch (e: IOException) {
             e.printStackTrace()
-            showMessage(resources.getString(R.string.Incorrect_file))
+            showMessage(resources.getString(R.string.incorrect_file))
         }
     }
 

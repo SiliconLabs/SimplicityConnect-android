@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/match"
+    android:orientation="vertical"
+    android:layout_marginTop="@dimen/space_S">
+
+    <TextView
+        style="@style/tb_robo_medium_14dp"
+        android:layout_gravity="left"
+        android:text="@string/motion_orientation" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_XS">
+
+        <TextView
+            style="@style/tb_robo_regular_12dp_grey"
+            android:text="@string/motion_x"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_marginStart="@dimen/space_S"
+            style="@style/tb_robo_regular_12dp"
+            android:id="@+id/orientation_x"
+            android:fontFamily="sans-serif-light"
+            tools:text="152"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/tb_robo_regular_12dp_grey"
+            android:text="@string/motion_y"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_marginStart="@dimen/space_S"
+            style="@style/tb_robo_regular_12dp"
+            android:id="@+id/orientation_y"
+            android:fontFamily="sans-serif-light" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/tb_robo_regular_12dp_grey"
+            android:text="@string/motion_z"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_marginStart="@dimen/space_S"
+            style="@style/tb_robo_regular_12dp"
+            android:id="@+id/orientation_z"
+            android:fontFamily="sans-serif-light" />
+    </LinearLayout>
+
+</LinearLayout>

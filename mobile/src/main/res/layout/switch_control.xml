@@ -1,0 +1,20 @@
+<LinearLayout android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView
+        android:layout_width="@dimen/space_SM"
+        android:layout_height="@dimen/space_SM"
+        android:layout_gravity="center"
+        android:src="@drawable/switch_status_off"
+        android:id="@+id/switch_image"/>
+
+    <TextView
+        android:layout_marginTop="@dimen/space_XXS"
+        android:layout_gravity="center"
+        android:text="OFF"
+        android:id="@+id/switch_text"
+        style="@style/tb_robo_regular_12dp_grey"/>
+
+</LinearLayout>

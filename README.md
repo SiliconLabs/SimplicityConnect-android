@@ -24,6 +24,9 @@ EFR Connect includes many demos to test sample apps in the Silicon Labs GSDK qui
 - **Health Thermometer**: Connect to a BLE hardware kit and receive the temperature data from the on-board sensor.
 - **Connected Lighting DMP**: Leverage the dynamic multi-protocol (DMP) sample apps to control a DMP light node from a mobile and protocol-specific switch node (Zigbee, proprietary) while keeping the light status in sync across all devices.
 - **Range Test**: Visualize the RSSI and other RF performance data on the mobile phone while running the Range Test sample application on a pair of Silicon Labs radio boards.
+- **Motion**: Control a 3D render of a Silicon Labs Thunderboard or Dev Kit that follows the phyiscal board movements.
+- **Environment**: Read and display the data from the on-board sensors on a Silicon Labs Thunderboard or Dev Kit.
+- **Wi-Fi Commissioning**: Commission a Wi-Fi device over BLE.
 
 ## Development Features
 EFR Connect helps developers create and troubleshoot Bluetooth applications running on Silicon Labs’ BLE hardware. Here’s a rundown of some example functionalities.

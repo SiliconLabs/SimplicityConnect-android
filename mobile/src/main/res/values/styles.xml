@@ -19,28 +19,6 @@
         <item name="android:ellipsize">none</item>
     </style>
 
-    <style name="Body" parent="TextAppearance.AppCompat.Body1">
-        <item name="android:textSize">@dimen/text_size_body</item>
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
-        <item name="android:maxLines">4</item>
-        <item name="android:ellipsize">end</item>
-    </style>
-
-    <style name="Caption" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:textSize">@dimen/text_size_caption</item>
-        <item name="android:textColor">?android:attr/textColorHint</item>
-        <item name="android:lines">1</item>
-        <item name="android:ellipsize">end</item>
-    </style>
-
-    <style name="Tab" parent="TextAppearance.AppCompat.Subhead">
-        <item name="android:textSize">@dimen/text_size_tab</item>
-        <item name="android:textColor">@color/device_tab_text</item>
-        <item name="android:lines">1</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:background">?attr/listChoiceBackgroundIndicator</item>
-    </style>
-
     <style name="ThermoLabelText" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">@dimen/thermo_label_text_size</item>
@@ -97,13 +75,6 @@
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">@dimen/toolbar_title_size</item>
         <item name="android:textColor">@color/silabs_white</item>
-    </style>
-
-    <style name="TextAppearance.TabText" parent="">
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textSize">@dimen/tab_text_size</item>
-        <item name="android:textColor">@color/silabs_white</item>
-        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="ButtonBlue" parent="Widget.AppCompat.Button.Colored">
@@ -223,6 +194,93 @@
     <style name="CustomSpinner" parent="Widget.AppCompat.Spinner">
         <item name="android:background">@drawable/spinner_background</item>
         <item name="android:layout_height">36dp</item>
+    </style>
+
+    <!-- Thunderboard general -->
+    <style name="wrap">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="match">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="block">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <!-- Demo Environment -->
+
+    <style name="EnvironmentControlLabel_HallStateTampered" parent="tb_robo_medium_18dp">
+        <item name="android:textColor">@color/tb_red</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
+    <style name="seekbar" parent="block">
+        <item name="android:paddingTop">@dimen/space_S</item>
+        <item name="android:paddingBottom">@dimen/space_S</item>
+    </style>
+
+    <!--RESKINNING-->
+
+    <style name="tb_text_color_black" parent="wrap">
+        <item name="android:textColor">@color/silabs_black</item>
+    </style>
+
+    <style name="tb_text_color_grey" parent="wrap">
+        <item name="android:textColor">@color/tb_font_grey</item>
+    </style>
+
+    <style name="tb_text_color_blue" parent="wrap">
+        <item name="android:textColor">@color/tb_blue</item>
+    </style>
+
+    <style name="tb_text_color_white" parent="wrap">
+        <item name="android:textColor">@color/silabs_white</item>
+    </style>
+
+    <style name="tb_robo_medium_18dp" parent="tb_text_color_black">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_size_ML</item>
+    </style>
+
+    <style name="tb_robo_medium_18dp_white" parent="tb_text_color_white">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_size_ML</item>
+    </style>
+
+    <style name="tb_robo_regular_18dp_grey" parent="tb_text_color_grey">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">@dimen/text_size_ML</item>
+    </style>
+
+    <style name="tb_robo_regular_14dp_grey" parent="tb_text_color_grey">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">@dimen/text_size_SM</item>
+    </style>
+
+    <style name="tb_robo_regular_12dp_grey" parent="tb_text_color_grey">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">@dimen/text_size_S</item>
+    </style>
+
+    <style name="tb_robo_regular_12dp" parent="tb_text_color_black">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">@dimen/text_size_S</item>
+    </style>
+
+    <style name="tb_robo_medium_14dp" parent="tb_text_color_black">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_size_SM</item>
+    </style>
+
+    <style name="tb_robo_medium_14dp_blue" parent="tb_text_color_blue">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_size_SM</item>
     </style>
 
 </resources>

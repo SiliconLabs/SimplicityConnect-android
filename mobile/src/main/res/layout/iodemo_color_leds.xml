@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/block"
+    android:orientation="vertical">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:layout_margin="@dimen/space_XXXS"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardCornerRadius="16dp">
+
+        <LinearLayout
+            style="@style/block"
+            android:background="@color/sl_white"
+            android:orientation="vertical">
+
+            <RelativeLayout style="@style/block"
+                android:layout_marginTop="@dimen/space_XS"
+                android:layout_marginBottom="@dimen/space_XS"
+                android:layout_marginStart="@dimen/space_S"
+                android:layout_marginEnd="@dimen/space_S"
+                >
+
+                <TextView
+                    android:layout_marginTop="4dp"
+                    android:layout_marginRight="8dp"
+                    android:text="RGB LEDs"
+                    style="@style/tb_robo_medium_18dp"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true">
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/iodemo_color_switch"
+                        android:layout_width="@dimen/space_L"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:thumb="@drawable/thumb_selector"
+                        app:track="@drawable/track_selector" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/space_XXXS"
+                android:background="@color/main_background" />
+
+            <TextView
+                android:layout_marginTop="@dimen/space_XS"
+                android:layout_marginBottom="@dimen/space_XS"
+                android:layout_marginStart="@dimen/space_S"
+                android:layout_marginEnd="@dimen/space_S"
+                style="@style/tb_robo_medium_14dp"
+                android:text="@string/blinky_tb_strength" />
+
+            <LinearLayout
+                android:layout_marginTop="@dimen/space_XS"
+                android:layout_marginBottom="@dimen/space_XS"
+                android:layout_marginStart="@dimen/space_S"
+                android:layout_marginEnd="@dimen/space_S"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.siliconlabs.bledemo.blinky_thunderboard.ui.ColorLEDs
+                    android:id="@+id/iodemo_color_leds"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/color_led_height" />
+            </LinearLayout>
+
+            <View
+
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/space_XXXS"
+                android:background="@color/main_background" />
+
+            <TextView
+                android:layout_marginTop="@dimen/space_XS"
+                android:layout_marginStart="@dimen/space_S"
+                android:layout_marginEnd="@dimen/space_S"
+
+                style="@style/tb_robo_medium_14dp"
+                android:text="@string/blinky_tb_color" />
+
+            <RelativeLayout
+                android:layout_marginBottom="@dimen/space_XS"
+                android:layout_marginStart="@dimen/space_S"
+                android:layout_marginEnd="@dimen/space_S"
+
+                style="@style/block">
+
+                <com.siliconlabs.bledemo.blinky_thunderboard.ui.HueBackgroundView
+                    android:id="@+id/iodemo_hue_background"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/space_SM"
+                    android:layout_centerVertical="true" />
+
+                <SeekBar
+                    android:id="@+id/iodemo_hue_select"
+                    style="@style/seekbar"
+                    android:layout_marginBottom="@dimen/space_XXS"
+                    android:layout_centerVertical="true"
+                    android:thumb="@drawable/interface_knob" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/space_XXXS"
+                android:background="@color/main_background" />
+
+            <TextView
+                android:layout_marginTop="@dimen/space_XS"
+                android:layout_marginStart="@dimen/space_S"
+                android:layout_marginEnd="@dimen/space_S"
+
+                style="@style/tb_robo_medium_14dp"
+                android:text="@string/blinky_tb_brightness" />
+
+            <SeekBar
+                android:layout_marginStart="@dimen/space_S"
+                android:layout_marginEnd="@dimen/space_S"
+                android:id="@+id/iodemo_brightness_select"
+                style="@style/seekbar"
+                android:paddingBottom="0dp"
+                android:thumb="@drawable/interface_knob" />
+
+            <RelativeLayout
+                android:layout_marginStart="@dimen/space_S"
+                android:layout_marginEnd="@dimen/space_S"
+                android:layout_marginBottom="@dimen/space_S"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="-" />
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="+"
+                    android:layout_alignParentEnd="true"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</LinearLayout>
+

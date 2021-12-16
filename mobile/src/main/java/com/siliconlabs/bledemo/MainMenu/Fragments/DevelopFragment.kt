@@ -9,7 +9,7 @@ import com.siliconlabs.bledemo.MainMenu.Adapters.MenuAdapter
 import com.siliconlabs.bledemo.MainMenu.MenuItems.Develop.Advertiser
 import com.siliconlabs.bledemo.MainMenu.MenuItems.Develop.Browser
 import com.siliconlabs.bledemo.MainMenu.MenuItems.Develop.GattConfigurator
-import com.siliconlabs.bledemo.MainMenu.MenuItems.IOPTest
+import com.siliconlabs.bledemo.MainMenu.MenuItems.Develop.IOPTest
 import com.siliconlabs.bledemo.MainMenu.MenuItems.MainMenuItem
 import com.siliconlabs.bledemo.R
 import kotlinx.android.synthetic.main.fragment_develop.*

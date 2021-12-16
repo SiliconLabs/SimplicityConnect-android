@@ -62,6 +62,12 @@
             android:label="@string/title_Throughput"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".wifi_commissioning.activities.WifiCommissioningActivity"
+            android:label="@string/wifi_commissioning_label"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
         <service android:name=".Bluetooth.Services.BluetoothService" />
         <service android:name=".Advertiser.Services.AdvertiserService" />
 
@@ -106,6 +112,25 @@
             android:parentActivityName=".iop_test.activities.IOPTestActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name=".motion.activities.MotionActivity"
+            android:label="@string/motion_demo_title"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".environment.activities.EnvironmentActivity"
+            android:label="@string/environment_demo_title"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".environment.activities.SettingsActivity"
+            android:label="@string/action_settings"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".blinky_thunderboard.activities.BlinkyThunderboardActivity"
+            android:label="@string/title_Blinky"
+            android:screenOrientation="portrait" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

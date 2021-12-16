@@ -31,19 +31,17 @@ import android.os.*
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
-import android.view.Window
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
-import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
 import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.utils.Notifications
-import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
-import com.siliconlabs.bledemo.utils.Converters
 import com.siliconlabs.bledemo.iop_test.fragments.IOPTestFragment
 import com.siliconlabs.bledemo.iop_test.fragments.IOPTestFragment.Companion.newInstance
 import com.siliconlabs.bledemo.iop_test.models.*
@@ -52,12 +50,19 @@ import com.siliconlabs.bledemo.iop_test.models.IOPTest.Companion.createDataTest
 import com.siliconlabs.bledemo.iop_test.models.IOPTest.Companion.getItemTestCaseInfo
 import com.siliconlabs.bledemo.iop_test.models.IOPTest.Companion.getListItemChildrenTest
 import com.siliconlabs.bledemo.iop_test.models.IOPTest.Companion.getSiliconLabsTestInfo
+import com.siliconlabs.bledemo.iop_test.test_cases.ota.OtaFileManager
+import com.siliconlabs.bledemo.iop_test.test_cases.ota.OtaFileSelectionDialog
+import com.siliconlabs.bledemo.iop_test.test_cases.ota.OtaLoadingDialog
+import com.siliconlabs.bledemo.iop_test.test_cases.ota.OtaProgressDialog
 import com.siliconlabs.bledemo.iop_test.utils.ErrorCodes
+import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
+import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.utils.Notifications
 import com.siliconlabs.bledemo.utils.UuidConsts
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_iop_test.*
+import timber.log.Timber
 import java.io.*
-import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
@@ -115,14 +120,10 @@ class IOPTestActivity : AppCompatActivity() {
     private var mByteSpeed = 0
     private var mEndThroughputNotification = false
 
-    private var otaSetup: Dialog? = null
-    private var otaProgress: Dialog? = null
-    private var loadingDialog: Dialog? = null
-    private var btnOtaStart: Button? = null
-    private var sizename: TextView? = null
-    private var loadingLog: TextView? = null
-    private var loadingHeader: TextView? = null
-    private var loadingimage: ProgressBar? = null
+    private var otaProgressDialog: OtaProgressDialog? = null
+    private var otaLoadingDialog: OtaLoadingDialog? = null
+    private var otaFileSelectionDialog: OtaFileSelectionDialog? = null
+    private var otaFileManager: OtaFileManager? = null
 
     /**
      * OTA Setup
@@ -137,9 +138,6 @@ class IOPTestActivity : AppCompatActivity() {
     private var disconnectGatt = false
     private var homekit = false
     private var otaMode = false
-    private var otafile: ByteArray? = null
-    private var otaFilename: String = ""
-    private var uploadimage: ProgressBar? = null
 
     private var mtu = 247
     private var mtuDivisible = 0
@@ -151,17 +149,7 @@ class IOPTestActivity : AppCompatActivity() {
     private var kitDescriptor: BluetoothGattDescriptor? = null
     private var pack = 0
     private var otaTime: Long = 0
-    private var progressBar: ProgressBar? = null
-    private var chrono: Chronometer? = null
-    private var dataRate: TextView? = null
-    private var dataSize: TextView? = null
-    private var filename: TextView? = null
-    private var steps: TextView? = null
 
-    private val ota1DeviceName = "IOP Test Update"
-    private val ota2DeviceName = "IOP Test"
-    private var otaDeviceName: String? = null
-    private var mDeviceName: String? = null
     private var mDeviceAddress: String? = null
     private var iopPhase3DatabaseHash: String? = null
     private var testCaseCount = 0
@@ -284,7 +272,6 @@ class IOPTestActivity : AppCompatActivity() {
             when (item) {
                 POSITION_TEST_SCANNER -> {
                     Log.d(TAG, "scanLeDevice at POSITION_TEST_SCANNER")
-                    otaDeviceName = getSiliconLabsTestInfo().fwName
                     scanLeDevice(true)
                 }
                 POSITION_TEST_CONNECTION -> connectToDevice(mBluetoothDevice)
@@ -307,11 +294,11 @@ class IOPTestActivity : AppCompatActivity() {
                 */
                 POSITION_TEST_IOP3_OTA_ACK -> {
                     iopPhase3IndexStartChildrenTest = 0
-                    iopPhase3TestCaseOTA(iopPhase3IndexStartChildrenTest)
+                    startOtaTestCase(iopPhase3IndexStartChildrenTest)
                 }
                 POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
                     iopPhase3IndexStartChildrenTest = 1
-                    iopPhase3TestCaseOTA(iopPhase3IndexStartChildrenTest)
+                    startOtaTestCase(iopPhase3IndexStartChildrenTest)
                 }
                 else -> {
                 }
@@ -443,19 +430,18 @@ class IOPTestActivity : AppCompatActivity() {
                     itemChildrenTest.setDataAndCompareResult(characteristic)
                 }
             }
-            if (mIndexRunning == POSITION_TEST_IOP3_OTA_ACK
-                    || mIndexRunning == POSITION_TEST_IOP3_OTA_WITHOUT_ACK) {
+            if (mIndexRunning == POSITION_TEST_IOP3_OTA_ACK || mIndexRunning == POSITION_TEST_IOP3_OTA_WITHOUT_ACK) {
                 if (!otaProcess) {
+                    testParametersService?.let { readCharacteristic(it.characteristics[0]) }
                     if (characteristicIOPPhase3DeviceName?.uuid.toString() == characteristic.uuid.toString()) {
-                        val nameArray = characteristic.value
-                        mDeviceName = String(nameArray, StandardCharsets.UTF_8)
-                        Log.d(TAG, "connected to $mDeviceName")
-                        if (mDeviceName?.replace(" ", "").equals(otaDeviceName?.replace(" ", ""), ignoreCase = true)) {
+                        if (isOtaNameCorrect(characteristic.getStringValue(0))) {
                             checkIOP3OTA(mIndexRunning, Common.IOP3_TC_STATUS_PASS)
                         } else {
                             checkIOP3OTA(mIndexRunning, Common.IOP3_TC_STATUS_FAILED)
                         }
-                        finishItemTest(mIndexRunning, getSiliconLabsTestInfo().listItemTest[mIndexRunning])
+                        handler?.postDelayed( {
+                            finishItemTest(mIndexRunning, getSiliconLabsTestInfo().listItemTest[mIndexRunning])
+                        }, 100) /* Read testParametersService characteristic before starting next test case. */
                     }
                 }
             } else if (characteristicIOPPhase3Control?.uuid.toString() == characteristic.uuid.toString()) {
@@ -592,14 +578,11 @@ class IOPTestActivity : AppCompatActivity() {
         disconnectGatt = false
 
         handler?.postDelayed({
-            if (loadingDialog != null && loadingDialog?.isShowing!!) {
-                loadingDialog?.dismiss()
+            if (otaLoadingDialog != null && otaLoadingDialog?.isShowing!!) {
+                otaLoadingDialog?.dismiss()
             }
-            if (otaProgress != null && otaProgress?.isShowing!!) {
-                otaProgress?.dismiss()
-            }
-            if (otaSetup != null && otaSetup?.isShowing!!) {
-                otaSetup?.dismiss()
+            if (otaProgressDialog != null && otaProgressDialog?.isShowing!!) {
+                otaProgressDialog?.dismiss()
             }
         }, 1000)
     }
@@ -863,11 +846,24 @@ class IOPTestActivity : AppCompatActivity() {
                 .commit()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == BLUETOOTH_SETTINGS_REQUEST_CODE) {
-            if (!bluetoothAdapter.isEnabled && mBluetoothEnableDialog != null) {
-                mBluetoothEnableDialog?.show()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        when (requestCode) {
+            BLUETOOTH_SETTINGS_REQUEST_CODE -> {
+                if (!bluetoothAdapter.isEnabled && mBluetoothEnableDialog != null) {
+                    mBluetoothEnableDialog?.show()
+                }
+            }
+            GBL_FILE_CHOICE_REQUEST_CODE -> {
+                intent?.data?.let {
+                    otaFileManager?.readFilename(it)
+                    otaFileSelectionDialog?.selectFileButton?.text = otaFileManager?.otaFilename
+                    if (otaFileManager?.hasCorrectFileExtension() == true) {
+                        otaFileManager?.readFile(it)
+                    } else {
+                        Toast.makeText(this, getString(R.string.incorrect_file), Toast.LENGTH_SHORT).show()
+                    }
+                } ?: Toast.makeText(this, getString(R.string.chosen_file_not_found), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -1093,38 +1089,58 @@ class IOPTestActivity : AppCompatActivity() {
         }
     }
 
-    private fun readParameters(characteristic: BluetoothGattCharacteristic) {
-        when (characteristic.uuid.toString()) {
-            CommonUUID.Characteristic.FIRMWARE_VERSION.toString() -> {
-                getSiliconLabsTestInfo().firmwareVersion = parseFirmwareVersion(characteristic.value)
+    private fun getModelNumberStringCharacteristic(): BluetoothGattCharacteristic? {
+        val gattService = mBluetoothGatt?.getService(GattService.DeviceInformation.number)
+        return gattService?.getCharacteristic(GattCharacteristic.ModelNumberString.uuid)
+    }
+
+    private fun readFirmwareVersion(payload: ByteArray) {
+        when (mIndexRunning) {
+            POSITION_TEST_DISCOVER_SERVICE -> {
+                getSiliconLabsTestInfo().firmwareVersion = parseFirmwareVersion(payload)
                 readCharacteristic(testParametersService?.characteristics?.get(1))
             }
-            CommonUUID.Characteristic.CONNECTION_PARAMETERS.toString() -> {
-                getSiliconLabsTestInfo().iopBoard = IopBoard.fromBoardCode(characteristic.value[0])
-                getSiliconLabsTestInfo().connectionParameters = ConnectionParameters(
-                        mtu = Converters.calculateDecimalValue(
-                                characteristic.value.copyOfRange(2, 4), isBigEndian = false),
-                        pdu = Converters.calculateDecimalValue(
-                                characteristic.value.copyOfRange(4, 6), isBigEndian = false),
-                        interval = Converters.calculateDecimalValue(
-                                characteristic.value.copyOfRange(6, 8), isBigEndian = false).toDouble()
-                                .times(1.25), // Conversion of sent int representation to actual double value in ms
-                        slaveLatency = Converters.calculateDecimalValue(
-                                characteristic.value.copyOfRange(8, 10), isBigEndian = false),
-                        supervisionTimeout = Converters.calculateDecimalValue(
-                                characteristic.value.copyOfRange(10, 12), isBigEndian = false)
-                                .times(10) // Conversion of sent int representation to actual value in ms
-                )
-                mIndexStartChildrenTest = 0
-                finishItemTest(POSITION_TEST_DISCOVER_SERVICE, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_DISCOVER_SERVICE])
-                Log.d(TAG, "convertValuesParameters(), finishItemTest(POSITION_TEST_DISCOVER_SERVICE)")
+            POSITION_TEST_IOP3_OTA_ACK -> {
+                getSiliconLabsTestInfo().firmwareAckVersion = parseFirmwareVersion(payload)
+            }
+            POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
+                getSiliconLabsTestInfo().firmwareUnackVersion = parseFirmwareVersion(payload)
             }
             else -> { }
         }
     }
 
+    private fun readConnectionParameters(payload: ByteArray) {
+        var payloadIndex = 0
+        when (getSiliconLabsTestInfo().firmwareVersion) {
+            "3.2.1", "3.2.2", "3.2.3", "3.2.4" -> {
+                getSiliconLabsTestInfo().iopBoard = IopBoard.fromBoardCode(payload[0])
+                payloadIndex = 2
+            }
+            else -> readCharacteristic(getModelNumberStringCharacteristic())
+        }
+
+        getSiliconLabsTestInfo().connectionParameters = ConnectionParameters(
+                mtu = Converters.calculateDecimalValue(
+                        payload.copyOfRange(payloadIndex, payloadIndex+2), isBigEndian = false),
+                pdu = Converters.calculateDecimalValue(
+                        payload.copyOfRange(payloadIndex+2, payloadIndex+4), isBigEndian = false),
+                interval = Converters.calculateDecimalValue(
+                        payload.copyOfRange(payloadIndex+4, payloadIndex+6), isBigEndian = false).
+                        toDouble().times(1.25), // Conversion of sent int representation to actual double value in ms
+                slaveLatency = Converters.calculateDecimalValue(
+                        payload.copyOfRange(payloadIndex+6, payloadIndex+8), isBigEndian = false),
+                supervisionTimeout = Converters.calculateDecimalValue(
+                        payload.copyOfRange(payloadIndex+8, payloadIndex+10), isBigEndian = false)
+                        .times(10) // Conversion of sent int representation to actual value in ms
+        )
+        mIndexStartChildrenTest = 0
+        finishItemTest(POSITION_TEST_DISCOVER_SERVICE, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_DISCOVER_SERVICE])
+        Log.d(TAG, "convertValuesParameters(), finishItemTest(POSITION_TEST_DISCOVER_SERVICE)")
+    }
+
     private fun parseFirmwareVersion(payload: ByteArray) : String {
-        return if (payload.size < 8) payload[0].toString()
+        return if (payload.size < 8) "3.2.1" /* Old, incompatible method for numbering versions. */
         else StringBuilder().apply {
             append(Converters.calculateDecimalValue(payload.copyOfRange(0, 2), isBigEndian = false))
             append(".")
@@ -1610,109 +1626,93 @@ class IOPTestActivity : AppCompatActivity() {
         updateDataTestFailed(POSITION_TEST_IOP3_SECURITY)
     }
 
-    private fun iopPhase3TestCaseOTA(index: Int) {
-        Log.d(TAG, "iopPhase3TestCaseOTA $index")
-        otaMode = true
-        if (index == 0) {
-            runOnUiThread {
-                initOtaProgress()
-                initLoading()
-                otaOnClick()
-                mBluetoothGatt?.requestMtu(247)
-            }
-        } else {
+    private fun startOtaTestCase(index: Int) {
+        Log.d(TAG, "startOtaTestCase $index")
+        initOtaProgressDialog()
+        otaLoadingDialog = OtaLoadingDialog(this)
+
+        if (index == 1) {
             reliable = false
-            otaOnClick()
+        }
+        otaFileManager = OtaFileManager(this)
+
+        when (getSiliconLabsTestInfo().firmwareVersion) {
+            "3.2.1", "3.2.2", "3.2.3", "3.2.4" -> {
+                otaFileManager?.uploadMode = OtaFileManager.UploadMode.AUTO
+                otaFileManager?.findGblFile(
+                        getSiliconLabsTestInfo().firmwareVersion,
+                        getSiliconLabsTestInfo().iopBoard,
+                        reliable)
+                startOtaProcess()
+            }
+            else -> {
+                otaFileManager?.uploadMode = OtaFileManager.UploadMode.USER
+                otaFileSelectionDialog = OtaFileSelectionDialog(
+                        context = this,
+                        listener = fileSelectionListener,
+                        deviceAddress = mBluetoothGatt?.device?.address ?: "Unknown device").apply {
+                    show()
+                }
+            }
+        }
+
+    }
+
+    private val fileSelectionListener = object : OtaFileSelectionDialog.FileSelectionListener {
+        override fun onSelectFileButtonClicked() {
+            val requestFileIntent = Intent(Intent.ACTION_GET_CONTENT)
+            requestFileIntent.type = "*/*"
+            startActivityForResult(requestFileIntent, GBL_FILE_CHOICE_REQUEST_CODE)
+        }
+
+        override fun onOtaButtonClicked() {
+            otaFileManager?.otaFile?.let {
+                otaFileSelectionDialog?.dismiss()
+                startOtaProcess()
+            } ?: if (otaFileManager?.otaFilename != null) {
+                Toast.makeText(this@IOPTestActivity, getString(R.string.incorrect_file), Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this@IOPTestActivity, getString(R.string.no_file_chosen), Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        override fun onCancelButtonClicked() {
+            otaFileSelectionDialog?.dismiss()
+            otaFileSelectionDialog = null
+
+            checkIOP3OTA(mIndexRunning, Common.IOP3_TC_STATUS_FAILED)
+            finishItemTest(mIndexRunning, getSiliconLabsTestInfo().listItemTest[mIndexRunning])
         }
     }
 
-    private fun getOtaFilename(): String {
-        val board = getSiliconLabsTestInfo().iopBoard
-        return if(iopPhase3IndexStartChildrenTest == 0) board.ota1FileName else board.ota2FileName
-    }
-
-    private fun openOtaFileInputStream(): InputStream {
-        val firmwareVersion =
-            if (getSiliconLabsTestInfo().firmwareVersion == "2") "3.2.1"
-            else getSiliconLabsTestInfo().firmwareVersion
-        return assets.open("iop/" + firmwareVersion + "/" + getOtaFilename())
-    }
-
     private fun startOtaProcess() {
-        otaFilename = getOtaFilename()
-
-        val inputStream = openOtaFileInputStream()
-        otafile = ByteArray(inputStream.available())
-        inputStream.read(otafile)
+        otaMode = true
+        otaProcess = true
+        ota_mode = false
+        boolOTAbegin = true
 
         runOnUiThread {
-            ota_mode = false
-            otaSetup?.dismiss()
-            boolOTAbegin = true
-            otaProcess = true
             Log.d(TAG, OTA_BEGIN)
             dfuMode(OTA_BEGIN)
         }
     }
 
-    /**
-     * INITIALIZES OTA PROGRESS DIALOG
-     */
-    private fun initOtaProgress() {
-        otaProgress = Dialog(this).apply {
-            requestWindowFeature(Window.FEATURE_NO_TITLE)
-            setContentView(R.layout.iop_ota_progress)
+    private fun isOtaNameCorrect(deviceName: String) : Boolean {
+        return when {
+            otaFileManager?.uploadMode == OtaFileManager.UploadMode.AUTO && mIndexRunning == POSITION_TEST_IOP3_OTA_ACK -> {
+                deviceName.equals(OTA_DEVICE_NAME_AUTO_ACK, ignoreCase = true)
+            }
+            otaFileManager?.uploadMode == OtaFileManager.UploadMode.AUTO && mIndexRunning == POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
+                deviceName.equals(OTA_DEVICE_NAME_AUTO_UNACK, ignoreCase = true)
+            }
+            otaFileManager?.uploadMode == OtaFileManager.UploadMode.USER && mIndexRunning == POSITION_TEST_IOP3_OTA_ACK -> {
+                deviceName.equals(OTA_DEVICE_NAME_USER_ACK, ignoreCase = true)
+            }
+            otaFileManager?.uploadMode == OtaFileManager.UploadMode.USER && mIndexRunning == POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
+                deviceName.equals(OTA_DEVICE_NAME_USER_UNACK, ignoreCase = true)
+            }
+            else -> false
 
-            findViewById<TextView>(R.id.device_address).text = mBluetoothGatt?.device?.address
-            progressBar = findViewById(R.id.otaprogress)
-            dataRate = findViewById(R.id.datarate)
-            dataSize = findViewById(R.id.datasize)
-            filename = findViewById(R.id.filename)
-            steps = findViewById(R.id.otasteps)
-            chrono = findViewById(R.id.chrono)
-            btnOtaStart = findViewById(R.id.otabutton)
-            sizename = findViewById(R.id.sizename)
-            uploadimage = findViewById(R.id.connecting_spinner)
-        }
-
-        btnOtaStart?.setOnClickListener {
-            otaProgress?.dismiss()
-            ota_mode = false
-            otaMode = false
-            dfuMode("DISCONNECTION")
-            handler?.postDelayed({ scanLeDevice(true) }, 1000)
-        }
-    }
-
-    /**
-     * INITIALIZES LOADING DIALOG
-     */
-    private fun initLoading() {
-        loadingDialog = Dialog(this).apply {
-            requestWindowFeature(Window.FEATURE_NO_TITLE)
-            setContentView(R.layout.loadingdialog)
-
-            loadingimage = findViewById(R.id.connecting_spinner)
-            loadingLog = findViewById(R.id.loadingLog)
-            loadingHeader = findViewById(R.id.loading_header)
-        }
-    }
-
-    /**
-     * START OTA BUTTON (UI, Bools)
-     */
-    private fun otaOnClick() {
-        if (ota_mode) {
-            otaProcess = true
-            boolOTAbegin = false
-        } else {
-            otaProcess = true
-            boolOTAbegin = true
-        }
-        runOnUiThread {
-            loadingimage?.visibility = View.GONE
-            loadingDialog?.dismiss()
-            startOtaProcess()
         }
     }
 
@@ -1746,15 +1746,11 @@ class IOPTestActivity : AppCompatActivity() {
                         charac.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
                         Log.d("Instance ID", "" + charac.instanceId)
 
-                        val datathread = otafile
                         pack = 0
 
                         //Set info into UI OTA Progress
                         runOnUiThread {
-                            filename?.text = otaFilename
-                            steps?.text = getString(R.string.iop_test_label_1_of_1)
-                            sizename?.text = getString(R.string.iop_test_n_bytes, datathread?.size)
-                            uploadimage?.visibility = View.VISIBLE
+                            otaProgressDialog?.setProgressInfo(otaFileManager?.otaFilename, otaFileManager?.otaFile?.size)
                             animateLoading()
                         }
                         //Start OTA_data Upload in another thread
@@ -1762,7 +1758,7 @@ class IOPTestActivity : AppCompatActivity() {
                             if (reliable) {
                                 otaWriteDataReliable()
                             } else {
-                                whiteOtaData(datathread)
+                                writeOtaData(otaFileManager?.otaFile)
                             }
                         }
                         otaUpload.start()
@@ -1787,22 +1783,25 @@ class IOPTestActivity : AppCompatActivity() {
         dfuMode(OTA_UPLOAD)
     }
 
-    /**
-     * SHOWS OTA PROGRESS DIALOG IN UI
-     */
-    private fun showOtaProgress() {
-        otaProgress?.show()
-        btnOtaStart?.isClickable = false
-        btnOtaStart?.setBackgroundColor(ContextCompat.getColor(this@IOPTestActivity, R.color.silabs_inactive))
-        otaProgress?.setCanceledOnTouchOutside(false)
+    private fun initOtaProgressDialog() {
+        otaProgressDialog = OtaProgressDialog(this, mBluetoothGatt?.device?.address ?: "Unknown device")
+
+        otaProgressDialog?.btnOtaEnd?.setOnClickListener {
+            otaProgressDialog?.dismiss()
+            ota_mode = false
+            otaMode = false
+            dfuMode(OTA_DISCONNECTION)
+            handler?.postDelayed({ scanLeDevice(true) }, 1000)
+        }
+    }
+
+    private fun showOtaProgressDialog() {
+        otaProgressDialog?.show()
         dfuMode(OTA_BEGIN)
     }
 
-    /**
-     * SHOWS OTA SETUP DIALOG IN UI
-     */
-    private fun showLoading() {
-        loadingDialog?.apply {
+    private fun showOtaLoadingDialog() {
+        otaLoadingDialog?.apply {
             show()
             setCanceledOnTouchOutside(false)
             animateLoading()
@@ -1813,14 +1812,14 @@ class IOPTestActivity : AppCompatActivity() {
      * CREATES BAR PROGRESS ANIMATION IN LOADING AND OTA PROGRESS DIALOG
      */
     private fun animateLoading() {
-        if (uploadimage != null && loadingimage != null && otaProgress != null) {
-            uploadimage?.visibility = View.GONE
-            loadingimage?.visibility = View.GONE
-            if (loadingDialog?.isShowing!!) {
-                loadingimage?.visibility = View.VISIBLE
+        if (otaProgressDialog?.uploadImage != null && otaLoadingDialog?.loadingImage != null) {
+            otaProgressDialog?.uploadImage?.visibility = View.GONE
+            otaLoadingDialog?.loadingImage?.visibility = View.GONE
+            if (otaLoadingDialog?.isShowing!!) {
+                otaLoadingDialog?.loadingImage?.visibility = View.VISIBLE
             }
-            if (otaProgress?.isShowing!!) {
-                uploadimage?.visibility = View.VISIBLE
+            if (otaProgressDialog?.isShowing!!) {
+                otaProgressDialog?.uploadImage?.visibility = View.VISIBLE
             }
         }
     }
@@ -1851,7 +1850,7 @@ class IOPTestActivity : AppCompatActivity() {
                 return bool
             }
         } catch (localException: Exception) {
-            Log.e(TAG, "refreshDevice An exception occured while refreshing device")
+            Log.e(TAG, "refreshDevice An exception occurred while refreshing device")
         }
         return false
     }
@@ -1864,8 +1863,8 @@ class IOPTestActivity : AppCompatActivity() {
      * (RUNNABLE) CHECKS OTA BEGIN BOX AND STARTS
      */
     private val checkBeginRunnable: Runnable = Runnable {
-        chrono?.base = SystemClock.elapsedRealtime()
-        chrono?.start()
+        otaProgressDialog?.chrono?.base = SystemClock.elapsedRealtime()
+        otaProgressDialog?.chrono?.start()
     }
 
     fun onceAgain() {
@@ -1912,10 +1911,10 @@ class IOPTestActivity : AppCompatActivity() {
         }
         val writearray: ByteArray
         val pgss: Float
-        if (pack + mtuDivisible > otafile!!.size - 1) {
+        if (pack + mtuDivisible > otaFileManager?.otaFile!!.size - 1) {
             //SET last by 4
             var plus = 0
-            var last = otafile!!.size - pack
+            var last = otaFileManager?.otaFile!!.size - pack
             do {
                 last += plus
                 plus++
@@ -1923,23 +1922,23 @@ class IOPTestActivity : AppCompatActivity() {
             writearray = ByteArray(last)
             var j = 0
             for (i in pack until pack + last) {
-                if (otafile!!.size - 1 < i) {
+                if (otaFileManager?.otaFile!!.size - 1 < i) {
                     writearray[j] = 0xFF.toByte()
                 } else {
-                    writearray[j] = otafile!![i]
+                    writearray[j] = otaFileManager?.otaFile!![i]
                 }
                 j++
             }
-            pgss = ((pack + last).toFloat() / (otafile!!.size - 1)) * 100
+            pgss = ((pack + last).toFloat() / (otaFileManager?.otaFile!!.size - 1)) * 100
             Log.d("characte", "last: " + pack + " / " + (pack + last) + " : " + Converters.getHexValue(writearray))
         } else {
             var j = 0
             writearray = ByteArray(mtuDivisible)
             for (i in pack until pack + mtuDivisible) {
-                writearray[j] = otafile!![i]
+                writearray[j] = otaFileManager?.otaFile!![i]
                 j++
             }
-            pgss = ((pack + mtuDivisible).toFloat() / (otafile!!.size - 1)) * 100
+            pgss = ((pack + mtuDivisible).toFloat() / (otaFileManager?.otaFile!!.size - 1)) * 100
             Log.d("characte", "pack: " + pack + " / " + (pack + mtuDivisible) + " : " + Converters.getHexValue(writearray))
         }
         val charac = mBluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data)
@@ -1951,10 +1950,10 @@ class IOPTestActivity : AppCompatActivity() {
         if (pack > 0) {
             handler?.post {
                 runOnUiThread {
-                    progressBar?.progress = pgss.toInt()
+                    otaProgressDialog?.progressBar?.progress = pgss.toInt()
                     val datarate = String.format(Locale.US, kBits, bitrate)
-                    dataRate?.text = datarate
-                    dataSize?.text = getString(R.string.iop_test_n_percent, pgss.toInt())
+                    otaProgressDialog?.dataRate?.text = datarate
+                    otaProgressDialog?.dataSize?.text = getString(R.string.iop_test_n_percent, pgss.toInt())
                 }
             }
         } else {
@@ -1966,7 +1965,7 @@ class IOPTestActivity : AppCompatActivity() {
      * White with NO RESPONSE
      */
     @Synchronized
-    fun whiteOtaData(dataThread: ByteArray?) {
+    fun writeOtaData(dataThread: ByteArray?) {
         try {
             val value = ByteArray(mtu - 3)
             val start = System.nanoTime()
@@ -1985,23 +1984,23 @@ class IOPTestActivity : AppCompatActivity() {
                         System.arraycopy(value, 0, end, 0, j)
                         Log.d("Progress", "sent " + (i + 1) + " / " + dataThread.size + " - " + String.format("%.1f", progress) + " % - " + String.format(kBits, bitrate) + " - " + Converters.getHexValue(end))
                         runOnUiThread {
-                            dataSize?.text = getString(R.string.iop_test_n_percent, progress.toInt())
-                            progressBar?.progress = progress.toInt()
+                            otaProgressDialog?.dataSize?.text = getString(R.string.iop_test_n_percent, progress.toInt())
+                            otaProgressDialog?.progressBar?.progress = progress.toInt()
                         }
                         charac?.value = end
                     } else {
                         j = 0
                         Log.d("Progress", "sent " + (i + 1) + " / " + dataThread.size + " - " + String.format("%.1f", progress) + " % - " + String.format(kBits, bitrate) + " - " + Converters.getHexValue(value))
                         runOnUiThread {
-                            dataSize?.text = getString(R.string.iop_test_n_percent, progress.toInt())
-                            progressBar?.progress = progress.toInt()
+                            otaProgressDialog?.dataSize?.text = getString(R.string.iop_test_n_percent, progress.toInt())
+                            otaProgressDialog?.progressBar?.progress = progress.toInt()
                         }
                         charac?.value = value
                     }
                     if (mBluetoothGatt!!.writeCharacteristic(charac)) {
                         runOnUiThread {
                             val datarate = String.format(Locale.US, kBits, bitrate)
-                            dataRate?.text = datarate
+                            otaProgressDialog?.dataRate?.text = datarate
                         }
                         while ((System.nanoTime() - wait) / 1000000.0 < delayNoResponse) {
                         }
@@ -2012,7 +2011,7 @@ class IOPTestActivity : AppCompatActivity() {
                             wait = System.nanoTime()
                             runOnUiThread {
                                 val datarate = String.format(Locale.US, kBits, bitrate)
-                                dataRate?.text = datarate
+                                otaProgressDialog?.dataRate?.text = datarate
                             }
                         } while (!mBluetoothGatt!!.writeCharacteristic(charac))
                     }
@@ -2020,9 +2019,9 @@ class IOPTestActivity : AppCompatActivity() {
             }
             handler?.post {
                 runOnUiThread {
-                    chrono?.stop()
-                    uploadimage?.clearAnimation()
-                    uploadimage?.visibility = View.INVISIBLE
+                    otaProgressDialog?.chrono?.stop()
+                    otaProgressDialog?.uploadImage?.clearAnimation()
+                    otaProgressDialog?.uploadImage?.visibility = View.INVISIBLE
                 }
             }
             val end = System.currentTimeMillis()
@@ -2166,9 +2165,6 @@ class IOPTestActivity : AppCompatActivity() {
                         if (disconnectGatt) {
                             exit(gatt)
                         }
-                        if (otaSetup != null && otaSetup?.isShowing!!) {
-                            exit(gatt)
-                        }
                         if (gatt.services.isEmpty()) {
                             exit(gatt)
                         }
@@ -2223,10 +2219,9 @@ class IOPTestActivity : AppCompatActivity() {
                     if (ota_mode && boolOTAbegin) {
                         handler?.postDelayed({
                             runOnUiThread {
-                                loadingimage?.visibility = View.GONE
-                                loadingDialog?.dismiss()
-                                initOtaProgress()
-                                showOtaProgress()
+                                otaLoadingDialog?.loadingImage?.visibility = View.GONE
+                                otaLoadingDialog?.dismiss()
+                                showOtaProgressDialog()
                             }
                         }, 1000)
                     }
@@ -2238,13 +2233,21 @@ class IOPTestActivity : AppCompatActivity() {
             super.onCharacteristicRead(gatt, characteristic, status)
             Log.d(TAG, "onCharacteristicRead: " + characteristic.uuid.toString() + " status " + status)
 
+            if (characteristic.uuid == GattCharacteristic.ModelNumberString.uuid) {
+                getSiliconLabsTestInfo().iopBoard = IopBoard.fromBoardString(characteristic.getStringValue(0))
+            }
+
             if (characteristic.service.uuid.toString() == CommonUUID.Service.TEST_PARAMETERS.toString()) {
                 if (status == 0) {
-                    readParameters(characteristic)
-                    Log.d(TAG, "onCharacteristicRead convertTestParameters")
+                    when (characteristic.uuid.toString()) {
+                        CommonUUID.Characteristic.FIRMWARE_VERSION.toString() ->
+                            readFirmwareVersion(characteristic.value)
+                        CommonUUID.Characteristic.CONNECTION_PARAMETERS.toString() ->
+                            readConnectionParameters(characteristic.value)
+                        else -> { }
+                    }
                 } else {
                     nrTries = 0
-                    Log.d(TAG, "onCharacteristicRead retryCommand")
                     retryCommand(characteristic)
                 }
             } else {
@@ -2277,8 +2280,8 @@ class IOPTestActivity : AppCompatActivity() {
                                 handler?.postDelayed(DFU_OTA_UPLOAD, 500)
                             } else if (!ota_mode && otaProcess) {
                                 runOnUiThread {
-                                    loadingLog?.text = getString(R.string.iop_test_label_resetting)
-                                    showLoading()
+                                    otaLoadingDialog?.loadingLog?.text = getString(R.string.iop_test_label_resetting)
+                                    showOtaLoadingDialog()
                                     animateLoading()
                                 }
                                 handler?.postDelayed({
@@ -2310,8 +2313,8 @@ class IOPTestActivity : AppCompatActivity() {
                                 handler?.postDelayed(DFU_OTA_UPLOAD, 500)
                             } else if (!ota_mode && otaProcess) {
                                 runOnUiThread {
-                                    loadingLog?.text = getString(R.string.iop_test_label_resetting)
-                                    showLoading()
+                                    otaLoadingDialog?.loadingLog?.text = getString(R.string.iop_test_label_resetting)
+                                    showOtaLoadingDialog()
                                     animateLoading()
                                 }
                                 handler?.post {
@@ -2323,9 +2326,9 @@ class IOPTestActivity : AppCompatActivity() {
                             if (otaProcess) {
                                 Log.e("Callback", "Control " + Converters.getHexValue(characteristic.value) + "status: " + status)
                                 runOnUiThread {
-                                    btnOtaStart?.setBackgroundColor(ContextCompat.getColor(this@IOPTestActivity, R.color.silabs_red))
-                                    btnOtaStart?.isClickable = true
-                                    btnOtaStart?.callOnClick()
+                                    otaProgressDialog?.btnOtaEnd?.setBackgroundColor(ContextCompat.getColor(this@IOPTestActivity, R.color.silabs_red))
+                                    otaProgressDialog?.btnOtaEnd?.isClickable = true
+                                    otaProgressDialog?.btnOtaEnd?.callOnClick()
                                 }
                                 boolOTAbegin = false
                             }
@@ -2340,16 +2343,16 @@ class IOPTestActivity : AppCompatActivity() {
                 }
                 if (characteristic.uuid == ota_data) {   //OTA Data Callback Handling
                     if (reliable) {
-                        if (otaProgress?.isShowing!!) {
+                        if (otaProgressDialog?.isShowing!!) {
                             pack += mtuDivisible
-                            if (pack <= otafile?.size!! - 1) {
+                            if (pack <= otaFileManager?.otaFile?.size!! - 1) {
                                 otaWriteDataReliable()
-                            } else if (pack > otafile?.size!! - 1) {
+                            } else if (pack > otaFileManager?.otaFile?.size!! - 1) {
                                 handler?.post {
                                     runOnUiThread {
-                                        chrono?.stop()
-                                        uploadimage?.clearAnimation()
-                                        uploadimage?.visibility = View.INVISIBLE
+                                        otaProgressDialog?.chrono?.stop()
+                                        otaProgressDialog?.uploadImage?.clearAnimation()
+                                        otaProgressDialog?.uploadImage?.visibility = View.INVISIBLE
                                     }
                                 }
                                 dfuMode(OTA_END)
@@ -2440,6 +2443,7 @@ class IOPTestActivity : AppCompatActivity() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
             val device = result.device
+            Timber.d("Device scanned. Name = ${device.name}, address = ${device.address}")
 
             synchronized(readScannerStartTime) {
                 if (readScannerStartTime) {
@@ -2449,58 +2453,34 @@ class IOPTestActivity : AppCompatActivity() {
                 }
             }
 
-            Log.d(TAG, "Scanner device name: " + device.name)
-            Log.d(TAG, "Scanner device address: " + device.address)
-            if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_OTA_ACK].getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING
-                    || getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_OTA_WITHOUT_ACK].getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING) {
-                otaDeviceName = if (mIndexRunning == POSITION_TEST_IOP3_OTA_ACK) {
-                    ota1DeviceName
-                } else {
-                    ota2DeviceName
+            when (mIndexRunning) {
+                POSITION_TEST_SCANNER -> {
+                   if (device.name.equals(getSiliconLabsTestInfo().fwName, ignoreCase = true)) {
+                       mBluetoothDevice = device
+                       mDeviceAddress = device.address
+                       scanLeDevice(false)
+                       finishItemTest(POSITION_TEST_SCANNER, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_SCANNER])
+                   } else return
                 }
-                if (device.address == mDeviceAddress) {
-                    Log.d(TAG, "Scanner, OTA IOP test device: " + device.address + ", device name: " + device.name)
-                    mBluetoothDevice = device
-                    scanLeDevice(false)
-                    isScanning = false
-                    handler?.removeCallbacks(scanRunnable)
-                    handler?.postDelayed({
+                POSITION_TEST_IOP3_OTA_ACK,
+                POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
+                    if (device.address == mDeviceAddress) {
+                        mBluetoothDevice = device
+                        scanLeDevice(false)
+                        handler?.postDelayed({
+                            connectToDevice(mBluetoothDevice)
+                        }, 5000)
+                    } else return
+                }
+                POSITION_TEST_IOP3_SECURITY,
+                POSITION_TEST_IOP3_CACHING -> {
+                    if (device.address == mDeviceAddress) {
+                        Timber.d("Manufacturer: ${Build.MANUFACTURER}")
+                        mBluetoothDevice = device
+                        scanLeDevice(false)
                         connectToDevice(mBluetoothDevice)
-                    }, 5000)
-                    mDeviceName = device.name
-                    Log.d(TAG, "connect to " + device.address)
-                    return
+                    } else return
                 }
-            }
-            if (!TextUtils.isEmpty(device.name)
-                    && (device.name.replace(" ", "").equals(getSiliconLabsTestInfo().fwName.replace(" ", ""), ignoreCase = true)
-                            || device.name.replace(" ", "").equals(otaDeviceName!!.replace(" ", ""), ignoreCase = true))) {
-                if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_SCANNER].getStatusTest() == Common.IOP3_TC_STATUS_PASS) {
-                    if (device.address != mDeviceAddress) {
-                        return
-                    }
-                }
-                mBluetoothDevice = device
-                getSiliconLabsTestInfo().fwName = device.name.trim()
-                Log.d(TAG, "Scanner, IOP test device: " + device.address + ", device name: " + device.name)
-                scanLeDevice(false)
-                if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_SCANNER].getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING) {
-                    mDeviceAddress = device.address
-                    mDeviceName = device.name
-                    finishItemTest(POSITION_TEST_SCANNER, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_SCANNER])
-                } else if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_SECURITY].getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING
-                        /*|| getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING]
-                                .getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING*/) {
-                    val manufacturer = Build.MANUFACTURER
-                    Log.d(TAG, "manufacturer: $manufacturer")
-                    if (mIndexRunning == POSITION_TEST_IOP3_SECURITY) {
-                        connectToDevice(mBluetoothDevice)
-                    } else if (mIndexRunning == POSITION_TEST_IOP3_CACHING) {
-                        connectToDevice(mBluetoothDevice)
-                    }
-                }
-                isScanning = false
-                handler?.removeCallbacks(scanRunnable)
             }
         }
     }
@@ -2523,6 +2503,12 @@ class IOPTestActivity : AppCompatActivity() {
         private const val OTA_BEGIN = "OTABEGIN"
         private const val OTA_UPLOAD = "OTAUPLOAD"
         private const val OTA_END = "OTAEND"
+        private const val OTA_DISCONNECTION = "DISCONNECTION"
+
+        private const val OTA_DEVICE_NAME_AUTO_ACK = "IOP Test Update"
+        private const val OTA_DEVICE_NAME_AUTO_UNACK = "IOP Test"
+        private const val OTA_DEVICE_NAME_USER_ACK = "IOP_Test_2"
+        private const val OTA_DEVICE_NAME_USER_UNACK = "IOP_Test_1"
 
         private const val POSITION_TEST_SCANNER = 0
         private const val POSITION_TEST_CONNECTION = 1
@@ -2539,6 +2525,8 @@ class IOPTestActivity : AppCompatActivity() {
         private const val SCAN_PERIOD: Long = 10000
         private const val CONNECTION_PERIOD: Long = 10000
         private const val BLUETOOTH_SETTINGS_REQUEST_CODE = 100
+
+        const val GBL_FILE_CHOICE_REQUEST_CODE = 201
 
         fun startActivity(context: Context) {
             val intent = Intent(context, IOPTestActivity::class.java)

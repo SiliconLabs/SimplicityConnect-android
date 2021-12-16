@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardview_env_tile"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/space_XXXS"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardCornerRadius="16dp">
+
+        <LinearLayout
+            android:id="@+id/env_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_XSS"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/space_XXXS"
+                android:id="@+id/env_icon"
+                tools:background="@drawable/icon_temp"
+                android:contentDescription="">
+            </ImageView>
+
+            <TextView
+                style="@style/tb_robo_regular_12dp_grey"
+                android:id="@+id/env_description"
+                android:layout_marginLeft="@dimen/space_XXXS"
+                android:layout_marginRight="@dimen/space_XXXS"
+                android:layout_marginBottom="@dimen/space_XXXS"
+                android:layout_marginTop="@dimen/space_XS"
+                tools:text="Temperature" />
+
+            <TextView
+                android:id="@+id/env_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/space_XXXS"
+                android:layout_marginRight="@dimen/space_XXXS"
+                tools:text="43%"
+                style="@style/tb_robo_medium_18dp" />
+
+            <TextView
+                android:id="@+id/hall_state_tampered_reset_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:text="@string/environment_hall_state_reset_tamper"
+                style = "@style/EnvironmentControlLabel_HallStateTampered"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

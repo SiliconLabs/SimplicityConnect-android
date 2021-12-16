@@ -2,6 +2,7 @@ package com.siliconlabs.bledemo.Base
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -17,24 +18,35 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.siliconlabs.bledemo.Adapters.DeviceInfoViewHolder
 import com.siliconlabs.bledemo.Adapters.ScannedDevicesAdapter
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery
 import com.siliconlabs.bledemo.Bluetooth.BLE.*
-import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService.GattConnectType
 import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery.BluetoothDiscoveryHost
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
+import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService.GattConnectType
 import com.siliconlabs.bledemo.ConnectedLighting.Activities.ConnectedLightingActivity
 import com.siliconlabs.bledemo.HealthThermometer.Activities.HealthThermometerActivity
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.blinky.activities.BlinkyActivity
+import com.siliconlabs.bledemo.blinky_thunderboard.activities.BlinkyThunderboardActivity
+import com.siliconlabs.bledemo.environment.activities.EnvironmentActivity
+import com.siliconlabs.bledemo.iop_test.activities.IOPTestActivity
+import com.siliconlabs.bledemo.iop_test.models.IOPTest
+import com.siliconlabs.bledemo.motion.activities.MotionActivity
 import com.siliconlabs.bledemo.throughput.activities.ThroughputActivity
 import com.siliconlabs.bledemo.throughput.utils.PeripheralManager
+import com.siliconlabs.bledemo.thunderboard.utils.BleUtils
+import com.siliconlabs.bledemo.wifi_commissioning.activities.WifiCommissioningActivity
 import kotlinx.android.synthetic.main.dialog_select_device.*
+import timber.log.Timber
 import java.util.*
 import kotlin.math.max
 
@@ -71,10 +83,25 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (newState == BluetoothGatt.STATE_CONNECTED) {
                     (activity as BaseActivity).dismissModalDialog()
-                    val intent = getIntent(connectType, activity)
-                    if (intent != null) {
-                        activity?.startActivity(intent)
-                    }
+                        when (connectType) {
+                            GattConnectType.MOTION -> gatt.discoverServices()
+                            GattConnectType.BLINKY -> {
+                                if (gatt.device.name == "Blinky Example") {
+                                    val intent = getIntent(connectType)
+                                    if (intent != null) {
+                                        activity?.startActivity(intent)
+                                    }
+                                } else {
+                                    gatt.discoverServices()
+                                }
+                            }
+                            else -> {
+                                val intent = getIntent(connectType)
+                                if (intent != null) {
+                                    activity?.startActivity(intent)
+                                }
+                            }
+                        }
                     retryAttempts = 0
                 }
             } else if (status == 133) {
@@ -91,8 +118,57 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
                 }
                 reDiscover(true)
             }
-
         }
+
+        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+            super.onServicesDiscovered(gatt, status)
+            BleUtils.readCharacteristic(gatt, getModelNumberCharacteristic(gatt))
+        }
+
+        override fun onCharacteristicRead(gatt: BluetoothGatt?,
+                                          characteristic: BluetoothGattCharacteristic?,
+                                          status: Int) {
+            super.onCharacteristicRead(gatt, characteristic, status)
+            if (characteristic?.uuid == GattCharacteristic.ModelNumberString.uuid) {
+                when (connectType) {
+                    GattConnectType.MOTION -> {
+                        getIntent(connectType)?.let {
+                            it.putExtra(MODEL_TYPE_EXTRA, characteristic.getStringValue(0))
+                            startActivity(it)
+                        }
+                    }
+                    GattConnectType.BLINKY -> {
+                        when (characteristic.getStringValue(0)) {
+                            "BRD4166A" -> BleUtils.readCharacteristic(gatt, getPowerSourceCharacteristic(gatt))
+                            "BRD4184A",
+                            "BRD4184B" -> {
+                                getIntent(connectType)?.let {
+                                    it.putExtra(MODEL_TYPE_EXTRA, characteristic.getStringValue(0))
+                                    startActivity(it)
+                                }
+                            }
+                            else -> { Timber.d("Unknown model")}
+                        }
+                    }
+                    else -> { }
+                }
+            } else if (characteristic?.uuid == GattCharacteristic.PowerSource.uuid) {
+                Intent(requireContext(), BlinkyThunderboardActivity::class.java).apply {
+                    putExtra(POWER_SOURCE_EXTRA, characteristic.getIntValue(GattCharacteristic.PowerSource.format, 0))
+                    startActivity(this)
+                }
+            }
+        }
+    }
+
+    private fun getModelNumberCharacteristic(gatt: BluetoothGatt?): BluetoothGattCharacteristic? {
+        val deviceInformationService = gatt?.getService(GattService.DeviceInformation.number)
+        return deviceInformationService?.getCharacteristic(GattCharacteristic.ModelNumberString.uuid)
+    }
+
+    private fun getPowerSourceCharacteristic(gatt: BluetoothGatt?): BluetoothGattCharacteristic? {
+        val service = gatt?.getService(GattService.PowerSource.number)
+        return service?.getCharacteristic(GattCharacteristic.PowerSource.uuid)
     }
 
     private fun retryConnectionAttempt() {
@@ -116,11 +192,20 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
                     if (adapterPos != RecyclerView.NO_POSITION) {
                         val devInfo = adapter.getDevicesInfo()[adapterPos]
                         currentDeviceInfo = devInfo
-                        if (connectType == GattConnectType.RANGE_TEST) {
-                            dismiss()
-                            callback?.getBluetoothDeviceInfo(currentDeviceInfo)
-                        } else {
-                            connect(devInfo)
+
+                        when (connectType) {
+                            GattConnectType.RANGE_TEST -> {
+                                dismiss()
+                                callback?.getBluetoothDeviceInfo(currentDeviceInfo)
+                            }
+                            GattConnectType.IOP_TEST -> {
+                                (activity as BaseActivity).dismissModalDialog()
+                                IOPTest.createDataTest(devInfo.name ?: "IOP Test")
+                                getIntent(connectType)?.let {
+                                    activity?.startActivity(it)
+                                }
+                            }
+                            else -> connect(devInfo)
                         }
                     }
                 })
@@ -232,10 +317,34 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
             }
             GattConnectType.BLINKY -> {
                 discovery.addFilter("Blinky Example")
+                discovery.addFilter(ManufacturerDataFilter(
+                        id = 71,
+                        data = byteArrayOf(2, 0)
+                ))
             }
             GattConnectType.THROUGHPUT_TEST -> {
                 discovery.addFilter("Throughput Test")
             }
+            GattConnectType.WIFI_COMMISSIONING -> {
+                discovery.addFilter("BLE_CONFIGURATOR")
+            }
+            GattConnectType.IOP_TEST -> {
+                discovery.addFilter("IOP Test")
+                discovery.addFilter("IOP_Test_1")
+            }
+            GattConnectType.MOTION -> {
+                discovery.addFilter(ManufacturerDataFilter(
+                        id = 71,
+                        data = byteArrayOf(2, 0)
+                ))
+            }
+            GattConnectType.ENVIRONMENT -> {
+                discovery.addFilter(ManufacturerDataFilter(
+                        id = 71,
+                        data = byteArrayOf(2, 0)
+                ))
+            }
+            else -> { }
         }
 
         discovery.startDiscovery(clearCachedDiscoveries)
@@ -267,7 +376,7 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
         this.callback = callback
     }
 
-    private fun getIntent(connectType: GattConnectType?, activity: FragmentActivity?): Intent? {
+    private fun getIntent(connectType: GattConnectType?): Intent? {
         return when (connectType) {
             GattConnectType.THERMOMETER -> {
                 Intent(activity, HealthThermometerActivity::class.java)
@@ -280,6 +389,18 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
             }
             GattConnectType.THROUGHPUT_TEST -> {
                 Intent(activity, ThroughputActivity::class.java)
+            }
+            GattConnectType.WIFI_COMMISSIONING -> {
+                Intent(activity, WifiCommissioningActivity::class.java)
+            }
+            GattConnectType.IOP_TEST -> {
+                Intent(activity, IOPTestActivity::class.java)
+            }
+            GattConnectType.MOTION -> {
+                Intent(activity, MotionActivity::class.java)
+            }
+            GattConnectType.ENVIRONMENT -> {
+                Intent(activity, EnvironmentActivity::class.java)
             }
             else -> null
         }
@@ -350,6 +471,9 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
         private const val CONN_TYPE_INFO = "_conn_type_info_"
 
         private const val RETRY_CONNECTION_COUNT = 2
+
+        const val MODEL_TYPE_EXTRA = "model type"
+        const val POWER_SOURCE_EXTRA = "power source"
 
         fun newDialog(titleInfo: Int, descriptionInfo: Int, profilesInfo: List<Pair<Int, Int>>?, connectType: GattConnectType?): SelectDeviceDialog {
             val dialog = SelectDeviceDialog()

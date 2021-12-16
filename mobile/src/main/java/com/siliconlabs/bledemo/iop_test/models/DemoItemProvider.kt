@@ -3,9 +3,11 @@ package com.siliconlabs.bledemo.iop_test.models
 
 class DemoItemProvider {
     companion object {
-        private fun getDataTest(): ArrayList<ItemTestCaseInfo> {
+        private fun getDataTest(fwName: String): ArrayList<ItemTestCaseInfo> {
             return ArrayList<ItemTestCaseInfo>().apply {
-                add(ItemTestCaseInfo(1, "Scan device", "Central starts scanning and looking for " + "\"IOP Test\" device.", null, Common.IOP3_TC_STATUS_WAITING))
+                add(ItemTestCaseInfo(1, "Scan device",
+                        "Central starts scanning and looking for \"$fwName\" device.",
+                        null, Common.IOP3_TC_STATUS_WAITING))
                 add(ItemTestCaseInfo(2, "Connect to device", "Central connects to peripheral.", null, Common.IOP3_TC_STATUS_WAITING))
                 add(ItemTestCaseInfo(3, "Central discovers the GATT", "Central discovers the GATT database from peripheral.", null, Common.IOP3_TC_STATUS_WAITING))
                 add(ItemTestCaseInfo(4, "Central performs all GATT", "Central performs all GATT operations supported by target.", dataChildrenTest(), Common.IOP3_TC_STATUS_WAITING))
@@ -21,7 +23,7 @@ class DemoItemProvider {
         }
 
         fun createDataSiliconLabsTest(fwName: String): SiliconLabsTestInfo {
-            return SiliconLabsTestInfo(fwName, getDataTest())
+            return SiliconLabsTestInfo(fwName, getDataTest(fwName))
         }
 
         private fun dataChildrenTest(): ArrayList<ChildrenItemTestInfo> {

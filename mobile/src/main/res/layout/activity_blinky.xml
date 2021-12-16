@@ -9,9 +9,8 @@
 
     <com.siliconlabs.bledemo.Views.HorizontalShadow
         android:layout_width="match_parent"
-        android:layout_height="@dimen/shadow_height"
-        android:layout_below="@id/toolbar_blinky"
-        android:rotation="180" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_blinky" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
@@ -19,5 +18,35 @@
         android:layout_height="match_parent"
         android:name="com.siliconlabs.bledemo.blinky.fragments.BlinkyFragment"
         android:layout_below="@id/toolbar_blinky" />
+
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bottom_shadow"
+        android:rotation="180"
+        android:layout_alignParentBottom="true"
+        android:visibility="visible" />
+
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/thunderboard_shadow"
+        android:rotation="180"
+        android:layout_above="@id/thunderboard_fragment_container"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/thunderboard_fragment_container"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone" >
+
+        <fragment
+            android:name="com.siliconlabs.bledemo.thunderboard.base.StatusFragment"
+            android:id="@+id/status_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
 
 </RelativeLayout>

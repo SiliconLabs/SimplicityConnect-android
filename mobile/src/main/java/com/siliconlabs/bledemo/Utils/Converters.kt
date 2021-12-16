@@ -160,7 +160,7 @@ object Converters {
         return value
     }
 
-    private fun getIntFromTwosComplement(value: Byte) : Int {
+    fun getIntFromTwosComplement(value: Byte) : Int {
         return if (value < 0) 256 - abs(value.toInt()) else value.toInt()
     }
 

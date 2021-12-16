@@ -55,19 +55,14 @@ class ScanResultCompat {
                 advertData = ScanRecordParser.getAdvertisements(sr.scanRecord?.bytes)
                 timestampNanos = sr.timestampNanos
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    isConnectable = sr.isConnectable
-                    isLegacy = sr.isLegacy
-                    dataStatus = sr.dataStatus
-                    primaryPhy = sr.primaryPhy
-                    secondaryPhy = sr.secondaryPhy
-                    advertisingSetID = sr.advertisingSid
-                    txPower = sr.txPower
-                    periodicAdvertisingInterval = sr.periodicAdvertisingInterval
-                } else {
-                    isLegacy = true
-                    isConnectable = true
-                }
+                isConnectable = sr.isConnectable
+                isLegacy = sr.isLegacy
+                dataStatus = sr.dataStatus
+                primaryPhy = sr.primaryPhy
+                secondaryPhy = sr.secondaryPhy
+                advertisingSetID = sr.advertisingSid
+                txPower = sr.txPower
+                periodicAdvertisingInterval = sr.periodicAdvertisingInterval
             }
         }
     }

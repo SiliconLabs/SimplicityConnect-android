@@ -27,6 +27,7 @@ enum class GattCharacteristic {
     SystemId(0x00002a23, "org.bluetooth.characteristic.system_id,", BluetoothGattCharacteristic.FORMAT_UINT32),
     BatteryLevel(0x00002a19, "org.bluetooth.characteristic.battery_level", BluetoothGattCharacteristic.FORMAT_UINT8),
     DockStatus(-0x4885305b, "com.sensedriver.characteristic.hud.dock_status"),
+    FirmwareRevision(0x00002a26, "org.bluetooth.characteristic.firmware_revision_string"),
 
     OtaControl("f7bf3564-fb6d-4e53-88a4-5e37e0326063", "com.silabs.characteristic.ota_control", BluetoothGattCharacteristic.FORMAT_UINT8, R.string.ota_control_attribute_characteristic_name),
     OtaData("984227f3-34fc-4045-a5d0-2c581f81a153", "com.silabs.characteristic.ota_data", BluetoothGattCharacteristic.FORMAT_UINT8, R.string.ota_data_characteristic_name),
@@ -71,7 +72,35 @@ enum class GattCharacteristic {
     ThroughputSlaveLatency("ff629b92-332b-e7f7-975f-0e535872ddae", "custom.type", customNameId = R.string.slave_latency_characteristic_name),
     ThroughputSupervisionTimeout("67e2c4f2-2f50-914c-a611-adb3727b056d", "custom.type", customNameId = R.string.supervision_timeout_characteristic_name),
     ThroughputPduSize("30cc364a-0739-268c-4926-36f112631e0c", "custom.type", customNameId = R.string.pdu_size_characteristic_name),
-    ThroughputMtuSize("3816df2f-d974-d915-d26e-78300f25e86e", "custom.type", customNameId = R.string.mtu_size_characteristic_name);
+    ThroughputMtuSize("3816df2f-d974-d915-d26e-78300f25e86e", "custom.type", customNameId = R.string.mtu_size_characteristic_name),
+
+    PowerSource("ec61a454-ed01-a5e8-b8f9-de9ec026ec51", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT8),
+
+    UvIndex(0x00002a76, "org.bluetooth.characteristic.uv_index", BluetoothGattCharacteristic.FORMAT_UINT8),
+    Pressure(0x00002a6d, "org.bluetooth.characteristic.pressure", BluetoothGattCharacteristic.FORMAT_UINT32),
+    EnvironmentTemperature(0x00002a6e, "org.bluetooth.characteristic.temperature", BluetoothGattCharacteristic.FORMAT_SINT16),
+    Humidity(0x00002a6f, "org.bluetooth.characteristic.humidity", BluetoothGattCharacteristic.FORMAT_UINT16),
+    SoundLevel("c8546913-bf02-45eb-8dde-9f8754f4a32e", "custom.type", BluetoothGattCharacteristic.FORMAT_SINT16),
+    AmbientLightReact("c8546913-bfd9-45eb-8dde-9f8754f4a32e", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT32),
+    AmbientLightSense("c8546913-bf01-45eb-8dde-9f8754f4a32e", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT32),
+
+    CO2Reading("efd658ae-c401-ef33-76e7-91b00019103b", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT16),
+    TVOCReading("efd658ae-c402-ef33-76e7-91b00019103b", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT16),
+
+    HallState("f598dbc5-2f01-4ec5-9936-b3d1aa4f957f", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT8),
+    HallFieldStrength("f598dbc5-2f02-4ec5-9936-b3d1aa4f957f", "custom.type", BluetoothGattCharacteristic.FORMAT_SINT32),
+    HallControlPoint("f598dbc5-2f03-4ec5-9936-b3d1aa4f957f", "custom.type"),
+
+    Digital(0x00002a56, "org.bluetooth.characteristic.digital"),
+    RgbLeds("fcb89c40-c603-59f3-7dc3-5ece444a401b", "custom.type", BluetoothGattCharacteristic.FORMAT_UINT8),
+
+    Acceleration("c4c1f6e2-4be5-11e5-885d-feff819cdc9f", "custom.type", BluetoothGattCharacteristic.FORMAT_SINT16),
+    Orientation("b7c4b694-bee3-45dd-ba9f-f3b5e994f49a", "custom.type", BluetoothGattCharacteristic.FORMAT_SINT16),
+    Calibration("71e30b8c-4131-4703-b0a0-b0bbba75856b", "custom.type"),
+
+    WifiCommissioningWrite("00001aa1-0000-1000-8000-00805f9b34fb", "custom.type"),
+    WifiCommissioningRead("00001bb1-0000-1000-8000-00805f9b34fb", "custom.type"),
+    WifiCommissioningNotify("00001cc1-0000-1000-8000-00805f9b34fb", "custom.type");
 
     /**
      * The so-called "Assigned Number" of this characteristic.

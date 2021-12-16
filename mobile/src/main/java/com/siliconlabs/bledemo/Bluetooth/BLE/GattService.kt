@@ -80,6 +80,46 @@ enum class GattService {
             GattCharacteristic.ThroughputSupervisionTimeout,
             GattCharacteristic.ThroughputPduSize,
             GattCharacteristic.ThroughputMtuSize
+    ),
+    PowerSource("ec61a454-ed00-a5e8-b8f9-de9ec026ec51", "custom.type",
+            GattCharacteristic.PowerSource
+    ),
+    EnvironmentalSensing(0x0000181a, "org.bluetooth.service.environmental_sensing",
+            GattCharacteristic.UvIndex,
+            GattCharacteristic.Pressure,
+            GattCharacteristic.EnvironmentTemperature,
+            GattCharacteristic.Humidity,
+            GattCharacteristic.SoundLevel,
+            GattCharacteristic.AmbientLightReact,
+            GattCharacteristic.AmbientLightSense
+    ),
+    IndoorAirQuality("efd658ae-c400-ef33-76e7-91b00019103b", "custom.type",
+            GattCharacteristic.CO2Reading,
+            GattCharacteristic.TVOCReading
+    ),
+    HallEffect("f598dbc5-2f00-4ec5-9936-b3d1aa4f957f", "custom.type",
+            GattCharacteristic.HallState,
+            GattCharacteristic.HallFieldStrength,
+            GattCharacteristic.HallControlPoint
+    ),
+    AmbientLight("d24c4f4e-17a7-4548-852c-abf51127368b", "custom.type",
+            GattCharacteristic.AmbientLightReact
+    ),
+    AutomationIo(0x00001815, "org.bluetooth.service.automation_io",
+            GattCharacteristic.Digital
+    ),
+    UserInterface("fcb89c40-c600-59f3-7dc3-5ece444a401b", "custom.type",
+            GattCharacteristic.RgbLeds
+    ),
+    Motion("a4e649f4-4be5-11e5-885d-feff819cdc9f", "custom.type",
+            GattCharacteristic.Acceleration,
+            GattCharacteristic.Orientation,
+            GattCharacteristic.Calibration
+    ),
+    WifiCommissioningService("0000aabb-0000-1000-8000-00805f9b34fb", "custom.type",
+            GattCharacteristic.WifiCommissioningWrite,
+            GattCharacteristic.WifiCommissioningRead,
+            GattCharacteristic.WifiCommissioningNotify
     );
 
     /**

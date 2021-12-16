@@ -7,7 +7,6 @@
     <color name="silabs_blue">#0086D9</color>
     <color name="silabs_red">#D91E2A</color>
     <color name="silabs_white">#FFFFFF</color>
-    <color name="silabs_green">#6BBF01</color>
     <color name="silabs_black">#000000</color>
     <color name="silabs_transparent">#00000000</color>
 
@@ -56,9 +55,67 @@
     <!--============================= DELETE IN THE FUTURE ==============================-->
     <color name="gallery">#FFF1EFEF</color>
     <color name="gallery_light">#FFF8F6F6</color>
-    <color name="dark_gray_id_text">#FF444444</color>
     <color name="masala">#FF504E4E</color>
     <color name="masala_50a">#7F504E4E</color>
     <color name="boulder">#FF7A7878</color>
+
+
+    <!-- ================================= Thunderboard ================================ -->
+
+
+    <color name="teal_2">#ff00aeff</color>
+
+    <color name="primary_color">@color/sl_silicon_grey</color>
+
+    <color name="transparent">#00000000</color>
+
+    <color name="sl_dark_grey">#ff333333</color>
+    <color name="sl_silicon_grey">#ff555555</color>
+    <color name="sl_grey">#ffc1c1c1</color>
+    <color name="sl_light_grey">#ffefefef</color>
+    <color name="sl_white">#ffffffff</color>
+
+    <color name="sl_yellow">#ffffcc00</color>
+    <color name="sl_yellow_orange">#ffffa200</color>
+    <color name="sl_bromine_orange">#ffff7100</color>
+    <color name="sl_red_orange">#ffe65100</color>
+    <color name="sl_red">#fffb2f3c</color>
+    <color name="sl_blue">#ff00aeff</color>
+    <color name="sl_light_blue">#ff78d6ff</color>
+
+    <color name="sl_bright_green">#ffcaf200</color>
+    <color name="sl_terbium_green">#ffa1b92e</color>
+    <color name="sl_medium_green">#ff87a10d</color>
+    <color name="sl_violet">#ff9196ff</color>
+    <color name="sl_dark_violet">#ff857cff</color>
+    <color name="sl_light_violet">#ffc3caf8</color>
+    <color name="sl_white_violet">#ffe9e3ff</color>
+    <color name="sl_pink">#ffff7469</color>
+    <color name="sl_light_peach">#fffff4f1</color>
+    <color name="sl_pinky_peach">#ffae9d</color>
+    <color name="sl_peach_gold">#ffffe7cf</color>
+
+    <color name="silicon_grey">#ff797777</color>
+
+    <color name="settings_text_background">@color/silicon_grey</color>
+    <color name="text_color">@color/silabs_white</color>
+
+    <color name="divider_line">@color/silicon_grey</color>
+
+    <!--RESKINNING-->
+
+    <color name="main_background">#ececec</color>
+    <color name="tb_font_grey">#7c7c7c</color>
+    <color name="tb_red">#d91e2a</color>
+    <color name="tb_green_dot">#32d74b</color>
+    <color name="tb_blue">#0086d9</color>
+    <color name="tb_grey">#cccccc</color>
+    <!-- WiFi Commissioning -->
+
+    <color name="light_grey">#C0C0C0</color>
+    <color name="grey">#808080</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
 
 </resources>

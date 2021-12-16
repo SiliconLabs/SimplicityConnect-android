@@ -29,5 +29,17 @@ enum class IopBoard(val icName: IcName, val ota1FileName: String, val ota2FileNa
                 else -> UNKNOWN
             }
         }
+
+        @JvmStatic
+        fun fromBoardString(model: String): IopBoard {
+            return when (model) {
+                "BRD4104A" -> BRD_4104A
+                "BRD4181A" -> BRD_4181A
+                "BRD4181B" -> BRD_4181B
+                "BRD4182A" -> BRD_4182A
+                "BRD4186B" -> BRD_4186B
+                else -> UNKNOWN
+            }
+        }
     }
 }

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/sl_light_grey">
+
+    <include
+        android:id="@+id/toolbar_demo_base"
+        layout="@layout/actionbar" />
+
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_demo_base" />
+
+    <FrameLayout
+        android:id="@+id/main_section"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_demo_base"
+        android:layout_above="@id/bluegecko_status_fragment"/>
+
+    <com.siliconlabs.bledemo.Views.HorizontalShadow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:rotation="180"
+        android:layout_above="@id/bluegecko_status_fragment" />
+
+    <fragment
+        android:name="com.siliconlabs.bledemo.thunderboard.base.StatusFragment"
+        android:id="@+id/bluegecko_status_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
+
+
+</RelativeLayout>

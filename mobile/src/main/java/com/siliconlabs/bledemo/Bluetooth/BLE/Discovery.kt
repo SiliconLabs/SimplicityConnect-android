@@ -23,6 +23,7 @@ class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, pri
 
     private val SERVICES: MutableList<GattService> = ArrayList()
     private val NAMES: MutableList<String> = ArrayList()
+    private val MANUFACTURER_DATA: MutableList<ManufacturerDataFilter> = ArrayList()
 
     private var bluetoothBinding: BluetoothService.Binding? = null
     private var bluetoothService: BluetoothService? = null
@@ -61,6 +62,7 @@ class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, pri
     fun clearFilters() {
         SERVICES.clear()
         NAMES.clear()
+        MANUFACTURER_DATA.clear()
     }
 
     fun addFilter(vararg services: GattService) {
@@ -71,6 +73,10 @@ class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, pri
 
     fun addFilter(vararg names: String) {
         NAMES.addAll(arrayOf(*names))
+    }
+
+    fun addFilter(vararg data: ManufacturerDataFilter) {
+        MANUFACTURER_DATA.addAll(data)
     }
 
     fun startDiscovery(clearCachedDiscoveries: Boolean) {
@@ -116,6 +122,14 @@ class Discovery(private val container: DeviceContainer<BluetoothDeviceInfo>, pri
         for (name in NAMES) {
             val filter = ScanFilterCompat()
             filter.deviceName = name
+            filters.add(filter)
+        }
+        for (data in MANUFACTURER_DATA) {
+            val filter = ScanFilterCompat().apply {
+                manufacturerId = data.id
+                manufacturerData = data.data
+                manufacturerDataMask = data.mask
+            }
             filters.add(filter)
         }
         return filters

@@ -19,6 +19,7 @@ android {
         targetSdkVersion 30
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField 'String', 'MICROSITE_URL', "\"http://www.silabs.com/thunderboard\""
     }
 
     buildTypes {
@@ -48,8 +49,8 @@ android {
         blueGecko {
             dimension "version"
             applicationId "com.siliconlabs.bledemo"
-            versionCode 21
-            versionName "2.3.3"
+            versionCode 22
+            versionName "2.4.0"
         }
     }
 
@@ -94,6 +95,7 @@ dependencies {
 
     'auto-parcel'
     implementation 'com.github.frankiesardo:auto-parcel:0.3'
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
     annotationProcessor 'com.github.frankiesardo:auto-parcel-processor:0.3'
 
     'hilt'
@@ -110,10 +112,45 @@ dependencies {
     androidTestImplementation('androidx.test:rules:1.1.0')
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
 
-
     'materialdesign'
     implementation project(':libraries:materialdesign')
 
     'timber'
     implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    implementation 'com.android.support:multidex:1.0.2'
+    // Android
+    implementation "com.android.support:appcompat-v7:30.0.0"
+    implementation "com.android.support:recyclerview-v7:30.0.0"
+    implementation "com.android.support:cardview-v7:30.0.0"
+    implementation "com.android.support:mediarouter-v7:30.0.0"
+    implementation "com.android.support:palette-v7:30.0.0"
+    implementation "com.android.support:design:30.0.0"
+    implementation "com.android.support:gridlayout-v7:30.0.0"
+    // dagger
+    implementation 'com.google.dagger:dagger:2.12'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.12'
+    kapt 'com.google.dagger:dagger-android-processor:2.15'
+    kapt 'com.google.dagger:dagger-compiler:2.15'
+    // Timber
+    implementation 'com.jakewharton.timber:timber:4.5.1'
+    // Butterknife
+    implementation ('com.jakewharton:butterknife:10.2.3'){
+        exclude module: 'support-compat'
+    }
+    kapt ('com.jakewharton:butterknife:10.2.3'){
+        exclude module: 'support-compat'
+    }
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
+    kapt 'com.jakewharton:butterknife-compiler:10.2.3'
+    //annotation?
+    //implementation 'org.glassfish:javax.annotation:10.0-b28'
+    // RxJava, RxAndroid
+    implementation 'io.reactivex:rxjava:1.1.3'
+    implementation 'io.reactivex:rxandroid:1.1.0'
+    // Gson
+    implementation 'com.google.code.gson:gson:2.8.0'
+    // Retrofit
+    implementation 'com.squareup.retrofit:retrofit:1.9.0'
+    implementation 'com.squareup.okhttp:okhttp:2.5.0'
 }

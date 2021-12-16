@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/sl_white">
+
+    <LinearLayout
+        android:id="@+id/device_info_holder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="@dimen/space_XS"
+        android:layout_marginTop="@dimen/space_XS"
+        android:layout_marginBottom="@dimen/space_XS"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/text_size_SM"
+                android:layout_height="@dimen/text_size_SM"
+                android:src="@drawable/green_dot"
+                android:layout_marginEnd="@dimen/space_XXS"/>
+
+            <TextView
+                style="@style/tb_robo_regular_12dp_grey"
+                android:id="@+id/device_status"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                tools:text="Connected to" />
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/tb_robo_medium_18dp"
+            android:id="@+id/device_name"
+            android:ellipsize="end"
+            tools:text="Thunderboard"/>
+
+        <TextView
+            style="@style/tb_robo_regular_12dp_grey"
+            android:id="@+id/device_firmware"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="0.5.0"/>
+
+    </LinearLayout>
+
+
+    <com.siliconlabs.bledemo.thunderboard.ui.BatteryIndicator
+        android:id="@+id/battery_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="@dimen/space_XS"
+        android:layout_marginRight="@dimen/space_XS"
+        android:layout_marginBottom="@dimen/space_XS" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/device_info_holder"
+        android:indeterminate="true"
+        style="@android:style/Widget.Holo.Light.ProgressBar.Horizontal" />
+</RelativeLayout>

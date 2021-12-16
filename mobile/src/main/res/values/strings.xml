@@ -194,15 +194,17 @@
     <string name="zero_percent">0%</string>
     <string name="zero_ms">0ms</string>
     <string name="zero">0</string>
-    <string name="There_was_a_problem_while_preparing_the_file">There was a problem while preparing the file!</string>
-    <string name="Incorrect_file">Incorrect file!</string>
+    <string name="problem_while_preparing_the_file">There was a problem while preparing the file!</string>
+    <string name="incorrect_file">Incorrect file!</string>
     <string name="Select_Apploader_gbl_file">Select Apploader .gbl file</string>
-    <string name="Select_Application_gbl_file">Select Application .gbl file</string>
+    <string name="select_application_gbl_file">Select application .gbl file</string>
     <string name="ota_filename_s">\/%s</string>
     <string name="ota_loading_text">Loading…</string>
     <string name="ota_rebooting_text">Rebooting…</string>
     <string name="ota_waiting_text">Waiting…</string>
     <string name="ota_resetting_text">Resetting…</string>
+    <string name="no_file_chosen">No file chosen for update</string>
+    <string name="chosen_file_not_found">Chosen file not found</string>
 
     <!-- Error dialog -->
     <string name="error_occurred">An error occurred</string>
@@ -674,6 +676,73 @@
     <string name="server">GATT Server</string>
     <string name="service">GATT Service</string>
 
+    <!-- Motion -->
+    <string name="motion_demo_title">Motion</string>
+    <string name="motion_demo_description">Control a 3D render of a dev kit.</string>
+
+    <string name="motion_orientation">Orientation</string>
+    <string name="motion_acceleration">Acceleration</string>
+    <string name="motion_x">X:</string>
+    <string name="motion_y">Y:</string>
+    <string name="motion_z">Z:</string>
+    <string name="motion_orientation_degree">%.0f&#176;</string>
+    <string name="motion_acceleration_g">%.02f g</string>
+
+    <string name="motion_calibrate">Calibrate</string>
+    <string name="motion_calibrating">Calibrating</string>
+    <string name="motion_calibrating_message">Please don\'t move the Thunderboard while it\'s calibrating its position and orientation.</string>
+
+    <!-- Environment -->
+    <string name="environment_demo_title">Environment</string>
+    <string name="environment_demo_description">Read and display data from the dev kit sensors.</string>
+
+    <string name="environment_temp">Temperature</string>
+    <string name="environment_humidity">Humidity</string>
+    <string name="environment_ambient">Ambient Light</string>
+    <string name="environment_uv">UV Index</string>
+    <string name="environment_uv_unit">%d</string>
+    <string name="environment_pressure">Air Pressure</string>
+    <string name="environment_sound_level">Sound Level</string>
+    <string name="environment_co2">Carbon Dioxide</string>
+    <string name="environment_vocs">VOCs</string>
+    <string name="environment_hall_strength">Magnetic Field</string>
+    <string name="environment_hall_state">Door State</string>
+
+    <string name="environment_temp_f">%.1f&#176;F</string>
+    <string name="environment_temp_c">%.1f&#176;C</string>
+    <string name="environment_humidity_measure">%d%%</string>
+    <string name="environment_ambient_lx">%d lx</string>
+    <string name="environment_pressure_measure">%d mbar</string>
+    <string name="environment_sound_level_measure">%d dB</string>
+    <string name="environment_co2_measure">%d ppm</string>
+    <string name="environment_voc_measure">%d ppb</string>
+    <string name="environment_hall_strength_measure">%.0f uT</string>
+    <string name="environment_hall_state_opened">Opened</string>
+    <string name="environment_hall_state_tampered">Tampered</string>
+    <string name="environment_hall_state_closed">Closed</string>
+    <string name="environment_hall_state_reset_tamper">Tap to reset</string>
+    <string name="environment_not_initialized">--</string>
+
+    <!-- Environment settings -->
+
+    <string name="action_settings">Settings</string>
+
+    <string name="settings_preferences">Preferences</string>
+    <string name="settings_temperature">Temperature</string>
+    <string name="settings_celsius">&#176;C</string>
+    <string name="settings_fahrenheit">&#176;F</string>
+
+    <!-- Blinky Thunderboard -->
+
+    <string name="blinky_tb_color">Color</string>
+    <string name="blinky_tb_brightness">Brightness</string>
+    <string name="blinky_tb_strength">Strength</string>
+    <string name="blinky_tb_off">OFF</string>
+    <string name="blinky_tb_on">ON</string>
+    <string name="blinky_tb_switch_status">Switch Status</string>
+    <string name="blinky_tb_leds">LEDs</string>
+    <string name="blinky_tb_led">LED</string>
+
     <!-- Notifications -->
     <string name="notification_title_device_has_connected">%s has connected</string>
     <string name="notification_note_debug_connection">Do you want to debug connection?</string>
@@ -688,5 +757,61 @@
     <string name="label_remove">remove</string>
     <string name="dialog_title_remove">Remove %s?</string>
     <string name="dialog_description_remove">Are you sure you want to delete %s?</string>
+
+    <!-- Thunderboard Status Fragment -->
+    <string name="ok">OK</string>
+
+    <string name="usb_power">USB Power</string>
+    <string name="unknown_power">--</string>
+
+    <string name="status_connected">Connected to</string>
+    <string name="status_disconnected">Disconnected from</string>
+    <string name="status_connection_lost">Connection Lost</string>
+    <string name="status_connection_lost_long">Connection with %s has been lost.</string>
+    <string name="status_unable_to_connect">Unable to Connect</string>
+    <string name="status_unable_to_connect_long">Unable to connect with %s.</string>
+    <string name="status_connecting">Connecting to</string>
+    <string name="status_disconnecting">Disconnecting from</string>
+    <string name="status_no_firmware_version">- -</string>
+
+    <!-- WiFi Commissioning -->
+
+    <string name="wifi_commissioning_label">Wi-Fi Commissioning</string>
+    <string name="wifi_commissioning_description">Wi-Fi commissioning over BLE</string>
+
+    <!--<string name="app_name">Smart Home Automation</string>-->
+    <string name="app_name">Silabs Connect</string>
+    <string name="empty_description"></string>
+
+    <!--WifiCommissioningActivity-->
+    <string name="hint_password">password</string>
+    <string name="security_mode_unknown">Unknown</string>
+    <string name="status_wpa_wpa2">WPA_WPA2_Mixed</string>
+    <string name="security_mode_eap_wpa2">EAP_WPA2</string>
+    <string name="security_mode_eap_wpa">EAP_WPA</string>
+    <string name="security_mode_wep">WEP</string>
+    <string name="security_mode_wpa2">WPA2</string>
+    <string name="security_mode_wpa">WPA</string>
+    <string name="security_mode_open">OPEN</string>
+    <string name="connect_btn_txt">CONNECT</string>
+
+    <string name="ble_detail_device_connection">Connecting to device…</string>
+    <string name="scanning_for_access_points">Scanning for access points…</string>
+    <string name="check_for_status">Checking for status…</string>
+    <string name="config_AP">Connecting to access point…</string>
+    <string name="disconnect_ap">Disconnecting from access point…</string>
+    <string name="ap_connect">Access Point connected successfully</string>
+    <string name="ap_connect_fail">Access Point connection failed</string>
+    <string name="ap_disconnect_success">Access Point disconnected successfully</string>
+    <string name="ap_disconnect_fail">Access Point disconnection failed</string>
+    <string name="disconnect_title">Do you want to disconnect the access point?</string>
+    <string name="another_ap_connected">You have to disconnect with current access
+        point to connect with another one. Do you want to do this?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="invalid_password">Invalid password!</string>
+    <string name="device_already_connected">Device already connected to the access point.</string>
+    <string name="details_disconnect">Disconnect</string>
+    <string name="firmware_version">Firmware version:</string>
 
 </resources>

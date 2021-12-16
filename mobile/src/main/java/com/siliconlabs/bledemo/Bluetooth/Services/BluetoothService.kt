@@ -10,11 +10,9 @@ import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanSettings
 import android.content.*
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Handler
 import android.preference.PreferenceManager
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.siliconlabs.bledemo.Bluetooth.BLE.*
 import com.siliconlabs.bledemo.Bluetooth.ConnectedGatts
@@ -22,12 +20,20 @@ import com.siliconlabs.bledemo.Bluetooth.Parsing.ScanRecordParser
 import com.siliconlabs.bledemo.Browser.Activities.BrowserActivity
 import com.siliconlabs.bledemo.Browser.Models.Logs.*
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.environment.model.EnvironmentEvent
 import com.siliconlabs.bledemo.gatt_configurator.utils.BluetoothGattServicesCreator
 import com.siliconlabs.bledemo.gatt_configurator.utils.GattConfiguratorStorage
+import com.siliconlabs.bledemo.motion.model.MotionEvent
+import com.siliconlabs.bledemo.thunderboard.model.NotificationEvent
+import com.siliconlabs.bledemo.thunderboard.model.StatusEvent
+import com.siliconlabs.bledemo.thunderboard.model.ThunderBoardDevice
+import com.siliconlabs.bledemo.thunderboard.utils.BleUtils
 import com.siliconlabs.bledemo.utils.Constants
 import com.siliconlabs.bledemo.utils.LocalService
 import com.siliconlabs.bledemo.utils.Notifications
 import com.siliconlabs.bledemo.utils.UuidConsts
+import rx.subjects.BehaviorSubject
+import rx.subjects.PublishSubject
 import timber.log.Timber
 import java.lang.reflect.Method
 import java.util.*
@@ -67,7 +73,11 @@ class BluetoothService : LocalService<BluetoothService>() {
         LIGHT,
         RANGE_TEST,
         BLINKY,
-        THROUGHPUT_TEST
+        THROUGHPUT_TEST,
+        WIFI_COMMISSIONING,
+        MOTION,
+        ENVIRONMENT,
+        IOP_TEST
     }
 
     class Receiver : BroadcastReceiver() {
@@ -104,7 +114,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         /**
          * If this returns a non-empty list, scanned devices will be matched by the
          * return filters. A device will be scanned and recognized if it advertisement matches
-         * one of more filters returned by this method.
+         * one or more filters returned by this method.
          *
          *
          * An empty list (or null) will match every bluetooth device, i.e. no filtering.
@@ -140,7 +150,8 @@ class BluetoothService : LocalService<BluetoothService>() {
          * @param devices           List of all bluetooth devices currently discovered by the scan since [.onScanStarted].
          * @param changedDeviceInfo Indicates which device in 'devices' is new or updated (can be ignored).
          */
-        fun onScanResultUpdated(devices: List<BluetoothDeviceInfo>?, changedDeviceInfo: BluetoothDeviceInfo?)
+        fun onScanResultUpdated(devices: List<BluetoothDeviceInfo>?,
+                                changedDeviceInfo: BluetoothDeviceInfo?)
 
         /**
          * Called when the current discovery process has ended.
@@ -218,6 +229,24 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
     }
 
+    @kotlin.jvm.JvmField
+    val selectedDeviceMonitor: BehaviorSubject<ThunderBoardDevice> = BehaviorSubject.create<ThunderBoardDevice>()
+    @kotlin.jvm.JvmField
+    val selectedDeviceStatusMonitor: BehaviorSubject<StatusEvent> = BehaviorSubject.create<StatusEvent>()
+    val motionDetector: PublishSubject<MotionEvent> = PublishSubject.create<MotionEvent>()
+    val environmentDetector: PublishSubject<EnvironmentEvent> = PublishSubject.create<EnvironmentEvent>()
+    val environmentReadMonitor: PublishSubject<EnvironmentEvent> = PublishSubject.create<EnvironmentEvent>()
+    val notificationsMonitor: BehaviorSubject<NotificationEvent> = BehaviorSubject.create<NotificationEvent>()
+    @kotlin.jvm.JvmField
+    var thunderboardDevice: ThunderBoardDevice? = null
+    @kotlin.jvm.JvmField
+    var thunderboardCallback: ThunderboardActivityCallback? = null
+
+
+
+    fun getThunderboardType() : ThunderBoardDevice.Type {
+        return thunderboardDevice?.boardType ?: ThunderBoardDevice.Type.UNKNOWN
+    }
     /**
      * Preference whose [.PREF_KEY_SAVED_DEVICES] key will have a set addresses of known devices.
      * Note that this list only grows... since we don't expect a phone/device to come into contact with many
@@ -433,18 +462,12 @@ class BluetoothService : LocalService<BluetoothService>() {
         if (useBLE) {
             val scannerCallback: ScanCallback = BLEScanCallbackLollipop(this)
             bleScannerCallback = scannerCallback
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val settings = ScanSettings.Builder()
-                        .setLegacy(false)
-                        .setReportDelay(0)
-                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
-                bluetoothAdapter?.bluetoothLeScanner?.startScan(listeners.scanFilterL as List<ScanFilter?>?, settings, scannerCallback)
-            } else {
-                val settings = ScanSettings.Builder()
-                        .setReportDelay(0)
-                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
-                bluetoothAdapter?.bluetoothLeScanner?.startScan(listeners.scanFilterL as List<ScanFilter?>?, settings, scannerCallback)
-            }
+            val settings = ScanSettings.Builder()
+                    .setLegacy(false)
+                    .setReportDelay(0)
+                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
+            bluetoothAdapter?.bluetoothLeScanner?.startScan(
+                    listeners.scanFilterL as List<ScanFilter?>?, settings, scannerCallback)
         } else {
             if (!bluetoothAdapter?.startDiscovery()!!) {
                 onDiscoveryCanceled()
@@ -1176,6 +1199,67 @@ class BluetoothService : LocalService<BluetoothService>() {
         override fun onCharacteristicChanged(characteristic: GattCharacteristic?, value: Any?) {
             for (listener in this) {
                 listener.onCharacteristicChanged(characteristic, value)
+            }
+        }
+    }
+
+    fun readRequiredCharacteristics() {
+        if (connectedGatt == null) return
+
+        thunderboardDevice?.let {
+            var readSuccessful: Boolean
+            if (it.name == null) {
+                readSuccessful = BleUtils.readCharacteristic(connectedGatt,
+                        GattService.GenericAccess.number,
+                        GattCharacteristic.DeviceName.uuid)
+            }
+            else if (it.modelNumber == null) {
+                readSuccessful = BleUtils.readCharacteristic(connectedGatt,
+                        GattService.DeviceInformation.number,
+                        GattCharacteristic.ModelNumberString.uuid)
+            } else if (it.isBatteryConfigured == null) {
+                readSuccessful = BleUtils.readCharacteristic(connectedGatt,
+                        GattService.BatteryService.number,
+                        GattCharacteristic.BatteryLevel.uuid)
+                if (!readSuccessful) {
+                    it.isBatteryConfigured = false
+                }
+            } else if (it.isBatteryNotificationEnabled == null) {
+                readSuccessful = BleUtils.setCharacteristicNotification(connectedGatt,
+                        GattService.BatteryService.number,
+                        GattCharacteristic.BatteryLevel.uuid,
+                        UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR,
+                        true)
+                if (!readSuccessful) {
+                    it.isBatteryNotificationEnabled = false
+                }
+            } else if (it.isPowerSourceConfigured == null) {
+                readSuccessful = BleUtils.readCharacteristic(connectedGatt,
+                        GattService.PowerSource.number,
+                        GattCharacteristic.PowerSource.uuid)
+                if (!readSuccessful) {
+                    it.isPowerSourceConfigured = false
+                }
+            } else if (it.isPowerSourceNotificationEnabled == null) {
+                readSuccessful = BleUtils.setCharacteristicNotification(connectedGatt,
+                        GattService.PowerSource.number,
+                        GattCharacteristic.PowerSource.uuid,
+                        UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR,
+                        true)
+                if (!readSuccessful) {
+                    it.isPowerSourceNotificationEnabled = false
+                }
+            } else if (it.firmwareVersion == null) {
+                readSuccessful = BleUtils.readCharacteristic(connectedGatt,
+                        GattService.DeviceInformation.number,
+                        GattCharacteristic.FirmwareRevision.uuid)
+            } else {
+                // out of items to read
+                readSuccessful = true
+                thunderboardCallback?.onPrepared()
+            }
+            if (!readSuccessful) {
+                readRequiredCharacteristics()
             }
         }
     }

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/match" >
+
+    <LinearLayout
+        style="@style/block"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/iodemo_margin"
+        android:paddingLeft="@dimen/iodemo_margin"
+        android:paddingRight="@dimen/iodemo_margin"
+        android:paddingBottom="@dimen/iodemo_margin">
+
+        <LinearLayout style="@style/block">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardview_menu_tile3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/space_XXXS"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="16dp">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textview_menu_title3"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_centerVertical="true"
+                        android:text="@string/blinky_tb_switch_status"
+                        style="@style/tb_robo_medium_18dp"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:layout_alignParentEnd="true">
+
+                            <com.siliconlabs.bledemo.blinky_thunderboard.control.SwitchControl
+                                android:id="@+id/switch0"
+                                android:layout_width="@dimen/space_L"
+                                android:layout_height="match_parent"
+                                android:layout_marginTop="@dimen/space_XXS"
+                                android:layout_marginEnd="@dimen/space_XXS"/>
+
+                            <com.siliconlabs.bledemo.blinky_thunderboard.control.SwitchControl
+                                android:layout_marginStart="@dimen/space_XXS"
+                                android:id="@+id/switch1"
+                                android:layout_width="@dimen/space_L"
+                                android:layout_height="match_parent"
+                                android:layout_marginTop="@dimen/space_XXS"
+                                android:layout_marginEnd="@dimen/space_XXS"
+                                style="@style/wrap" />
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/space_XXXS"
+            android:layout_marginEnd="@dimen/space_XXXS"
+            android:layout_marginTop="@dimen/space_SM"
+            android:layout_marginBottom="@dimen/space_XS"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardCornerRadius="16dp">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/lightsTitle"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_centerVertical="true"
+                    android:text="@string/blinky_tb_leds"
+                    style="@style/tb_robo_medium_18dp"/>
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true">
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/led0"
+                            android:layout_width="@dimen/space_L"
+                            android:layout_height="wrap_content"
+                            android:thumb="@drawable/thumb_selector"
+                            app:track="@drawable/track_selector"
+                            android:layout_marginEnd="@dimen/space_XS"/>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/led1"
+                            android:layout_width="@dimen/space_L"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:thumb="@drawable/thumb_selector"
+                            app:track="@drawable/track_selector"
+                            android:layout_marginEnd="@dimen/space_XS"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <com.siliconlabs.bledemo.blinky_thunderboard.control.ColorLEDControl
+            android:id="@+id/color_led_control"
+            style="@style/block"
+            android:layout_marginTop="@dimen/space_S"
+            android:layout_marginBottom="@dimen/space_XS" />
+
+
+    </LinearLayout>
+
+</ScrollView>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@android:color/white"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_marginHorizontal="@dimen/access_pt_item_margin_horizontal"
+        android:layout_marginVertical="@dimen/access_pt_item_margin_vertical"
+        app:cardCornerRadius="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/access_pt_padding_horizontal"
+            android:paddingVertical="@dimen/access_pt_padding_vertical">
+
+            <ImageView
+                android:layout_width="@dimen/access_pt_wifi_image_width"
+                android:layout_height="@dimen/access_pt_item_height"
+                android:layout_gravity="center"
+                android:id="@+id/access_pt_image"
+                android:src="@drawable/icon_wifi"
+                android:contentDescription="@string/empty_description" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.6"
+                android:orientation="vertical"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/access_pt_text_layout_margin_left"
+                android:layout_marginVertical="@dimen/access_pt_text_layout_margin_vertical" >
+
+                <TextView
+                    android:id="@+id/access_pt_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name"
+                    android:textSize="@dimen/access_pt_name_size"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/access_pt_type"
+                    android:textSize="@dimen/access_pt_type_size"
+                    android:textColor="@color/grey"
+                    android:layout_width="match_parent"
+                    android:text="@string/app_name"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/access_mac_address"
+                    android:textSize="@dimen/access_pt_type_size"
+                    android:textColor="@color/grey"
+                    android:layout_width="match_parent"
+                    android:text="@string/app_name"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+                <TextView
+                    android:id="@+id/access_pt_ip_address"
+                    android:textSize="@dimen/access_pt_type_size"
+                    android:textColor="@color/grey"
+                    android:layout_width="match_parent"
+                    android:text="@string/app_name"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/access_pt_status"
+                android:layout_width="@dimen/access_pt_image_width"
+                android:layout_height="@dimen/access_pt_image_width"
+                android:layout_gravity="center"
+                android:src="@drawable/icon_disconnect"
+                android:contentDescription="@string/empty_description" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

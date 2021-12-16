@@ -1,12 +1,15 @@
 package com.siliconlabs.bledemo.iop_test.models
 
 import com.siliconlabs.bledemo.iop_test.utils.Utils
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
 class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTestCaseInfo>) {
     var connectionParameters: ConnectionParameters? = null
     var firmwareVersion: String = ""
+    var firmwareAckVersion: String = ""
+    var firmwareUnackVersion: String = ""
     var iopBoard: IopBoard = IopBoard.UNKNOWN
     private var phoneOs: String = Utils.getAndroidVersion()
     var phoneName: String = Utils.getDeviceName()
@@ -117,8 +120,10 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
             append("\t").append("<phone_os_version>").append(phoneOs).append("</phone_os_version>").append("\n")
             append("</phone_informations>").append("\n")
             append("<firmware_informations>").append("\n")
-            append("\t").append("<firmware_version>").append(firmwareVersion).append("</firmware_version>").append("\n")
-            append("\t").append("<firmware_ic_name>").append(iopBoard.icName.text).append("</firmware_ic_name>").append("\n")
+            append("\t").append("<firmware_original_version>").append(firmwareVersion).append("</firmware_original_version>").append("\n")
+            append("\t").append("<firmware_ota_ack_version>").append(firmwareAckVersion).append("</firmware_ota_ack_version>").append("\n")
+            append("\t").append("<firmware_ota_non_ack_version>").append(firmwareUnackVersion).append("</firmware_ota_non_ack_version>").append("\n")
+            append("\t").append("<firmware_ic_name>").append(iopBoard.toString().replace("_", "")).append("</firmware_ic_name>").append("\n")
             append("\t").append("<firmware_name>").append(fwName).append("</firmware_name>").append("\n")
             append("</firmware_informations>").append("\n")
             append("<connection_parameters>").append("\n")
@@ -131,6 +136,7 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
             append("<test_results>").append("\n")
             append(logDataTest())
             append("</test_results>").append("\n")
+            Timber.d(this.toString())
         }.toString()
     }
 
