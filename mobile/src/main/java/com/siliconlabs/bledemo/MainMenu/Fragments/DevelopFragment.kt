@@ -24,8 +24,8 @@ class DevelopFragment : Fragment(R.layout.fragment_develop), MenuAdapter.OnMenuI
         list.apply {
             add(Browser(R.drawable.ic_browser, getString(R.string.title_Browser), getString(R.string.main_menu_description_browser)))
             add(Advertiser(R.drawable.ic_advertiser, getString(R.string.title_Advertiser), getString(R.string.main_menu_description_advertiser)))
-            add(IOPTest(R.drawable.ic_iop_tester, getString(R.string.title_Interoperability_Test), getString(R.string.main_menu_description_iop_test)))
             add(GattConfigurator(R.drawable.ic_gatt_configurator, getString(R.string.title_GATT_Configurator), getString(R.string.main_menu_description_gatt_configurator)))
+            add(IOPTest(R.drawable.ic_iop_tester, getString(R.string.title_Interoperability_Test), getString(R.string.main_menu_description_iop_test)))
         }
     }
 

@@ -15,6 +15,7 @@ import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.siliconlabs.bledemo.Base.SelectDeviceDialog
@@ -54,6 +55,9 @@ class BlinkyThunderboardActivity : BaseActivity(),
     @BindView(R.id.led1)
     lateinit var led1: SwitchCompat
 
+    @BindView(R.id.leds_control)
+    lateinit var ledsControl: CardView
+
     @BindView(R.id.color_led_control)
     lateinit var colorLEDControl: ColorLEDControl
 
@@ -69,8 +73,10 @@ class BlinkyThunderboardActivity : BaseActivity(),
 
         val view = LayoutInflater.from(this).inflate(R.layout.activity_blinky_thunderboard, null, false)
         colorLEDControl = view.findViewById(R.id.color_led_control) // make the view gone (if necessary) before it can be showed
+        ledsControl = view.findViewById(R.id.leds_control)
         val powerSourceIntent = intent.getIntExtra(SelectDeviceDialog.POWER_SOURCE_EXTRA, 0)
-        setPowerSource(ThunderBoardDevice.PowerSource.fromInt(powerSourceIntent))
+        val modelNumberIntent = intent.getStringExtra(SelectDeviceDialog.MODEL_TYPE_EXTRA)
+        setControlsVisibility(ThunderBoardDevice.PowerSource.fromInt(powerSourceIntent), modelNumberIntent)
 
         prepareToolbar()
         mainSection?.addView(view)
@@ -87,8 +93,8 @@ class BlinkyThunderboardActivity : BaseActivity(),
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(bluetoothStateReceiver)
-        bluetoothService!!.clearConnectedGatt()
-        bluetoothBinding!!.unbind()
+        bluetoothService?.clearConnectedGatt()
+        bluetoothBinding?.unbind()
         presenter?.clearViewListener()
     }
 
@@ -206,10 +212,15 @@ class BlinkyThunderboardActivity : BaseActivity(),
         colorLEDControl.setColorLEDControlListener(this)
     }
 
-    override fun setPowerSource(powerSource: ThunderBoardDevice.PowerSource) {
-        when (powerSource) {
-            ThunderBoardDevice.PowerSource.COIN_CELL -> colorLEDControl.visibility = View.GONE
-            else -> { }
+    override fun setControlsVisibility(powerSource: ThunderBoardDevice.PowerSource, modelNumber: String?) {
+        if (modelNumber == ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V1 ||
+                modelNumber == ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2) {
+            ledsControl.visibility = View.GONE
+        }
+
+        if (modelNumber == ThunderBoardDevice.THUNDERBOARD_MODEL_SENSE &&
+                powerSource == ThunderBoardDevice.PowerSource.COIN_CELL) {
+            colorLEDControl.visibility = View.GONE
         }
     }
 
@@ -217,10 +228,14 @@ class BlinkyThunderboardActivity : BaseActivity(),
 
     public override fun initControls() {
         runOnUiThread {
-            if (presenter?.boardType != ThunderBoardDevice.Type.THUNDERBOARD_SENSE) {
+            if (presenter?.boardType != ThunderBoardDevice.Type.THUNDERBOARD_SENSE &&
+                    presenter?.boardType != ThunderBoardDevice.Type.THUNDERBOARD_DEV_KIT) {
                 colorLEDControl.visibility = View.GONE
             }
         }
+        presenter?.findRgbLedMaskDescriptor()?.let {
+            bluetoothService?.connectedGatt?.readDescriptor(it)
+        } ?: presenter?.setRgbLedMask(0x0f)
     }
 
     override fun updateColorLEDs(ledRGBState: LedRGBState?) {
@@ -333,7 +348,7 @@ class BlinkyThunderboardActivity : BaseActivity(),
             if (characteristic.uuid == GattCharacteristic.Digital.uuid) {
                 bluetoothService?.let {
                     it.thunderboardDevice?.sensorBlinky?.setLed(characteristic.value[0])
-                    it.selectedDeviceMonitor?.onNext(it.thunderboardDevice)
+                    it.selectedDeviceMonitor.onNext(it.thunderboardDevice)
                 }
             }
         }
@@ -375,6 +390,18 @@ class BlinkyThunderboardActivity : BaseActivity(),
             }
         }
 
+        override fun onDescriptorRead(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?,
+                                      status: Int) {
+            super.onDescriptorRead(gatt, descriptor, status)
+            Timber.d("onDescriptorRead; descriptor = ${descriptor?.uuid}, status = $status")
+            Timber.d("Raw data = ${Arrays.toString(descriptor?.value)}")
+
+            if (descriptor?.uuid == LED_MASK_DESCRIPTOR) {
+                presenter?.setRgbLedMask(descriptor?.value?.get(0)?.toInt() ?: 0)
+            }
+
+        }
+
         override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor,
                                        status: Int) {
             super.onDescriptorWrite(gatt, descriptor, status)
@@ -391,14 +418,14 @@ class BlinkyThunderboardActivity : BaseActivity(),
                     device?.isBatteryNotificationEnabled = true
                     bluetoothService?.let {
                         it.readRequiredCharacteristics()
-                        it.selectedDeviceMonitor?.onNext(device)
+                        it.selectedDeviceMonitor.onNext(device)
                     }
                 }
                 GattCharacteristic.PowerSource.uuid -> {
                     device?.isPowerSourceNotificationEnabled = true
                     bluetoothService?.let {
                         it.readRequiredCharacteristics()
-                        it.selectedDeviceMonitor?.onNext(device)
+                        it.selectedDeviceMonitor.onNext(device)
                     }
                 }
                 GattCharacteristic.Digital.uuid -> {
@@ -415,5 +442,6 @@ class BlinkyThunderboardActivity : BaseActivity(),
     companion object {
         private const val STATE_NORMAL = 0
         private const val STATE_PRESSED = 1
+        val LED_MASK_DESCRIPTOR: UUID? = UUID.fromString("1c694489-8825-45cc-8720-28b54b1fbf00")
     }
 }

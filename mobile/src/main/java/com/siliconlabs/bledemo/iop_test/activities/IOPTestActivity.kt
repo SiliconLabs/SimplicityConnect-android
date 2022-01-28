@@ -527,7 +527,6 @@ class IOPTestActivity : AppCompatActivity() {
                 Log.d(TAG, "Attempting connection...")
                 mBluetoothBinding = object : BluetoothService.Binding(applicationContext) {
                     override fun onBound(service: BluetoothService?) {
-                        service?.isNotificationEnabled = false
                         mBluetoothGatt = mBluetoothDevice?.connectGatt(applicationContext, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
                     }
                 }
@@ -596,7 +595,6 @@ class IOPTestActivity : AppCompatActivity() {
         mBluetoothBinding = object : BluetoothService.Binding(applicationContext) {
             override fun onBound(service: BluetoothService?) {
                 mBluetoothService = service
-                service?.isNotificationEnabled = false
                 service?.connectGatt(bluetoothDevice!!, false, gattCallback)
                 mBluetoothGatt = service?.connectedGatt!!
             }

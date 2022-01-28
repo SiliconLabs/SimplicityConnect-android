@@ -24,12 +24,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.siliconlabs.bledemo.Adapters.DeviceInfoViewHolder
 import com.siliconlabs.bledemo.Adapters.ScannedDevicesAdapter
-import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
-import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery
 import com.siliconlabs.bledemo.Bluetooth.BLE.*
 import com.siliconlabs.bledemo.Bluetooth.BLE.Discovery.BluetoothDiscoveryHost
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
-import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService.GattConnectType
 import com.siliconlabs.bledemo.ConnectedLighting.Activities.ConnectedLightingActivity
@@ -43,6 +40,7 @@ import com.siliconlabs.bledemo.iop_test.models.IOPTest
 import com.siliconlabs.bledemo.motion.activities.MotionActivity
 import com.siliconlabs.bledemo.throughput.activities.ThroughputActivity
 import com.siliconlabs.bledemo.throughput.utils.PeripheralManager
+import com.siliconlabs.bledemo.thunderboard.model.ThunderBoardDevice
 import com.siliconlabs.bledemo.thunderboard.utils.BleUtils
 import com.siliconlabs.bledemo.wifi_commissioning.activities.WifiCommissioningActivity
 import kotlinx.android.synthetic.main.dialog_select_device.*
@@ -67,6 +65,8 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
 
     private var descriptionInfo = 0
     private var titleInfo = 0
+
+    private var intentWithExtras: Intent? = null
 
 
     val timeoutGattCallback = object : TimeoutGattCallback() {
@@ -139,9 +139,15 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
                     }
                     GattConnectType.BLINKY -> {
                         when (characteristic.getStringValue(0)) {
-                            "BRD4166A" -> BleUtils.readCharacteristic(gatt, getPowerSourceCharacteristic(gatt))
-                            "BRD4184A",
-                            "BRD4184B" -> {
+                            ThunderBoardDevice.THUNDERBOARD_MODEL_SENSE,
+                            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V1,
+                            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2 -> {
+                                intentWithExtras = Intent(requireContext(), BlinkyThunderboardActivity::class.java)
+                                intentWithExtras?.putExtra(MODEL_TYPE_EXTRA, characteristic.getStringValue(0))
+                                BleUtils.readCharacteristic(gatt, getPowerSourceCharacteristic(gatt))
+                            }
+                            ThunderBoardDevice.THUNDERBOARD_MODEL_BLUE_V1,
+                            ThunderBoardDevice.THUNDERBOARD_MODEL_BLUE_V2 -> {
                                 getIntent(connectType)?.let {
                                     it.putExtra(MODEL_TYPE_EXTRA, characteristic.getStringValue(0))
                                     startActivity(it)
@@ -153,7 +159,7 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
                     else -> { }
                 }
             } else if (characteristic?.uuid == GattCharacteristic.PowerSource.uuid) {
-                Intent(requireContext(), BlinkyThunderboardActivity::class.java).apply {
+                intentWithExtras?.apply {
                     putExtra(POWER_SOURCE_EXTRA, characteristic.getIntValue(GattCharacteristic.PowerSource.format, 0))
                     startActivity(this)
                 }

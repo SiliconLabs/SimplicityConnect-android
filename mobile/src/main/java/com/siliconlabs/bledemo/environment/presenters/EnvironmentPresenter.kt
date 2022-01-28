@@ -199,6 +199,14 @@ class EnvironmentPresenter @Inject constructor(
                             submitted = readUvIndex()
                             (viewListener as EnvironmentListener).setUvIndexEnabled(submitted)
                             Timber.d("readStatus: %02x, submitted: %s", readStatus, submitted)
+                        } else { /* Hotfix for 2601b board. Skip UV index sensor. */
+                            readStatus = readStatus or 0x30
+                            readStatus = readStatus or 0x40
+                            if (characteristicAmbientLightReactAvailable || characteristicAmbientLightSenseAvailable) {
+                                submitted = readAmbientLightReact() || readAmbientLightSense()
+                                (viewListener as EnvironmentListener).setAmbientLightEnabled(submitted)
+                                Timber.d("readStatus: %02x, submitted: %s", readStatus, submitted)
+                            }
                         }
                     }
                     0x15 -> {
@@ -232,6 +240,19 @@ class EnvironmentPresenter @Inject constructor(
                             submitted = readPressure()
                             (viewListener as EnvironmentListener).setPressureEnabled(submitted)
                             Timber.d("readStatus: %04x, submitted: %s", readStatus, submitted)
+                        } else { /* Hotfix for 4184b board. Skip air quality and pressure sensors. */
+                            readStatus = readStatus or 0x0c00
+                            readStatus = readStatus or 0x1000
+                            readStatus = readStatus or 0x3000
+                            readStatus = readStatus or 0x4000
+                            readStatus = readStatus or 0xc000
+                            readStatus = readStatus or 0x10000
+                            if (characteristicHallFieldStrengthAvailable) {
+                                submitted = readHallStrength()
+                                (viewListener as EnvironmentListener).setHallStrengthEnabled(submitted)
+                                Timber.d("readStatus: %04x, submitted: %s", readStatus, submitted)
+                            }
+
                         }
                     }
                     0x555 -> {
@@ -243,6 +264,16 @@ class EnvironmentPresenter @Inject constructor(
                             submitted = readCO2Level()
                             (viewListener as EnvironmentListener).setCO2LevelEnabled(submitted)
                             Timber.d("readStatus: %04x, submitted: %s", readStatus, submitted)
+                        } else { /* Hotfix for 2601b board. Skip air quality sensors. */
+                            readStatus = readStatus or 0x3000
+                            readStatus = readStatus or 0x4000
+                            readStatus = readStatus or 0xc000
+                            readStatus = readStatus or 0x10000
+                            if (characteristicHallFieldStrengthAvailable) {
+                                submitted = readHallStrength()
+                                (viewListener as EnvironmentListener).setHallStrengthEnabled(submitted)
+                                Timber.d("readStatus: %04x, submitted: %s", readStatus, submitted)
+                            }
                         }
                     }
                     0x1555 -> {

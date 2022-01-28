@@ -97,7 +97,8 @@ class MotionPresenter : BasePresenter() {
 
             override fun onNext(device: ThunderBoardDevice) {
                 if (boardType != ThunderBoardDevice.Type.THUNDERBOARD_SENSE &&
-                        boardType != ThunderBoardDevice.Type.THUNDERBOARD_BLUE) {
+                        boardType != ThunderBoardDevice.Type.THUNDERBOARD_BLUE &&
+                        boardType != ThunderBoardDevice.Type.THUNDERBOARD_DEV_KIT) {
                     unsubscribe()
                 }
             }

@@ -1,9 +1,11 @@
 package com.siliconlabs.bledemo.blinky_thunderboard.presenters
 
 import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
 import android.os.Handler
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
+import com.siliconlabs.bledemo.blinky_thunderboard.activities.BlinkyThunderboardActivity
 import com.siliconlabs.bledemo.thunderboard.base.BasePresenter
 import com.siliconlabs.bledemo.thunderboard.injection.scope.ActivityScope
 import com.siliconlabs.bledemo.thunderboard.model.LedRGBState
@@ -16,6 +18,7 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import timber.log.Timber
 import java.nio.ByteBuffer
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 @ActivityScope
@@ -27,11 +30,17 @@ class BlinkyThunderboardPresenter : BasePresenter() {
     private var ledRGBState: LedRGBState? = null
     private val handler: Handler = Handler()
 
+    private var rgbLedMask = 0
+
     private val retryWriteLed: Runnable = object : Runnable {
         override fun run() {
             handler.removeCallbacks(this)
             setColorLEDs(ledRGBState)
         }
+    }
+
+    fun setRgbLedMask(maskRepresentation: Int) {
+        rgbLedMask = maskRepresentation and 0xff
     }
 
     fun ledAction(action: Int) {
@@ -140,9 +149,6 @@ class BlinkyThunderboardPresenter : BasePresenter() {
                     return
                 }
                 this@BlinkyThunderboardPresenter.sensor = sensor
-                if (device.isPowerSourceConfigured != null && device.isPowerSourceConfigured!! && viewListener != null) {
-                    (viewListener as BlinkyThunderboardListener).setPowerSource(device.powerSource)
-                }
                 if (sensor.isSensorDataChanged && viewListener != null) {
                     val sensorData = sensor.sensorData
                     (viewListener as BlinkyThunderboardListener).setButton0State(sensorData.sw0)
@@ -159,7 +165,8 @@ class BlinkyThunderboardPresenter : BasePresenter() {
                         ledSent = null
                     }
                     sensor.isSensorDataChanged = false
-                    if (boardType == ThunderBoardDevice.Type.THUNDERBOARD_SENSE) {
+                    if (boardType == ThunderBoardDevice.Type.THUNDERBOARD_SENSE ||
+                            boardType == ThunderBoardDevice.Type.THUNDERBOARD_DEV_KIT) {
                         if (sensorData.colorLed != null) {
                             (viewListener as BlinkyThunderboardListener).setColorLEDsValue(sensorData.colorLed!!)
                         } else {
@@ -167,7 +174,9 @@ class BlinkyThunderboardPresenter : BasePresenter() {
                         }
                     }
                 }
-                if (boardType == ThunderBoardDevice.Type.THUNDERBOARD_SENSE && sensor != null && sensor.sensorData.colorLed == null) {
+                if ( (boardType == ThunderBoardDevice.Type.THUNDERBOARD_SENSE ||
+                                boardType == ThunderBoardDevice.Type.THUNDERBOARD_DEV_KIT)
+                        && sensor != null && sensor.sensorData.colorLed == null) {
                     readColorLEDs()
                 }
             }
@@ -191,7 +200,7 @@ class BlinkyThunderboardPresenter : BasePresenter() {
         bytes[0] = (ledRGBState!!.blue and 0xff).toByte()
         bytes[1] = (ledRGBState.green and 0xff).toByte()
         bytes[2] = (ledRGBState.red and 0xff).toByte()
-        bytes[3] = (if (ledRGBState.on) 0x0f else 0x00).toByte()
+        bytes[3] = (if (ledRGBState.on) rgbLedMask else 0x00).toByte()
         val value = ByteBuffer.wrap(bytes).int
         val characteristicsWriteResult = BleUtils.writeCharacteristics(
                 bluetoothService?.connectedGatt!!,
@@ -202,6 +211,12 @@ class BlinkyThunderboardPresenter : BasePresenter() {
         if (!characteristicsWriteResult) {
             handler.postDelayed(retryWriteLed, 100)
         }
+    }
+
+    fun findRgbLedMaskDescriptor() : BluetoothGattDescriptor? {
+        return bluetoothService?.connectedGatt?.getService(GattService.UserInterface.number)?.
+        getCharacteristic(GattCharacteristic.RgbLeds.uuid)?.
+        getDescriptor(BlinkyThunderboardActivity.LED_MASK_DESCRIPTOR)
     }
 
 }

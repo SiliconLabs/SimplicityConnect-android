@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g3d.utils.BaseShaderProvider
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
 import com.badlogic.gdx.math.Matrix4
 import com.siliconlabs.bledemo.motion.ui.EmissiveShader
+import com.siliconlabs.bledemo.thunderboard.model.ThunderBoardDevice
 import java.util.*
 
 class GdxAdapter(private val backgroundColor: Int, modelType: String?) :
@@ -258,8 +259,11 @@ class GdxAdapter(private val backgroundColor: Int, modelType: String?) :
         assets = AssetManager()
         instances = ArrayList()
         when (modelType) {
-            "BRD4184A", "BRD4184B" -> this.modelType = ModelType.BLUE
-            "BRD4166A" -> this.modelType = ModelType.SENSE
+            ThunderBoardDevice.THUNDERBOARD_MODEL_BLUE_V1,
+            ThunderBoardDevice.THUNDERBOARD_MODEL_BLUE_V2 -> this.modelType = ModelType.BLUE
+            ThunderBoardDevice.THUNDERBOARD_MODEL_SENSE,
+            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V1,
+            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2 -> this.modelType = ModelType.SENSE
             else -> this.modelType = ModelType.SENSE
         }
     }

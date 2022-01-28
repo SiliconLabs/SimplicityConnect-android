@@ -10,5 +10,5 @@ interface BlinkyThunderboardListener : BaseViewListener {
     fun setLed0State(state: Int)
     fun setLed1State(state: Int)
     fun setColorLEDsValue(colorLEDsValue: LedRGBState)
-    fun setPowerSource(powerSource: ThunderBoardDevice.PowerSource)
+    fun setControlsVisibility(powerSource: ThunderBoardDevice.PowerSource, modelNumber: String?)
 }

@@ -45,6 +45,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 private val TAG = BluetoothService::class.java.simpleName
 
+@SuppressWarnings("LogNotTimber")
 class BluetoothService : LocalService<BluetoothService>() {
 
     companion object {
@@ -423,7 +424,6 @@ class BluetoothService : LocalService<BluetoothService>() {
 
     fun clearCache() {
         synchronized(discoveredDevices) {
-            isNotificationEnabled = true
             discoveredDevices.clear()
             interestingDevices.clear()
         }
@@ -940,8 +940,6 @@ class BluetoothService : LocalService<BluetoothService>() {
         this.gattServerCallback = callback
     }
 
-    var isNotificationEnabled = true
-
     private val bluetoothGattServerCallback = object : BluetoothGattServerCallback() {
         override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
             super.onConnectionStateChange(device, status, newState)
@@ -951,7 +949,7 @@ class BluetoothService : LocalService<BluetoothService>() {
 
             if (gattServerCallback != null) {
                 gattServerCallback?.onConnectionStateChange(device, status, newState)
-            } else if (isSuccessfullyConnected && isNotificationEnabled) {
+            } else if (isSuccessfullyConnected && connectedGatt?.device != device) {
                 showDebugConnectionNotification(device)
             }
         }

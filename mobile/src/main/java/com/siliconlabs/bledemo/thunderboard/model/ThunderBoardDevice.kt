@@ -37,9 +37,11 @@ class ThunderBoardDevice(device: BluetoothDevice) {
 
     val boardType: Type
         get() = when (modelNumber) {
-            THUNDERBOARD_SENSE_MODEL_NUMBER_TB2 -> Type.THUNDERBOARD_SENSE
-            THUNDERBOARD_SENSE_MODEL_NUMBER_BLUE_V1,
-            THUNDERBOARD_SENSE_MODEL_NUMBER_BLUE_V2 -> Type.THUNDERBOARD_BLUE
+            THUNDERBOARD_MODEL_SENSE -> Type.THUNDERBOARD_SENSE
+            THUNDERBOARD_MODEL_BLUE_V1,
+            THUNDERBOARD_MODEL_BLUE_V2 -> Type.THUNDERBOARD_BLUE
+            THUNDERBOARD_MODEL_DEV_KIT_V1,
+            THUNDERBOARD_MODEL_DEV_KIT_V2 -> Type.THUNDERBOARD_DEV_KIT
             else -> Type.UNKNOWN
         }
 
@@ -61,13 +63,16 @@ class ThunderBoardDevice(device: BluetoothDevice) {
     enum class Type {
         THUNDERBOARD_SENSE,
         THUNDERBOARD_BLUE,
+        THUNDERBOARD_DEV_KIT,
         UNKNOWN
     }
 
     companion object {
-        private const val THUNDERBOARD_SENSE_MODEL_NUMBER_TB2 = "BRD4166A"
-        private const val THUNDERBOARD_SENSE_MODEL_NUMBER_BLUE_V1 = "BRD4184A"
-        private const val THUNDERBOARD_SENSE_MODEL_NUMBER_BLUE_V2 = "BRD4184B"
+        const val THUNDERBOARD_MODEL_SENSE = "BRD4166A"
+        const val THUNDERBOARD_MODEL_BLUE_V1 = "BRD4184A"
+        const val THUNDERBOARD_MODEL_BLUE_V2 = "BRD4184B"
+        const val THUNDERBOARD_MODEL_DEV_KIT_V1 = "BRD2601A"
+        const val THUNDERBOARD_MODEL_DEV_KIT_V2 = "BRD2601B"
     }
 
 }

@@ -67,6 +67,7 @@
 
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/leds_control"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="@dimen/space_XXXS"
