@@ -54,6 +54,7 @@ object Consts {
     const val TAG_P = "p"
     const val TAG_REFERENCE = "Reference"
     const val TAG_DECIMAL_EXPONENT = "DecimalExponent"
+    const val TAG_MULTIPLIER = "Multiplier"
     const val TAG_REQUIREMENT = "Requirement"
     const val TAG_CHARACTERISTICS = "Characteristics"
     const val TAG_DESCRIPTORS = "Descriptors"

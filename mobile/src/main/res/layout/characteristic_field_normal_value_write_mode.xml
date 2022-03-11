@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/writable_container_top_margin"
+    android:paddingVertical="@dimen/writable_container_vertical_padding" >
+
+    <TextView
+        android:id="@+id/characteristic_field_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginEnd="@dimen/writable_container_value_horizontal_margin"
+        android:gravity="center_vertical"
+
+        android:background="@color/silabs_white"
+        android:textSize="@dimen/characteristic_list_item_value_label_text_size"
+        android:textColor="@color/silabs_subtle_text"
+        tools:text="Characteristic field" />
+
+    <EditText
+        android:id="@+id/characteristic_field_value_edit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="@dimen/writable_container_value_horizontal_margin"
+        android:padding="0dp"
+        android:gravity="center_vertical"
+        android:background="@drawable/et_custom_color"
+
+        android:singleLine="true"
+        android:textSize="@dimen/characteristic_list_item_value_text_size"
+        android:textColor="@color/silabs_primary_text"
+        tools:text="Some value" />
+
+</LinearLayout>

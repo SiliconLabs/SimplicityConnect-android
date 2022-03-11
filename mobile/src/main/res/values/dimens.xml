@@ -27,6 +27,11 @@
     <dimen name="encoded_label_width">50dp</dimen>
     <dimen name="dialog_writable_fields_container_padding">25dp</dimen>
 
+    <dimen name="writable_container_top_margin">5dp</dimen>
+    <dimen name="writable_container_bottom_margin">10dp</dimen>
+    <dimen name="writable_container_vertical_padding">15dp</dimen>
+    <dimen name="writable_container_value_horizontal_margin">8dp</dimen>
+
     <!-- Dialog: advertisement details -->
     <dimen name="advertisement_details_title_padding_left">20dp</dimen>
     <dimen name="advertisement_details_title_padding_top">20dp</dimen>

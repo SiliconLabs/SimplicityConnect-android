@@ -871,6 +871,7 @@ class BluetoothService : LocalService<BluetoothService>() {
             super.onCharacteristicWrite(gatt, characteristic, status)
             Timber.d("onCharacteristicWrite(): gatt device = %s, characteristic uuid = %s",
                     gatt.device.address, characteristic.uuid)
+            Timber.d("Characteristic value = ${characteristic.value?.contentToString()}")
             extraGattCallback?.onCharacteristicWrite(gatt, characteristic, status)
         }
 
@@ -911,7 +912,8 @@ class BluetoothService : LocalService<BluetoothService>() {
         override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
             super.onCharacteristicRead(gatt, characteristic, status)
             Timber.d("onCharacteristicRead(): gatt device = %s, status = %d",
-                    gatt.device.address, status) //todo characteristic value ?
+                    gatt.device.address, status)
+            Timber.d("Characteristic value = ${characteristic.value?.contentToString()}")
 
             extraGattCallback?.onCharacteristicRead(gatt, characteristic, status)
         }
@@ -920,7 +922,7 @@ class BluetoothService : LocalService<BluetoothService>() {
             super.onCharacteristicChanged(gatt, characteristic)
             Timber.d("onCharacteristicChanged(): gatt device = %s, uuid = %s",
                 gatt.device.address, characteristic.uuid)
-
+            Timber.d("Characteristic value = ${characteristic.value?.contentToString()}")
             extraGattCallback?.onCharacteristicChanged(gatt, characteristic)
         }
 

@@ -353,9 +353,10 @@ class BluetoothXmlParser {
                 Consts.TAG_UNIT -> field.unit = readUnit(parser)
                 Consts.TAG_BITFIELD -> field.bitfield = readBitField(parser)
                 Consts.TAG_ENUMERATIONS -> field.enumerations = readEnumerations(parser)
-                Consts.TAG_REQUIREMENT -> field.requirement = readRequirement(parser)
+                Consts.TAG_REQUIREMENT -> field.requirements.add(readRequirement(parser))
                 Consts.TAG_REFERENCE -> field.reference = readReference(parser)
                 Consts.TAG_DECIMAL_EXPONENT -> field.decimalExponent = readDecimalExponent(parser)
+                Consts.TAG_MULTIPLIER -> field.multiplier = readMultiplier(parser)
                 else -> skip(parser)
             }
         }
@@ -455,6 +456,15 @@ class BluetoothXmlParser {
         val decimalExponent = readLong(parser)
         parser.require(XmlPullParser.END_TAG, ns, Consts.TAG_DECIMAL_EXPONENT)
         return decimalExponent
+    }
+
+    // Reads field multiplier
+    @Throws(XmlPullParserException::class, IOException::class)
+    private fun readMultiplier(parser: XmlPullParser) : Long {
+        parser.require(XmlPullParser.START_TAG, ns, Consts.TAG_MULTIPLIER)
+        val multiplier = readLong(parser)
+        parser.require(XmlPullParser.END_TAG, ns, Consts.TAG_MULTIPLIER)
+        return multiplier
     }
 
     // Reads bit field

@@ -195,7 +195,7 @@
             <Requirement>C2</Requirement>
             <Requirement>C9</Requirement>
             <Format>uint16</Format>
-            <Unit>org.bluetooth.unit.mass.kilogram</Unit>
+            <Unit>org.bluetooth.unit.mass.pound</Unit>
             <DecimalExponent>-2</DecimalExponent>
         </Field>
         <Field name="Body Water Mass - Kilograms">

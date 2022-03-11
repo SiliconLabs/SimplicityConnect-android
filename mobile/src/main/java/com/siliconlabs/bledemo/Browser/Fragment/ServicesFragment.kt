@@ -27,11 +27,10 @@ import com.siliconlabs.bledemo.Browser.MappingCallback
 import com.siliconlabs.bledemo.Browser.Models.Mapping
 import com.siliconlabs.bledemo.Browser.Models.MappingType
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.utils.*
 import com.siliconlabs.bledemo.Views.CharacteristicItemContainer
 import com.siliconlabs.bledemo.Views.ServiceItemContainer
-import com.siliconlabs.bledemo.utils.Notifications
 import com.siliconlabs.bledemo.iop_test.models.CommonUUID
+import com.siliconlabs.bledemo.utils.*
 import java.util.*
 
 abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layout.fragment_services) {
@@ -230,7 +229,6 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
     ): FragmentCharacteristicDetail {
         val characteristicDetail = FragmentCharacteristicDetail().apply {
             isRemote = this@ServicesFragment.isRemote
-            address = bluetoothGatt?.device?.address
             setmService(service)
             setmBluetoothCharact(bluetoothGattCharacteristic)
             this.displayWriteDialog = displayWriteDialog
@@ -467,7 +465,7 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
         )
         if (characteristicFragments.containsKey(id)) {
             currentWriteReadFragment = characteristicFragments[id]
-            characteristicFragments[id]?.showCharacteristicWriteDialog(writeType)
+            characteristicFragments[id]?.createWriteDialog(writeType)
         } else {
             currentWriteReadFragment = initFragmentCharacteristicDetail(
                 characteristic,

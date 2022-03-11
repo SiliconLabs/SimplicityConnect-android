@@ -34,4 +34,7 @@ class Characteristic {
         this.uuid = uuid
     }
 
+    fun getSizeInBytes() : Int {
+        return fields.orEmpty().sumBy { it.getSizeInBytes() }
+    }
 }

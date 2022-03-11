@@ -17,10 +17,14 @@
 package com.siliconlabs.bledemo.Bluetooth.Parsing
 
 import android.content.Context
+import com.google.common.math.IntMath.pow
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.utils.Converters.calculateDecimalValue
 import com.siliconlabs.bledemo.utils.Converters.getDecimalValue
+import com.siliconlabs.bledemo.utils.Converters.getTwosComplementFromUnsignedInt
+import timber.log.Timber
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -64,10 +68,18 @@ object Common {
 
     private var FIRST_SFLOAT_RESERVED_VALUE = SFLOAT_POSITIVE_INFINITY
 
-    private val reservedSFloatValues = floatArrayOf(SFLOAT_POSITIVE_INFINITY.toFloat(), SFLOAT_NaN.toFloat(), SFLOAT_NaN.toFloat(), SFLOAT_NaN.toFloat(),
+    private val reservedSFloatValues = floatArrayOf(
+            SFLOAT_POSITIVE_INFINITY.toFloat(),
+            SFLOAT_NaN.toFloat(),
+            SFLOAT_NaN.toFloat(),
+            SFLOAT_NaN.toFloat(),
             SFLOAT_NEGATIVE_INFINITY.toFloat())
 
-    private val reservedFloatValues = floatArrayOf(FLOAT_POSITIVE_INFINITY.toFloat(), FLOAT_NaN.toFloat(), FLOAT_NaN.toFloat(), FLOAT_NaN.toFloat(),
+    private val reservedFloatValues = floatArrayOf(
+            FLOAT_POSITIVE_INFINITY.toFloat(),
+            FLOAT_NaN.toFloat(),
+            FLOAT_NaN.toFloat(),
+            FLOAT_NaN.toFloat(),
             FLOAT_NEGATIVE_INFINITY.toFloat())
 
     // Compares two uuid objects
@@ -107,25 +119,19 @@ object Common {
         return 1 shl bit.let { tmpVal = tmpVal xor it; tmpVal }
     }
 
-    // Reads SFLOAT type
-    fun readSfloat(value: ByteArray, start: Int, end: Int): Float {
-        var mantissa = 0
-        mantissa = mantissa shl 8 or getDecimalValue(value[start + end - 1]).toInt()
-        mantissa = mantissa shl 8 or (getDecimalValue(value[start + end]).toInt() and 0x0F)
-        var exponent: Int = value[start + end].toInt() and 0xF0
-        if (exponent >= 0x0008) {
-            exponent = -(0x000F + 1 - exponent)
+    /* Least Significant Octet -> Most Significant Octet */
+    fun readSfloat(value: ByteArray): Float {
+        var output: Float
+        val fullNumber = calculateDecimalValue(value, isBigEndian = false)
+        if (fullNumber in FIRST_SFLOAT_RESERVED_VALUE..SFLOAT_NEGATIVE_INFINITY) {
+            output = reservedSFloatValues[fullNumber - FIRST_SFLOAT_RESERVED_VALUE]
         }
-        var output = 0f
-        if (mantissa >= FIRST_SFLOAT_RESERVED_VALUE && mantissa <= SFLOAT_NEGATIVE_INFINITY) {
-            output = reservedSFloatValues[mantissa - FIRST_SFLOAT_RESERVED_VALUE]
-        } else {
-            if (mantissa >= 0x0800) {
-                mantissa = -(0x0FFF + 1 - mantissa)
-            }
-            val magnitude = 10.0.pow(exponent.toDouble())
-            output = (mantissa * magnitude).toFloat()
-        }
+
+        val mantissa = getTwosComplementFromUnsignedInt(fullNumber and 0x0fff, 12)
+        val exponent = getTwosComplementFromUnsignedInt(fullNumber shr 12, 4)
+        val magnitude = 10.0.pow(exponent.toDouble())
+        output = mantissa.toFloat() * magnitude.toFloat()
+
         return output
     }
 
@@ -153,15 +159,13 @@ object Common {
     }
 
     // Reads float32 type
-    fun readFloat32(value: ByteArray?, start: Int, end: Int): Float {
-        val bytes = Arrays.copyOfRange(value, start, end)
-        return ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).float
+    fun readFloat32(value: ByteArray): Float {
+        return ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN).float
     }
 
     // Reads float64 type
-    fun readFloat64(value: ByteArray?, start: Int, end: Int): Double {
-        val bytes = Arrays.copyOfRange(value, start, end)
-        return ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).double
+    fun readFloat64(value: ByteArray): Double {
+        return ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN).double
     }
 
     fun getServiceName(uuid: UUID?, context: Context): String {

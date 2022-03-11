@@ -317,6 +317,7 @@
     <string name="advertisement_details_dialog_title">Advertisement Details</string>
     <string name="characteristic_dialog_invalid_input">Invalid input</string>
     <string name="characteristic_dialog_invalid_out_of_range">Value out of range</string>
+    <string name="characteristic_dialog_field_size_exceeded">Field size exceeded</string>
 
     <!-- silicon labs string arrays -->
     <string-array name="properties_array">

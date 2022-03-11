@@ -19,18 +19,17 @@ import com.siliconlabs.bledemo.Base.SelectDeviceDialog
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.RangeTest.Fragments.RangeTestFragment
 import com.siliconlabs.bledemo.RangeTest.Fragments.RangeTestModeDialog
-import com.siliconlabs.bledemo.RangeTest.Models.RangeTestAdvertisementHandler
-import com.siliconlabs.bledemo.RangeTest.Models.RangeTestMode
-import com.siliconlabs.bledemo.RangeTest.Models.RangeTestValues
 import com.siliconlabs.bledemo.RangeTest.Presenters.RangeTestPresenter
 import com.siliconlabs.bledemo.RangeTest.Presenters.RangeTestPresenter.Controller
 import com.siliconlabs.bledemo.RangeTest.Presenters.RangeTestPresenter.RangeTestView
 import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
 import com.siliconlabs.bledemo.Bluetooth.BLE.*
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
+import com.siliconlabs.bledemo.RangeTest.Models.*
 import com.siliconlabs.bledemo.utils.Notifications
 import kotlinx.android.synthetic.main.actionbar.*
 import kotlinx.android.synthetic.main.activity_range_test.*
+import timber.log.Timber
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -46,12 +45,6 @@ import kotlin.math.abs
 class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.BluetoothStateListener {
 
     private var activeDeviceId = 1
-    private var deviceInfo1: BluetoothDeviceInfo? = null
-    private var deviceInfo2: BluetoothDeviceInfo? = null
-    private var test1Running: Boolean = false
-    private var test2Running: Boolean = false
-    private var mode1: RangeTestMode? = null
-    private var mode2: RangeTestMode? = null
 
     private var advertisementHandler: RangeTestAdvertisementHandler? = null
     private var stateReceiver: BluetoothStateReceiver? = null
@@ -70,13 +63,8 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
     private var reconnectionRetry = 0
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    private val switchDeviceRunnable = Runnable {
-        service?.getConnectedGatt(getDeviceInfo()?.address)?.connect()
-        initTest(service)
-    }
-
     private val reconnectionRunnable = Runnable {
-        val gatt: BluetoothGatt? = service?.getConnectedGatt(getDeviceInfo()?.address)
+        val gatt: BluetoothGatt? = service?.getConnectedGatt(presenter.getDeviceInfo()?.address)
         val device: BluetoothDevice?
 
         if (service == null) {
@@ -121,7 +109,7 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
         retryAttempts++
         runOnUiThread {
             Handler(Looper.getMainLooper()).postDelayed({
-                service?.connectGatt(getDeviceInfo()?.device!!, false, timeoutGattCallback)
+                service?.connectGatt(presenter.getDeviceInfo()?.device!!, false, timeoutGattCallback)
             }, 1000)
         }
     }
@@ -151,7 +139,7 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
                 retryConnectionAttempt()
             } else {
                 runOnUiThread {
-                    showMessage(ErrorCodes.getFailedConnectingToDeviceMessage(getDeviceInfo()?.name, status))
+                    showMessage(ErrorCodes.getFailedConnectingToDeviceMessage(presenter.getDeviceInfo()?.name, status))
                     dismissModalDialog()
                     connectToSecondDevice()
                 }
@@ -182,83 +170,33 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
         registerReceiver(stateReceiver, filter)
     }
 
-    private fun getDeviceInfo(): BluetoothDeviceInfo? {
-        return if (activeDeviceId == 1) deviceInfo1
-        else deviceInfo2
-    }
-
-    private fun getDeviceInfoAt(which: Int): BluetoothDeviceInfo? {
-        return if (which == 1) deviceInfo1
-        else deviceInfo2
-    }
 
     private fun switchCurrentDevice() {
-        activeDeviceId = if (activeDeviceId == 1) 2
-        else 1
+        activeDeviceId =
+                if (activeDeviceId == 1) 2
+                else 1
+        presenter.switchCurrentDevice()
     }
-
-    private fun setDeviceInfo(deviceInfo: BluetoothDeviceInfo?) {
-        if (activeDeviceId == 1) deviceInfo1 = deviceInfo
-        else deviceInfo2 = deviceInfo
-    }
-
-    private fun setDeviceInfoAt(which: Int, deviceInfo: BluetoothDeviceInfo?) {
-        if (which == 1) deviceInfo1 = deviceInfo
-        else deviceInfo2 = deviceInfo
-    }
-
-    private fun getMode(): RangeTestMode? {
-        return if (activeDeviceId == 1) mode1
-        else mode2
-    }
-
-    private fun setMode(mode: RangeTestMode?) {
-        if (activeDeviceId == 1) mode1 = mode
-        else mode2 = mode
-    }
-
-    private fun setModeAt(which: Int, mode: RangeTestMode?) {
-        if (which == 1) mode1 = mode
-        else mode2 = mode
-    }
-
-    private fun getTestRunning(): Boolean {
-        return if (activeDeviceId == 1) test1Running
-        else test2Running
-    }
-
-    private fun setTestRunning(running: Boolean) {
-        if (activeDeviceId == 1) test1Running = running
-        else test2Running = running
-    }
-
-    private fun setTestRunningAt(which: Int, running: Boolean) {
-        if (which == 1) test1Running = running
-        else test2Running = running
-    }
-
-    private fun resetDeviceAt(which: Int) {
-        setDeviceInfoAt(which, null)
-        setModeAt(which, null)
-        setTestRunningAt(which, false)
-    }
+    
+    
 
     private fun changeDevice(tvTab: TextView, which: Int) {
         activeDeviceId = which
+        presenter.setCurrentDevice(which)
 
-        if (getDeviceInfo() == null) {
+        if (presenter.getDeviceInfo() == null) {
             val connectType = BluetoothService.GattConnectType.RANGE_TEST
             val selectDeviceDialog = SelectDeviceDialog.newDialog(R.string.title_Range_Test, R.string.main_menu_description_range_test, null, connectType)
             selectDeviceDialog.setCallback(object : SelectDeviceDialog.Callback {
                 override fun getBluetoothDeviceInfo(info: BluetoothDeviceInfo?) {
                     removeRangeTestFragment()
-                    doInitialSetupForDeviceChange()
+                    advertisementHandler?.stopListening()
 
                     runOnUiThread {
                         showModalDialog(ConnectionStatus.CONNECTING, DialogInterface.OnCancelListener {
-                            getDeviceInfo()?.address?.let {
+                            presenter.getDeviceInfo()?.address?.let {
                                 service?.clearConnectedGatt()
-                                resetDeviceAt(which)
+                                presenter.resetDeviceAt(which)
                             }
                             tvTab.text = "No Device"
                         })
@@ -266,12 +204,12 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
                         selectTab(tvTab)
                     }
 
-                    setDeviceInfo(info)
+                    presenter.setDeviceInfo(info)
 
                     binding = object : BluetoothService.Binding(this@RangeTestActivity) {
                         override fun onBound(service: BluetoothService?) {
                             this@RangeTestActivity.service = service
-                            service?.connectGatt(getDeviceInfo()?.device!!, false, timeoutGattCallback)
+                            service?.connectGatt(presenter.getDeviceInfo()?.device!!, false, timeoutGattCallback)
                         }
                     }
                     binding?.bind()
@@ -287,25 +225,9 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
                     .commitAllowingStateLoss()
         } else {
             removeRangeTestFragment()
-            doInitialSetupForDeviceChange()
-
-            runOnUiThread {
-                showModalDialog(ConnectionStatus.READING_DEVICE_STATE)
-                selectTab(tvTab)
-            }
-
-            mainHandler.apply {
-                removeCallbacks(switchDeviceRunnable)
-                postDelayed(switchDeviceRunnable, SWITCH_DEVICE_TIMEOUT_MS)
-            }
+            runOnUiThread { selectTab(tvTab) }
+            showRangeTestFragment(presenter.getMode())
         }
-    }
-
-    private fun doInitialSetupForDeviceChange() {
-        presenter = RangeTestPresenter()
-        processor = GattProcessor()
-        advertisementHandler?.stopListening()
-        advertisementHandler = null
     }
 
     private fun prepareToolbar() {
@@ -381,7 +303,7 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
     }
 
     override fun toggleRunningState() {
-        withGatt(SetValueGattAction(GattCharacteristic.RangeTestIsRunning, !getTestRunning()))
+        withGatt(SetValueGattAction(GattCharacteristic.RangeTestIsRunning, !presenter.getTestRunning()))
     }
 
     override fun updatePhyConfig(id: Int) {
@@ -389,21 +311,21 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
     }
 
     private fun initTestView(mode: RangeTestMode?, writeCharacteristic: Boolean) {
-        setMode(mode)
+        presenter.setMode(mode)
 
         if (writeCharacteristic) {
             withGatt(SetValueGattAction(GattCharacteristic.RangeTestRadioMode, mode?.code!!))
         }
 
-        showRangeTestFragment(getMode())
+        showRangeTestFragment(presenter.getMode())
     }
 
     private fun connectToSecondDevice() {
 
         // Set previous device to null
-        resetDeviceAt(activeDeviceId)
+        presenter.resetDeviceAt(activeDeviceId)
 
-        if (deviceInfo1 == null && deviceInfo2 == null) {
+        if (presenter.deviceState1.deviceInfo == null && presenter.deviceState2.deviceInfo == null) {
             if (!isFinishing) finish()
         }
 
@@ -419,19 +341,21 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
     }
 
     private fun initTest(service: BluetoothService?) {
-        val gatt: BluetoothGatt? = service?.getConnectedGatt(getDeviceInfo()?.address)
+        val gatt: BluetoothGatt? = service?.getConnectedGatt(presenter.getDeviceInfo()?.address)
         val device: BluetoothDevice?
 
-        if (gatt == null || !service.isGattConnected(getDeviceInfo()?.address)) {
+        if (gatt == null || !service.isGattConnected(presenter.getDeviceInfo()?.address)) {
             runOnUiThread {
-                Toast.makeText(this@RangeTestActivity, "Disconnected: ${getDeviceInfo()?.device?.name}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@RangeTestActivity, "Disconnected: ${presenter.getDeviceInfo()?.device?.name}", Toast.LENGTH_SHORT).show()
                 connectToSecondDevice()
             }
         }
 
         device = gatt?.device
         if (device == null) {
-            if (!isFinishing) finish()
+            if (!isFinishing) {
+                finish()
+            }
             return
         }
 
@@ -439,11 +363,11 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
 
         advertisementHandler = object : RangeTestAdvertisementHandler(this, device.address) {
             override fun handleAdvertisementRecord(manufacturerData: Int, companyId: Int, structureType: Int, rssi: Int, packetCount: Int, packetReceived: Int) {
-                if (getMode() == RangeTestMode.Rx && structureType == 0) {
+                if (presenter.getMode() == RangeTestMode.Rx && structureType == 0) {
                     cancelReconnect()
                     presenter.onTestDataReceived(rssi, packetCount, packetReceived)
-                } else if (!reconnecting) {
-                    scheduleReconnect()
+                } else if (manufacturerData != -1) {
+                    handleConnectionError()
                 }
             }
         }
@@ -465,7 +389,11 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
     }
 
     private fun withGatt(action: GattAction) {
-        var gatt: BluetoothGatt? = service?.getConnectedGatt(getDeviceInfo()?.address)
+        if (presenter.getMode() == RangeTestMode.Rx && presenter.getTestRunning()) {
+            return /* Rx board is already disconnected and just transmits data through advertisement. */
+        }
+
+        var gatt: BluetoothGatt? = service?.getConnectedGatt(presenter.getDeviceInfo()?.address)
 
         if (service == null || !service?.isGattConnected()!!) {
             handleConnectionError()
@@ -688,7 +616,7 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
                 }
             }
 
-            if (getMode() == RangeTestMode.Rx && status == 19 && newState == BluetoothProfile.STATE_DISCONNECTED) {
+            if (presenter.getMode() == RangeTestMode.Rx && status == 19 && newState == BluetoothProfile.STATE_DISCONNECTED) {
                 if (isFinishing) {
                     return
                 }
@@ -702,7 +630,7 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
                     }
                 }
 
-                setTestRunning(true)
+                presenter.setTestRunning(true)
                 setKeepScreenOn(true)
                 presenter.onRunningStateUpdated(true)
             }
@@ -712,12 +640,12 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
                 reconnectionRetry = 0
                 cancelReconnect()
 
-                if (getMode() == RangeTestMode.Rx) {
+                if (presenter.getMode() == RangeTestMode.Rx) {
                     synchronized(this@RangeTestActivity) {
                         advertisementHandler?.stopListening()
                     }
 
-                    setTestRunning(false)
+                    presenter.setTestRunning(false)
                     setKeepScreenOn(false)
                     presenter.onRunningStateUpdated(false)
                 }
@@ -730,18 +658,26 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
             if (status != 19 && newState == BluetoothProfile.STATE_DISCONNECTED) {
                 runOnUiThread {
                     dismissModalDialog()
-                    if (service?.connectedGatt == gatt) {
-                        showMessage(ErrorCodes.getDeviceDisconnectedMessage(getDeviceInfo()?.name, status))
-                        connectToSecondDevice()
+                    var resetDeviceId: Int
+                    var resetDevice: DeviceState
+
+                    if (gatt.device.address == presenter.deviceState1.deviceInfo?.address) {
+                        resetDeviceId = 1
+                        resetDevice = presenter.deviceState1
                     } else {
-                        val resetDeviceId = if (activeDeviceId == 1) 2 else 1
-                        showMessage(ErrorCodes.getDeviceDisconnectedMessage(getDeviceInfoAt(resetDeviceId)?.name, status))
-
-                        resetDeviceAt(resetDeviceId)
-
-                        if (resetDeviceId == 1) tv_device1_tab.text = "No Device"
-                        else tv_device2_tab.text = "No Device"
+                        resetDeviceId = 2
+                        resetDevice = presenter.deviceState2
                     }
+
+                    if (resetDevice.mode == RangeTestMode.Tx && resetDevice.testRunning) {
+                        finish()
+                    }
+
+                    showMessage(ErrorCodes.getDeviceDisconnectedMessage(presenter.getDeviceInfoAt(resetDeviceId)?.name, status))
+                    presenter.resetDeviceAt(resetDeviceId)
+
+                    if (resetDeviceId == 1) tv_device1_tab.text = "No Device"
+                    else tv_device2_tab.text = "No Device"
                 }
             }
         }
@@ -853,13 +789,13 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
 
             val gattCharacteristic = GattCharacteristic.fromUuid(characteristic.uuid)
 
-            if (getMode() == RangeTestMode.Tx && gattCharacteristic != null) {
+            if (presenter.getMode() == RangeTestMode.Tx && gattCharacteristic != null) {
                 when (gattCharacteristic) {
                     GattCharacteristic.RangeTestIsRunning -> {
-                        setTestRunning(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) != 0)
-                        setKeepScreenOn(getTestRunning())
-                        handleTxTimer(getTestRunning())
-                        presenter.onRunningStateUpdated(getTestRunning())
+                        presenter.setTestRunning(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) != 0)
+                        setKeepScreenOn(presenter.getTestRunning())
+                        handleTxTimer(presenter.getTestRunning())
+                        presenter.onRunningStateUpdated(presenter.getTestRunning())
                     }
                     GattCharacteristic.RangeTestPacketsRequired -> {
                         val packetsRequired = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)
@@ -943,7 +879,7 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
                 GattCharacteristic.RangeTestPacketsSend -> {
                     val packetsSent = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)
                     txSentPackets = packetsSent
-                    if (getTestRunning()) {
+                    if (presenter.getTestRunning()) {
                         if (!timerStarted && packetsSent > 0) {
                             handleTxTimer(true)
                         }
@@ -981,14 +917,14 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
                     val rangeTestMode = RangeTestMode.fromCode(radioMode)
 
                     if (service?.connectedGatt == gatt) {
-                        if (getMode() == null && getTestRunning()) {
+                        if (presenter.getMode() == null && presenter.getTestRunning()) {
                             initTestView(rangeTestMode, false)
-                            presenter.onRunningStateUpdated(getTestRunning())
-                        } else if (getMode() != null) {
+                            presenter.onRunningStateUpdated(presenter.getTestRunning())
+                        } else if (presenter.getMode() != null) {
                             initTestView(rangeTestMode, false)
                         }
                     } else {
-                        setModeAt(if (activeDeviceId == 1) 2 else 1, rangeTestMode)
+                        presenter.setModeAt(if (activeDeviceId == 1) 2 else 1, rangeTestMode)
                     }
                 }
                 GattCharacteristic.RangeTestTxPower -> {
@@ -1008,19 +944,28 @@ class RangeTestActivity : BaseActivity(), Controller, BluetoothStateReceiver.Blu
                     presenter.onUartLogEnabledUpdated(log != 0)
                 }
                 GattCharacteristic.RangeTestIsRunning -> {
-                    setTestRunning(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) != 0)
-                    if (getMode() == null && !getTestRunning()) {
+                    presenter.setTestRunning(characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) != 0)
+                    if (presenter.getMode() == null && !presenter.getTestRunning()) {
                         showModeSelectionDialog()
-                    } else if (getMode() == RangeTestMode.Tx) {
-                        handleTxTimer(getTestRunning())
-                        if (!getTestRunning() && service != null) {
-                            val gatt = service?.connectedGatt
-                            if (gatt != null) {
-                                testWasRunning = true
-                                queueRead(gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestPacketsSend))
+                    } else if (presenter.getMode() == RangeTestMode.Tx) {
+                        if (gatt.device.address == presenter.currentDevice.deviceInfo?.address) {
+                            handleTxTimer(presenter.getTestRunning())
+                            if (!presenter.getTestRunning() && service != null) {
+                                val gatt = service?.connectedGatt
+                                if (gatt != null) {
+                                    testWasRunning = true
+                                    queueRead(gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestPacketsSend))
+                                }
                             }
+                            presenter.onRunningStateUpdated(presenter.getTestRunning())
+                        } else { // Rx mode start from the board on tx screen in the app
+                            val otherDevice =
+                                    if (presenter.currentDevice === presenter.deviceState1) presenter.deviceState2
+                                    else presenter.deviceState1
+                            otherDevice.testRunning = true
+                            otherDevice.running = true
+                            advertisementHandler?.startListening()
                         }
-                        presenter.onRunningStateUpdated(getTestRunning())
                     }
                 }
                 GattCharacteristic.RangePhyConfig -> {

@@ -18,6 +18,8 @@ package com.siliconlabs.bledemo.utils
 
 import android.text.TextUtils
 import androidx.core.util.Pair
+import com.google.common.math.IntMath.pow
+import timber.log.Timber
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -59,8 +61,9 @@ object Converters {
         return builder.toString()
     }
 
-    fun hexToByteArray(hex: String): ByteArray? {
+    fun hexToByteArray(hex: String): ByteArray {
         var tmpHex = hex
+
         if (tmpHex.isNotEmpty() && tmpHex.length % 2 != 0) {
             tmpHex = "0$tmpHex"
         }
@@ -73,6 +76,16 @@ object Converters {
             byteArr[i] = (temp and 0xFF).toByte()
         }
         return byteArr
+    }
+
+    fun intToByteArray(newVal: Int, formatLength: Int): ByteArray {
+        var tmpNewVal = newVal
+        val tmpVal = ByteArray(formatLength)
+        for (i in 0 until formatLength) {
+            tmpVal[i] = (tmpNewVal and 0xff).toByte()
+            tmpNewVal = tmpNewVal shr 8
+        }
+        return tmpVal
     }
 
     fun isZeroed(bytes: ByteArray): Boolean {
@@ -162,6 +175,17 @@ object Converters {
 
     fun getIntFromTwosComplement(value: Byte) : Int {
         return if (value < 0) 256 - abs(value.toInt()) else value.toInt()
+    }
+
+    fun getTwosComplementFromUnsignedInt(number: Int, bits: Int) : Int {
+        var convertedNumber = 0
+        for (i in 0 until bits) {
+            if (number shr i and 0x01 == 0x01) {
+                if (i == bits-1) convertedNumber -= pow(2, i)
+                else convertedNumber += pow(2, i)
+            }
+        }
+        return convertedNumber
     }
 
     // Gets value in decimal system for single byte
@@ -266,6 +290,7 @@ object Converters {
             "sint48" -> return convertToSint48(input)
             "float32" -> return convertToFloat32(input)
             "float64" -> return convertToFloat64(input)
+            "SFLOAT" -> return convertToSfloat(input)
             else -> return Pair(input.toByteArray(), true)
         }
         return Pair(returnVal, true)
@@ -304,6 +329,52 @@ object Converters {
         } catch (e: Exception) {
             e.printStackTrace()
             Pair(input.toByteArray(), false)
+        }
+    }
+
+    fun convertToSfloat(input: String): Pair<ByteArray, Boolean> {
+        val maxMantissa = pow(2, 11)
+        val maxExponent = 7
+        val minExponent = -8
+
+        try {
+            var mantissa = 0
+            var exponent = 0
+
+            if (input.contains('.')) {
+                val dotIndex = input.indexOf('.')
+                val decimalPlaces = input.length - 1 - dotIndex
+                mantissa = StringBuilder(input).deleteCharAt(dotIndex).toString().toInt()
+                exponent = -decimalPlaces
+            } else {
+                mantissa = input.toInt()
+            }
+
+            for (i in mantissa.toString().length - 1 downTo 0) {
+                if (mantissa.toString()[i] == '0') {
+                    mantissa /= 10
+                    exponent += 1
+                }
+                else break
+            }
+
+            if (abs(mantissa) > maxMantissa || exponent > maxExponent || exponent < minExponent) {
+                return Pair(input.toByteArray(), false)
+            }
+
+            val leastSignificantByte = getTwosComplementFromUnsignedInt(mantissa and 0xff, 8).toByte()
+            val exponentPartOfMsb = getTwosComplementFromUnsignedInt(exponent, 4) and 0x0f shl 4
+            val mantissaPartOfMsb = getTwosComplementFromUnsignedInt(mantissa shr 8, 4) and 0x0f
+
+            val sfloatByteArray = byteArrayOf(
+                leastSignificantByte,
+                (exponentPartOfMsb or mantissaPartOfMsb).toByte()
+            )
+
+            return Pair(sfloatByteArray, true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return Pair(input.toByteArray(), false)
         }
     }
 

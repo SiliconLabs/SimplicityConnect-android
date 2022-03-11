@@ -2,6 +2,8 @@ package com.siliconlabs.bledemo.RangeTest.Presenters
 
 import android.os.Looper
 import androidx.annotation.UiThread
+import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.RangeTest.Models.DeviceState
 import com.siliconlabs.bledemo.RangeTest.Models.RangeTestMode
 import com.siliconlabs.bledemo.RangeTest.Models.TxPower
 import java.util.*
@@ -88,33 +90,11 @@ class RangeTestPresenter {
         fun clearTestResults()
     }
 
+    var deviceState1 = DeviceState()
+    var deviceState2 = DeviceState()
+    var currentDevice = deviceState1
+
     private var view: RangeTestView? = null
-    private var deviceName: String? = null
-    private var modelNumber: String? = null
-    private var txPower: TxPower? = null
-    private var txPowerValues: List<TxPower>? = null
-    private var payloadLength: Int? = null
-    private var payloadLengthValues: List<Int>? = null
-    private var maWindowSize: Int? = null
-    private var maWindowSizeValues: List<Int>? = null
-    private var channelNumber: Int? = null
-    private var packetCountRepeat: Boolean? = null
-    private var packetRequired: Int? = null
-    private var packetReceived: Int? = null
-    private var packetSent: Int? = null
-    private var packetCount: Int? = null
-    private var per: Float? = null
-    private var ma: Float? = null
-    private var remoteId: Int? = null
-    private var selfId: Int? = null
-    private var uartLogEnabled: Boolean? = null
-    private var running: Boolean? = null
-    private var phy: Int? = null
-    private var phyMap: LinkedHashMap<Int, String>? = null
-    private var lastPacketCount = -1
-    private var lastPacketLoss = 0
-    private val maBuffer = IntArray(MA_WINDOW_MAX)
-    private var maBufferPtr = 0
 
     @UiThread
     fun setView(view: RangeTestView?) {
@@ -124,32 +104,81 @@ class RangeTestPresenter {
             return
         }
 
-        if (deviceName != null) view.showDeviceName(deviceName)
-        if (modelNumber != null) view.showModelNumber(modelNumber, running)
-        if (txPower != null && txPowerValues != null) view.showTxPower(txPower, txPowerValues!!)
-        if (payloadLength != null && payloadLengthValues != null) view.showPayloadLength(payloadLength!!, payloadLengthValues!!)
-        if (maWindowSize != null && maWindowSizeValues != null) view.showMaWindowSize(maWindowSize!!, maWindowSizeValues!!)
-        if (channelNumber != null) view.showChannelNumber(channelNumber!!)
-        if (packetCountRepeat != null) view.showPacketCountRepeat(packetCountRepeat!!)
-        if (packetRequired != null) view.showPacketRequired(packetRequired!!)
-        if (packetSent != null) view.showPacketSent(packetSent!!)
-        if (remoteId != null) view.showRemoteId(remoteId!!)
-        if (selfId != null) view.showSelfId(selfId!!)
-        if (uartLogEnabled != null) view.showUartLogEnabled(uartLogEnabled!!)
-        if (running != null) view.showRunningState(running!!)
-        if (phy != null && phyMap != null) view.showPhy(phy!!, phyMap!!)
-        view.showMa(if (ma == null) 0f else ma!!)
-        view.showPer(if (per == null) 0f else per!!)
-        if (packetReceived == null || packetCount == null) {
+        if (currentDevice.deviceName != null) view.showDeviceName(currentDevice.deviceName)
+        if (currentDevice.modelNumber != null) view.showModelNumber(currentDevice.modelNumber, currentDevice.running)
+        if (currentDevice.txPower != null && currentDevice.txPowerValues != null) view.showTxPower(currentDevice.txPower, currentDevice.txPowerValues!!)
+        if (currentDevice.payloadLength != null && currentDevice.payloadLengthValues != null) view.showPayloadLength(currentDevice.payloadLength!!, currentDevice.payloadLengthValues!!)
+        if (currentDevice.maWindowSize != null && currentDevice.maWindowSizeValues != null) view.showMaWindowSize(currentDevice.maWindowSize!!, currentDevice.maWindowSizeValues!!)
+        if (currentDevice.channelNumber != null) view.showChannelNumber(currentDevice.channelNumber!!)
+        if (currentDevice.packetCountRepeat != null) view.showPacketCountRepeat(currentDevice.packetCountRepeat!!)
+        if (currentDevice.packetRequired != null) view.showPacketRequired(currentDevice.packetRequired!!)
+        if (currentDevice.packetSent != null) view.showPacketSent(currentDevice.packetSent!!)
+        if (currentDevice.remoteId != null) view.showRemoteId(currentDevice.remoteId!!)
+        if (currentDevice.selfId != null) view.showSelfId(currentDevice.selfId!!)
+        if (currentDevice.uartLogEnabled != null) view.showUartLogEnabled(currentDevice.uartLogEnabled!!)
+        if (currentDevice.running != null) view.showRunningState(currentDevice.running!!)
+        if (currentDevice.phy != null && currentDevice.phyMap != null) view.showPhy(currentDevice.phy!!, currentDevice.phyMap!!)
+        view.showMa(if (currentDevice.ma == null) 0f else currentDevice.ma!!)
+        view.showPer(if (currentDevice.per == null) 0f else currentDevice.per!!)
+        if (currentDevice.packetReceived == null || currentDevice.packetCount == null) {
             view.showTestRx(0, 0)
         } else {
-            view.showTestRx(packetReceived!!, packetCount!!)
+            view.showTestRx(currentDevice.packetReceived!!, currentDevice.packetCount!!)
         }
+    }
+
+    fun getDeviceInfo()  = currentDevice.deviceInfo
+    fun getDeviceInfoAt(which: Int) : BluetoothDeviceInfo? {
+        return if (which == 1) deviceState1.deviceInfo
+               else deviceState2.deviceInfo
+    }
+    fun setDeviceInfo(info: BluetoothDeviceInfo?) {
+        currentDevice.deviceInfo = info
+    }
+    fun setDeviceInfoAt(which: Int, info: BluetoothDeviceInfo?) {
+        if (which == 1) deviceState1.deviceInfo = info
+        else deviceState2.deviceInfo = info
+    }
+
+    fun getMode() = currentDevice.mode
+    fun setMode(mode: RangeTestMode?) {
+        currentDevice.mode = mode
+    }
+    fun setModeAt(which: Int, mode: RangeTestMode?) {
+        if (which == 1) deviceState1.mode = mode
+        else deviceState2.mode = mode
+    }
+
+    fun getTestRunning() = currentDevice.testRunning
+    fun setTestRunning(running: Boolean) {
+        currentDevice.testRunning = running
+    }
+    fun setTestRunningAt(which: Int, running: Boolean) {
+        if (which == 1) deviceState1.testRunning = running
+        else deviceState2.testRunning = running
+    }
+
+    fun resetDeviceAt(which: Int) {
+        setDeviceInfoAt(which, null)
+        setModeAt(which, null)
+        setTestRunningAt(which, false)
+    }
+
+    fun switchCurrentDevice() {
+        currentDevice =
+                if (currentDevice === deviceState1) deviceState2
+                else deviceState1
+    }
+
+    fun setCurrentDevice(which: Int) {
+        currentDevice =
+                if (which == 1) deviceState1
+                else deviceState2
     }
 
     // controller -> view
     fun onDeviceNameUpdated(deviceName: String?) {
-        this.deviceName = deviceName
+        currentDevice.deviceName = deviceName
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
                 view.showDeviceName(deviceName)
@@ -158,49 +187,49 @@ class RangeTestPresenter {
     }
 
     fun onModelNumberUpdated(number: String?) {
-        modelNumber = number
+        currentDevice.modelNumber = number
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
-                view.showModelNumber(number, running)
+                view.showModelNumber(number, currentDevice.running)
             }
         })
     }
 
     fun onTxPowerUpdated(power: Int) {
-        txPower = TxPower(power)
-        if (txPowerValues != null) {
+        currentDevice.txPower = TxPower(power)
+        if (currentDevice.txPowerValues != null) {
             onView(object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showTxPower(txPower, txPowerValues!!)
+                    view.showTxPower(currentDevice.txPower, currentDevice.txPowerValues!!)
                 }
             })
         }
     }
 
     fun onPayloadLengthUpdated(length: Int) {
-        payloadLength = length
-        if (payloadLengthValues != null) {
+        currentDevice.payloadLength = length
+        if (currentDevice.payloadLengthValues != null) {
             onView(object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showPayloadLength(length, payloadLengthValues!!)
+                    view.showPayloadLength(length, currentDevice.payloadLengthValues!!)
                 }
             })
         }
     }
 
     fun onMaWindowSizeUpdated(size: Int) {
-        maWindowSize = size
-        if (maWindowSizeValues != null) {
+        currentDevice.maWindowSize = size
+        if (currentDevice.maWindowSizeValues != null) {
             onView(object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showMaWindowSize(size, maWindowSizeValues!!)
+                    view.showMaWindowSize(size, currentDevice.maWindowSizeValues!!)
                 }
             })
         }
     }
 
     fun onChannelNumberUpdated(number: Int) {
-        channelNumber = number
+        currentDevice.channelNumber = number
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
                 view.showChannelNumber(number)
@@ -209,7 +238,7 @@ class RangeTestPresenter {
     }
 
     fun onPacketCountRepeatUpdated(enabled: Boolean) {
-        packetCountRepeat = enabled
+        currentDevice.packetCountRepeat = enabled
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
                 view.showPacketCountRepeat(enabled)
@@ -218,7 +247,7 @@ class RangeTestPresenter {
     }
 
     fun onPacketRequiredUpdated(required: Int) {
-        packetRequired = required
+        currentDevice.packetRequired = required
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
                 view.showPacketRequired(required)
@@ -227,20 +256,20 @@ class RangeTestPresenter {
     }
 
     fun onPacketReceivedUpdated(received: Int) {
-        packetReceived = received
+        currentDevice.packetReceived = received
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
-                if (packetCount != null) {
-                    view.showTestRx(received, packetCount!!)
+                if (currentDevice.packetCount != null) {
+                    view.showTestRx(received, currentDevice.packetCount!!)
                 }
             }
         })
     }
 
     fun onPacketSentUpdated(sent: Int) {
-        packetRequired?.let { packetRequired ->
+        currentDevice.packetRequired?.let { packetRequired ->
             if (sent <= packetRequired) {
-                packetSent = sent
+                currentDevice.packetSent = sent
                 onView(object : ViewAction {
                     override fun run(view: RangeTestView) {
                         view.showPacketSent(sent)
@@ -251,18 +280,18 @@ class RangeTestPresenter {
     }
 
     fun onPacketCountUpdated(packetCount: Int) {
-        this.packetCount = packetCount
+        currentDevice.packetCount = packetCount
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
-                if (packetReceived != null) {
-                    view.showTestRx(packetReceived!!, packetCount)
+                if (currentDevice.packetReceived != null) {
+                    view.showTestRx(currentDevice.packetReceived!!, packetCount)
                 }
             }
         })
     }
 
     fun onMaUpdated(ma: Float) {
-        this.ma = ma
+        currentDevice.ma = ma
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
                 view.showMa(ma)
@@ -271,7 +300,7 @@ class RangeTestPresenter {
     }
 
     fun onPerUpdated(per: Float) {
-        this.per = per
+        currentDevice.per = per
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
                 view.showPer(per)
@@ -280,7 +309,7 @@ class RangeTestPresenter {
     }
 
     fun onRemoteIdUpdated(id: Int) {
-        remoteId = id
+        currentDevice.remoteId = id
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
                 view.showRemoteId(id)
@@ -289,7 +318,7 @@ class RangeTestPresenter {
     }
 
     fun onSelfIdUpdated(id: Int) {
-        selfId = id
+        currentDevice.selfId = id
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
                 view.showSelfId(id)
@@ -298,7 +327,7 @@ class RangeTestPresenter {
     }
 
     fun onUartLogEnabledUpdated(enabled: Boolean) {
-        uartLogEnabled = enabled
+        currentDevice.uartLogEnabled = enabled
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
                 view.showUartLogEnabled(enabled)
@@ -307,7 +336,7 @@ class RangeTestPresenter {
     }
 
     fun onRunningStateUpdated(running: Boolean) {
-        this.running = running
+        currentDevice.running = running
         onView(object : ViewAction {
             override fun run(view: RangeTestView) {
                 view.showRunningState(running)
@@ -316,22 +345,22 @@ class RangeTestPresenter {
     }
 
     fun onPhyConfigUpdated(phy: Int) {
-        this.phy = phy
-        if (phyMap != null) {
+        currentDevice.phy = phy
+        if (currentDevice.phyMap != null) {
             onView(object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showPhy(phy, phyMap!!)
+                    view.showPhy(phy, currentDevice.phyMap!!)
                 }
             })
         }
     }
 
     fun onPhyMapUpdated(phyMap: LinkedHashMap<Int, String>) {
-        this.phyMap = phyMap
-        if (phy != null) {
+        currentDevice.phyMap = phyMap
+        if (currentDevice.phy != null) {
             onView(object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showPhy(phy!!, phyMap)
+                    view.showPhy(currentDevice.phy!!, phyMap)
                 }
             })
         }
@@ -344,11 +373,11 @@ class RangeTestPresenter {
             values.add(TxPower(value))
             value += 5
         }
-        txPowerValues = values
-        if (txPower != null) {
+        currentDevice.txPowerValues = values
+        if (currentDevice.txPower != null) {
             onView(object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showTxPower(txPower, txPowerValues!!)
+                    view.showTxPower(currentDevice.txPower, currentDevice.txPowerValues!!)
                 }
             })
         }
@@ -359,11 +388,11 @@ class RangeTestPresenter {
         for (i in 0 until to - from + 1) {
             values.add(from + i)
         }
-        payloadLengthValues = values
-        if (payloadLength != null) {
+        currentDevice.payloadLengthValues = values
+        if (currentDevice.payloadLength != null) {
             onView(object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showPayloadLength(payloadLength!!, payloadLengthValues!!)
+                    view.showPayloadLength(currentDevice.payloadLength!!, currentDevice.payloadLengthValues!!)
                 }
             })
         }
@@ -376,20 +405,20 @@ class RangeTestPresenter {
             values.add(i)
             i *= 2
         }
-        maWindowSizeValues = values
-        if (maWindowSize != null) {
+        currentDevice.maWindowSizeValues = values
+        if (currentDevice.maWindowSize != null) {
             onView(object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showMaWindowSize(maWindowSize!!, maWindowSizeValues!!)
+                    view.showMaWindowSize(currentDevice.maWindowSize!!, currentDevice.maWindowSizeValues!!)
                 }
             })
         }
     }
 
     fun onTestDataReceived(rssi: Int, packetCount: Int, packetReceived: Int) {
-        if (packetCount < lastPacketCount) {
+        if (packetCount < currentDevice.lastPacketCount) {
             clearMaBuffer()
-            lastPacketLoss = 0
+            currentDevice.lastPacketLoss = 0
             onView(object : ViewAction {
                 override fun run(view: RangeTestView) {
                     view.showPer(0f)
@@ -398,13 +427,13 @@ class RangeTestPresenter {
                 }
             })
         }
-        lastPacketCount = packetCount
+        currentDevice.lastPacketCount = packetCount
 
 //        this.packetRequired = packetCount;
-        this.packetReceived = packetReceived
+        currentDevice.packetReceived = packetReceived
         val totalPacketLoss = packetCount - packetReceived
-        val currentPacketLoss = totalPacketLoss - lastPacketLoss
-        lastPacketLoss = totalPacketLoss
+        val currentPacketLoss = totalPacketLoss - currentDevice.lastPacketLoss
+        currentDevice.lastPacketLoss = totalPacketLoss
         val per = totalPacketLoss * 100f / packetCount.toFloat()
         val ma = updateMa(currentPacketLoss)
         onView(object : ViewAction {
@@ -427,10 +456,10 @@ class RangeTestPresenter {
     }
 
     private fun updateMa(packetsLost: Int): Float {
-        maBuffer[maBufferPtr++] = packetsLost
+        currentDevice.maBuffer[currentDevice.maBufferPtr++] = packetsLost
 
-        if (maBufferPtr >= maBuffer.size) {
-            maBufferPtr = 0
+        if (currentDevice.maBufferPtr >= currentDevice.maBuffer.size) {
+            currentDevice.maBufferPtr = 0
         }
 
         val window = maWindow
@@ -440,11 +469,11 @@ class RangeTestPresenter {
     private fun sumMaBuffer(window: Int): Int {
         var sum = 0
         for (i in 1..window) {
-            var location = maBufferPtr - i
+            var location = currentDevice.maBufferPtr - i
             if (location < 0) {
-                location = maBuffer.size - i
+                location = currentDevice.maBuffer.size - i
             }
-            val loss = maBuffer[location]
+            val loss = currentDevice.maBuffer[location]
             sum += if (loss >= 0) {
                 loss
             } else {
@@ -456,13 +485,13 @@ class RangeTestPresenter {
 
     private val maWindow: Int
         get() {
-            val window = maWindowSize
+            val window = currentDevice.maWindowSize
             return if (window != null && window > 0 && window <= MA_WINDOW_MAX) window else MA_WINDOW_DEFAULT
         }
 
     private fun clearMaBuffer() {
-        Arrays.fill(maBuffer, -1)
-        maBufferPtr = 0
+        Arrays.fill(currentDevice.maBuffer, -1)
+        currentDevice.maBufferPtr = 0
     }
 
     private interface ViewAction {

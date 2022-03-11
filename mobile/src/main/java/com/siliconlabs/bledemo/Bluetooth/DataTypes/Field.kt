@@ -16,6 +16,7 @@
  */
 package com.siliconlabs.bledemo.Bluetooth.DataTypes
 
+import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine
 import java.util.*
 
 // Field - It's wrapper for <Field> xml tag
@@ -24,7 +25,7 @@ class Field {
     var unit: String? = null
     var format: String? = null
     var type: String? = null
-    var requirement: String? = null
+    var requirements = arrayListOf<String>()
     var reference: String? = null
     var minimum: Long = 0
     var maximum: Long = 0
@@ -32,24 +33,73 @@ class Field {
     var bitfield: BitField? = null
     var referenceFields: ArrayList<Field>? = null
     var decimalExponent: Long = 0
+    var multiplier: Long = 1
 
-    constructor() {
+    init {
         referenceFields = ArrayList()
     }
 
-    constructor(name: String?, unit: String?, format: String?, type: String?, requirement: String?, reference: String?,
-                minimum: Int, maximum: Int, enumerations: ArrayList<Enumeration>?, bitfield: BitField?, decimalExponent: Int) {
-        this.name = name
-        this.unit = unit
-        this.format = format
-        this.type = type
-        this.minimum = minimum.toLong()
-        this.maximum = maximum.toLong()
-        this.enumerations = enumerations
-        this.bitfield = bitfield
-        this.requirement = requirement
-        this.reference = reference
-        this.decimalExponent = decimalExponent.toLong()
+    fun getSizeInBytes() : Int {
+        return format?.let { field ->
+            Engine.getFormat(field)
+        } ?: referenceFields?.sumBy { refField ->
+            refField.getSizeInBytes()
+        } ?: 0
+    }
+
+    fun getBitField() : ArrayList<Field> {
+        val bitFields = arrayListOf<Field>()
+        if (bitfield != null) {
+            bitFields.add(this)
+        } else if (referenceFields?.size ?: 0 > 0 ) {
+            for (subField in referenceFields!!) {
+                bitFields.addAll(subField.getBitField())
+            }
+        }
+        return bitFields
+    }
+
+    fun isNumberFormat(): Boolean {
+        return when (format) {
+            "uint8", "uint16", "uint24", "uint32", "uint40", "uint48", "sint8", "sint16",
+            "sint24", "sint32", "sint40", "sint48", "float32", "float64", "SFLOAT", "FLOAT" -> true
+            else -> false
+        }
+    }
+
+    fun isStringFormat(): Boolean {
+        return when (format?.toLowerCase(Locale.getDefault())) {
+            "utf8s", "utf16s" -> true
+            else -> false
+        }
+    }
+
+    fun isFloatFormat(): Boolean {
+        return when (format) {
+            "FLOAT", "SFLOAT", "float32", "float64" -> true
+            else -> false
+        }
+    }
+
+    fun isNibbleFormat(): Boolean {
+        return when (format) {
+            "nibble" -> true
+            else -> false
+        }
+    }
+
+    fun isFullByteSintFormat(): Boolean {
+        return when (format) {
+            "sint8", "sint16", "sint24", "sint32", "sint48", "sint64", "sint128" -> true
+            else -> false
+        }
+    }
+
+    fun isFullByteUintFormat(): Boolean {
+        return when (format) {
+            "uint8", "uint16", "uint24", "uint32", "uint48", "uint64", "uint128" -> true
+            else -> false
+        }
     }
 
 }

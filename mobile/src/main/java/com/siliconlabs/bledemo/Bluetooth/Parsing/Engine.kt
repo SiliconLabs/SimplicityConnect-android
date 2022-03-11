@@ -93,11 +93,11 @@ object Engine {
     }
 
     // List of variables formats from Bluetooth.org
-    // https://developer.bluetooth.org/gatt/Pages/FormatTypes.aspx
+    // https://btprodspecificationrefs.blob.core.windows.net/assigned-numbers/Assigned%20Number%20Types/Format%20Types.pdf
     private fun loadFormats() {
         formats["boolean"] = 1
         formats["2bit"] = 1
-        formats["nibble"] = 2
+        formats["nibble"] = 1
         formats["4bit"] = 1
         formats["8bit"] = 1
         formats["16bit"] = 2
@@ -137,6 +137,7 @@ object Engine {
         units["org.bluetooth.unit.unitless"] = Unit("", "")
         units["org.bluetooth.unit.length.metre"] = Unit("m", "metre")
         units["org.bluetooth.unit.mass.kilogram"] = Unit("kg", "kilogram")
+        units["org.bluetooth.unit.mass.pound"] = Unit("lb", "pound")
         units["org.bluetooth.unit.time.second"] = Unit("s", "second")
         units["org.bluetooth.unit.electric_current.ampere"] = Unit("A", "ampere")
         units["org.bluetooth.unit.thermodynamic_temperature.kelvin"] = Unit("K", "kelvin")
@@ -322,7 +323,7 @@ object Engine {
 
     // Gets format length for given format text
     // Return length in bytes
-    fun getFormat(format: String?): Int? {
+    fun getFormat(format: String?): Int {
         return formats[format]!!
     }
 
