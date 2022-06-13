@@ -21,7 +21,6 @@ import com.siliconlabs.bledemo.Views.HorizontalShadow
 import com.siliconlabs.bledemo.blinky.models.LightState
 import com.siliconlabs.bledemo.blinky.viewmodels.BlinkyViewModel
 import com.siliconlabs.bledemo.thunderboard.base.StatusFragment
-import com.siliconlabs.bledemo.thunderboard.model.StatusEvent
 import com.siliconlabs.bledemo.thunderboard.model.ThunderBoardDevice
 import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.utils.Notifications
@@ -36,6 +35,8 @@ class BlinkyActivity : BaseActivity() {
     private var service: BluetoothService? = null
     private val processor = GattProcessor()
     private var isDeviceThunderboard = false
+
+    private var statusFragment: StatusFragment? = null
 
     private val bluetoothReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -69,10 +70,13 @@ class BlinkyActivity : BaseActivity() {
                         finish()
                     } else {
                         if (isDeviceThunderboard) {
-                            this.thunderboardDevice = ThunderBoardDevice(service.connectedGatt?.device!!)
+                            statusFragment = (supportFragmentManager.findFragmentById(R.id
+                                    .status_fragment) as StatusFragment).apply {
+                                viewModel.thunderboardDevice.value =
+                                        ThunderBoardDevice(service.connectedGatt?.device!!)
+                                viewModel.state.postValue(BluetoothProfile.STATE_CONNECTED)
+                            }
                             showPowerSourceBar()
-                            loadStatusFragment()
-                            showConnectionState()
                         }
 
                         registerGattCallback(true, processor)
@@ -146,23 +150,6 @@ class BlinkyActivity : BaseActivity() {
         findViewById<LinearLayout>(R.id.thunderboard_fragment_container).visibility = View.VISIBLE
         findViewById<HorizontalShadow>(R.id.thunderboard_shadow).visibility = View.VISIBLE
         findViewById<HorizontalShadow>(R.id.bottom_shadow).visibility = View.INVISIBLE
-    }
-
-    private fun loadStatusFragment() {
-        val fragment = fragmentManager.findFragmentById(R.id.status_fragment)
-        (fragment as StatusFragment).let {
-            it.setBluetoothService(service)
-            it.onPrepared()
-            it.disableHeartbeatTimer()
-        }
-    }
-
-    private fun showConnectionState() {
-        service?.thunderboardDevice?.apply {
-            state = BluetoothProfile.STATE_CONNECTED
-            isServicesDiscovered = true
-            service?.selectedDeviceStatusMonitor?.onNext(StatusEvent(this))
-        }
     }
 
     override fun onBackPressed() {
@@ -298,29 +285,9 @@ class BlinkyActivity : BaseActivity() {
                 GattCharacteristic.LedControl,
                 GattCharacteristic.Digital -> viewModel.handleLightStateChanges(characteristic)
 
-
-                GattCharacteristic.FirmwareRevision -> {
-                    val firmwareVersion = characteristic.getStringValue(0)
-                    service?.thunderboardDevice?.let {
-                        it.firmwareVersion = firmwareVersion
-                        service?.selectedDeviceStatusMonitor?.onNext(StatusEvent(it))
-                    }
-                }
-                GattCharacteristic.PowerSource -> {
-                    val powerSource = ThunderBoardDevice.PowerSource.fromInt(
-                            characteristic.getIntValue(GattCharacteristic.PowerSource.format, 0))
-                    service?.thunderboardDevice?.let {
-                        it.powerSource = powerSource
-                        service?.selectedDeviceStatusMonitor?.onNext(StatusEvent(it))
-                    }
-                }
-                GattCharacteristic.BatteryLevel -> {
-                    val batteryLevel = characteristic.getIntValue(GattCharacteristic.BatteryLevel.format, 0)
-                    service?.thunderboardDevice?.let {
-                        it.batteryLevel = batteryLevel
-                        service?.selectedDeviceStatusMonitor?.onNext(StatusEvent(it))
-                    }
-                }
+                GattCharacteristic.FirmwareRevision,
+                GattCharacteristic.PowerSource,
+                GattCharacteristic.BatteryLevel -> statusFragment?.handleBaseCharacteristic(characteristic)
                 else -> { }
             }
         }

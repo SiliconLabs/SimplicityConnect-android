@@ -194,6 +194,7 @@
     <string name="zero_percent">0%</string>
     <string name="zero_ms">0ms</string>
     <string name="zero">0</string>
+    <string name="minus_hundred_thirty">-130</string>
     <string name="problem_while_preparing_the_file">There was a problem while preparing the file!</string>
     <string name="incorrect_file">Incorrect file!</string>
     <string name="Select_Apploader_gbl_file">Select Apploader .gbl file</string>
@@ -233,7 +234,7 @@
     <string name="button_connections">Connections</string>
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
-    <string name="button_ok">Ok</string>
+    <string name="button_ok">@android:string/ok</string>
     <string name="button_yes">Yes</string>
     <string name="button_no">No</string>
     <string name="button_run_test">Run Test</string>
@@ -651,8 +652,9 @@
     <string name="gatt_configurator_toast_invalid_gatt_server_name">Invalid GATT Server name!</string>
     <string name="gatt_configurator_leave_config_dialog_content">Your GATT Server has unsaved changes. Do you wish to save them?</string>
     <string name="gatt_configurator_toast_export_location_choice">Choose location for your files</string>
-    <string name="gatt_configurator_toast_export_wrong_location_chosen">Chosen export location is forbidden</string>
+    <string name="toast_export_wrong_location_chosen">Chosen export location is forbidden</string>
     <string name="gatt_configurator_toast_export_successful">Export successful</string>
+    <string name="gatt_configurator_toast_export_unsuccessful">Export unsuccessful</string>
     <string name="gatt_configurator_toast_import_file_not_found">File not found</string>
     <string name="gatt_configurator_popup_import_successful_title">Successful import</string>
     <string name="gatt_configurator_popup_import_successful_content">Created 1 configuration from the XML file</string>
@@ -676,6 +678,14 @@
     <string name="characteristic">GATT Characteristic</string>
     <string name="server">GATT Server</string>
     <string name="service">GATT Service</string>
+
+    <!-- Thunderboard -->
+    <string name="sensor_malfunction_dialog_title">Sensor malfunction</string>
+    <string name="critical_sensor_malfunction_dialog_message">Demo cannot work properly with this
+        device because of the malfunction of following sensors: \n%s \nYou will be
+        redirected to home screen. </string>
+    <string name="sensor_malfunction_dialog_message">Following sensors don\'t work on this device:
+        \n%s \nTheir values won\'t appear on screen.</string>
 
     <!-- Motion -->
     <string name="motion_demo_title">Motion</string>
@@ -717,7 +727,7 @@
     <string name="environment_sound_level_measure">%d dB</string>
     <string name="environment_co2_measure">%d ppm</string>
     <string name="environment_voc_measure">%d ppb</string>
-    <string name="environment_hall_strength_measure">%.0f uT</string>
+    <string name="environment_hall_strength_measure">%d uT</string>
     <string name="environment_hall_state_opened">Opened</string>
     <string name="environment_hall_state_tampered">Tampered</string>
     <string name="environment_hall_state_closed">Closed</string>
@@ -814,5 +824,26 @@
     <string name="device_already_connected">Device already connected to the access point.</string>
     <string name="details_disconnect">Disconnect</string>
     <string name="firmware_version">Firmware version:</string>
+
+    <!-- RSSI Graph -->
+    <string name="rssi_graph_label">RSSI Graph</string>
+    <string name="rssi_graph_demo_description">Draw a plot with RSSI data from discovered
+        devices.</string>
+    <string name="rssi_graph_scan_failed">Scan failed</string>
+    <string name="bluetooth_disabled">Bluetooth disabled!</string>
+    <string name="rssi_graph_export_to_csv">Export data to .csv</string>
+    <string name="rssi_graph_file_creation_unsuccessful">Creating a .csv file unsuccessful</string>
+    <string name="rssi_graph_export_successful">Export successful</string>
+    <string name="rssi_graph_file_location_chooser">Choose location for an exported file</string>
+    <string name="rssi_graph_scan_not_started_label">Scan not started yet.</string>
+    <string name="rssi_graph_no_devices_found_label">No devices found.</string>
+
+    <!-- Sort DialogFragment -->
+    <string name="sort_dialog_fragment_title">Sort devices</string>
+    <string name="button_apply">Apply</string>
+
+    <!-- Filter DialogFragment -->
+    <string name="filter_dialog_fragment_title">Filter devices</string>
+    <string name="filter_dialog_fragment_min_dBm">-130dBm</string>
 
 </resources>

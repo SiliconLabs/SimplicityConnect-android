@@ -2,107 +2,101 @@ package com.siliconlabs.bledemo.thunderboard.base
 
 import android.animation.AnimatorInflater
 import android.app.AlertDialog
-import android.app.Fragment
+import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothProfile
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.core.app.NavUtils
-import butterknife.BindView
-import butterknife.ButterKnife
-import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
-import com.siliconlabs.bledemo.Bluetooth.Services.ThunderboardActivityCallback
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.thunderboard.model.ThunderBoardDevice
-import com.siliconlabs.bledemo.thunderboard.ui.BatteryIndicator
-import timber.log.Timber
-import javax.inject.Inject
+import kotlinx.android.synthetic.main.fragment_device_status.view.*
 
-class StatusFragment : Fragment(), StatusViewListener, ThunderboardActivityCallback {
-    @Inject
-    lateinit var presenter: StatusPresenter
+class StatusFragment : Fragment() {
 
-    @BindView(R.id.battery_indicator)
-    lateinit var batteryIndicator: BatteryIndicator
-
-    @BindView(R.id.device_status)
-    lateinit var deviceStatus: TextView
-
-    @BindView(R.id.device_name)
-    lateinit var deviceName: TextView
-
-    @BindView(R.id.device_firmware)
-    lateinit var deviceFirmware: TextView
-
-    @BindView(R.id.progress_bar)
-    lateinit var progressBar: ProgressBar
-
+    lateinit var viewModel: StatusViewModel
 
     private lateinit var rootView: View
-    private var bluetoothService: BluetoothService? = null
     private var isConnecting = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        presenter = StatusPresenter(bluetoothService)
+        viewModel = ViewModelProvider(this).get(StatusViewModel::class.java)
+
+        setupDataListeners()
+
         rootView = inflater.inflate(R.layout.fragment_device_status, container, false)
-        ButterKnife.bind(this, rootView)
-        batteryIndicator.visibility = View.INVISIBLE
-        batteryIndicator.setBatteryValue(ThunderBoardDevice.PowerSource.UNKNOWN, 0)
+        rootView.battery_indicator.visibility = View.INVISIBLE
+        rootView.battery_indicator.setBatteryValue(ThunderBoardDevice.PowerSource.UNKNOWN, 0)
         return rootView
     }
 
-    override fun onPause() {
-        presenter.clearViewListener()
-        super.onPause()
-    }
-
-    fun setBluetoothService(service: BluetoothService?) {
-        bluetoothService = service
-    }
-
-    override fun onPrepared() {
-        presenter.setBluetoothService(bluetoothService)
-        presenter.setViewListener(this)
-    }
-
-    fun disableHeartbeatTimer() {
-        presenter.disableHeartbeatTimer()
-    }
-
-    // StatusViewListener
-    override fun onData(device: ThunderBoardDevice?) {
-        Timber.d("name: %s, state: %d", device?.name, device?.state)
-        deviceName.text = device?.name
-        if (device?.firmwareVersion == null || device.firmwareVersion?.isEmpty()!!) {
-            deviceFirmware.text = getString(R.string.status_no_firmware_version)
-        } else {
-            deviceFirmware.setText(device.firmwareVersion)
+    fun handleBaseCharacteristic(characteristic: BluetoothGattCharacteristic) {
+        when (characteristic.uuid) {
+            GattCharacteristic.DeviceName.uuid ->
+                viewModel.setDeviceName(characteristic.getStringValue(0))
+            GattCharacteristic.ModelNumberString.uuid ->
+                viewModel.setModelNumber(characteristic.getStringValue(0))
+            GattCharacteristic.BatteryLevel.uuid -> {
+                viewModel.setBatteryLevel(characteristic.value[0].toInt())
+            }
+            GattCharacteristic.PowerSource.uuid -> {
+                val powerSource = ThunderBoardDevice.PowerSource.fromInt(characteristic.value[0].toInt())
+                viewModel.setPowerSource(powerSource)
+            }
+            GattCharacteristic.FirmwareRevision.uuid ->
+                viewModel.setFirmwareVersion(characteristic.getStringValue(0))
+            else -> { }
         }
+    }
+
+    private fun setupDataListeners() {
+        viewModel.thunderboardDevice.observe(viewLifecycleOwner, Observer {
+            updateStatusViews(it)
+        })
+        viewModel.state.observe(viewLifecycleOwner, Observer {
+            showDeviceStatus(it)
+        })
+    }
+
+    private fun updateStatusViews(device: ThunderBoardDevice) {
+        rootView.apply {
+            device_name.text = device.name
+            device_firmware.text =
+                    if (device.firmwareVersion == null || device.firmwareVersion?.isEmpty()!!) {
+                        getString(R.string.status_no_firmware_version)
+                    } else device.firmwareVersion
+            battery_indicator.setBatteryValue(device.powerSource, device.batteryLevel)
+        }
+    }
+
+    private fun showDeviceStatus(state: Int) {
         val resourceId: Int
-        when (device?.state) {
+        when (state) {
             BluetoothProfile.STATE_CONNECTED -> {
                 resourceId = R.string.status_connected
                 isConnecting = false
-                batteryIndicator.visibility = View.VISIBLE
-                progressBar.visibility = View.INVISIBLE
+                rootView.battery_indicator.visibility = View.VISIBLE
+                rootView.progress_bar.visibility = View.INVISIBLE
             }
             BluetoothProfile.STATE_CONNECTING -> {
                 resourceId = R.string.status_connecting
                 isConnecting = true
-                batteryIndicator.visibility = View.INVISIBLE
-                progressBar.visibility = View.VISIBLE
+                rootView.battery_indicator.visibility = View.INVISIBLE
+                rootView.progress_bar.visibility = View.VISIBLE
             }
             BluetoothProfile.STATE_DISCONNECTING -> {
                 resourceId = BluetoothProfile.STATE_DISCONNECTING
                 isConnecting = false
-                batteryIndicator.visibility = View.INVISIBLE
-                progressBar.visibility = View.VISIBLE
+                rootView.battery_indicator.visibility = View.INVISIBLE
+                rootView.progress_bar.visibility = View.VISIBLE
             }
             else -> {
                 val titleId: Int
@@ -116,16 +110,15 @@ class StatusFragment : Fragment(), StatusViewListener, ThunderboardActivityCallb
                 }
                 resourceId = R.string.status_disconnected
                 isConnecting = false
-                batteryIndicator.visibility = View.INVISIBLE
-                progressBar.visibility = View.VISIBLE
+                rootView.battery_indicator.visibility = View.INVISIBLE
+                rootView.progress_bar.visibility = View.VISIBLE
                 animateDown()
-                showNotConnectedDialog(device?.name, titleId, messageId)
-                (activity as BaseActivity).onDisconnected()
+                showNotConnectedDialog(viewModel.thunderboardDevice.value?.name, titleId, messageId)
             }
         }
-        deviceStatus.text = getString(resourceId)
-        batteryIndicator.setBatteryValue(device?.powerSource!!, device.batteryLevel)
+        rootView.device_status.text = getString(resourceId)
     }
+
 
     private fun showNotConnectedDialog(deviceName: String?, titleId: Int, messageId: Int) {
         val builder = AlertDialog.Builder(activity)
@@ -133,9 +126,9 @@ class StatusFragment : Fragment(), StatusViewListener, ThunderboardActivityCallb
                 .setMessage(String.format(getString(messageId), deviceName))
                 .setTitle(titleId)
                 .setPositiveButton(R.string.ok) { dialogInterface, which ->
-                    val intent = NavUtils.getParentActivityIntent(activity)
+                    val intent = NavUtils.getParentActivityIntent(activity as ThunderboardActivity)
                     intent!!.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    NavUtils.navigateUpTo(activity, intent)
+                    NavUtils.navigateUpTo(activity as ThunderboardActivity, intent)
                 }
         val dialog = builder.create()
         dialog.show()

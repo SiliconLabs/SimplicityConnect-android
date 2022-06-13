@@ -1,72 +1,34 @@
 package com.siliconlabs.bledemo.blinky_thunderboard.activities
 
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.CompoundButton
-import android.widget.TextView
-import androidx.appcompat.widget.SwitchCompat
-import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
-import butterknife.BindView
-import butterknife.ButterKnife
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.siliconlabs.bledemo.Base.SelectDeviceDialog
 import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
+import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
 import com.siliconlabs.bledemo.Bluetooth.BLE.TimeoutGattCallback
-import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
-import com.siliconlabs.bledemo.Bluetooth.Services.ThunderboardActivityCallback
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.blinky_thunderboard.viewmodels.BlinkyThunderboardViewModel
 import com.siliconlabs.bledemo.blinky_thunderboard.control.ColorLEDControl
 import com.siliconlabs.bledemo.blinky_thunderboard.control.ColorLEDControl.ColorLEDControlListener
-import com.siliconlabs.bledemo.blinky_thunderboard.control.SwitchControl
-import com.siliconlabs.bledemo.blinky_thunderboard.presenters.BlinkyThunderboardListener
-import com.siliconlabs.bledemo.blinky_thunderboard.presenters.BlinkyThunderboardPresenter
-import com.siliconlabs.bledemo.thunderboard.base.BaseActivity
-import com.siliconlabs.bledemo.thunderboard.model.LedRGBState
-import com.siliconlabs.bledemo.thunderboard.model.StatusEvent
+import com.siliconlabs.bledemo.thunderboard.base.ThunderboardActivity
+import com.siliconlabs.bledemo.blinky_thunderboard.model.LedRGBState
 import com.siliconlabs.bledemo.thunderboard.model.ThunderBoardDevice
-import com.siliconlabs.bledemo.thunderboard.sensor.SensorBlinky
-import timber.log.Timber
+import kotlinx.android.synthetic.main.activity_blinky_thunderboard.*
 import java.util.*
 
-class BlinkyThunderboardActivity : BaseActivity(),
-        BlinkyThunderboardListener,
-        CompoundButton.OnCheckedChangeListener,
-        ColorLEDControlListener {
-    var presenter: BlinkyThunderboardPresenter? = null
+class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListener {
 
-    @BindView(R.id.switch0)
-    lateinit var switch0: SwitchControl
+    private lateinit var ledsControl: CardView
+    private lateinit var colorLEDControl: ColorLEDControl
 
-    @BindView(R.id.switch1)
-    lateinit var switch1: SwitchControl
-
-    @BindView(R.id.led0)
-    lateinit var led0: SwitchCompat
-
-    @BindView(R.id.led1)
-    lateinit var led1: SwitchCompat
-
-    @BindView(R.id.leds_control)
-    lateinit var ledsControl: CardView
-
-    @BindView(R.id.color_led_control)
-    lateinit var colorLEDControl: ColorLEDControl
-
-    @BindView(R.id.lightsTitle)
-    lateinit var lightsTitle: TextView
-
-    private var bluetoothBinding: BluetoothService.Binding? = null
-    private var bluetoothService: BluetoothService? = null
-    private var isAlreadyPrepared = false
+    private lateinit var viewModel: BlinkyThunderboardViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,141 +40,78 @@ class BlinkyThunderboardActivity : BaseActivity(),
         val modelNumberIntent = intent.getStringExtra(SelectDeviceDialog.MODEL_TYPE_EXTRA)
         setControlsVisibility(ThunderBoardDevice.PowerSource.fromInt(powerSourceIntent), modelNumberIntent)
 
-        prepareToolbar()
         mainSection?.addView(view)
-        ButterKnife.bind(this)
 
-        presenter = BlinkyThunderboardPresenter()
-        getDaggerComponent().inject(this)
-        registerReceiver(bluetoothStateReceiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
-        bindBluetoothService()
+        viewModel = ViewModelProvider(this).get(BlinkyThunderboardViewModel::class.java)
+        bindBluetoothService(ioGattCallback)
 
-        setInitialState()
+        setupDataListeners(modelNumberIntent)
+        setupUiListeners()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(bluetoothStateReceiver)
-        bluetoothService?.clearConnectedGatt()
-        bluetoothBinding?.unbind()
-        presenter?.clearViewListener()
-    }
+    private fun setupUiListeners() {
+        led_0.setOnCheckedChangeListener { _, isChecked ->
+            var action = 0
+            if (isChecked) action = BlinkyThunderboardViewModel.LED_0_ON
+            if (led_1.isChecked) action = action or BlinkyThunderboardViewModel.LED_1_ON
 
-    private fun prepareToolbar() {
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        findViewById<View>(R.id.iv_go_back).setOnClickListener { view: View? -> onBackPressed() }
-    }
-
-    private val bluetoothStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val action = intent.action
-            if (action != null && action == BluetoothAdapter.ACTION_STATE_CHANGED) {
-                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
-                if (BluetoothAdapter.STATE_OFF == state) finish()
+            getDigitalWriteCharacteristic()?.apply {
+                value = byteArrayOf(action.toByte())
+                gattQueue.queueWrite(this)
             }
         }
-    }
+        led_1.setOnCheckedChangeListener { _, isChecked ->
+            var action = 0
+            if (isChecked) action = BlinkyThunderboardViewModel.LED_1_ON
+            if (led_0.isChecked) action = action or BlinkyThunderboardViewModel.LED_0_ON
 
-    private fun bindBluetoothService() {
-        bluetoothBinding = object : BluetoothService.Binding(this) {
-            override fun onBound(service: BluetoothService?) {
-                service?.let {
-                    if (!it.isGattConnected()) finish()
-                    else {
-                        bluetoothService = it
-                        presenter?.bluetoothService = it
-                        bluetoothService?.thunderboardDevice = ThunderBoardDevice(it.connectedGatt?.device!!)
-                        bluetoothService?.thunderboardCallback = thunderboardActivityCallback
-                        it.registerGattCallback(ioGattCallback)
-                        it.discoverGattServices()
-                        presenter?.loadStatusFragment(fragmentManager)
-                        presenter?.showConnectionState()
-                    }
-                }
+            getDigitalWriteCharacteristic()?.apply {
+                value = byteArrayOf(action.toByte())
+                gattQueue.queueWrite(this)
             }
         }
-        bluetoothBinding?.bind()
-    }
-
-    var thunderboardActivityCallback = ThunderboardActivityCallback {
-        if (!isAlreadyPrepared) {
-            initControls()
-            presenter?.prepareViewListener(this@BlinkyThunderboardActivity)
-            isAlreadyPrepared = true
-        }
-    }
-
-    private fun setInitialState() {
-        setButton0State(STATE_NORMAL)
-        setButton1State(STATE_NORMAL)
-        led0.isChecked = false
-        led0.setOnCheckedChangeListener(this)
-        led1.isChecked = false
-        led1.setOnCheckedChangeListener(this)
         colorLEDControl.setColorLEDControlListener(this)
     }
 
+    private fun setupDataListeners(modelNumber: String?) {
+        viewModel.button0.observe(this, Observer { switch_0.setChecked(it) })
+        viewModel.button1.observe(this, Observer { switch_1.setChecked(it) })
+        viewModel.led0.observe(this, Observer {
+            if (it != led_0.isChecked) led_0.isChecked = it })
+        viewModel.led1.observe(this, Observer {
+            if (it != led_1.isChecked) led_1.isChecked = it })
 
-    override fun setButton0State(state: Int) {
-        if (state == STATE_NORMAL) {
-            switch0.setChecked(false)
-        } else if (state == STATE_PRESSED) {
-            switch0.setChecked(true)
+        when (modelNumber) {
+            ThunderBoardDevice.THUNDERBOARD_MODEL_SENSE,
+            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V1,
+            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2 -> {
+                viewModel.colorLed.observe(this, Observer {
+                    colorLEDControl.setColorLEDsUI(it)
+                })
+            }
+        }
+        viewModel.rgbLedMask.observe(this, Observer {
+            gattQueue.queueRead(getRgbLedCharacteristic())
+            gattQueue.queueNotify(getDigitalNotifyCharacteristic())
+            dismissModalDialog()
+        })
+    }
+
+    private fun sendColorLedCommand(rgbState: LedRGBState) {
+        val data = byteArrayOf(
+                (if (rgbState.on) viewModel.rgbLedMask.value!! else 0x00).toByte(),
+                (rgbState.red and 0xff).toByte(),
+                (rgbState.green and 0xff).toByte(),
+                (rgbState.blue and 0xff).toByte()
+
+        )
+        getRgbLedCharacteristic()?.apply {
+            value = data
+            gattQueue.queueWrite(this)
         }
     }
 
-    override fun setButton1State(state: Int) {
-        if (state == STATE_NORMAL) {
-            switch1.setChecked(false)
-        } else if (state == STATE_PRESSED) {
-            switch1.setChecked(true)
-        }
-    }
-
-    /**
-     * Turns the LED on or off while preserving the state of the other LED.
-     *
-     * @param buttonView
-     * @param isChecked
-     */
-    override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
-        val res = resources
-        var action = 0
-        if (buttonView === led0) {
-            if (isChecked) action = res.getInteger(R.integer.led0_on)
-            if (led1.isChecked) action = action or res.getInteger(R.integer.led1_on)
-        } else if (buttonView === led1) {
-            if (isChecked) action = res.getInteger(R.integer.led1_on)
-            if (led0.isChecked) action = action or res.getInteger(R.integer.led0_on)
-        }
-        presenter?.ledAction(action)
-    }
-
-    override fun setLed0State(state: Int) {
-        if (state == STATE_NORMAL) {
-            led0.isChecked = false
-        } else if (state == STATE_PRESSED) {
-            led0.isChecked = true
-        }
-    }
-
-    override fun setLed1State(state: Int) {
-        if (state == STATE_NORMAL) {
-            led1.isChecked = false
-        } else if (state == STATE_PRESSED) {
-            led1.isChecked = true
-        }
-    }
-
-    override fun setColorLEDsValue(colorLEDsValue: LedRGBState) {
-        // remove and reset listener to prevent repeated write commands
-        colorLEDControl.setColorLEDControlListener(null)
-        colorLEDControl.setColorLEDsUI(colorLEDsValue)
-        colorLEDControl.setColorLEDControlListener(this)
-    }
-
-    override fun setControlsVisibility(powerSource: ThunderBoardDevice.PowerSource, modelNumber: String?) {
+    private fun setControlsVisibility(powerSource: ThunderBoardDevice.PowerSource, modelNumber: String?) {
         if (modelNumber == ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V1 ||
                 modelNumber == ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2) {
             ledsControl.visibility = View.GONE
@@ -224,22 +123,52 @@ class BlinkyThunderboardActivity : BaseActivity(),
         }
     }
 
-    public override fun retrieveDemoPresenter() = presenter!!
+    private fun initControls() {
+        if (statusFragment.viewModel.thunderboardDevice.value?.
+                boardType != ThunderBoardDevice.Type.THUNDERBOARD_SENSE &&
+            statusFragment.viewModel.thunderboardDevice.value?.
+                boardType != ThunderBoardDevice.Type.THUNDERBOARD_DEV_KIT) {
 
-    public override fun initControls() {
-        runOnUiThread {
-            if (presenter?.boardType != ThunderBoardDevice.Type.THUNDERBOARD_SENSE &&
-                    presenter?.boardType != ThunderBoardDevice.Type.THUNDERBOARD_DEV_KIT) {
-                colorLEDControl.visibility = View.GONE
-            }
+            runOnUiThread { colorLEDControl.visibility = View.GONE }
         }
-        presenter?.findRgbLedMaskDescriptor()?.let {
+
+        getRgbLedMaskDescriptor()?.let {
             bluetoothService?.connectedGatt?.readDescriptor(it)
-        } ?: presenter?.setRgbLedMask(0x0f)
+        } ?: viewModel.rgbLedMask.postValue(0x0f)
     }
 
-    override fun updateColorLEDs(ledRGBState: LedRGBState?) {
-        presenter?.setColorLEDs(ledRGBState)
+    override fun updateColorLEDs(ledRGBState: LedRGBState) {
+        sendColorLedCommand(ledRGBState)
+    }
+
+    override fun onLedUpdateStop() {
+        gattQueue.clearAllButLast() // prevent from queueing more gatt commands
+    }
+
+    private fun getDigitalWriteCharacteristic() : BluetoothGattCharacteristic? {
+        return bluetoothService?.connectedGatt?.getService(
+                GattService.AutomationIo.number)?.characteristics
+                ?.filter { it.uuid == GattCharacteristic.Digital.uuid } // there are two
+                ?.first { it.properties and BluetoothGattCharacteristic.PROPERTY_WRITE != 0 }
+    }
+
+    private fun getDigitalNotifyCharacteristic() : BluetoothGattCharacteristic? {
+        return bluetoothService?.connectedGatt?.getService(
+                GattService.AutomationIo.number)?.characteristics
+                ?.filter { it.uuid == GattCharacteristic.Digital.uuid } // there are two
+                ?.first { it.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0 }
+    }
+
+
+    private fun getRgbLedCharacteristic() : BluetoothGattCharacteristic? {
+        return bluetoothService?.connectedGatt?.getService(GattService.UserInterface.number)?.
+        getCharacteristic(GattCharacteristic.RgbLeds.uuid)
+    }
+
+    private fun getRgbLedMaskDescriptor() : BluetoothGattDescriptor? {
+        return bluetoothService?.connectedGatt?.getService(GattService.UserInterface.number)?.
+        getCharacteristic(GattCharacteristic.RgbLeds.uuid)?.
+        getDescriptor(LED_MASK_DESCRIPTOR)
     }
 
     private fun onDeviceDisconnect() {
@@ -249,7 +178,7 @@ class BlinkyThunderboardActivity : BaseActivity(),
         }
     }
 
-    val ioGattCallback: TimeoutGattCallback = object : TimeoutGattCallback() {
+    private val ioGattCallback: TimeoutGattCallback = object : TimeoutGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
             if (newState == BluetoothGatt.STATE_DISCONNECTED) {
@@ -261,59 +190,25 @@ class BlinkyThunderboardActivity : BaseActivity(),
             super.onServicesDiscovered(gatt, status)
             if (status != BluetoothGatt.GATT_SUCCESS) return
 
-            bluetoothService?.let {
-                it.thunderboardDevice?.isServicesDiscovered = true
-                it.readRequiredCharacteristics()
-            }
+            queueReadingDeviceCharacteristics()
         }
 
         override fun onCharacteristicRead(gatt: BluetoothGatt,
                                           characteristic: BluetoothGattCharacteristic,
                                           status: Int) {
             super.onCharacteristicRead(gatt, characteristic, status)
-            Timber.d("onCharacteristicRead; characteristic = ${characteristic.uuid}, status = $status")
-            Timber.d("Raw data = ${Arrays.toString(characteristic.value)}")
+            gattQueue.handleCommandProcessed()
             if (status != BluetoothGatt.GATT_SUCCESS) return
 
-            val device = bluetoothService?.thunderboardDevice
             val gattCharacteristic = GattCharacteristic.fromUuid(characteristic.uuid)
 
             when (gattCharacteristic) {
-                GattCharacteristic.DeviceName -> device?.name = characteristic.getStringValue(0)
-                GattCharacteristic.ModelNumberString -> device?.modelNumber = characteristic.getStringValue(0)
-                GattCharacteristic.BatteryLevel -> {
-                    device?.let {
-                        it.batteryLevel = characteristic.getIntValue(gattCharacteristic.format, 0)
-                        it.isBatteryConfigured = true
-                    }
-                }
-                GattCharacteristic.PowerSource -> {
-                    device?.let {
-                        val powerSource = ThunderBoardDevice.PowerSource.fromInt(
-                                characteristic.getIntValue(gattCharacteristic.format, 0))
-                        it.powerSource = powerSource
-                        it.isPowerSourceConfigured = true
-                    }
-                    bluetoothService?.let {
-                        it.selectedDeviceStatusMonitor.onNext(StatusEvent(device))
-                        it.selectedDeviceMonitor.onNext(device)
-                    }
-                }
-                GattCharacteristic.FirmwareRevision -> {
-                    device?.firmwareVersion = characteristic.getStringValue(0)
-                    bluetoothService?.let {
-                        it.selectedDeviceStatusMonitor.onNext(StatusEvent(device))
-                        it.selectedDeviceMonitor.onNext(device)
-                    }
-                }
-                GattCharacteristic.Digital -> {
-                    device?.sensorBlinky ?: SensorBlinky().let {
-                        device?.sensorBlinky = it
-                        it.setLed(characteristic.value[0])
-                        it.isSensorDataChanged = true
-                    }
-                    bluetoothService?.selectedDeviceMonitor?.onNext(device)
-                }
+                GattCharacteristic.DeviceName,
+                GattCharacteristic.ModelNumberString,
+                GattCharacteristic.BatteryLevel,
+                GattCharacteristic.PowerSource,
+                GattCharacteristic.FirmwareRevision -> statusFragment.handleBaseCharacteristic(characteristic)
+
                 GattCharacteristic.RgbLeds -> {
                     val on = characteristic.getIntValue(gattCharacteristic.format, 0)
                     val red = characteristic.getIntValue(gattCharacteristic.format, 1)
@@ -326,29 +221,44 @@ class BlinkyThunderboardActivity : BaseActivity(),
                             blue ?: 0
 
                     )
-                    val sensor = device?.sensorBlinky ?: SensorBlinky()
-                    device?.sensorBlinky = sensor
-                    device?.sensorBlinky?.colorLed = ledState
-                    bluetoothService?.selectedDeviceMonitor?.onNext(device)
+                    viewModel.colorLed.postValue(ledState)
                 }
                 else -> { }
             }
-
-            bluetoothService?.readRequiredCharacteristics()
         }
 
         override fun onCharacteristicWrite(gatt: BluetoothGatt,
                                            characteristic: BluetoothGattCharacteristic,
                                            status: Int) {
             super.onCharacteristicWrite(gatt, characteristic, status)
-            Timber.d("onCharacteristicWrite; characteristic = ${characteristic.uuid}, status = $status")
-            Timber.d("Raw data = ${Arrays.toString(characteristic.value)}")
+            gattQueue.handleCommandProcessed()
             if (status != BluetoothGatt.GATT_SUCCESS) return
 
-            if (characteristic.uuid == GattCharacteristic.Digital.uuid) {
-                bluetoothService?.let {
-                    it.thunderboardDevice?.sensorBlinky?.setLed(characteristic.value[0])
-                    it.selectedDeviceMonitor.onNext(it.thunderboardDevice)
+            val gattCharacteristic = GattCharacteristic.fromUuid(characteristic.uuid)
+
+            when (gattCharacteristic) {
+                GattCharacteristic.Digital -> {
+                    val led0State =
+                            (characteristic.value[0].toInt() and BlinkyThunderboardViewModel.LED_0_ON) != 0
+                    val led1State =
+                            (characteristic.value[0].toInt() and BlinkyThunderboardViewModel.LED_1_ON) != 0
+                    viewModel.led0.postValue(led0State)
+                    viewModel.led1.postValue(led1State)
+                }
+                GattCharacteristic.RgbLeds -> {
+                    val on = characteristic.getIntValue(gattCharacteristic.format, 0)
+                    val red = characteristic.getIntValue(gattCharacteristic.format, 1)
+                    val green = characteristic.getIntValue(gattCharacteristic.format, 2)
+                    val blue = characteristic.getIntValue(gattCharacteristic.format, 3)
+                    val ledState = LedRGBState(
+                            on != null && on != 0,
+                            red ?: 0,
+                            green ?: 0,
+                            blue ?: 0
+                    )
+                    viewModel.colorLed.postValue(ledState)
+                }
+                else -> {
                 }
             }
         }
@@ -356,35 +266,20 @@ class BlinkyThunderboardActivity : BaseActivity(),
         override fun onCharacteristicChanged(gatt: BluetoothGatt,
                                              characteristic: BluetoothGattCharacteristic) {
             super.onCharacteristicChanged(gatt, characteristic)
-            Timber.d("onCharacteristicChanged; characteristic = ${characteristic.uuid}")
-            Timber.d("Raw value = ${Arrays.toString(characteristic.value)}")
 
-            val device = bluetoothService?.thunderboardDevice
             val gattCharacteristic = GattCharacteristic.fromUuid(characteristic.uuid)
 
             when (gattCharacteristic) {
-                GattCharacteristic.BatteryLevel -> {
-                    device?.let {
-                        it.batteryLevel = characteristic.getIntValue(gattCharacteristic.format, 0)
-                        it.isBatteryConfigured = true
-                    }
-                    bluetoothService?.selectedDeviceStatusMonitor?.onNext(StatusEvent(device))
-                }
-                GattCharacteristic.PowerSource -> {
-                    device?.let {
-                        val powerSource = ThunderBoardDevice.PowerSource.fromInt(
-                                characteristic.getIntValue(gattCharacteristic.format, 0))
-                        it.powerSource = powerSource
-                        it.isPowerSourceConfigured = true
-                    }
-                    bluetoothService?.selectedDeviceStatusMonitor?.onNext(StatusEvent(device))
-                }
+                GattCharacteristic.BatteryLevel,
+                GattCharacteristic.PowerSource -> statusFragment.handleBaseCharacteristic(characteristic)
+
                 GattCharacteristic.Digital -> {
-                    device?.sensorBlinky?.let {
-                        it.isSensorDataChanged = true
-                        it.setSwitch(characteristic.value[0])
-                    }
-                    bluetoothService?.selectedDeviceMonitor?.onNext(device)
+                    val button0State =
+                            (characteristic.value[0].toInt() and BlinkyThunderboardViewModel.BUTTON_0_ON) != 0
+                    val button1State =
+                            (characteristic.value[0].toInt() and BlinkyThunderboardViewModel.BUTTON_1_ON) != 0
+                    viewModel.button0.postValue(button0State)
+                    viewModel.button1.postValue(button1State)
                 }
                 else -> { }
             }
@@ -393,11 +288,9 @@ class BlinkyThunderboardActivity : BaseActivity(),
         override fun onDescriptorRead(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?,
                                       status: Int) {
             super.onDescriptorRead(gatt, descriptor, status)
-            Timber.d("onDescriptorRead; descriptor = ${descriptor?.uuid}, status = $status")
-            Timber.d("Raw data = ${Arrays.toString(descriptor?.value)}")
 
             if (descriptor?.uuid == LED_MASK_DESCRIPTOR) {
-                presenter?.setRgbLedMask(descriptor?.value?.get(0)?.toInt() ?: 0)
+                viewModel.rgbLedMask.postValue(descriptor?.value?.get(0)?.toInt() ?: 0)
             }
 
         }
@@ -405,43 +298,17 @@ class BlinkyThunderboardActivity : BaseActivity(),
         override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor,
                                        status: Int) {
             super.onDescriptorWrite(gatt, descriptor, status)
-            Timber.d("onDescriptorWrite; descriptor = ${descriptor.uuid}, status = $status")
-            Timber.d("Raw data = ${Arrays.toString(descriptor.value)}")
+            gattQueue.handleCommandProcessed()
             if (status != BluetoothGatt.GATT_SUCCESS) return
 
-            val device = bluetoothService?.thunderboardDevice
-            val characteristicUuid = descriptor.characteristic.uuid
-            Timber.d("descriptor for characteristic: $characteristicUuid")
-
-            when (characteristicUuid) {
-                GattCharacteristic.BatteryLevel.uuid -> {
-                    device?.isBatteryNotificationEnabled = true
-                    bluetoothService?.let {
-                        it.readRequiredCharacteristics()
-                        it.selectedDeviceMonitor.onNext(device)
-                    }
-                }
-                GattCharacteristic.PowerSource.uuid -> {
-                    device?.isPowerSourceNotificationEnabled = true
-                    bluetoothService?.let {
-                        it.readRequiredCharacteristics()
-                        it.selectedDeviceMonitor.onNext(device)
-                    }
-                }
-                GattCharacteristic.Digital.uuid -> {
-                    val sensor = device?.sensorBlinky ?: SensorBlinky()
-                    device?.sensorBlinky = sensor
-                    device?.sensorBlinky?.isNotificationEnabled = true
-                    bluetoothService?.selectedDeviceMonitor?.onNext(device)
-                }
+            when (descriptor.characteristic.uuid) {
+                GattCharacteristic.BatteryLevel.uuid -> initControls()
                 else -> { }
             }
         }
     }
 
     companion object {
-        private const val STATE_NORMAL = 0
-        private const val STATE_PRESSED = 1
-        val LED_MASK_DESCRIPTOR: UUID? = UUID.fromString("1c694489-8825-45cc-8720-28b54b1fbf00")
+        private val LED_MASK_DESCRIPTOR: UUID? = UUID.fromString("1c694489-8825-45cc-8720-28b54b1fbf00")
     }
 }

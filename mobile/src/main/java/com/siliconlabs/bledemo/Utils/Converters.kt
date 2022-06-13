@@ -173,6 +173,17 @@ object Converters {
         return value
     }
 
+    fun calculateLongValue(array: ByteArray, isBigEndian: Boolean) : Long {
+        val byteBasis = 256.0
+        var value = 0L
+
+        if (isBigEndian) array.reverse()
+        array.forEachIndexed { index, byteValue ->
+            value += getIntFromTwosComplement(byteValue) * byteBasis.pow(index).toLong()
+        }
+        return value
+    }
+
     fun getIntFromTwosComplement(value: Byte) : Int {
         return if (value < 0) 256 - abs(value.toInt()) else value.toInt()
     }

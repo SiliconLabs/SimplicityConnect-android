@@ -17,9 +17,9 @@ import com.badlogic.gdx.backends.android.surfaceview.FillResolutionStrategy
 import com.badlogic.gdx.backends.android.surfaceview.ResolutionStrategy
 import com.badlogic.gdx.utils.*
 import com.badlogic.gdx.utils.Array
-import com.siliconlabs.bledemo.thunderboard.base.BaseActivity
+import com.siliconlabs.bledemo.thunderboard.base.ThunderboardActivity
 
-abstract class GdxActivity : BaseActivity(), AndroidApplicationBase {
+abstract class GdxActivity : ThunderboardActivity(), AndroidApplicationBase {
     protected var graphics: AndroidGraphics? = null
     protected var _input: AndroidInput? = null
     protected var audio: AndroidAudio? = null

@@ -4,11 +4,11 @@ import java.util.*
 
 class TemperatureScale(locale: Locale) {
 
-    var temperatureType = CELSIUS
+    var scale = CELSIUS
 
     override fun toString(): String {
         return String.format("temperatureType: %s",
-                if (temperatureType == CELSIUS) "celsius" else "fahrenheit")
+                if (scale == CELSIUS) "celsius" else "fahrenheit")
     }
 
     companion object {
@@ -18,7 +18,7 @@ class TemperatureScale(locale: Locale) {
 
     init {
         if (Locale.US == locale) {
-            temperatureType = FAHRENHEIT
+            scale = FAHRENHEIT
         }
     }
 }

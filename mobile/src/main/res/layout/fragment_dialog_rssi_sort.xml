@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="16dp" >
+
+    <TextView
+        style="@style/TitleMedium"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="@string/sort_title_rssi" />
+
+    <include
+        android:id="@+id/sort_rssi_asc"
+        layout="@layout/name_with_checkmark"
+        android:layout_width="match_parent"
+        android:layout_height="36dp" />
+
+    <include layout="@layout/horizontal_separator" />
+
+    <include
+        android:id="@+id/sort_rssi_desc"
+        layout="@layout/name_with_checkmark"
+        android:layout_width="match_parent"
+        android:layout_height="36dp" />
+
+    <include layout="@layout/horizontal_separator" />
+
+    <TextView
+        style="@style/TitleMedium"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/sort_title_name" />
+
+    <include
+        android:id="@+id/sort_name_a_to_z"
+        layout="@layout/name_with_checkmark"
+        android:layout_width="match_parent"
+        android:layout_height="36dp" />
+
+    <include layout="@layout/horizontal_separator" />
+
+    <include
+        android:id="@+id/sort_name_z_to_a"
+        layout="@layout/name_with_checkmark"
+        android:layout_width="match_parent"
+        android:layout_height="36dp" />
+
+    <include layout="@layout/horizontal_separator" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="40dp"
+        android:gravity="end">
+
+        <Button android:id="@+id/rssi_sort_button_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_cancel"
+            style="@style/ButtonBorderlessBlue" />
+
+        <Button android:id="@+id/rssi_sort_button_apply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/button_apply"
+            style="@style/ButtonBlue"/>
+
+    </LinearLayout>
+
+</LinearLayout>

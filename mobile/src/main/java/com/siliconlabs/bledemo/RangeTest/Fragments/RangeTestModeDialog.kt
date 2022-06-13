@@ -69,14 +69,12 @@ class RangeTestModeDialog : DialogFragment(), RangeTestView {
 
     private fun onTxModeButtonClicked() {
         dismiss()
-        val controller = activity as RangeTestActivity
         controller.setView(null)
         controller.initTestMode(RangeTestMode.Tx)
     }
 
     private fun onRxModeButtonClicked() {
         dismiss()
-        val controller = activity as RangeTestActivity
         controller.setView(null)
         controller.initTestMode(RangeTestMode.Rx)
     }

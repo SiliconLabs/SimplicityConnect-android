@@ -111,8 +111,8 @@ class RangeTestPresenter {
         if (currentDevice.maWindowSize != null && currentDevice.maWindowSizeValues != null) view.showMaWindowSize(currentDevice.maWindowSize!!, currentDevice.maWindowSizeValues!!)
         if (currentDevice.channelNumber != null) view.showChannelNumber(currentDevice.channelNumber!!)
         if (currentDevice.packetCountRepeat != null) view.showPacketCountRepeat(currentDevice.packetCountRepeat!!)
-        if (currentDevice.packetRequired != null) view.showPacketRequired(currentDevice.packetRequired!!)
-        if (currentDevice.packetSent != null) view.showPacketSent(currentDevice.packetSent!!)
+        if (currentDevice.packetsRequired != null) view.showPacketRequired(currentDevice.packetsRequired!!)
+        if (currentDevice.packetsSent != null) view.showPacketSent(currentDevice.packetsSent!!)
         if (currentDevice.remoteId != null) view.showRemoteId(currentDevice.remoteId!!)
         if (currentDevice.selfId != null) view.showSelfId(currentDevice.selfId!!)
         if (currentDevice.uartLogEnabled != null) view.showUartLogEnabled(currentDevice.uartLogEnabled!!)
@@ -120,10 +120,18 @@ class RangeTestPresenter {
         if (currentDevice.phy != null && currentDevice.phyMap != null) view.showPhy(currentDevice.phy!!, currentDevice.phyMap!!)
         view.showMa(if (currentDevice.ma == null) 0f else currentDevice.ma!!)
         view.showPer(if (currentDevice.per == null) 0f else currentDevice.per!!)
-        if (currentDevice.packetReceived == null || currentDevice.packetCount == null) {
+        if (currentDevice.packetsReceived == null || currentDevice.packetCount == null) {
             view.showTestRx(0, 0)
         } else {
-            view.showTestRx(currentDevice.packetReceived!!, currentDevice.packetCount!!)
+            view.showTestRx(currentDevice.packetsReceived!!, currentDevice.packetCount!!)
+        }
+    }
+
+    fun getDeviceByAddress(address: String) : DeviceState? {
+        return when (address) {
+            deviceState1.deviceInfo?.address -> deviceState1
+            deviceState2.deviceInfo?.address -> deviceState2
+            else -> null
         }
     }
 
@@ -150,8 +158,8 @@ class RangeTestPresenter {
     }
 
     fun getTestRunning() = currentDevice.testRunning
-    fun setTestRunning(running: Boolean) {
-        currentDevice.testRunning = running
+    fun setTestRunning(address: String, running: Boolean) {
+        getDeviceByAddress(address)?.testRunning = running
     }
     fun setTestRunningAt(which: Int, running: Boolean) {
         if (which == 1) deviceState1.testRunning = running
@@ -177,303 +185,309 @@ class RangeTestPresenter {
     }
 
     // controller -> view
-    fun onDeviceNameUpdated(deviceName: String?) {
-        currentDevice.deviceName = deviceName
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showDeviceName(deviceName)
-            }
-        })
-    }
-
-    fun onModelNumberUpdated(number: String?) {
-        currentDevice.modelNumber = number
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showModelNumber(number, currentDevice.running)
-            }
-        })
-    }
-
-    fun onTxPowerUpdated(power: Int) {
-        currentDevice.txPower = TxPower(power)
-        if (currentDevice.txPowerValues != null) {
-            onView(object : ViewAction {
+    fun onDeviceNameUpdated(address: String, deviceName: String?) {
+        getDeviceByAddress(address)?.let {
+            it.deviceName = deviceName
+            onView(it, object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showTxPower(currentDevice.txPower, currentDevice.txPowerValues!!)
+                    view.showDeviceName(deviceName)
                 }
             })
         }
+
     }
 
-    fun onPayloadLengthUpdated(length: Int) {
-        currentDevice.payloadLength = length
-        if (currentDevice.payloadLengthValues != null) {
-            onView(object : ViewAction {
+    fun onModelNumberUpdated(address: String, number: String?) {
+        getDeviceByAddress(address)?.let {
+            it.modelNumber = number
+            onView(it, object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showPayloadLength(length, currentDevice.payloadLengthValues!!)
+                    view.showModelNumber(number, it.running)
                 }
             })
         }
+
     }
 
-    fun onMaWindowSizeUpdated(size: Int) {
-        currentDevice.maWindowSize = size
-        if (currentDevice.maWindowSizeValues != null) {
-            onView(object : ViewAction {
-                override fun run(view: RangeTestView) {
-                    view.showMaWindowSize(size, currentDevice.maWindowSizeValues!!)
-                }
-            })
-        }
-    }
-
-    fun onChannelNumberUpdated(number: Int) {
-        currentDevice.channelNumber = number
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showChannelNumber(number)
-            }
-        })
-    }
-
-    fun onPacketCountRepeatUpdated(enabled: Boolean) {
-        currentDevice.packetCountRepeat = enabled
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showPacketCountRepeat(enabled)
-            }
-        })
-    }
-
-    fun onPacketRequiredUpdated(required: Int) {
-        currentDevice.packetRequired = required
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showPacketRequired(required)
-            }
-        })
-    }
-
-    fun onPacketReceivedUpdated(received: Int) {
-        currentDevice.packetReceived = received
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                if (currentDevice.packetCount != null) {
-                    view.showTestRx(received, currentDevice.packetCount!!)
-                }
-            }
-        })
-    }
-
-    fun onPacketSentUpdated(sent: Int) {
-        currentDevice.packetRequired?.let { packetRequired ->
-            if (sent <= packetRequired) {
-                currentDevice.packetSent = sent
-                onView(object : ViewAction {
+    fun onTxPowerUpdated(address: String, power: Int) {
+        getDeviceByAddress(address)?.let {
+            it.txPower = TxPower(power)
+            if (it.txPowerValues != null) {
+                onView(it, object : ViewAction {
                     override fun run(view: RangeTestView) {
-                        view.showPacketSent(sent)
+                        view.showTxPower(it.txPower, it.txPowerValues!!)
                     }
                 })
             }
         }
     }
 
-    fun onPacketCountUpdated(packetCount: Int) {
-        currentDevice.packetCount = packetCount
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                if (currentDevice.packetReceived != null) {
-                    view.showTestRx(currentDevice.packetReceived!!, packetCount)
-                }
+    fun onPayloadLengthUpdated(address: String, length: Int) {
+        getDeviceByAddress(address)?.let {
+            it.payloadLength = length
+            if (it.payloadLengthValues != null) {
+                onView(it, object : ViewAction {
+                    override fun run(view: RangeTestView) {
+                        view.showPayloadLength(length, it.payloadLengthValues!!)
+                    }
+                })
             }
-        })
+        }
+
     }
 
-    fun onMaUpdated(ma: Float) {
-        currentDevice.ma = ma
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showMa(ma)
+    fun onMaWindowSizeUpdated(address: String, size: Int) {
+        getDeviceByAddress(address)?.let {
+            it.maWindowSize = size
+            if (it.maWindowSizeValues != null) {
+                onView(it, object : ViewAction {
+                    override fun run(view: RangeTestView) {
+                        view.showMaWindowSize(size, it.maWindowSizeValues!!)
+                    }
+                })
             }
-        })
+        }
     }
 
-    fun onPerUpdated(per: Float) {
-        currentDevice.per = per
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showPer(per)
-            }
-        })
-    }
-
-    fun onRemoteIdUpdated(id: Int) {
-        currentDevice.remoteId = id
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showRemoteId(id)
-            }
-        })
-    }
-
-    fun onSelfIdUpdated(id: Int) {
-        currentDevice.selfId = id
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showSelfId(id)
-            }
-        })
-    }
-
-    fun onUartLogEnabledUpdated(enabled: Boolean) {
-        currentDevice.uartLogEnabled = enabled
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showUartLogEnabled(enabled)
-            }
-        })
-    }
-
-    fun onRunningStateUpdated(running: Boolean) {
-        currentDevice.running = running
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showRunningState(running)
-            }
-        })
-    }
-
-    fun onPhyConfigUpdated(phy: Int) {
-        currentDevice.phy = phy
-        if (currentDevice.phyMap != null) {
-            onView(object : ViewAction {
+    fun onChannelNumberUpdated(address: String, number: Int) {
+        getDeviceByAddress(address)?.let {
+            it.channelNumber = number
+            onView(it, object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showPhy(phy, currentDevice.phyMap!!)
+                    view.showChannelNumber(number)
                 }
             })
         }
     }
 
-    fun onPhyMapUpdated(phyMap: LinkedHashMap<Int, String>) {
-        currentDevice.phyMap = phyMap
-        if (currentDevice.phy != null) {
-            onView(object : ViewAction {
+    fun onPacketCountRepeatUpdated(address: String, enabled: Boolean) {
+        getDeviceByAddress(address)?.let {
+            it.packetCountRepeat = enabled
+            onView(it, object : ViewAction {
                 override fun run(view: RangeTestView) {
-                    view.showPhy(currentDevice.phy!!, phyMap)
+                    view.showPacketCountRepeat(enabled)
                 }
             })
         }
     }
 
-    fun onTxPowerRangeUpdated(from: Int, to: Int) {
+    fun onPacketRequiredUpdated(address: String, required: Int) {
+        getDeviceByAddress(address)?.let {
+            it.packetsRequired = required
+            onView(it, object : ViewAction {
+                override fun run(view: RangeTestView) {
+                    view.showPacketRequired(required)
+                }
+            })
+        }
+    }
+
+    fun onPacketSentUpdated(address: String, sent: Int) {
+        getDeviceByAddress(address)?.let {
+            it.packetsRequired?.let { packetRequired ->
+                if (sent <= packetRequired) {
+                    it.packetsSent = sent
+                    onView(it, object : ViewAction {
+                        override fun run(view: RangeTestView) {
+                            view.showPacketSent(sent)
+                        }
+                    })
+                }
+            }
+        }
+    }
+
+    fun onRemoteIdUpdated(address: String, id: Int) {
+        getDeviceByAddress(address)?.let {
+            it.remoteId = id
+            onView(it, object : ViewAction {
+                override fun run(view: RangeTestView) {
+                    view.showRemoteId(id)
+                }
+            })
+        }
+    }
+
+    fun onSelfIdUpdated(address: String, id: Int) {
+        getDeviceByAddress(address)?.let {
+            it.selfId = id
+            onView(it, object : ViewAction {
+                override fun run(view: RangeTestView) {
+                    view.showSelfId(id)
+                }
+            })
+        }
+    }
+
+    fun onUartLogEnabledUpdated(address: String, enabled: Boolean) {
+        getDeviceByAddress(address)?.let {
+            it.uartLogEnabled = enabled
+            onView(it, object : ViewAction {
+                override fun run(view: RangeTestView) {
+                    view.showUartLogEnabled(enabled)
+                }
+            })
+        }
+    }
+
+    fun onRunningStateUpdated(address: String, running: Boolean) {
+        getDeviceByAddress(address)?.let {
+            it.running = running
+            onView(it, object : ViewAction {
+                override fun run(view: RangeTestView) {
+                    view.showRunningState(running)
+                }
+            })
+        }
+    }
+
+    fun onPhyConfigUpdated(address: String, phy: Int) {
+        getDeviceByAddress(address)?.let {
+            it.phy = phy
+            if (it.phyMap != null) {
+                onView(it, object : ViewAction {
+                    override fun run(view: RangeTestView) {
+                        view.showPhy(phy, it.phyMap!!)
+                    }
+                })
+            }
+        }
+    }
+
+    fun onPhyMapUpdated(address: String, phyMap: LinkedHashMap<Int, String>) {
+        getDeviceByAddress(address)?.let {
+            it.phyMap = phyMap
+            if (it.phy != null) {
+                onView(it, object : ViewAction {
+                    override fun run(view: RangeTestView) {
+                        view.showPhy(it.phy!!, phyMap)
+                    }
+                })
+            }
+        }
+    }
+
+    fun onTxPowerRangeUpdated(address: String, from: Int, to: Int) {
         val values: MutableList<TxPower> = ArrayList()
         var value = from
         while (value <= to) {
             values.add(TxPower(value))
             value += 5
         }
-        currentDevice.txPowerValues = values
-        if (currentDevice.txPower != null) {
-            onView(object : ViewAction {
-                override fun run(view: RangeTestView) {
-                    view.showTxPower(currentDevice.txPower, currentDevice.txPowerValues!!)
-                }
-            })
+
+        getDeviceByAddress(address)?.let {
+            it.txPowerValues = values
+            if (it.txPower != null) {
+                onView(it, object : ViewAction {
+                    override fun run(view: RangeTestView) {
+                        view.showTxPower(it.txPower, it.txPowerValues!!)
+                    }
+                })
+            }
         }
     }
 
-    fun onPayloadLengthRangeUpdated(from: Int, to: Int) {
+    fun onPayloadLengthRangeUpdated(address: String, from: Int, to: Int) {
         val values: MutableList<Int> = ArrayList()
         for (i in 0 until to - from + 1) {
             values.add(from + i)
         }
-        currentDevice.payloadLengthValues = values
-        if (currentDevice.payloadLength != null) {
-            onView(object : ViewAction {
-                override fun run(view: RangeTestView) {
-                    view.showPayloadLength(currentDevice.payloadLength!!, currentDevice.payloadLengthValues!!)
-                }
-            })
+
+        getDeviceByAddress(address)?.let {
+            it.payloadLengthValues = values
+            if (it.payloadLength != null) {
+                onView(it, object : ViewAction {
+                    override fun run(view: RangeTestView) {
+                        view.showPayloadLength(it.payloadLength!!, it.payloadLengthValues!!)
+                    }
+                })
+            }
         }
     }
 
-    fun onMaWindowSizeRangeUpdated(from: Int, to: Int) {
+    fun onMaWindowSizeRangeUpdated(address: String, from: Int, to: Int) {
         val values: MutableList<Int> = ArrayList()
         var i = from
         while (i <= to) {
             values.add(i)
             i *= 2
         }
-        currentDevice.maWindowSizeValues = values
-        if (currentDevice.maWindowSize != null) {
-            onView(object : ViewAction {
-                override fun run(view: RangeTestView) {
-                    view.showMaWindowSize(currentDevice.maWindowSize!!, currentDevice.maWindowSizeValues!!)
-                }
-            })
-        }
-    }
 
-    fun onTestDataReceived(rssi: Int, packetCount: Int, packetReceived: Int) {
-        if (packetCount < currentDevice.lastPacketCount) {
-            clearMaBuffer()
-            currentDevice.lastPacketLoss = 0
-            onView(object : ViewAction {
-                override fun run(view: RangeTestView) {
-                    view.showPer(0f)
-                    view.showMa(0f)
-                    view.clearTestResults()
-                }
-            })
-        }
-        currentDevice.lastPacketCount = packetCount
-
-//        this.packetRequired = packetCount;
-        currentDevice.packetReceived = packetReceived
-        val totalPacketLoss = packetCount - packetReceived
-        val currentPacketLoss = totalPacketLoss - currentDevice.lastPacketLoss
-        currentDevice.lastPacketLoss = totalPacketLoss
-        val per = totalPacketLoss * 100f / packetCount.toFloat()
-        val ma = updateMa(currentPacketLoss)
-        onView(object : ViewAction {
-            override fun run(view: RangeTestView) {
-                view.showTestRx(packetReceived, packetCount)
-                view.showPer(per)
-                view.showMa(ma)
-                view.showTestRssi(rssi)
+        getDeviceByAddress(address)?.let {
+            it.maWindowSizeValues = values
+            if (it.maWindowSize != null) {
+                onView(it, object : ViewAction {
+                    override fun run(view: RangeTestView) {
+                        view.showMaWindowSize(it.maWindowSize!!, it.maWindowSizeValues!!)
+                    }
+                })
             }
-        })
-    }
-
-    private fun onView(action: ViewAction) {
-        val view = view ?: return
-        if (Thread.currentThread() === Looper.getMainLooper().thread) {
-            action.run(view)
-        } else {
-            view.runOnUiThread(Runnable { action.run(view) })
         }
     }
 
-    private fun updateMa(packetsLost: Int): Float {
-        currentDevice.maBuffer[currentDevice.maBufferPtr++] = packetsLost
+    fun onTestDataReceived(address: String, rssi: Int, packetCount: Int, packetReceived: Int) {
+        getDeviceByAddress(address)?.let {
+            if (packetCount < it.lastPacketCount) {
+                clearMaBuffer(it)
+                it.lastPacketLoss = 0
+                onView(it, object : ViewAction {
+                    override fun run(view: RangeTestView) {
+                        view.showPer(0f)
+                        view.showMa(0f)
+                        view.clearTestResults()
+                    }
+                })
+            }
+            it.lastPacketCount = packetCount
 
-        if (currentDevice.maBufferPtr >= currentDevice.maBuffer.size) {
-            currentDevice.maBufferPtr = 0
+            //        this.packetRequired = packetCount;
+            it.packetsReceived = packetReceived
+            val totalPacketLoss = packetCount - packetReceived
+            val currentPacketLoss = totalPacketLoss - it.lastPacketLoss
+            it.lastPacketLoss = totalPacketLoss
+            val per = totalPacketLoss * 100f / packetCount.toFloat()
+            val ma = updateMa(it, currentPacketLoss)
+            onView(it, object : ViewAction {
+                override fun run(view: RangeTestView) {
+                    view.showTestRx(packetReceived, packetCount)
+                    view.showPer(per)
+                    view.showMa(ma)
+                    view.showTestRssi(rssi)
+                }
+            })
         }
-
-        val window = maWindow
-        return sumMaBuffer(window) * 100f / window.toFloat()
     }
 
-    private fun sumMaBuffer(window: Int): Int {
+    private fun onView(deviceState: DeviceState, action: ViewAction) {
+        if (deviceState === currentDevice) {
+            val view = view ?: return
+            if (Thread.currentThread() === Looper.getMainLooper().thread) {
+                action.run(view)
+            } else {
+                view.runOnUiThread(Runnable { action.run(view) })
+            }
+        }
+    }
+
+    private fun updateMa(deviceState: DeviceState, packetsLost: Int): Float {
+        deviceState.maBuffer[deviceState.maBufferPtr++] = packetsLost
+
+        if (deviceState.maBufferPtr >= deviceState.maBuffer.size) {
+            deviceState.maBufferPtr = 0
+        }
+
+        val window = getMaWindow(deviceState)
+        return sumMaBuffer(deviceState, window) * 100f / window.toFloat()
+    }
+
+    private fun sumMaBuffer(deviceState: DeviceState, window: Int): Int {
         var sum = 0
         for (i in 1..window) {
-            var location = currentDevice.maBufferPtr - i
+            var location = deviceState.maBufferPtr - i
             if (location < 0) {
-                location = currentDevice.maBuffer.size - i
+                location = deviceState.maBuffer.size - i
             }
-            val loss = currentDevice.maBuffer[location]
+            val loss = deviceState.maBuffer[location]
             sum += if (loss >= 0) {
                 loss
             } else {
@@ -483,15 +497,14 @@ class RangeTestPresenter {
         return sum
     }
 
-    private val maWindow: Int
-        get() {
-            val window = currentDevice.maWindowSize
-            return if (window != null && window > 0 && window <= MA_WINDOW_MAX) window else MA_WINDOW_DEFAULT
-        }
+    private fun getMaWindow(deviceState: DeviceState) : Int {
+        val window = deviceState.maWindowSize
+        return if (window != null && window > 0 && window <= MA_WINDOW_MAX) window else MA_WINDOW_DEFAULT
+    }
 
-    private fun clearMaBuffer() {
-        Arrays.fill(currentDevice.maBuffer, -1)
-        currentDevice.maBufferPtr = 0
+    private fun clearMaBuffer(deviceState: DeviceState) {
+        Arrays.fill(deviceState.maBuffer, -1)
+        deviceState.maBufferPtr = 0
     }
 
     private interface ViewAction {

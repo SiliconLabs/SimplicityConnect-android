@@ -6,10 +6,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.siliconlabs.bledemo.Application.SiliconLabsDemoApplication
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.thunderboard.injection.component.ActivityComponent
-import com.siliconlabs.bledemo.thunderboard.injection.component.DaggerActivityComponent
 
 abstract class BaseActivity : AppCompatActivity() {
     companion object {
@@ -21,7 +18,6 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private var connectionStatusModalDialog: ProgressDialogWithSpinner? = null
-    private var daggerComponent: ActivityComponent? = null
 
     @JvmOverloads
     fun showModalDialog(connStat: ConnectionStatus? = null, cancelListener: DialogInterface.OnCancelListener? = null) {
@@ -71,11 +67,5 @@ abstract class BaseActivity : AppCompatActivity() {
         //If no view currently has focus, create a new one, just so we can grab a window token from it
         if (view == null) view = View(this)
         imm.hideSoftInputFromWindow(view.windowToken, 0)
-    }
-
-    fun getDaggerComponent() : ActivityComponent {
-        return daggerComponent ?:
-        DaggerActivityComponent.builder().thunderBoardComponent(
-                (application as SiliconLabsDemoApplication).component()).build()
     }
 }

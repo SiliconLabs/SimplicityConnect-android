@@ -287,7 +287,7 @@ class GattConfiguratorActivity : BaseActivity(), OnClickListener {
 
     private fun showWrongLocationToast() {
         Toast.makeText(this, getString(R.string
-                .gatt_configurator_toast_export_wrong_location_chosen), Toast.LENGTH_LONG).show()
+                .toast_export_wrong_location_chosen), Toast.LENGTH_LONG).show()
     }
 
     private fun getFileDescriptorFromIntent(intent: Intent?) : FileDescriptor? {

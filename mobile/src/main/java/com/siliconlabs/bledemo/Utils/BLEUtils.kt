@@ -9,6 +9,7 @@ import java.util.*
 
 object BLEUtils {
 
+
     fun setNotificationForCharacteristic(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic?, gattDescriptor: UUID?, value: Notifications): Boolean {
         var written = false
         if (characteristic != null) {
@@ -24,15 +25,6 @@ object BLEUtils {
             return written
         }
         return false
-    }
-
-    fun setNotificationForCharacteristic(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic?, value: Notifications): Boolean {
-        return setNotificationForCharacteristic(
-            gatt,
-            characteristic,
-            UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR,
-            value
-        )
     }
 
     /**
@@ -83,6 +75,15 @@ object BLEUtils {
         )
     }
 
+    fun setNotificationForCharacteristic(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic?, value: Notifications): Boolean {
+        return setNotificationForCharacteristic(
+                gatt,
+                characteristic,
+                UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR,
+                value
+        )
+    }
+
     /**
      * Search for a specific characteristic given a BluetoothGattService
      *
@@ -108,6 +109,10 @@ object BLEUtils {
             }
         }
         return null
+    }
+
+    fun getCharacteristic(gatt: BluetoothGatt?, service: GattService, characteristic: GattCharacteristic) : BluetoothGattCharacteristic? {
+        return gatt?.getService(service.number)?.getCharacteristic(characteristic.uuid)
     }
 
 }

@@ -294,4 +294,7 @@
     <!-- Password dialog -->
     <dimen name="password_edit_text_margin">20dp</dimen>
 
+    <!-- RSSI Graph -->
+    <dimen name="legend_dot_size">16dp</dimen>
+
 </resources>

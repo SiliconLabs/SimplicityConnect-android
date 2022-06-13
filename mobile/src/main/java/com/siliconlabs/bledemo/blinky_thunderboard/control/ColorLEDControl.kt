@@ -11,12 +11,11 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.widget.SwitchCompat
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.blinky_thunderboard.model.LedRGBState
 import com.siliconlabs.bledemo.blinky_thunderboard.ui.ColorLEDs
 import com.siliconlabs.bledemo.blinky_thunderboard.ui.HueBackgroundView
-import com.siliconlabs.bledemo.thunderboard.model.LedRGBState
+import kotlinx.android.synthetic.main.iodemo_color_leds.view.*
 
 class ColorLEDControl @JvmOverloads constructor(
         context: Context,
@@ -24,27 +23,26 @@ class ColorLEDControl @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    @BindView(R.id.iodemo_color_leds)
-    lateinit var colorLEDs: ColorLEDs
-
-    @BindView(R.id.iodemo_hue_select)
-    lateinit var hueSelect: SeekBar
-
-    @BindView(R.id.iodemo_brightness_select)
-    lateinit var brightnessSelect: SeekBar
-
-    @BindView(R.id.iodemo_color_switch)
-    lateinit var colorSwitch: SwitchCompat
-
-    @BindView(R.id.iodemo_hue_background)
-    lateinit var hueBackgroundView: HueBackgroundView
+    private lateinit var colorLEDs: ColorLEDs
+    private lateinit var hueSelect: SeekBar
+    private lateinit var brightnessSelect: SeekBar
+    private lateinit var colorSwitch: SwitchCompat
+    private lateinit var hueBackgroundView: HueBackgroundView
 
     private var hue: Float = 0f // from 0 to 360
     private var brightness: Float = 1f // from 0 to 1
 
     private var colorLEDControlListener: ColorLEDControlListener? = null
 
-    var selectBrightnessListener: OnSeekBarChangeListener = object : OnSeekBarChangeListener {
+    private fun setupViews(rootView: LinearLayout) {
+        colorLEDs = rootView.iodemo_color_leds
+        hueSelect = rootView.iodemo_hue_select
+        brightnessSelect = rootView.iodemo_brightness_select
+        colorSwitch = rootView.iodemo_color_switch
+        hueBackgroundView = rootView.iodemo_hue_background
+    }
+
+    private var selectBrightnessListener: OnSeekBarChangeListener = object : OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
             brightness = findBrightness(progress)
             setColorLEDs(colorSwitch.isChecked, hue, brightness)
@@ -52,7 +50,9 @@ class ColorLEDControl @JvmOverloads constructor(
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {}
-        override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        override fun onStopTrackingTouch(seekBar: SeekBar) {
+            colorLEDControlListener?.onLedUpdateStop()
+        }
     }
 
     fun setColorLEDControlListener(listener: ColorLEDControlListener?) {
@@ -122,14 +122,15 @@ class ColorLEDControl @JvmOverloads constructor(
     }
 
     interface ColorLEDControlListener {
-        fun updateColorLEDs(ledRGBState: LedRGBState?)
+        fun updateColorLEDs(ledRGBState: LedRGBState)
+        fun onLedUpdateStop()
     }
 
     init {
-        val inflater = LayoutInflater.from(context)
-        val layout = inflater.inflate(R.layout.iodemo_color_leds, this, false) as LinearLayout
+        val layout = LayoutInflater.from(context).inflate(
+                R.layout.iodemo_color_leds, this, false) as LinearLayout
+        setupViews(layout)
         addView(layout)
-        ButterKnife.bind(this, this)
 
         val color = hsvToRGB(hue, brightness)
 
@@ -148,7 +149,9 @@ class ColorLEDControl @JvmOverloads constructor(
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    colorLEDControlListener?.onLedUpdateStop()
+                }
             })
         }
         initHueSelectBackground()
@@ -158,7 +161,7 @@ class ColorLEDControl @JvmOverloads constructor(
             setOnSeekBarChangeListener(selectBrightnessListener)
         }
         colorSwitch.apply {
-            setOnCheckedChangeListener { buttonView, isChecked ->
+            setOnCheckedChangeListener { _, isChecked ->
                 enableControls(isChecked)
                 setColorLEDs(isChecked, hue, brightness)
             }

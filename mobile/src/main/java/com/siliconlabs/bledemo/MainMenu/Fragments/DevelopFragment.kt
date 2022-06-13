@@ -6,10 +6,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.siliconlabs.bledemo.MainMenu.Adapters.MenuAdapter
-import com.siliconlabs.bledemo.MainMenu.MenuItems.Develop.Advertiser
-import com.siliconlabs.bledemo.MainMenu.MenuItems.Develop.Browser
-import com.siliconlabs.bledemo.MainMenu.MenuItems.Develop.GattConfigurator
-import com.siliconlabs.bledemo.MainMenu.MenuItems.Develop.IOPTest
+import com.siliconlabs.bledemo.MainMenu.MenuItems.Develop.*
 import com.siliconlabs.bledemo.MainMenu.MenuItems.MainMenuItem
 import com.siliconlabs.bledemo.R
 import kotlinx.android.synthetic.main.fragment_develop.*
@@ -26,6 +23,7 @@ class DevelopFragment : Fragment(R.layout.fragment_develop), MenuAdapter.OnMenuI
             add(Advertiser(R.drawable.ic_advertiser, getString(R.string.title_Advertiser), getString(R.string.main_menu_description_advertiser)))
             add(GattConfigurator(R.drawable.ic_gatt_configurator, getString(R.string.title_GATT_Configurator), getString(R.string.main_menu_description_gatt_configurator)))
             add(IOPTest(R.drawable.ic_iop_tester, getString(R.string.title_Interoperability_Test), getString(R.string.main_menu_description_iop_test)))
+            add(RssiGraph(R.drawable.ic_range_test, getString(R.string.rssi_graph_label), getString(R.string.rssi_graph_demo_description)))
         }
     }
 

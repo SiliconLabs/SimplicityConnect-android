@@ -19,9 +19,9 @@ class DeviceState {
     var maWindowSizeValues: List<Int>? = null
     var channelNumber: Int? = null
     var packetCountRepeat: Boolean? = null
-    var packetRequired: Int? = null
-    var packetReceived: Int? = null
-    var packetSent: Int? = null
+    var packetsRequired: Int? = null
+    var packetsReceived: Int? = null
+    var packetsSent: Int? = null
     var packetCount: Int? = null
     var per: Float? = null
     var ma: Float? = null

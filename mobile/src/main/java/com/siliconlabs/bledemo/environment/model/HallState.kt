@@ -1,13 +1,18 @@
 package com.siliconlabs.bledemo.environment.model
 
-import androidx.annotation.IntDef
+enum class HallState(val value: Int) {
+    CLOSED(0),
+    OPENED(1),
+    TAMPERED(2);
 
-@Retention(AnnotationRetention.SOURCE)
-@IntDef(HallState.CLOSED, HallState.OPENED, HallState.TAMPERED)
-annotation class HallState {
     companion object {
-        const val CLOSED = 0
-        const val OPENED = 1
-        const val TAMPERED = 2
+        fun fromValue(value: Int) : HallState? {
+            return when (value) {
+                0 -> CLOSED
+                1 -> OPENED
+                2 -> TAMPERED
+                else -> null
+            }
+        }
     }
 }

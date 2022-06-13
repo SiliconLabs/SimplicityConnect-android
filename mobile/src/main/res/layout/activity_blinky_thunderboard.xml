@@ -43,7 +43,7 @@
                         android:layout_alignParentEnd="true">
 
                             <com.siliconlabs.bledemo.blinky_thunderboard.control.SwitchControl
-                                android:id="@+id/switch0"
+                                android:id="@+id/switch_0"
                                 android:layout_width="@dimen/space_L"
                                 android:layout_height="match_parent"
                                 android:layout_marginTop="@dimen/space_XXS"
@@ -51,7 +51,7 @@
 
                             <com.siliconlabs.bledemo.blinky_thunderboard.control.SwitchControl
                                 android:layout_marginStart="@dimen/space_XXS"
-                                android:id="@+id/switch1"
+                                android:id="@+id/switch_1"
                                 android:layout_width="@dimen/space_L"
                                 android:layout_height="match_parent"
                                 android:layout_marginTop="@dimen/space_XXS"
@@ -99,7 +99,7 @@
                     android:layout_alignParentEnd="true">
 
                         <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/led0"
+                            android:id="@+id/led_0"
                             android:layout_width="@dimen/space_L"
                             android:layout_height="wrap_content"
                             android:thumb="@drawable/thumb_selector"
@@ -107,7 +107,7 @@
                             android:layout_marginEnd="@dimen/space_XS"/>
 
                         <androidx.appcompat.widget.SwitchCompat
-                            android:id="@+id/led1"
+                            android:id="@+id/led_1"
                             android:layout_width="@dimen/space_L"
                             android:layout_height="wrap_content"
                             android:checked="true"

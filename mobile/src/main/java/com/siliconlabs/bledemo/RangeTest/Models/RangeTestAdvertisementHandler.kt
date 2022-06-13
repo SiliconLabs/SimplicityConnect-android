@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.RangeTest.Models
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -8,12 +9,13 @@ import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
-import android.util.Log
+import com.siliconlabs.bledemo.utils.Converters
+import timber.log.Timber
 
 /**
  * @author Comarch S.A.
  */
-abstract class RangeTestAdvertisementHandler(context: Context, address: String?) {
+abstract class RangeTestAdvertisementHandler(context: Context, address: String) {
     private val bluetoothAdapter: BluetoothAdapter
     val address: String
     private var listener: Any? = null
@@ -31,7 +33,7 @@ abstract class RangeTestAdvertisementHandler(context: Context, address: String?)
                     .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                     .setReportDelay(0)
                     .build()
-            val advertisementListener = RangeTestAdvertisementListenerPost21()
+            val advertisementListener = AdvertisementListener()
             bluetoothAdapter.bluetoothLeScanner.startScan(listOf(filter),
                     scanSettings,
                     advertisementListener
@@ -46,7 +48,7 @@ abstract class RangeTestAdvertisementHandler(context: Context, address: String?)
             return
         }
         run {
-            val advertisementListener = listener as RangeTestAdvertisementListenerPost21?
+            val advertisementListener = listener as AdvertisementListener?
             bluetoothAdapter.bluetoothLeScanner.stopScan(advertisementListener)
         }
         listener = null
@@ -56,30 +58,29 @@ abstract class RangeTestAdvertisementHandler(context: Context, address: String?)
 
     @Synchronized
     private fun handleDeviceAdvertisement(device: BluetoothDevice, record: ByteArray) {
-        val address = device.address
-        if (this.address == address) {
+        if (this.address == device.address) {
             decodeAndNotify(record)
         }
     }
 
+    @SuppressLint("BinaryOperationInTimber")
     private fun decodeAndNotify(record: ByteArray) {
         val manufacturerData = record[13].toInt()
-        val companyId = unsignedIntFromLittleEndian(record[15], record[14])
+        val companyId = Converters.calculateDecimalValue(record.copyOfRange(14, 16), false)
         val structureType = record[16].toInt()
         val rssi = record[17].toInt()
-        val packetCount = unsignedIntFromLittleEndian(record[19], record[18])
-        val packetReceived = unsignedIntFromLittleEndian(record[21], record[20])
-        Log.d("RangeAdvData", String.format("Address: %s, M: %d, CID: %d, T: %d, RSSI: %d, PC: %d, PR: %d",
-                address, manufacturerData, companyId, structureType, rssi, packetCount, packetReceived))
-        handleAdvertisementRecord(manufacturerData, companyId, structureType, rssi, packetCount, packetReceived)
-    }
+        val packetCount = Converters.calculateDecimalValue(record.copyOfRange(18, 20), false)
+        val packetReceived = Converters.calculateDecimalValue(record.copyOfRange(20, 22), false)
 
-    private fun unsignedIntFromLittleEndian(vararg bytes: Byte): Int {
-        var value = 0
-        for (b in bytes) {
-            value = value shl 8 or (b.toInt() and 0xFF)
-        }
-        return value
+        Timber.d("DecodedAdvData; " +
+                "Address = $address, " +
+                "M = $manufacturerData, " +
+                "CID = $companyId, " +
+                "T = $structureType, " +
+                "RSSI = $rssi, " +
+                "PC = $packetCount, " +
+                "PR = $packetReceived")
+        handleAdvertisementRecord(manufacturerData, companyId, structureType, rssi, packetCount, packetReceived)
     }
 
     private fun getBluetoothAdapter(context: Context): BluetoothAdapter {
@@ -87,7 +88,7 @@ abstract class RangeTestAdvertisementHandler(context: Context, address: String?)
         return bluetoothManager.adapter
     }
 
-    private inner class RangeTestAdvertisementListenerPost21 : ScanCallback() {
+    private inner class AdvertisementListener : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             handleScanResult(result)
         }
@@ -108,7 +109,6 @@ abstract class RangeTestAdvertisementHandler(context: Context, address: String?)
     }
 
     init {
-        requireNotNull(address) { "Address cannot be null" }
         bluetoothAdapter = getBluetoothAdapter(context)
         this.address = address
     }

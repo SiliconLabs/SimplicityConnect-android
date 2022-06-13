@@ -19,7 +19,6 @@ android {
         targetSdkVersion 30
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField 'String', 'MICROSITE_URL', "\"http://www.silabs.com/thunderboard\""
     }
 
     buildTypes {
@@ -49,8 +48,8 @@ android {
         blueGecko {
             dimension "version"
             applicationId "com.siliconlabs.bledemo"
-            versionCode 24
-            versionName "2.4.3"
+            versionCode 25
+            versionName "2.5.0"
         }
     }
 
@@ -127,30 +126,18 @@ dependencies {
     implementation "com.android.support:palette-v7:30.0.0"
     implementation "com.android.support:design:30.0.0"
     implementation "com.android.support:gridlayout-v7:30.0.0"
-    // dagger
-    implementation 'com.google.dagger:dagger:2.12'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.12'
-    kapt 'com.google.dagger:dagger-android-processor:2.15'
-    kapt 'com.google.dagger:dagger-compiler:2.15'
+
     // Timber
     implementation 'com.jakewharton.timber:timber:4.5.1'
-    // Butterknife
-    implementation ('com.jakewharton:butterknife:10.2.3'){
-        exclude module: 'support-compat'
-    }
-    kapt ('com.jakewharton:butterknife:10.2.3'){
-        exclude module: 'support-compat'
-    }
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
-    kapt 'com.jakewharton:butterknife-compiler:10.2.3'
-    //annotation?
-    //implementation 'org.glassfish:javax.annotation:10.0-b28'
+
     // RxJava, RxAndroid
     implementation 'io.reactivex:rxjava:1.1.3'
     implementation 'io.reactivex:rxandroid:1.1.0'
-    // Gson
-    implementation 'com.google.code.gson:gson:2.8.0'
+    
     // Retrofit
     implementation 'com.squareup.retrofit:retrofit:1.9.0'
     implementation 'com.squareup.okhttp:okhttp:2.5.0'
+
+    'open csv'
+    implementation 'com.opencsv:opencsv:5.6'
 }

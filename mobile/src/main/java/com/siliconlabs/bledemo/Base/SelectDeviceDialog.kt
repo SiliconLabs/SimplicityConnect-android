@@ -41,7 +41,6 @@ import com.siliconlabs.bledemo.motion.activities.MotionActivity
 import com.siliconlabs.bledemo.throughput.activities.ThroughputActivity
 import com.siliconlabs.bledemo.throughput.utils.PeripheralManager
 import com.siliconlabs.bledemo.thunderboard.model.ThunderBoardDevice
-import com.siliconlabs.bledemo.thunderboard.utils.BleUtils
 import com.siliconlabs.bledemo.wifi_commissioning.activities.WifiCommissioningActivity
 import kotlinx.android.synthetic.main.dialog_select_device.*
 import timber.log.Timber
@@ -87,20 +86,12 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
                             GattConnectType.MOTION -> gatt.discoverServices()
                             GattConnectType.BLINKY -> {
                                 if (gatt.device.name == "Blinky Example") {
-                                    val intent = getIntent(connectType)
-                                    if (intent != null) {
-                                        activity?.startActivity(intent)
-                                    }
+                                    getIntent(connectType)?.let { startActivity(it) }
                                 } else {
                                     gatt.discoverServices()
                                 }
                             }
-                            else -> {
-                                val intent = getIntent(connectType)
-                                if (intent != null) {
-                                    activity?.startActivity(intent)
-                                }
-                            }
+                            else -> getIntent(connectType)?.let { startActivity(it) }
                         }
                     retryAttempts = 0
                 }
@@ -122,7 +113,7 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             super.onServicesDiscovered(gatt, status)
-            BleUtils.readCharacteristic(gatt, getModelNumberCharacteristic(gatt))
+            gatt?.readCharacteristic(getModelNumberCharacteristic(gatt))
         }
 
         override fun onCharacteristicRead(gatt: BluetoothGatt?,
@@ -144,7 +135,7 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
                             ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2 -> {
                                 intentWithExtras = Intent(requireContext(), BlinkyThunderboardActivity::class.java)
                                 intentWithExtras?.putExtra(MODEL_TYPE_EXTRA, characteristic.getStringValue(0))
-                                BleUtils.readCharacteristic(gatt, getPowerSourceCharacteristic(gatt))
+                                gatt?.readCharacteristic(getPowerSourceCharacteristic(gatt))
                             }
                             ThunderBoardDevice.THUNDERBOARD_MODEL_BLUE_V1,
                             ThunderBoardDevice.THUNDERBOARD_MODEL_BLUE_V2 -> {
@@ -168,13 +159,11 @@ class SelectDeviceDialog : BaseDialogFragment(), BluetoothDiscoveryHost {
     }
 
     private fun getModelNumberCharacteristic(gatt: BluetoothGatt?): BluetoothGattCharacteristic? {
-        val deviceInformationService = gatt?.getService(GattService.DeviceInformation.number)
-        return deviceInformationService?.getCharacteristic(GattCharacteristic.ModelNumberString.uuid)
+        return gatt?.getService(GattService.DeviceInformation.number)?.getCharacteristic(GattCharacteristic.ModelNumberString.uuid)
     }
 
     private fun getPowerSourceCharacteristic(gatt: BluetoothGatt?): BluetoothGattCharacteristic? {
-        val service = gatt?.getService(GattService.PowerSource.number)
-        return service?.getCharacteristic(GattCharacteristic.PowerSource.uuid)
+        return gatt?.getService(GattService.PowerSource.number)?.getCharacteristic(GattCharacteristic.PowerSource.uuid)
     }
 
     private fun retryConnectionAttempt() {

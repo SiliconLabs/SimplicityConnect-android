@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.Bluetooth.Services
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -20,20 +21,12 @@ import com.siliconlabs.bledemo.Bluetooth.Parsing.ScanRecordParser
 import com.siliconlabs.bledemo.Browser.Activities.BrowserActivity
 import com.siliconlabs.bledemo.Browser.Models.Logs.*
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.environment.model.EnvironmentEvent
 import com.siliconlabs.bledemo.gatt_configurator.utils.BluetoothGattServicesCreator
 import com.siliconlabs.bledemo.gatt_configurator.utils.GattConfiguratorStorage
-import com.siliconlabs.bledemo.motion.model.MotionEvent
-import com.siliconlabs.bledemo.thunderboard.model.NotificationEvent
-import com.siliconlabs.bledemo.thunderboard.model.StatusEvent
-import com.siliconlabs.bledemo.thunderboard.model.ThunderBoardDevice
-import com.siliconlabs.bledemo.thunderboard.utils.BleUtils
 import com.siliconlabs.bledemo.utils.Constants
 import com.siliconlabs.bledemo.utils.LocalService
 import com.siliconlabs.bledemo.utils.Notifications
 import com.siliconlabs.bledemo.utils.UuidConsts
-import rx.subjects.BehaviorSubject
-import rx.subjects.PublishSubject
 import timber.log.Timber
 import java.lang.reflect.Method
 import java.util.*
@@ -179,7 +172,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         fun onCharacteristicChanged(characteristic: GattCharacteristic?, value: Any?)
     }
 
-    private val mReceiver: BroadcastReceiver = BScanCallback(this)
+    private val mReceiver: BroadcastReceiver = BluetoothScanCallback(this)
     private val interestingDevices: MutableMap<String, BluetoothDeviceInfo?> = LinkedHashMap()
     private val discoveredDevices: MutableMap<String, BluetoothDeviceInfo> = LinkedHashMap()
     private val knownDevice = AtomicReference<BluetoothDevice?>()
@@ -230,24 +223,6 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
     }
 
-    @kotlin.jvm.JvmField
-    val selectedDeviceMonitor: BehaviorSubject<ThunderBoardDevice> = BehaviorSubject.create<ThunderBoardDevice>()
-    @kotlin.jvm.JvmField
-    val selectedDeviceStatusMonitor: BehaviorSubject<StatusEvent> = BehaviorSubject.create<StatusEvent>()
-    val motionDetector: PublishSubject<MotionEvent> = PublishSubject.create<MotionEvent>()
-    val environmentDetector: PublishSubject<EnvironmentEvent> = PublishSubject.create<EnvironmentEvent>()
-    val environmentReadMonitor: PublishSubject<EnvironmentEvent> = PublishSubject.create<EnvironmentEvent>()
-    val notificationsMonitor: BehaviorSubject<NotificationEvent> = BehaviorSubject.create<NotificationEvent>()
-    @kotlin.jvm.JvmField
-    var thunderboardDevice: ThunderBoardDevice? = null
-    @kotlin.jvm.JvmField
-    var thunderboardCallback: ThunderboardActivityCallback? = null
-
-
-
-    fun getThunderboardType() : ThunderBoardDevice.Type {
-        return thunderboardDevice?.boardType ?: ThunderBoardDevice.Type.UNKNOWN
-    }
     /**
      * Preference whose [.PREF_KEY_SAVED_DEVICES] key will have a set addresses of known devices.
      * Note that this list only grows... since we don't expect a phone/device to come into contact with many
@@ -460,7 +435,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
         handler.removeCallbacks(scanTimeout)
         if (useBLE) {
-            val scannerCallback: ScanCallback = BLEScanCallbackLollipop(this)
+            val scannerCallback: ScanCallback = BleScanCallback(this)
             bleScannerCallback = scannerCallback
             val settings = ScanSettings.Builder()
                     .setLegacy(false)
@@ -862,74 +837,72 @@ class BluetoothService : LocalService<BluetoothService>() {
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             super.onServicesDiscovered(gatt, status)
-            Timber.d("onServicesDiscovered(): gatt device = %s, status = %d",
-                    gatt.device.address, status)
+            Timber.d("onServicesDiscovered(): gatt device = ${gatt.device.address}, status = $status")
             extraGattCallback?.onServicesDiscovered(gatt, status)
+        }
+
+        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+            super.onCharacteristicRead(gatt, characteristic, status)
+            Timber.d("onCharacteristicRead(): gatt device = ${gatt.device.address}, uuid = ${characteristic.uuid}")
+            Timber.d("Characteristic value = ${characteristic.value?.contentToString()}")
+            extraGattCallback?.onCharacteristicRead(gatt, characteristic, status)
         }
 
         override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
             super.onCharacteristicWrite(gatt, characteristic, status)
-            Timber.d("onCharacteristicWrite(): gatt device = %s, characteristic uuid = %s",
-                    gatt.device.address, characteristic.uuid)
+            Timber.d("onCharacteristicWrite(): gatt device = ${gatt.device.address}, uuid = ${characteristic.uuid}")
             Timber.d("Characteristic value = ${characteristic.value?.contentToString()}")
             extraGattCallback?.onCharacteristicWrite(gatt, characteristic, status)
         }
 
+        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+            super.onCharacteristicChanged(gatt, characteristic)
+            Timber.d("onCharacteristicChanged(): gatt device = ${gatt.device.address}, uuid = ${characteristic.uuid}")
+            Timber.d("Characteristic value = ${characteristic.value?.contentToString()}")
+            extraGattCallback?.onCharacteristicChanged(gatt, characteristic)
+        }
+
+        @SuppressLint("BinaryOperationInTimber")
         override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
             super.onDescriptorRead(gatt, descriptor, status)
-            Timber.d("onDescriptorRead(): gatt device = %s, descriptor uuid = %s",
-                    gatt.device.address, descriptor.uuid)
+            Timber.d("onDescriptorRead(): gatt device = ${gatt.device.address}, uuid = " +
+                    "${descriptor.uuid}, descriptor's characteristic = ${descriptor.characteristic.uuid}")
+            Timber.d("Descriptor value = ${descriptor.value?.contentToString()}")
             extraGattCallback?.onDescriptorRead(gatt, descriptor, status)
         }
 
+        @SuppressLint("BinaryOperationInTimber")
         override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
             super.onDescriptorWrite(gatt, descriptor, status)
-            Timber.d("onDescriptorWrite(): gatt device = %s, descriptor uuid = %s",
-                    gatt.device.address, descriptor.uuid)
+            Timber.d("onDescriptorWrite(): gatt device = ${gatt.device.address}, uuid = " +
+                    "${descriptor.uuid}, descriptor's characteristic = ${descriptor.characteristic.uuid}")
+            Timber.d("Descriptor value = ${descriptor.value?.contentToString()}")
             extraGattCallback?.onDescriptorWrite(gatt, descriptor, status)
         }
 
         override fun onReliableWriteCompleted(gatt: BluetoothGatt, status: Int) {
             super.onReliableWriteCompleted(gatt, status)
-            Timber.d("onReliableWriteCompleted(): gatt device = %s, status = %d",
-                    gatt.device.address, status)
+            Timber.d("onReliableWriteCompleted(): gatt device = ${gatt.device.address}, status = $status")
             extraGattCallback?.onReliableWriteCompleted(gatt, status)
         }
 
         override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {
             super.onReadRemoteRssi(gatt, rssi, status)
-            Timber.v("onReadRemoteRssi(): gatt device = %s, rssi = %d",
-                    gatt.device.address, rssi)
+            Timber.v("onReadRemoteRssi(): gatt device = ${gatt.device.address}, rssi = $rssi")
             extraGattCallback?.onReadRemoteRssi(gatt, rssi, status)
         }
 
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
             super.onMtuChanged(gatt, mtu, status)
-            Timber.d("onMtuChanged(): gatt device = %s, mtu = %d", gatt.device.address, mtu)
+            Timber.d("onMtuChanged(): gatt device =${gatt.device.address}, mtu = $mtu")
             extraGattCallback?.onMtuChanged(gatt, mtu, status)
         }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
-            super.onCharacteristicRead(gatt, characteristic, status)
-            Timber.d("onCharacteristicRead(): gatt device = %s, status = %d",
-                    gatt.device.address, status)
-            Timber.d("Characteristic value = ${characteristic.value?.contentToString()}")
-
-            extraGattCallback?.onCharacteristicRead(gatt, characteristic, status)
-        }
-
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
-            super.onCharacteristicChanged(gatt, characteristic)
-            Timber.d("onCharacteristicChanged(): gatt device = %s, uuid = %s",
-                gatt.device.address, characteristic.uuid)
-            Timber.d("Characteristic value = ${characteristic.value?.contentToString()}")
-            extraGattCallback?.onCharacteristicChanged(gatt, characteristic)
-        }
-
+        @SuppressLint("BinaryOperationInTimber")
         override fun onPhyUpdate(gatt: BluetoothGatt?, txPhy: Int, rxPhy: Int, status: Int) {
             super.onPhyUpdate(gatt, txPhy, rxPhy, status)
-            Timber.d("onPhyUpdate(): gatt device = %s, txPhy = %d, rxPhy = %d, status = %d",
-                    gatt?.device?.address, txPhy, rxPhy, status)
+            Timber.d("onPhyUpdate(): gatt device = ${gatt?.device?.address}, txPhy = $txPhy, " +
+                    "rxPhy = $rxPhy, status = $status")
             extraGattCallback?.onPhyUpdate(gatt, txPhy, rxPhy, status)
         }
     }
@@ -1203,64 +1176,4 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
     }
 
-    fun readRequiredCharacteristics() {
-        if (connectedGatt == null) return
-
-        thunderboardDevice?.let {
-            var readSuccessful: Boolean
-            if (it.name == null) {
-                readSuccessful = BleUtils.readCharacteristic(connectedGatt,
-                        GattService.GenericAccess.number,
-                        GattCharacteristic.DeviceName.uuid)
-            }
-            else if (it.modelNumber == null) {
-                readSuccessful = BleUtils.readCharacteristic(connectedGatt,
-                        GattService.DeviceInformation.number,
-                        GattCharacteristic.ModelNumberString.uuid)
-            } else if (it.isBatteryConfigured == null) {
-                readSuccessful = BleUtils.readCharacteristic(connectedGatt,
-                        GattService.BatteryService.number,
-                        GattCharacteristic.BatteryLevel.uuid)
-                if (!readSuccessful) {
-                    it.isBatteryConfigured = false
-                }
-            } else if (it.isBatteryNotificationEnabled == null) {
-                readSuccessful = BleUtils.setCharacteristicNotification(connectedGatt,
-                        GattService.BatteryService.number,
-                        GattCharacteristic.BatteryLevel.uuid,
-                        UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR,
-                        true)
-                if (!readSuccessful) {
-                    it.isBatteryNotificationEnabled = false
-                }
-            } else if (it.isPowerSourceConfigured == null) {
-                readSuccessful = BleUtils.readCharacteristic(connectedGatt,
-                        GattService.PowerSource.number,
-                        GattCharacteristic.PowerSource.uuid)
-                if (!readSuccessful) {
-                    it.isPowerSourceConfigured = false
-                }
-            } else if (it.isPowerSourceNotificationEnabled == null) {
-                readSuccessful = BleUtils.setCharacteristicNotification(connectedGatt,
-                        GattService.PowerSource.number,
-                        GattCharacteristic.PowerSource.uuid,
-                        UuidConsts.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR,
-                        true)
-                if (!readSuccessful) {
-                    it.isPowerSourceNotificationEnabled = false
-                }
-            } else if (it.firmwareVersion == null) {
-                readSuccessful = BleUtils.readCharacteristic(connectedGatt,
-                        GattService.DeviceInformation.number,
-                        GattCharacteristic.FirmwareRevision.uuid)
-            } else {
-                // out of items to read
-                readSuccessful = true
-                thunderboardCallback?.onPrepared()
-            }
-            if (!readSuccessful) {
-                readRequiredCharacteristics()
-            }
-        }
-    }
 }

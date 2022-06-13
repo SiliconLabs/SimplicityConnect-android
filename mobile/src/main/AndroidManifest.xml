@@ -123,13 +123,13 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".environment.activities.SettingsActivity"
-            android:label="@string/action_settings"
+            android:name=".blinky_thunderboard.activities.BlinkyThunderboardActivity"
+            android:label="@string/title_Blinky"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".blinky_thunderboard.activities.BlinkyThunderboardActivity"
-            android:label="@string/title_Blinky"
+            android:name=".rssi_graph.activities.RssiGraphActivity"
+            android:label="@string/rssi_graph_label"
             android:screenOrientation="portrait" />
 
         <provider
