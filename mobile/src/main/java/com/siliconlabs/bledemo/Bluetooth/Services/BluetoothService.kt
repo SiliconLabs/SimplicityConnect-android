@@ -31,7 +31,6 @@ import timber.log.Timber
 import java.lang.reflect.Method
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Service handling Bluetooth (regular and BLE) communcations.
@@ -175,7 +174,6 @@ class BluetoothService : LocalService<BluetoothService>() {
     private val mReceiver: BroadcastReceiver = BluetoothScanCallback(this)
     private val interestingDevices: MutableMap<String, BluetoothDeviceInfo?> = LinkedHashMap()
     private val discoveredDevices: MutableMap<String, BluetoothDeviceInfo> = LinkedHashMap()
-    private val knownDevice = AtomicReference<BluetoothDevice?>()
     private val currentState = Receiver.currentState
     private val listeners = Listeners()
 
@@ -248,7 +246,6 @@ class BluetoothService : LocalService<BluetoothService>() {
         savedInterestingDevices = PreferenceManager.getDefaultSharedPreferences(this)
         handler = Handler()
 
-        knownDevice.set(null)
         discoveredDevices.clear()
         interestingDevices.clear()
 
@@ -484,10 +481,6 @@ class BluetoothService : LocalService<BluetoothService>() {
         BluetoothLEGatt.cancelAll(leGattsToClose)
     }
 
-    private fun setKnownDevice(device: BluetoothDevice?) {
-        knownDevice.set(device)
-    }
-
     fun notifyBluetoothStateChange(newState: Int) {
         if (newState == BluetoothAdapter.STATE_TURNING_OFF) {
             stopScanning()
@@ -505,7 +498,6 @@ class BluetoothService : LocalService<BluetoothService>() {
                         discoveredDevices.clear()
                         interestingDevices.clear()
                     }
-                    setKnownDevice(null)
                     listeners.onDeviceReady(null, false)
                     listeners.onStateChanged(newState)
                 } else if (newState == BluetoothAdapter.STATE_ON) {
@@ -522,7 +514,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         if (useBLE) {
             return false
         }
-        val continueScanning = !isDestroyed && knownDevice.get() == null
+        val continueScanning = !isDestroyed
         if (!continueScanning) {
             if (discoveryStarted) {
                 discoveryStarted = false
@@ -532,45 +524,38 @@ class BluetoothService : LocalService<BluetoothService>() {
         return continueScanning
     }
 
-    fun addDiscoveredDevice(result: ScanResultCompat): Boolean {
-        Log.d(TAG, "addDiscoveredDevice: $result")
-        if (knownDevice.get() != null) {
-            return true
-        }
+    fun addDiscoveredDevice(result: ScanResultCompat) {
+        Timber.d("addDiscoveredDevice: $result")
+
         var listenerResult: ArrayList<BluetoothDeviceInfo>?
         var listenerChanged: BluetoothDeviceInfo?
-        val device = result.device
-        var devInfo: BluetoothDeviceInfo?
         synchronized(discoveredDevices) {
-            val address = device?.address!!
-            devInfo = discoveredDevices[address]
-            if (devInfo == null) {
-                devInfo = BluetoothDeviceInfo()
-                devInfo!!.device = device
-                discoveredDevices[address] = devInfo!!
-            } else {
-                devInfo!!.device = device
+            val address = result.device?.address!!
+            val deviceInfo = discoveredDevices[address] ?: BluetoothDeviceInfo()
+            discoveredDevices[address] = deviceInfo
+
+            deviceInfo.apply {
+                this.device = result.device!!
+                scanInfo = result
+                count++
+                if (!isConnectable) {
+                    isConnectable = result.isConnectable
+                }
+                timestampLast = if (timestampLast == 0L) {
+                    result.timestampNanos
+                } else {
+                    setIntervalIfLower(result.timestampNanos - timestampLast)
+                    result.timestampNanos
+                }
+
+                rawData = ScanRecordParser.getRawAdvertisingDate(result.scanRecord?.bytes)
+                isNotOfInterest = false
+                isOfInterest = true
             }
-            devInfo!!.scanInfo = result
-            if (!devInfo!!.isConnectable) {
-                devInfo!!.isConnectable = result.isConnectable
-            }
-            devInfo!!.count++
-            if (devInfo!!.timestampLast == 0L) {
-                devInfo!!.timestampLast = result.timestampNanos
-            } else {
-                devInfo!!.setIntervalIfLower(result.timestampNanos - devInfo!!.timestampLast)
-                devInfo!!.timestampLast = result.timestampNanos
-            }
-            devInfo!!.rawData = ScanRecordParser.getRawAdvertisingDate(result.scanRecord?.bytes)
-            devInfo!!.isNotOfInterest = false
-            devInfo!!.isOfInterest = true
-            if (!interestingDevices.containsKey(address)) {
-                interestingDevices[address] = devInfo
-            }
+
             if (!listeners.isEmpty()) {
                 listenerResult = ArrayList(discoveredDevices.size)
-                listenerChanged = devInfo!!.clone()
+                listenerChanged = deviceInfo.clone()
                 for (di in discoveredDevices.values) {
                     listenerResult?.add(di.clone())
                 }
@@ -585,17 +570,13 @@ class BluetoothService : LocalService<BluetoothService>() {
                 listeners.onScanResultUpdated(listenerResult, listenerChanged)
             }
         }
-
-        return false
     }
 
     private fun scanDiscoveredDevices(): Boolean {
-        Log.d("scanDiscoveredDevices", "called")
+        Timber.d("scanDiscoveredDevices")
         handler.removeCallbacks(scanTimeout)
         handler.postDelayed(scanTimeout, SCAN_DEVICE_TIMEOUT.toLong())
-        if (knownDevice.get() != null) {
-            return false
-        }
+
         var devInfo: BluetoothDeviceInfo? = null
         synchronized(discoveredDevices) {
             val devices: Collection<BluetoothDeviceInfo> = discoveredDevices.values
@@ -1152,6 +1133,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
 
         override fun onScanResultUpdated(devices: List<BluetoothDeviceInfo>?, changedDeviceInfo: BluetoothDeviceInfo?) {
+            Timber.d("onScanResultUpdated")
             for (listener in this) {
                 listener.onScanResultUpdated(devices, changedDeviceInfo)
             }

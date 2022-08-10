@@ -8,24 +8,27 @@ import android.text.TextUtils
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.cardview.widget.CardView
 import com.siliconlabs.bledemo.Adapters.DeviceInfoViewHolder
 import com.siliconlabs.bledemo.Adapters.ScannedDevicesAdapter
 import com.siliconlabs.bledemo.BeaconUtils.BleFormat
 import com.siliconlabs.bledemo.BeaconUtils.altbeacon.AltBeacon
+import com.siliconlabs.bledemo.BeaconUtils.eddystone.*
 import com.siliconlabs.bledemo.BeaconUtils.ibeacon.IBeaconInfo
-import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.Bluetooth.BLE.BluetoothDeviceInfo
 import com.siliconlabs.bledemo.Bluetooth.BLE.ScanResultCompat
+import com.siliconlabs.bledemo.Bluetooth.ConnectedGatts
 import com.siliconlabs.bledemo.Bluetooth.Parsing.ScanRecordParser
+import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.Browser.Activities.BrowserActivity
 import com.siliconlabs.bledemo.Browser.DebugModeCallback
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.utils.SharedPrefUtils
 import com.siliconlabs.bledemo.Views.DetailsRow
-import com.siliconlabs.bledemo.BeaconUtils.eddystone.*
-import com.siliconlabs.bledemo.Bluetooth.ConnectedGatts
+import com.siliconlabs.bledemo.utils.SharedPrefUtils
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToLong
@@ -96,9 +99,6 @@ class DebugModeDeviceAdapter(mContext: Context, generator: DeviceInfoViewHolder.
             }
 
             cardView.requestLayout()
-            if (currentAdvertismentDataMap.containsKey(device?.address!!)) {
-                addAdvertsToContainer(currentAdvertismentDataMap[device?.address!!])
-            }
 
             if (device?.isConnectable!!) {
                 connectBtn.visibility = View.VISIBLE
@@ -129,6 +129,12 @@ class DebugModeDeviceAdapter(mContext: Context, generator: DeviceInfoViewHolder.
                 debugModeCallback.addToTemporaryFavorites(device?.address!!)
             }
 
+            advertisementContainer.removeAllViews()
+            if (CURRENT_ADVERTISEMENT_DATA_MAP.containsKey(device?.address!!)) {
+                generateAdvertData()
+                addAdvertsToContainer(CURRENT_ADVERTISEMENT_DATA_MAP[device?.address!!])
+            }
+
             favoriteBtn.setOnClickListener {
                 val isFavorite = sharedPrefUtils.isFavorite(device?.address) || sharedPrefUtils.isTemporaryFavorite(device?.address)
                 if (isFavorite) {
@@ -145,7 +151,7 @@ class DebugModeDeviceAdapter(mContext: Context, generator: DeviceInfoViewHolder.
 
         override fun onClick(v: View) {
             when (v.id) {
-                R.id.card_view -> generateAdvertData()
+                R.id.card_view -> toggleAdvertData()
                 R.id.disconnect_btn -> disconnect()
                 R.id.connect_btn -> connect()
                 else -> {
@@ -169,41 +175,41 @@ class DebugModeDeviceAdapter(mContext: Context, generator: DeviceInfoViewHolder.
             bluetoothBinding?.bind()
         }
 
-        private fun generateAdvertData() {
-            if (currentAdvertismentDataMap.containsKey(device?.address)) {
-                currentAdvertismentDataMap.remove(device?.address)
+        private fun toggleAdvertData() {
+            if (CURRENT_ADVERTISEMENT_DATA_MAP.containsKey(device?.address)) {
+                CURRENT_ADVERTISEMENT_DATA_MAP.remove(device?.address)
                 advertisementContainer.removeAllViews()
             } else {
-                val advertismentData = AdvertismentData()
-                val rows: MutableList<AdvertismentRow> = ArrayList()
-
-                // If not legacy, prepare extra Advertising Extension to show
-                if (!device?.scanInfo?.isLegacy!!) {
-                    rows.add(AdvertismentRow(context.resources.getString(R.string.Bluetooth_5_Advertising_Extension),
-                            prepareBluetooth5AdvertExtensionData(device?.scanInfo!!)))
-                }
-                for (i in device?.advertData?.indices!!) {
-                    val data = device?.advertData!![i]
-                    val advertiseData = data?.split(ScanRecordParser.SPLIT.toRegex())?.toTypedArray()!!
-                    val dataLabel = advertiseData[0]
-                    var dataValue = ""
-                    if (advertiseData.size > 1) {
-                        dataValue = advertiseData[1]
-                    }
-                    rows.add(AdvertismentRow(dataLabel, dataValue))
-                }
-
-                when (bleFormat) {
-                    BleFormat.I_BEACON -> iBeaconAdv(rows)
-                    BleFormat.EDDYSTONE -> eddystoneAdv(rows)
-                    BleFormat.ALT_BEACON -> altBeaconAdv(rows)
-                    else -> {
-                    }
-                }
-                advertismentData.rows = rows
-                currentAdvertismentDataMap[device?.address!!] = advertismentData
-                addAdvertsToContainer(advertismentData)
+                generateAdvertData()
+                addAdvertsToContainer(CURRENT_ADVERTISEMENT_DATA_MAP[device?.address!!])
             }
+        }
+
+        private fun generateAdvertData() {
+            val rows: MutableList<Pair<String, String>> = ArrayList()
+
+            // If not legacy, prepare extra Advertising Extension to show
+            if (!device?.scanInfo?.isLegacy!!) {
+                rows.add(Pair(context.resources.getString(R.string.Bluetooth_5_Advertising_Extension),
+                        prepareBluetooth5AdvertExtensionData(device?.scanInfo!!)))
+            }
+            device?.advertData?.forEach {
+                val data = it?.split(ScanRecordParser.SPLIT.toRegex())?.toTypedArray()!!
+                val dataLabel = data[0]
+                val dataValue =
+                        if (data.size > 1) data[1]
+                        else ""
+                rows.add(Pair(dataLabel, dataValue))
+            }
+
+            when (bleFormat) {
+                BleFormat.I_BEACON -> iBeaconAdv(rows)
+                BleFormat.EDDYSTONE -> eddystoneAdv(rows)
+                BleFormat.ALT_BEACON -> altBeaconAdv(rows)
+                else -> { }
+            }
+
+            CURRENT_ADVERTISEMENT_DATA_MAP[device?.address!!] = AdvertisementData(rows)
         }
 
         private fun prepareBluetooth5AdvertExtensionData(scanResult: ScanResultCompat): String {
@@ -269,32 +275,28 @@ class DebugModeDeviceAdapter(mContext: Context, generator: DeviceInfoViewHolder.
             }
         }
 
-        private fun addAdvertsToContainer(advertismentData: AdvertismentData?) {
-            advertisementContainer.removeAllViews()
-            for (row in advertismentData?.rows!!) {
-                val title = row.title
-                val text = Html.fromHtml(row.body).toString()
+        private fun addAdvertsToContainer(advertisementData: AdvertisementData?) {
+            advertisementData?.rows?.forEach {
+                val title = it.first
+                val text = Html.fromHtml(it.second).toString()
                 val serviceItemContainer = DetailsRow(context, title, text)
                 advertisementContainer.addView(serviceItemContainer, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             }
         }
 
-        private fun iBeaconAdv(rows: MutableList<AdvertismentRow>) {
-            val iBeaconInfo = IBeaconInfo.getIBeaconInfo(device?.scanInfo?.scanRecord?.bytes!!)
-            if (iBeaconInfo != null) {
-                val uuid = iBeaconInfo.uuid
-                val major = iBeaconInfo.major
-                val minor = iBeaconInfo.minor
-                val rssiAt1m = iBeaconInfo.power
-                val details = "Minor: " + minor + "<br>" +
-                        "Major: " + major + "<br>" +
-                        "UUID: " + uuid + "<br>" +
-                        "RSSI at 1m: " + rssiAt1m
-                rows.add(AdvertismentRow("iBeacon data", details))
+        private fun iBeaconAdv(rows: MutableList<Pair<String, String>>) {
+            IBeaconInfo.getIBeaconInfo(device?.scanInfo?.scanRecord?.bytes!!)?.let { beaconInfo ->
+                val info = StringBuilder().apply {
+                    append("Minor: ").append(beaconInfo.minor).append("<br>")
+                    append("Major: ").append(beaconInfo.major).append("<br>")
+                    append("UUID: ").append(beaconInfo.uuid).append("<br>")
+                    append("RSSI at 1m: ").append(beaconInfo.power)
+                }.toString()
+                rows.add(Pair("iBeacon data", info))
             }
         }
 
-        private fun eddystoneAdv(rows: MutableList<AdvertismentRow>) {
+        private fun eddystoneAdv(rows: MutableList<Pair<String, String>>) {
             var dataValue = ""
             val scanInfo = device?.scanInfo
             val deviceAddress = scanInfo?.device?.address
@@ -347,10 +349,10 @@ class DebugModeDeviceAdapter(mContext: Context, generator: DeviceInfoViewHolder.
                     eddystoneUidNameSpace + "<br><br>"
             dataValue += context.getString(R.string.beacon_details_dialog_tlm_data) + ":<br>" + eddystoneTlm +
                     "<br>"
-            rows.add(AdvertismentRow("Eddystone data", dataValue))
+            rows.add(Pair("Eddystone data", dataValue))
         }
 
-        private fun altBeaconAdv(rows: MutableList<AdvertismentRow>) {
+        private fun altBeaconAdv(rows: MutableList<Pair<String, String>>) {
             var dataValue = ""
 
             val altBeacon = AltBeacon(device!!)
@@ -363,18 +365,14 @@ class DebugModeDeviceAdapter(mContext: Context, generator: DeviceInfoViewHolder.
                     "<br><br>"
             dataValue +=  context.getString(R.string.beacon_details_dialog_reference_rssi) + ": " + refRssi +
                     "&nbsp;dBm<br>"
-            rows.add(AdvertismentRow("AltBeacon data", dataValue))
+            rows.add(Pair("AltBeacon data", dataValue))
         }
     }
 
-    class AdvertismentData {
-        var rows: List<AdvertismentRow> = ArrayList()
-    }
-
-    class AdvertismentRow(var title: String, var body: String?)
+    class AdvertisementData(val rows: List<Pair<String, String>>)
 
     companion object {
-        private val currentAdvertismentDataMap: MutableMap<String, AdvertismentData?> = HashMap()
+        private val CURRENT_ADVERTISEMENT_DATA_MAP: MutableMap<String, AdvertisementData?> = HashMap()
         val EDDYSTONE_SERVICE_UUID = ParcelUuid.fromString("0000FEAA-0000-1000-8000-00805F9B34FB")
     }
 }

@@ -4,28 +4,22 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import com.siliconlabs.bledemo.Bluetooth.BLE.ScanResultCompat.Companion.from
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
+import timber.log.Timber
 
 class BleScanCallback(private val service: BluetoothService) : ScanCallback() {
     private val handler: Handler = Handler(Looper.getMainLooper())
 
     override fun onScanResult(callbackType: Int, result: ScanResult) {
-        Log.d("onScanResult", "Discovered bluetoothLE +$result");
-        if (service.addDiscoveredDevice(from(result)!!)) {
-            service.bluetoothAdapter?.bluetoothLeScanner?.stopScan(this)
-        }
+        Timber.d( "onScanResult: $result")
+        service.addDiscoveredDevice(from(result)!!)
     }
 
     override fun onBatchScanResults(results: List<ScanResult>) {
         for (result in results) {
-            val device = result.device
-            Log.d("onBatchScanResults", "Discovered bluetoothLE +" + device.address + " with name " + device.name);
-            if (service.addDiscoveredDevice(from(result)!!)) {
-                service.bluetoothAdapter?.bluetoothLeScanner?.stopScan(this)
-                break
-            }
+            Timber.d("onBatchScanResults: $result")
+            service.addDiscoveredDevice(from(result)!!)
         }
     }
 

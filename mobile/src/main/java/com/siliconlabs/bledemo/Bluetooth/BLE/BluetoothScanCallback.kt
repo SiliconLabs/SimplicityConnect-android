@@ -4,8 +4,8 @@ import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
+import timber.log.Timber
 
 class BluetoothScanCallback(private val service: BluetoothService) : BroadcastReceiver() {
 
@@ -28,10 +28,8 @@ class BluetoothScanCallback(private val service: BluetoothService) : BroadcastRe
             result.device = device
             result.scanRecord = record
 
-            Log.d("onReceive", "Discovered bluetooth +" + device?.address + " with name " + device?.name);
-            if (service.addDiscoveredDevice(result)) {
-                service.bluetoothAdapter?.cancelDiscovery()
-            }
+            Timber.d("onReceive; discovered bluetooth: address = ${device?.address}, name = ${device?.name}")
+            service.addDiscoveredDevice(result)
         }
     }
 
