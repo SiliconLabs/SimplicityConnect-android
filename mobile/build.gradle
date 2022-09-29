@@ -48,8 +48,8 @@ android {
         blueGecko {
             dimension "version"
             applicationId "com.siliconlabs.bledemo"
-            versionCode 26
-            versionName "2.5.1"
+            versionCode 27
+            versionName "2.5.2"
         }
     }
 

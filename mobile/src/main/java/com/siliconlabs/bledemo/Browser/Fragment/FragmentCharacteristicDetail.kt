@@ -19,6 +19,7 @@ import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine
 import com.siliconlabs.bledemo.Bluetooth.Services.BluetoothService
 import com.siliconlabs.bledemo.Browser.Activities.DeviceServicesActivity
 import com.siliconlabs.bledemo.Browser.Dialogs.CharacteristicWriteDialog
+import com.siliconlabs.bledemo.Browser.Sig.GlucoseManagement
 import com.siliconlabs.bledemo.Browser.Utils.FieldViewHelper
 import com.siliconlabs.bledemo.Browser.Views.*
 import com.siliconlabs.bledemo.R
@@ -194,7 +195,6 @@ open class FragmentCharacteristicDetail : Fragment() {
     }
 
     private fun saveValueInCharacteristic(newValue: ByteArray) {
-        Timber.d("New value to set = ${newValue.contentToString()}")
         value = newValue
         mBluetoothCharact?.value = newValue
 
@@ -279,8 +279,17 @@ open class FragmentCharacteristicDetail : Fragment() {
     // of field requirements
     private fun addNormalValue(): Boolean {
         mCharact?.fields?.forEach {
+            Timber.d("HERE, field = ${it.name}")
             try {
+                if (GlucoseManagement.isRecordAccessControlPoint(mCharact) && it.name == "Operand") {
+                    it.format =
+                        if (GlucoseManagement.isNumberOfRecordsResponse(mBluetoothCharact, value)) "16bit"
+                        else "variable"
+                }
                 addField(it)
+                if (GlucoseManagement.isCgmSpecificOpsControlPoint(mCharact) && it.name == "Operand") {
+                   return true
+                }
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 parsingProblemInfo = prepareParsingProblemInfo(mCharact)
@@ -363,7 +372,13 @@ open class FragmentCharacteristicDetail : Fragment() {
                 if (field.reference == null) {
                     val currentValue = value
                     val currentOffset = offset
-                    var currentRange = currentValue.copyOfRange(currentOffset, currentOffset + field.getSizeInBytes())
+                    val fieldSize = calculateFieldSize(field)
+                    val currentRange = currentValue.copyOfRange(currentOffset, currentOffset + fieldSize)
+
+                    if (GlucoseManagement.isNumberOfRecordsResponse(mBluetoothCharact, value) && field.name == "Operand") {
+                        handleNumberOfRecordsView(field, fieldSize, currentRange.copyOfRange(0, 1))
+                        return
+                    }
 
                     if (field.bitfield != null) {
                         BitFieldView(context, field, currentRange).createViewForRead(!parseProblem, viewHandler)
@@ -378,13 +393,8 @@ open class FragmentCharacteristicDetail : Fragment() {
                         }
                     }
                     else {
-                        var offsetShift = field.getSizeInBytes()
-                        if (offsetShift == 0) {
-                            offsetShift = value.size - currentOffset // for "variable", "utf8", "utf16" format types
-                            currentRange = currentValue.copyOfRange(currentOffset, currentOffset + offsetShift)
-                        }
                         NormalValueView(context, field, currentRange).createViewForRead(!parseProblem, viewHandler)
-                        offset += offsetShift
+                        offset += fieldSize
                     }
                 }
             }
@@ -393,15 +403,28 @@ open class FragmentCharacteristicDetail : Fragment() {
         }
     }
 
-    private fun handleNibbleRead(field: Field, data: Byte) {
-        val firstNibble = Converters.byteToUnsignedInt(data) shr 4
-        val secondNibble = Converters.byteToUnsignedInt(data) and 0x0f
+    private fun handleNumberOfRecordsView(field: Field, fieldSize: Int, currentRange: ByteArray) {
+        NormalValueView(context, field, currentRange).createViewForRead(!parseProblem, viewHandler)
+        offset += fieldSize
+    }
 
-        if (fieldViewHelper?.isFirstNibbleInByte(field) == true) {
-            EnumerationView(context, field, byteArrayOf(firstNibble.toByte())).createViewForRead(!parseProblem, viewHandler)
-        } else {
-            EnumerationView(context, field, byteArrayOf(secondNibble.toByte())).createViewForRead(!parseProblem, viewHandler)
-            offset += field.getSizeInBytes()
+    private fun handleNibbleRead(field: Field, data: Byte) {
+        val value =
+                if (field.isMostSignificantNibble()) Converters.byteToUnsignedInt(data) shr 4
+                else Converters.byteToUnsignedInt(data) and 0x0f
+        EnumerationView(context, field, byteArrayOf(value.toByte())).createViewForRead(!parseProblem, viewHandler)
+
+        if (!field.isFirstNibbleInSchema()) offset += field.getSizeInBytes()
+    }
+
+    private fun calculateFieldSize(field: Field) : Int {
+        return if (field.getSizeInBytes() != 0) {
+            field.getSizeInBytes()
+        }
+        else when (field.format) {
+            "utf8s", "utf16s" -> value.size - offset
+            "variable" -> field.getVariableFieldLength(mCharact, value)
+            else -> 0
         }
     }
 
@@ -410,6 +433,9 @@ open class FragmentCharacteristicDetail : Fragment() {
         val size = mCharact.size()
         if (size != 0) {
             value = ByteArray(size)
+        }
+        if (GlucoseManagement.isRecordAccessControlPoint(mCharact)) {
+            value = ByteArray(4)
         }
     }
 
@@ -530,6 +556,6 @@ open class FragmentCharacteristicDetail : Fragment() {
     companion object {
         private const val REFRESH_INTERVAL = 500
         private const val REG_CERT_DATA_LIST_NAME = "IEEE 11073-20601 Regulatory Certification Data List"
-
+        const val CGM_SPECIFIC_OPS_CONTROL_POINT_UUID = "2aac"
     }
 }

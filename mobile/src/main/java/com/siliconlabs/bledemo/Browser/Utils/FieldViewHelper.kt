@@ -39,8 +39,8 @@ class FieldViewHelper(
     }
 
     fun isFirstNibbleInByte(field: Field) : Boolean {
-        return if (field.format == "nibble") {
-            field.name == "Type"
+        return if (field.format == "nibble" || field.format == "4bit") {
+            field.isFirstNibbleInSchema()
         } else false
     }
 

@@ -13,6 +13,7 @@ import com.siliconlabs.bledemo.Bluetooth.DataTypes.Characteristic
 import com.siliconlabs.bledemo.Bluetooth.DataTypes.Field
 import com.siliconlabs.bledemo.Bluetooth.Parsing.Common
 import com.siliconlabs.bledemo.Browser.Fragment.FragmentCharacteristicDetail
+import com.siliconlabs.bledemo.Browser.Sig.GlucoseManagement
 import com.siliconlabs.bledemo.Browser.Utils.FieldViewHelper
 import com.siliconlabs.bledemo.Browser.Views.*
 import com.siliconlabs.bledemo.R
@@ -84,7 +85,13 @@ class CharacteristicWriteDialog(
 
     private fun setListeners() {
         btnSave.setOnClickListener {
-            if (isInputValid()) listener.onNewValueSet(value, writeType)
+            if (isInputValid()) {
+                val valueToSet =
+                        if (GlucoseManagement.isRecordAccessControlPoint(characteristic))
+                            GlucoseManagement.updateValueToWrite(value)
+                        else value
+                listener.onNewValueSet(valueToSet, writeType)
+            }
         }
         btnClear.setOnClickListener {
             editableFields.forEach {
@@ -231,6 +238,9 @@ class CharacteristicWriteDialog(
     private fun addNormalValue() {
         characteristic?.fields?.forEach {
             addField(it)
+            if (GlucoseManagement.isCgmSpecificOpsControlPoint(characteristic) && it.name == "Operand") {
+                return
+            }
         }
     }
 
@@ -244,7 +254,8 @@ class CharacteristicWriteDialog(
                 if (field.reference == null) {
                     val currentValue = value
                     val currentOffset = offset
-                    var currentRange = currentValue.copyOfRange(currentOffset, currentOffset + field.getSizeInBytes())
+                    val fieldSize = calculateFieldSize(field)
+                    val currentRange = currentValue.copyOfRange(currentOffset, currentOffset + fieldSize)
 
                     if (field.bitfield != null) {
                         BitFieldView(context, field, currentRange).createViewForWrite(currentOffset, valueListener)
@@ -260,19 +271,24 @@ class CharacteristicWriteDialog(
                         }
                     }
                     else {
-                        var offsetShift = field.getSizeInBytes()
-                        if (offsetShift == 0) {
-                            offsetShift = value.size - currentOffset // "variable" format type
-                            currentRange = currentValue.copyOfRange(currentOffset, currentOffset + offsetShift)
-                        }
                         NormalValueView(context, field, currentRange).createViewForWrite(currentOffset, valueListener)
-                        offset += offsetShift
-
+                        offset += fieldSize
                     }
                 }
             }
         } else {
             offset += field.getSizeInBytes()
+        }
+    }
+
+    private fun calculateFieldSize(field: Field) : Int {
+        return if (field.getSizeInBytes() != 0) {
+            field.getSizeInBytes()
+        }
+        else when (field.format) {
+            "utf8s", "utf16s" -> value.size - offset
+            "variable" -> field.getVariableFieldLength(characteristic, value)
+            else -> 0
         }
     }
 

@@ -85,6 +85,7 @@ import java.io.*
 import java.lang.reflect.Method
 import java.util.*
 
+@SuppressWarnings("LogNotTimber")
 class DeviceServicesActivity : BaseActivity(), ServicesConnectionsCallback {
 
     private lateinit var handler: Handler

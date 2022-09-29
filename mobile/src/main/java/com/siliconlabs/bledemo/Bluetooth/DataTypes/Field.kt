@@ -17,6 +17,7 @@
 package com.siliconlabs.bledemo.Bluetooth.DataTypes
 
 import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine
+import com.siliconlabs.bledemo.Browser.Sig.GlucoseManagement
 import java.util.*
 
 // Field - It's wrapper for <Field> xml tag
@@ -84,6 +85,22 @@ class Field {
     fun isNibbleFormat(): Boolean {
         return when (format) {
             "nibble" -> true
+            "4bit" -> true
+            else -> false
+        }
+    }
+
+    fun isFirstNibbleInSchema() : Boolean {
+        return when (name) {
+            "Type","CGM Type" -> true
+            else -> false
+        }
+    }
+
+    fun isMostSignificantNibble() : Boolean {
+        return when (name) {
+            "CGM Sample Location" -> true
+            "CGM Type" -> false
             else -> false
         }
     }
@@ -99,6 +116,28 @@ class Field {
         return when (format) {
             "uint8", "uint16", "uint24", "uint32", "uint48", "uint64", "uint128" -> true
             else -> false
+        }
+    }
+
+    fun getVariableFieldLength(char: Characteristic?, charValue: ByteArray) : Int {
+        return when (name) {
+            "Sensor Status Annunciation" -> {
+                val flagsByte = charValue[1].toInt()
+                val warningOctetPresent = ((flagsByte shr 5) and 0x01) == 0x01
+                val calTempOctetPresent = ((flagsByte shr 6) and 0x01) == 0x01
+                val statusOctetPresent = ((flagsByte shr 7) and 0x01) == 0x01
+
+                var length = 0
+                if (warningOctetPresent) length++
+                if (calTempOctetPresent) length++
+                if (statusOctetPresent) length++
+                length
+            }
+            "Operand" -> {
+                if (GlucoseManagement.isRecordAccessControlPoint(char)) 2
+                else 0
+            }
+            else -> 0
         }
     }
 
