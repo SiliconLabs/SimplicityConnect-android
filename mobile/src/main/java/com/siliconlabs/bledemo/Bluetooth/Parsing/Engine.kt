@@ -14,13 +14,12 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.Bluetooth.Parsing
+package com.siliconlabs.bledemo.bluetooth.parsing
 
-import android.bluetooth.BluetoothGatt
 import android.content.Context
-import com.siliconlabs.bledemo.Bluetooth.DataTypes.Characteristic
-import com.siliconlabs.bledemo.Bluetooth.DataTypes.Descriptor
-import com.siliconlabs.bledemo.Bluetooth.DataTypes.Service
+import com.siliconlabs.bledemo.bluetooth.data_types.Characteristic
+import com.siliconlabs.bledemo.bluetooth.data_types.Descriptor
+import com.siliconlabs.bledemo.bluetooth.data_types.Service
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.util.*
@@ -38,12 +37,10 @@ object Engine {
     private var descriptorsByTypes: HashMap<String, Descriptor> = HashMap()
     private var characteristicsByTypes: HashMap<String, Characteristic> = HashMap()
 
-    var devices: Vector<Device>? = null
     var isCharacteristicsLoaded = false
 
     // Initializes class members, it must be first called
     fun init(context: Context?) {
-        devices = Vector()
         BluetoothXmlParser.instance?.init(context)
         loadUnits()
         loadFormats()
@@ -268,32 +265,6 @@ object Engine {
         }
     }
 
-    // Gets device for given device address
-    fun getDevice(address: String): Device? {
-        val e: Iterator<Device> = devices?.iterator()!!
-        var elem: Device
-        while (e.hasNext()) {
-            elem = e.next()
-            if (elem.address == address) {
-                return elem
-            }
-        }
-        return null
-    }
-
-    // Gets device for given device gatt object
-    fun getDevice(gatt: BluetoothGatt): Device? {
-        val e: Iterator<Device> = devices?.iterator()!!
-        var elem: Device
-        while (e.hasNext()) {
-            elem = e.next()
-            if (elem.bluetoothGatt == gatt) {
-                return elem
-            }
-        }
-        return null
-    }
-
     // Gets service for given UUID
     fun getService(uuid: UUID?): Service? {
         return services[uuid]
@@ -329,7 +300,6 @@ object Engine {
 
     // Clears all data lists
     fun close() {
-        devices?.clear()
         characteristics.clear()
         services.clear()
         units.clear()

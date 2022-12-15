@@ -1,29 +1,140 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/connection_bar_text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context="com.siliconlabs.bledemo.HealthThermometer.Activities.HealthThermometerActivity">
+        android:layout_height="wrap_content"
+        android:text="@string/demo_connected_to"
+        android:background="@color/bar_with_additional_info"
+        android:paddingVertical="16dp"
+        android:textColor="@color/blue_primary"
+        android:paddingHorizontal="24dp"
+        android:maxLines="1"
+        android:ellipsize="end" />
 
-        <include
-            android:id="@+id/toolbar_thermometer"
-            layout="@layout/actionbar" />
+    <com.google.android.material.card.MaterialCardView
+        style="@style/list_item_card_view_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/card_view_margin_vertical">
 
-        <fragment
-            android:id="@+id/fragment"
-            android:name="com.siliconlabs.bledemo.HealthThermometer.Fragments.HealthThermometerActivityFragment"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
 
-    <include
-        android:id="@+id/splash"
-        layout="@layout/splash"
-        android:visibility="gone" />
+            <LinearLayout
+                style="@style/list_item_card_view_container_margins"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="@dimen/card_view_margin_vertical">
 
-</RelativeLayout>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/redesign_ic_demo_health_thermometer"
+                    android:contentDescription="@string/content_desc_demo_item_icon" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="16dp">
+
+                        <TextView
+                            style="@style/list_item_card_view_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:text="@string/temperature" />
+
+                        <TextView
+                            android:id="@+id/thermo_type_value"
+                            style="@style/list_item_card_view_text_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/temperature_type"/>
+
+                    </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/type_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:checked="true"
+                    android:textOff="@string/c_symbol"
+                    android:textOn="@string/f_symbol"
+                    android:thumb="@drawable/sw_color_thumb"
+                    app:showText="true"
+                    app:switchTextAppearance="@style/SwitchText"
+                    app:track="@drawable/track" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/silabs_divider" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/list_item_card_view_container_margins"
+                android:layout_marginBottom="@dimen/card_view_margin_vertical"
+                android:orientation="horizontal">
+
+                <com.siliconlabs.bledemo.features.demo.health_thermometer.views.TemperatureDisplay
+                    android:id="@+id/thermo_large_temperature"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:large_text_size="@dimen/thermo_large_temp_primary_text_size"
+                    app:small_text_size="@dimen/thermo_large_temp_secondary_text_size" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/thermo_large_time_text"
+                        style="@style/ThermoValueText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/loading_ellipsis" />
+
+                    <TextView
+                        android:id="@+id/thermo_humidity_label"
+                        style="@style/ThermoLabelText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/type" />
+
+                    <TextView
+                        android:id="@+id/thermo_type_value_text"
+                        style="@style/ThermoValueText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/loading_ellipsis" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

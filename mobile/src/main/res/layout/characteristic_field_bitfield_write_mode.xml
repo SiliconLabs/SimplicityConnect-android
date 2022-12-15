@@ -14,7 +14,6 @@
         android:layout_marginEnd="@dimen/writable_container_value_horizontal_margin"
         android:layout_gravity="center_vertical"
         android:gravity="center_vertical"
-
         android:background="@color/silabs_white"
         android:textSize="@dimen/characteristic_list_item_value_label_text_size"
         android:textColor="@color/silabs_subtle_text"
@@ -25,5 +24,5 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginStart="@dimen/writable_container_value_horizontal_margin" />
+        android:layout_gravity="center_vertical"/>
 </LinearLayout>

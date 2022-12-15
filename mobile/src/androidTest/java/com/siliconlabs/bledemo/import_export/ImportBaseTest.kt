@@ -1,10 +1,10 @@
 package com.siliconlabs.bledemo.import_export
 
 import android.util.Xml
-import com.siliconlabs.bledemo.gatt_configurator.models.GattServer
-import com.siliconlabs.bledemo.gatt_configurator.import_export.*
-import com.siliconlabs.bledemo.gatt_configurator.import_export.utils.XmlConst
-import com.siliconlabs.bledemo.gatt_configurator.import_export.utils.XmlPrinter
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.GattServer
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.import_export.*
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.import_export.utils.XmlConst
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.import_export.utils.XmlPrinter
 import org.junit.AfterClass
 import org.junit.Assert.*
 import org.junit.Before

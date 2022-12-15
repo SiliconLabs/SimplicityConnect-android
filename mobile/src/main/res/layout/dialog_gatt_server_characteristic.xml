@@ -62,7 +62,7 @@
 
                 <include
                     android:id="@+id/initial_value"
-                    layout="@layout/dialog_gatt_configurator_initial_value"
+                    layout="@layout/gatt_configurator_initial_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/properties_content" />
@@ -84,7 +84,7 @@
                 android:id="@+id/btn_clear"
                 style="@style/ButtonBorderlessBlue"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="8dp"
@@ -94,7 +94,7 @@
                 android:id="@+id/btn_cancel"
                 style="@style/ButtonBorderlessBlue"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="8dp"
@@ -104,7 +104,7 @@
                 android:id="@+id/btn_save"
                 style="@style/ButtonBlue"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:enabled="false"

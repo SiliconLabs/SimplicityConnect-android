@@ -1,9 +1,9 @@
 package com.siliconlabs.bledemo.import_export
 
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import com.siliconlabs.bledemo.gatt_configurator.import_export.ImportException
-import com.siliconlabs.bledemo.gatt_configurator.import_export.ImportException.ErrorType.*
-import com.siliconlabs.bledemo.gatt_configurator.import_export.utils.XmlConst
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.import_export.ImportException
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.import_export.ImportException.ErrorType.*
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.import_export.utils.XmlConst
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

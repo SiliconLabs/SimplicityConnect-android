@@ -1,7 +1,7 @@
-package com.siliconlabs.bledemo.Application
+package com.siliconlabs.bledemo.application
 
 import android.app.Application
-import com.siliconlabs.bledemo.Bluetooth.Parsing.Engine
+import com.siliconlabs.bledemo.bluetooth.parsing.Engine
 import com.siliconlabs.bledemo.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber

@@ -4,11 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".wifi_commissioning.activities.WifiCommissioningActivity">
-
-    <include
-        android:id="@+id/tool_bar"
-        layout="@layout/actionbar" />
+    tools:context=".features.demo.wifi_commissioning.activities.WifiCommissioningActivity">
 
     <LinearLayout
         android:id="@+id/firmware_ly"
@@ -42,7 +38,7 @@
             android:gravity="end" />
     </LinearLayout>
 
-    <com.siliconlabs.bledemo.Views.HorizontalShadow
+    <com.siliconlabs.bledemo.common.views.HorizontalShadow
         android:id="@+id/top_shadow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -57,7 +53,7 @@
         android:layout_below="@id/top_shadow"
         android:orientation="vertical" />
 
-    <com.siliconlabs.bledemo.Views.HorizontalShadow
+    <com.siliconlabs.bledemo.common.views.HorizontalShadow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:rotation="180"

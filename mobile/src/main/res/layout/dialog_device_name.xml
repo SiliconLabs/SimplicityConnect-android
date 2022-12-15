@@ -1,75 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
-    app:cardCornerRadius="16dp">
+    style="@style/dialog_card">
 
     <LinearLayout
+        style="@style/dialog_margins"
+        android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/silabs_dialog_title_background"
         android:orientation="vertical">
 
         <TextView
-            style="@style/DialogHeaderText"
+            style="@style/dialog_title"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
             android:text="@string/advertiser_title_device_name" />
 
+        <TextView
+            style="@style/dialog_text_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/advertiser_dialog_device_name"
+            android:layout_marginBottom="@dimen/space_S" />
+
         <LinearLayout
+            style="@style/edit_text_box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/silabs_white">
+            android:layout_marginVertical="@dimen/space_XS" >
 
-            <EditText
-                android:id="@+id/et_device_name"
+            <EditText android:id="@+id/et_device_name"
+                style="@style/edit_text_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:hint="@string/advertiser_hint_enter_device_name"
-                android:inputType="textCapWords"
-                android:textColor="@color/silabs_subtle_text"
-                android:textSize="14sp" />
+                android:imeOptions="actionDone"
+                android:inputType="text" />
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/silabs_white"
-            android:gravity="center_horizontal"
+            android:gravity="end"
             android:orientation="horizontal"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp">
+            android:layout_marginTop="@dimen/dialog_button_margin_top"
+            android:layout_marginHorizontal="@dimen/dialog_margin_horizontal">
 
-            <Button
-                android:id="@+id/btn_clear"
-                style="@style/ButtonBorderlessBlue"
+            <Button android:id="@+id/btn_cancel"
+                style="@style/dialog_button_negative_action"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/button_clear" />
-
-            <Button
-                android:id="@+id/btn_cancel"
-                style="@style/ButtonBorderlessBlue"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginBottom="8dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dialog_margin_between_buttons"
                 android:text="@string/button_cancel" />
 
-            <Button
-                android:id="@+id/btn_save"
-                style="@style/ButtonBlue"
+            <Button android:id="@+id/btn_save"
+                style="@style/dialog_button_positive_action"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dialog_button_margin_end"
                 android:text="@string/button_save" />
+
         </LinearLayout>
+
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>

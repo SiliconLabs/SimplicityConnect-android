@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Bluetooth.Parsing
+package com.siliconlabs.bledemo.bluetooth.parsing
 
 import android.bluetooth.BluetoothGattDescriptor
 import com.siliconlabs.bledemo.utils.Converters

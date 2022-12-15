@@ -1,18 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="true">
+    <item
+        android:state_enabled="true"
+        android:state_checked="true">
         <shape android:shape="rectangle">
-            <size android:height="24dp"/>
+            <size android:height="@dimen/switch_height" />
             <solid android:color="@color/silabs_blue" />
-            <corners android:radius="4dp" />
+            <corners android:radius="@dimen/switch_corner_radius" />
+
         </shape>
     </item>
 
-    <item android:state_checked="false">
+    <item
+        android:state_enabled="true"
+        android:state_checked="false">
         <shape android:shape="rectangle">
-            <size android:height="24dp"/>
-            <solid android:color="@color/silabs_inactive_light" />
-            <corners android:radius="4dp" />
+            <size android:height="@dimen/switch_height" />
+            <solid android:color="@color/silabs_white" />
+            <corners android:radius="@dimen/switch_corner_radius" />
+            <stroke
+                android:width="@dimen/switch_border_width"
+                android:color="@color/silabs_ripple_blue"/>
         </shape>
     </item>
+
+    <item
+        android:state_enabled="false"
+        android:state_checked="false">
+        <shape android:shape="rectangle">
+            <size android:height="@dimen/switch_height" />
+            <solid android:color="@color/track_disabled" />
+            <corners android:radius="@dimen/switch_corner_radius" />
+        </shape>
+    </item>
+
+
 </selector>

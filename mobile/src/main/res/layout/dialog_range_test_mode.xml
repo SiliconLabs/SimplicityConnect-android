@@ -1,46 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="0dp">
+    style="@style/dialog_card">
 
     <LinearLayout
+        style="@style/dialog_margins"
+        android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            style="@style/dialog_title"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/gallery"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                style="@style/TextSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/demo_item_range_title"
-                android:textColor="@color/silabs_subtle_text" />
-
-            <TextView
-                style="@style/TitleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/demo_range_select_mode" />
-
-        </LinearLayout>
+            android:text="@string/demo_range_select_mode" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="26dp"
+
             android:layout_marginBottom="16dp"
             android:orientation="vertical">
 
@@ -162,15 +144,18 @@
                 android:text="@string/demo_range_mode_rx" />
         </LinearLayout>
 
+        <include layout="@layout/horizontal_separator" />
+
         <Button
             android:id="@+id/btn_cancel"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/btn_blue_selector"
+            style="@style/dialog_button_negative_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/dialog_button_margin_end"
+            android:layout_marginTop="@dimen/dialog_button_margin_top"
             android:fontFamily="sans-serif-medium"
+            android:layout_gravity="end"
             android:gravity="center"
-            android:text="@string/button_cancel"
-            android:textAllCaps="true"
-            android:textColor="@color/silabs_white" />
+            android:text="@string/button_cancel" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

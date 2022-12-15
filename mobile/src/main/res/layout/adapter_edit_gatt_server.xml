@@ -80,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="@string/More_Info"
+            android:text="@string/more_info"
             android:textColor="@color/silabs_blue"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_service_type" />
@@ -105,11 +105,10 @@
                 android:visibility="gone" />
         </androidx.cardview.widget.CardView>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_add_characteristic"
-            style="@style/ButtonBlue"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:text="@string/button_add_characteristic"

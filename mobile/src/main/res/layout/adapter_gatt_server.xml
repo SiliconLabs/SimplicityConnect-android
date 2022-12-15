@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rl_gatt_server"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,20 +9,16 @@
         android:id="@+id/cb_export"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
-        android:visibility="visible" />
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/space_ML"
+        android:visibility="visible"
+        tools:visibility="gone" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cv_gatt_server"
-        android:layout_width="match_parent"
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/cb_export"
-        android:layout_margin="8dp"
-        android:foreground="?android:attr/selectableItemBackground"
-        app:cardCornerRadius="16dp">
+        android:layout_weight="1"
+        style="@style/list_item_card_view_box">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,85 +26,114 @@
             android:orientation="vertical">
 
             <LinearLayout
+                style="@style/list_item_card_view_container_margins"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingTop="16dp"
-                android:paddingEnd="16dp">
-
-                <TextView
-                    android:id="@+id/tv_gatt_server_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:fontFamily="sans-serif-medium"
-                    android:lines="1"
-                    android:maxLines="1"
-                    android:textColor="@color/silabs_primary_text"
-                    android:textSize="@dimen/device_name_text_size"
-                    tools:text="New GATT server 1" />
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/sw_gatt_server"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="2dp"
-                    android:thumb="@drawable/sw_thumb"
-                    app:track="@drawable/sw_track" />
-            </LinearLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="16dp">
-
-                <TextView
-                    android:id="@+id/tv_total_services"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_toStartOf="@id/ll_manage_buttons"
-                    android:text="@string/gatt_configurator_n_services"
-                    android:textColor="@color/silabs_primary_text"
-                    android:textSize="16sp" />
+                android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/ll_manage_buttons"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal" >
 
-                    <ImageButton
-                        android:id="@+id/ib_copy"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/btn_grey_ripple_effect"
-                        android:contentDescription="@string/label_copy"
-                        android:src="@drawable/ic_copy" />
+                    <ImageView
+                        android:layout_width="@dimen/card_view_main_icon_dimension"
+                        android:layout_height="@dimen/card_view_main_icon_dimension"
+                        android:src="@drawable/redesign_ic_gatt_server"
+                        android:contentDescription="@string/content_desc_gatt_server_icon" />
 
-                    <ImageButton
-                        android:id="@+id/ib_edit"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/btn_grey_ripple_effect"
-                        android:contentDescription="@string/label_edit"
-                        android:src="@drawable/ic_edit2" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical"
+                        android:layout_marginStart="@dimen/space_S" >
 
-                    <ImageButton
-                        android:id="@+id/ib_remove"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/btn_grey_ripple_effect"
-                        android:contentDescription="@string/label_remove"
-                        android:src="@drawable/ic_trash" />
+                        <TextView
+                            android:id="@+id/tv_gatt_server_name"
+                            style="@style/list_item_card_view_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="New GATT server 1" />
+
+                        <TextView
+                            android:id="@+id/tv_total_services"
+                            style="@style/list_item_card_view_text_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/gatt_configurator_n_services" />
+
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sw_gatt_server"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:thumb="@drawable/sw_thumb"
+                        app:track="@drawable/sw_track" />
+
                 </LinearLayout>
-            </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/space_SM"
+                    android:layout_marginBottom="@dimen/space_S"
+                    android:background="?android:attr/listDivider" />
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/card_view_margin_vertical" >
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
+                        <ImageButton
+                            android:id="@+id/ib_edit"
+                            style="@style/card_view_action_icon"
+                            android:layout_width="@dimen/card_view_action_icon_container_width"
+                            android:layout_height="@dimen/card_view_action_icon_container_height"
+                            android:layout_marginEnd="@dimen/space_S"
+                            android:contentDescription="@string/label_edit"
+                            android:src="@drawable/redesign_ic_card_view_action_icon_edit" />
+
+                        <ImageButton
+                            android:id="@+id/ib_copy"
+                            style="@style/card_view_action_icon"
+                            android:layout_width="@dimen/card_view_action_icon_container_width"
+                            android:layout_height="@dimen/card_view_action_icon_container_height"
+                            android:layout_marginEnd="@dimen/space_S"
+                            android:contentDescription="@string/label_copy"
+                            android:src="@drawable/redesign_ic_card_view_action_icon_copy" />
+
+                        <ImageButton
+                            android:id="@+id/ib_remove"
+                            style="@style/card_view_action_icon"
+                            android:layout_width="@dimen/card_view_action_icon_container_width"
+                            android:layout_height="@dimen/card_view_action_icon_container_height"
+                            android:contentDescription="@string/label_remove"
+                            android:src="@drawable/redesign_ic_card_view_action_icon_delete" />
+
+                    </LinearLayout>
+
+                    <com.siliconlabs.bledemo.common.views.ExpandArrow
+                        android:id="@+id/expand_arrow"
+                        style="@style/expand_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_down_on"
+                        android:contentDescription="@string/content_desc_dropdown_arrow"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/ll_gatt_server_details"
@@ -120,5 +144,7 @@
                 tools:visibility="visible" />
 
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
-</RelativeLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

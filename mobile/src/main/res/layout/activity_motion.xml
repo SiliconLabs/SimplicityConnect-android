@@ -72,16 +72,16 @@
         android:orientation="vertical"
         android:layout_marginBottom="@dimen/space_XS">
 
-        <TextView
-
+        <Button
             android:id="@+id/calibrate"
             android:layout_gravity="center"
-            android:background="@drawable/button_rounded_bg"
+            android:backgroundTint="@color/blue_primary"
             android:paddingStart="@dimen/space_M"
             android:paddingTop="@dimen/space_XXS"
             android:paddingEnd="@dimen/space_M"
             android:paddingBottom="@dimen/space_XXS"
             android:text="@string/motion_calibrate"
+            android:textAllCaps="false"
             style="@style/tb_robo_medium_18dp_white" />
 
     </LinearLayout>

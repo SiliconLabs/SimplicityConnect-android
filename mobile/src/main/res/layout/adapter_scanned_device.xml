@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/listChoiceBackgroundIndicator"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:id="@android:id/icon2"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/device_selection_item_margin"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:src="@drawable/icon_zigbee"
+            android:contentDescription="@string/content_desc_scanned_device_proprietary_icon"/>
+
+        <ImageView
+            android:id="@android:id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/device_selection_item_margin"
+            android:src="@drawable/bt_level"
+            android:contentDescription="@string/content_desc_scanned_device_icon" />
+
+        <TextView
+            android:id="@android:id/title"
+            style="@style/Subhead"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/device_selection_item_margin"
+            android:layout_weight="1"
+            android:drawablePadding="@dimen/device_selection_item_padding"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/silabs_primary_text"
+            android:gravity="center_vertical"
+            android:lines="2"
+            android:textSize="@dimen/device_item_text_size"
+            tools:text="Bluetooth Device" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+</LinearLayout>

@@ -1,8 +1,7 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
 import androidx.annotation.StringRes
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.utils.UuidUtils.parseIntFromUuidStart
 import java.util.*
 
 /**
@@ -146,15 +145,12 @@ enum class GattService {
         this.number = UUID.fromString(String.format(Locale.US, FORMAT_STR, number))
         this.type = type
         this.availableCharacteristics = arrayOf(*availableCharacteristics)
-        BluetoothLEGatt.GATT_SERVICE_DESCS.put(number, this)
     }
 
     constructor(uuid: String?, type: String, vararg availableCharacteristics: GattCharacteristic) {
         number = UUID.fromString(uuid)
         this.type = type
         this.availableCharacteristics = arrayOf(*availableCharacteristics)
-        val key = parseIntFromUuidStart(uuid!!)
-        BluetoothLEGatt.GATT_SERVICE_DESCS.put(key, this)
     }
 
     constructor(uuid: String?, type: String, customNameId: Int, vararg availableCharacteristics: GattCharacteristic) {
@@ -162,8 +158,6 @@ enum class GattService {
         this.type = type
         this.availableCharacteristics = arrayOf(*availableCharacteristics)
         this.customNameId = customNameId
-        val key = parseIntFromUuidStart(uuid!!)
-        BluetoothLEGatt.GATT_SERVICE_DESCS.put(key, this)
     }
 
     companion object {

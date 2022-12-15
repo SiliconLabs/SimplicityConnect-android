@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.siliconlabs.bledemo.throughput.views.SpeedView
+        <com.siliconlabs.bledemo.features.demo.throughput.views.SpeedView
             android:id="@+id/speed_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
             android:layout_marginBottom="16dp" />
     </LinearLayout>
 
-    <com.siliconlabs.bledemo.Views.HorizontalShadow
+    <com.siliconlabs.bledemo.common.views.HorizontalShadow
         android:id="@+id/scanning_separator"
         android:layout_width="match_parent"
         android:layout_height="@dimen/shadow_height"
@@ -58,7 +58,7 @@
             android:id="@+id/btn_start_stop"
             style="@style/ButtonBlue"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:paddingHorizontal="10dp"
             android:text="@string/button_start"

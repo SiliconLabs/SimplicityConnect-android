@@ -1,31 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
-    app:cardCornerRadius="16dp">
+    style="@style/dialog_card" >
 
     <LinearLayout
-        android:layout_width="@dimen/characteristic_write_dialog_width"
+        style="@style/dialog_margins"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/silabs_dialog_title_background"
+        android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
         android:orientation="vertical">
+
+        <TextView
+            style="@style/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
+            android:text="@string/dialog_char_write_title"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/silabs_dialog_title_background"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.6"
                 android:gravity="center_vertical"
-                android:orientation="vertical"
-                android:padding="24dp">
+                android:orientation="vertical" >
 
                 <TextView
                     android:id="@+id/characteristic_dialog_service_name"
@@ -54,35 +58,6 @@
                     android:textSize="@dimen/dialog_charac_uuid_text_size" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/picker_dialog_properties_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight=".4"
-                android:background="@color/silabs_dialog_title_background"
-                android:gravity="center_vertical|end"
-                android:orientation="vertical"
-                android:paddingStart="0dp"
-                android:paddingTop="@dimen/characteristic_dialog_header_padding_top"
-                android:paddingEnd="@dimen/characteristic_spinner_dialog_header_padding_right"
-                android:paddingBottom="@dimen/characteristic_dialog_header_padding_bottom"
-                android:visibility="gone">
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/silabs_transparent" />
-            </LinearLayout>
-
-            <ImageView
-                android:id="@+id/image_view_close"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
-                android:layout_gravity="top"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="4dp"
-                android:padding="10dp"
-                android:src="@drawable/ic_small_x" />
         </LinearLayout>
 
         <View
@@ -92,74 +67,66 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="@dimen/characteristic_spinner_dialog_spinner_scroll_height"
-            android:background="#FFFFFF">
+            android:layout_height="@dimen/characteristic_spinner_dialog_spinner_scroll_height">
 
             <LinearLayout
                 android:id="@+id/characteristic_writable_fields_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="@dimen/dialog_writable_fields_container_padding" />
+                android:paddingVertical="@dimen/dialog_writable_fields_container_padding" />
         </ScrollView>
 
         <RadioGroup
             android:id="@+id/write_method_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/silabs_white"
             android:orientation="vertical">
 
             <RadioButton
                 android:id="@+id/write_with_resp_radio_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="24dp"
-                android:layout_marginEnd="24dp"
-                android:layout_marginBottom="4dp"
                 android:text="@string/Write_with_response"/>
-
 
             <RadioButton
                 android:id="@+id/write_without_resp_radio_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginEnd="24dp"
-                android:layout_marginBottom="4dp"
                 android:text="@string/Write_without_response"/>
 
         </RadioGroup>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/about_blue_giga_dialog_close_btn_height"
-            android:background="#FFFFFF"
-            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:layout_marginEnd="@dimen/dialog_button_margin_end"
+            android:layout_marginTop="@dimen/dialog_button_margin_top"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/clear_btn"
-                style="@style/ButtonBorderlessBlue"
+            <Button android:id="@+id/cancel_btn"
+                style="@style/dialog_button_negative_action"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginBottom="8dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dialog_margin_between_buttons"
+                android:text="@string/button_cancel"/>
+
+            <Button android:id="@+id/clear_btn"
+                style="@style/dialog_button_negative_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dialog_margin_between_buttons"
                 android:gravity="center"
                 android:text="@string/button_clear" />
 
-            <Button
-                android:id="@+id/save_btn"
-                style="@style/ButtonBlue"
+            <Button android:id="@+id/save_btn"
+                style="@style/dialog_button_positive_action"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:enabled="false"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/button_send" />
+
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

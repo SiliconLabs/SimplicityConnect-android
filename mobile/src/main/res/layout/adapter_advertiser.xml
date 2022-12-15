@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cv_advertiser"
+
+    style="@style/list_item_card_view_box"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:foreground="?android:attr/selectableItemBackground"
-    app:cardCornerRadius="16dp">
+    android:layout_height="wrap_content" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,124 +14,248 @@
         android:orientation="vertical">
 
         <LinearLayout
+            style="@style/list_item_card_view_container_margins"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingTop="16dp"
-            android:paddingEnd="16dp">
-
-            <TextView
-                android:id="@+id/tv_device_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:fontFamily="sans-serif-medium"
-                android:lines="1"
-                android:maxLines="1"
-                android:text="@string/devices_list_list_item_default_device_name"
-                android:textColor="@color/silabs_primary_text"
-                android:textSize="@dimen/device_name_text_size" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/sw_advertiser"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dp"
-                android:thumb="@drawable/sw_thumb"
-                app:track="@drawable/sw_track" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:baselineAligned="false"
-            android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="16dp">
+            android:orientation="vertical" >
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_weight="0.2"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
+                android:orientation="horizontal" >
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:contentDescription="@string/advertiser_label_tx_power"
-                    android:src="@drawable/ic_wifi"
-                    app:tint="@color/silabs_dark_gray_icon" />
+                    android:layout_width="@dimen/card_view_main_icon_dimension"
+                    android:layout_height="@dimen/card_view_main_icon_dimension"
+                    android:src="@drawable/redesign_ic_bluetooth_with_background"
+                    android:contentDescription="@string/content_desc_gatt_server_icon" />
 
-                <TextView
-                    android:id="@+id/tv_tx_power"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="@dimen/space_S" >
+
+                    <TextView
+                        android:id="@+id/tv_device_name"
+                        style="@style/list_item_card_view_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="New Advertiser" />
+
+                    <TextView
+                        android:id="@+id/tv_advertiser_address"
+                        style="@style/list_item_card_view_text_info_ellipsized"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="xx:xx:xx:xx:xx:xx"/>
+
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/sw_advertiser"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="-dBm"
-                    android:textColor="@color/silabs_primary_text"
-                    android:textSize="16sp" />
+                    android:layout_gravity="center"
+                    android:thumb="@drawable/sw_thumb"
+                    app:track="@drawable/sw_track" />
+
             </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/card_view_first_horizontal_separator_margin_top"
+                android:layout_marginBottom="@dimen/space_S"
+                android:background="?android:attr/listDivider" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_weight="0.2"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:contentDescription="@string/advertiser_label_interval"
-                    android:src="@drawable/ic_clock"
-                    app:tint="@color/silabs_dark_gray_icon" />
-
-                <TextView
-                    android:id="@+id/tv_interval"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="-ms"
-                    android:textColor="@color/silabs_primary_text"
-                    android:textSize="16sp" />
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="@dimen/card_view_feature_icon_dimension"
+                        android:layout_height="@dimen/card_view_feature_icon_dimension"
+                        android:layout_marginBottom="@dimen/space_XXS"
+                        android:contentDescription="@string/advertiser_label_tx_power"
+                        android:src="@drawable/redesign_ic_wifi"
+                        android:layout_gravity="center"
+                        app:tint="@color/silabs_dark_gray_icon" />
+
+                    <TextView
+                        android:id="@+id/tv_tx_power"
+                        style="@style/list_item_card_view_text_info_ellipsized"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:text="-40 dBm"
+                        android:gravity="center_horizontal" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="@dimen/card_view_vertical_separator_horizontal_margin"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginBottom="@dimen/space_XXS"
+                        android:layout_gravity="center_horizontal"
+                        android:contentDescription="@string/advertiser_label_interval"
+                        android:src="@drawable/redesign_ic_clock"
+                        app:tint="@color/silabs_dark_gray_icon" />
+
+                    <TextView
+                        android:id="@+id/tv_interval"
+                        style="@style/list_item_card_view_text_info_ellipsized"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        tools:text="325 ms" />
+
+                </LinearLayout>
+
+
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="@dimen/card_view_vertical_separator_horizontal_margin"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="@dimen/space_XXS"
+                        android:contentDescription="@string/advertiser_label_interval"
+                        android:src="@drawable/ic_beacon_ibeacon"
+                        app:tint="@color/silabs_dark_gray_icon" />
+
+                    <TextView
+                        android:id="@+id/tv_beacon_type"
+                        style="@style/list_item_card_view_text_info_ellipsized"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:text="@string/advertiser_setting_beacon_unspecified" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="@dimen/card_view_vertical_separator_horizontal_margin"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="@dimen/card_view_feature_icon_dimension"
+                        android:layout_height="@dimen/card_view_feature_icon_dimension"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="@dimen/space_XXS"
+                        android:contentDescription="@string/advertiser_label_interval"
+                        android:src="@drawable/redesign_ic_bluetooth"
+                        app:tint="@color/silabs_dark_gray_icon" />
+
+                    <TextView
+                        android:id="@+id/tv_connectible"
+                        style="@style/list_item_card_view_text_info_ellipsized"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        tools:text="Connectible" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="@dimen/space_S"
+                android:background="?android:attr/listDivider" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginBottom="@dimen/space_S" >
 
-                <ImageButton
-                    android:id="@+id/ib_copy"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@drawable/btn_grey_ripple_effect"
-                    android:contentDescription="@string/label_copy"
-                    android:src="@drawable/ic_copy" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
 
-                <ImageButton
-                    android:id="@+id/ib_edit"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@drawable/btn_grey_ripple_effect"
-                    android:contentDescription="@string/label_edit"
-                    android:src="@drawable/ic_edit2" />
+                    <ImageButton
+                        android:id="@+id/ib_edit"
+                        style="@style/card_view_action_icon"
+                        android:layout_width="@dimen/card_view_action_icon_container_width"
+                        android:layout_height="@dimen/card_view_action_icon_container_height"
+                        android:layout_marginEnd="@dimen/space_S"
+                        android:contentDescription="@string/label_edit"
+                        android:src="@drawable/redesign_ic_card_view_action_icon_edit" />
 
-                <ImageButton
-                    android:id="@+id/ib_remove"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@drawable/btn_grey_ripple_effect"
-                    android:contentDescription="@string/label_remove"
-                    android:src="@drawable/ic_trash" />
-            </LinearLayout>
+                    <ImageButton
+                        android:id="@+id/ib_copy"
+                        style="@style/card_view_action_icon"
+                        android:layout_width="@dimen/card_view_action_icon_container_width"
+                        android:layout_height="@dimen/card_view_action_icon_container_height"
+                        android:layout_marginEnd="@dimen/space_S"
+                        android:contentDescription="@string/label_copy"
+                        android:src="@drawable/redesign_ic_card_view_action_icon_copy" />
+
+                    <ImageButton
+                        android:id="@+id/ib_remove"
+                        style="@style/card_view_action_icon"
+                        android:layout_width="@dimen/card_view_action_icon_container_width"
+                        android:layout_height="@dimen/card_view_action_icon_container_height"
+                        android:contentDescription="@string/label_remove"
+                        android:src="@drawable/redesign_ic_card_view_action_icon_delete" />
+
+                </LinearLayout>
+
+                <com.siliconlabs.bledemo.common.views.ExpandArrow
+                    android:id="@+id/expand_arrow"
+                    style="@style/expand_arrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arrow_down_on"
+                    android:contentDescription="@string/content_desc_dropdown_arrow"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true" />
+
+            </RelativeLayout>
+
         </LinearLayout>
 
         <LinearLayout
@@ -143,4 +267,5 @@
             tools:visibility="visible" />
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+
+</com.google.android.material.card.MaterialCardView>

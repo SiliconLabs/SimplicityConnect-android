@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    style="@style/dialog_card">
+
+    <LinearLayout
+        style="@style/dialog_margins"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/about_mappings_about" />
+
+        <TextView
+            style="@style/dialog_text_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/iop_test_note_device_name_dialog" />
+
+        <Button android:id="@+id/btn_interoperability_test"
+            style="@style/button_external_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/iop_test_label_interoperability_test" />
+
+
+        <Button android:id="@+id/btn_ok"
+            style="@style/dialog_button_neutral_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/dialog_button_margin_top"
+            android:layout_marginEnd="@dimen/dialog_button_margin_end"
+            android:text="@string/button_ok" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

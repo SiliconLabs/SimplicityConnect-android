@@ -54,7 +54,7 @@
     </LinearLayout>
 
 
-    <com.siliconlabs.bledemo.thunderboard.ui.BatteryIndicator
+    <com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.ui.BatteryIndicator
         android:id="@+id/battery_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

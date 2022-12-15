@@ -1,178 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?><!--  --><!-- Bluegiga's Bluetooth Smart Android SW for Bluegiga BLE modules --><!-- Contact: support@bluegiga.com. --><!--  --><!-- This is free software distributed under the terms of the MIT license reproduced below. --><!--  --><!-- Copyright (c) 2013, Bluegiga Technologies --><!--  --><!-- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files ("Software") --><!-- to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, --><!-- and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: --><!--  --><!-- THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF --><!-- ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT --><!-- NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE. --><!--  -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/silabs_background"
-    tools:context=".Browser.Activities.DeviceServicesActivity">
+    android:orientation="vertical"
+    tools:context=".features.scan.browser.activities.DeviceServicesActivity">
 
-    <include
-        android:id="@+id/toolbar_device_services"
-        layout="@layout/actionbar" />
-
-    <RelativeLayout
-        android:id="@+id/header_services"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar_device_services"
-        android:background="@color/silabs_red"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp">
-
-        <TextView
-            android:id="@+id/tv_bond_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:padding="4dp"
-            android:textColor="@color/silabs_white"
-            tools:text="BONDED" />
-
-        <ImageView
-            android:id="@+id/iv_rssi"
-            android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/tv_rssi"
-            android:src="@drawable/ic_wifi"
-            app:tint="@color/silabs_white" />
-
-        <TextView
-            android:id="@+id/tv_rssi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="4dp"
-            android:padding="4dp"
-            android:text="- dBm"
-            android:textColor="@color/silabs_white"
-            android:textSize="@dimen/rssi_indicator_text_size" />
-    </RelativeLayout>
-
-    <include
-        android:id="@+id/services_toolbar"
-        layout="@layout/toolbar_device_services"
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_below="@id/header_services" />
-
-    <RelativeLayout
-        android:id="@+id/framelayout_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/services_toolbar"
-        android:background="@drawable/browser_card_bg">
-
-        <FrameLayout
-            android:id="@+id/frame_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/bluetooth_browser_background"
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/services_toolbar"
-        android:layout_alignParentBottom="true"
-        android:clickable="true"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 
-    <RelativeLayout
-        android:id="@+id/servicesWrapper"
+    <LinearLayout
+        android:id="@+id/services_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/services_toolbar"
-        android:background="@color/silabs_transparent">
-
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/services_fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/services_bottom_nav" />
+        android:orientation="vertical"
+        android:layout_height="match_parent" >
 
         <RelativeLayout
-            android:id="@+id/loading_container"
+            android:id="@+id/connection_info"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/services_bottom_nav"
-            android:background="@color/silabs_connecting_background"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:layout_height="wrap_content"
+            android:background="@color/bar_with_additional_info"
+            android:paddingVertical="@dimen/space_XS"
+            android:paddingHorizontal="@dimen/space_S">
 
             <LinearLayout
-                android:id="@+id/device_services_background"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/silabs_background"
-                android:gravity="center"
-                android:orientation="vertical" />
-
-            <RelativeLayout
-                android:id="@+id/loading_bar_container"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/scanning_animation_bar_height"
-                android:layout_alignParentBottom="true">
+                android:id="@+id/tv_bond_state_with_rssi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true" >
 
                 <TextView
-                    android:id="@+id/loading_label_textview"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/scanning_animation_bar_height"
-                    android:layout_alignParentBottom="true"
-                    android:background="@color/silabs_red"
-                    android:gravity="center"
-                    android:text="@string/debug_mode_device_loading_gatt_info"
-                    android:textColor="@color/silabs_white"
-                    android:textSize="@dimen/scanning_animation_bar_textsize"
-                    android:visibility="visible" />
+                    android:id="@+id/tv_bond_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/silabs_black"
+                    tools:text="BONDED" />
 
-                <LinearLayout
-                    android:id="@+id/loading_anim_gradient_right_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/scanning_animation_bar_height"
-                    android:layout_alignParentBottom="true"
-                    android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/separator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/separator"
+                    android:textColor="@color/silabs_black"
+                    android:layout_marginHorizontal="@dimen/space_XXS" />
 
-                    <ImageView
-                        android:id="@+id/loading_scan_anim_gradient_right"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/scanning_animation_bar_height"
-                        android:src="@drawable/debug_scanning_indicator_right" />
-                </LinearLayout>
-            </RelativeLayout>
+                <TextView
+                    android:id="@+id/tv_rssi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/silabs_black"
+                    android:textSize="@dimen/rssi_indicator_text_size"
+                    tools:text="- dBm"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_ota_firmware"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="?attr/selectableItemBackground"
+                android:padding="@dimen/space_XS"
+                android:text="@string/ota_firmware"
+                android:textColor="@color/silabs_black"/>
+
         </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" >
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/services_fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <com.siliconlabs.bledemo.common.views.MainActionButton
+                android:id="@+id/btn_bond_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="@dimen/extended_fab_margin"
+                android:text="@string/create_bond"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:text="@string/create_bond" />
+        </RelativeLayout>
+
+        <com.siliconlabs.bledemo.common.views.FlyInBar
+            android:id="@+id/fly_in_bar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/scanning_animation_bar_height"
+            android:visibility="gone"
+            tools:visibility="visible"/>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/services_bottom_nav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            app:menu="@menu/services_bottom_nav" />
+            app:menu="@menu/bottom_nav_device_services" />
 
-        <RelativeLayout
-            android:id="@+id/log_body_connected"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_below="@id/loading_container"
-            android:layout_alignParentBottom="true"
-            android:animateLayoutChanges="true"
-            android:background="@color/background_material_dark"
-            android:visibility="gone">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_alignParentTop="true"
-                android:background="@color/silabs_red" />
-        </RelativeLayout>
-    </RelativeLayout>
+    </LinearLayout>
 
-    <com.siliconlabs.bledemo.Views.HorizontalShadow
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/services_toolbar" />
-
-</RelativeLayout>
+</LinearLayout>

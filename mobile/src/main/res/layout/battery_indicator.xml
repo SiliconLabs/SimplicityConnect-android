@@ -10,7 +10,7 @@
         android:layout_gravity="center_vertical"
         style="@style/tb_robo_medium_14dp_blue"/>
 
-    <com.siliconlabs.bledemo.thunderboard.ui.BatteryMeter
+    <com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.ui.BatteryMeter
         android:id="@+id/battery_meter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

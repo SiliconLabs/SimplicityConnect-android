@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:id="@+id/device_container"
+    style="@style/list_item_card_view_box"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <LinearLayout
+        style="@style/list_item_card_view_container_margins"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/card_view_margin_vertical"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/manufacturer_icon"
+                android:layout_width="@dimen/card_view_main_icon_dimension"
+                android:layout_height="@dimen/card_view_main_icon_dimension"
+                android:src="@drawable/redesign_ic_bluetooth_with_background"
+                android:contentDescription="@string/content_desc_scanned_device_manufacturer_icon"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:layout_marginHorizontal="@dimen/space_XS"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/device_name"
+                    style="@style/list_item_card_view_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/devices_list_list_item_default_device_name" />
+
+                <TextView
+                    android:id="@+id/tv_device_address"
+                    style="@style/list_item_card_view_text_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Device_address" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/disconnect_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/btn_action_on"
+                    android:textSize="@dimen/connect_button_text_size"
+                    android:text="@string/button_disconnect" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar_connections"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/card_view_first_horizontal_separator_margin_top"
+            android:layout_marginBottom="@dimen/space_S"
+            android:background="?android:attr/listDivider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:layout_width="@dimen/card_view_feature_icon_dimension"
+                    android:layout_height="@dimen/card_view_feature_icon_dimension"
+                    android:layout_marginBottom="@dimen/space_XXS"
+                    android:contentDescription="@string/advertiser_label_tx_power"
+                    android:src="@drawable/redesign_ic_wifi"
+                    android:layout_gravity="center"
+                    app:tint="@color/silabs_dark_gray_icon" />
+
+                <TextView
+                    android:id="@+id/rssi"
+                    style="@style/list_item_card_view_text_info_ellipsized"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="-40 dBm"
+                    android:gravity="center_horizontal" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/card_view_vertical_separator_horizontal_margin"
+                android:background="?android:attr/listDivider" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginBottom="@dimen/space_XXS"
+                    android:layout_gravity="center_horizontal"
+                    android:contentDescription="@string/advertiser_label_interval"
+                    android:src="@drawable/redesign_ic_clock"
+                    app:tint="@color/silabs_dark_gray_icon" />
+
+                <TextView
+                    android:id="@+id/tv_interval"
+                    style="@style/list_item_card_view_text_info_ellipsized"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    tools:text="325 ms" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/card_view_vertical_separator_horizontal_margin"
+                android:background="?android:attr/listDivider" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="@dimen/space_XXS"
+                    android:contentDescription="@string/advertiser_label_interval"
+                    android:src="@drawable/ic_beacon_ibeacon"
+                    app:tint="@color/silabs_dark_gray_icon" />
+
+                <TextView
+                    android:id="@+id/device_type"
+                    style="@style/list_item_card_view_text_info_ellipsized"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="@string/advertiser_setting_beacon_unspecified" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/card_view_vertical_separator_horizontal_margin"
+                android:background="?android:attr/listDivider" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:layout_width="@dimen/card_view_feature_icon_dimension"
+                    android:layout_height="@dimen/card_view_feature_icon_dimension"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="@dimen/space_XXS"
+                    android:contentDescription="@string/advertiser_label_interval"
+                    android:src="@drawable/redesign_ic_bluetooth"
+                    app:tint="@color/silabs_dark_gray_icon" />
+
+                <TextView
+                    android:id="@+id/tv_is_connectable"
+                    style="@style/list_item_card_view_text_info_ellipsized"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/connectible" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

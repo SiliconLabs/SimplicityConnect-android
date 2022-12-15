@@ -1,0 +1,142 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/silabs_white"
+        android:orientation="vertical"
+        android:padding="@dimen/help_text_padding">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="@string/help_text_moreinfo_label"
+            android:textColor="@color/silabs_primary_text"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:id="@+id/silabs_products_wireless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/silabs_blue"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/help_section_and_body_separation"
+            android:fontFamily="sans-serif"
+            android:text="@string/help_text_support_label"
+            android:textColor="@color/silabs_primary_text"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:id="@+id/silabs_support"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/silabs_blue"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/help_section_and_body_separation"
+            android:fontFamily="sans-serif"
+            android:text="@string/help_text_sourcecode_label"
+            android:textColor="@color/silabs_primary_text"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:id="@+id/github_siliconlabs_efrconnect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/silabs_blue"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/help_section_and_body_separation"
+            android:fontFamily="sans-serif"
+            android:text="@string/help_text_users_guide_label"
+            android:textColor="@color/silabs_primary_text"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:id="@+id/users_guide_efrconnect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/silabs_blue"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/help_section_and_body_separation"
+            android:fontFamily="sans-serif"
+            android:text="@string/help_text_release_notes_label"
+            android:textColor="@color/silabs_primary_text"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:id="@+id/docs_silabs_release_notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/silabs_blue"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/help_section_and_body_separation"
+            android:fontFamily="sans-serif"
+            android:text="@string/help_text_documentation_label"
+            android:textColor="@color/silabs_primary_text"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:id="@+id/docs_silabs_bluetooth_latest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/silabs_blue"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/help_section_and_body_separation"
+            android:fontFamily="sans-serif"
+            android:text="@string/help_text_pub_label"
+            android:textColor="@color/silabs_primary_text"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:id="@+id/help_text_playstore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="@string/help_Google_Play_Store_label"
+            android:textColor="@color/silabs_blue"
+            android:textSize="@dimen/help_text_size" />
+
+        <TextView
+            android:id="@+id/dialog_help_version_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/help_body_and_version_separation"
+            android:fontFamily="sans-serif"
+            tools:text="Version X.X.X"
+            android:textSize="@dimen/help_text_size" />
+
+    </LinearLayout>
+</ScrollView>

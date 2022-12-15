@@ -1,17 +1,31 @@
 <resources>
 
-    <style name="AppTheme" parent="BaseAppThemeOverride.Light">
+    <style name="MainAppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="android:windowBackground">@color/gallery</item>
-        <item name="colorAccent">@color/silabs_blue</item>
-        <item name="colorControlHighlight">@color/silabs_click_grey</item>
+
+        <item name="colorPrimary">@color/blue_primary</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimaryDark">@color/blue_primary</item>
+        <item name="colorSecondary">@color/blue_primary</item>
+
         <item name="bottomNavigationStyle">@style/BottomNavigationView</item>
+        <item name="extendedFloatingActionButtonStyle">@style/ExtendedFloatingActionButton</item>
     </style>
 
-    <style name="HeadLine" parent="TextAppearance.AppCompat.Headline">
-        <item name="android:textSize">@dimen/text_size_headline</item>
-        <item name="android:lines">1</item>
-        <item name="android:ellipsize">end</item>
+    <style name="SplashTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_screen_gradient</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
+
+    <style name="FullscreenTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">@color/gallery</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
 
     <style name="Subhead" parent="TextAppearance.AppCompat.Subhead">
         <item name="android:textSize">@dimen/text_size_subhead</item>
@@ -29,7 +43,7 @@
     <style name="SwitchText" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">@dimen/empty_thermo_subheader_text_size</item>
-        <item name="android:textColor">@color/silabs_red</item>
+        <item name="android:textColor">@color/blue_primary</item>
         <item name="android:textAllCaps">true</item>
     </style>
 
@@ -38,18 +52,19 @@
         <item name="android:color">@color/masala</item>
     </style>
 
-    <style name="ThermoGraphTimeText">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:gravity">center</item>
-        <item name="android:textSize">@dimen/thermo_graph_time_text_size</item>
-    </style>
-
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="BottomNavigationView" parent="Widget.Design.BottomNavigationView">
-        <item name="android:background">@android:color/white</item>
+    <style name="ExtendedFloatingActionButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
+        <item name="shapeAppearanceOverlay">@style/ExtendedFloatingActionButton.Shape</item>
+        <item name="materialThemeOverlay">@style/ExtendedFloatingActionButton.Color</item>
+        <item name="backgroundTint">@color/main_action_button_selector</item>
+        <item name="android:paddingVertical">@dimen/extended_fab_padding_vertical</item>
+        <item name="android:paddingHorizontal">@dimen/extended_fab_padding_horizontal</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="android:backgroundTint">@android:color/white</item>
         <item name="android:paddingBottom">@dimen/bottom_navigation_bottom_padding</item>
         <item name="itemBackground">@drawable/bottom_item_selector</item>
         <item name="itemIconTint">@drawable/nav_bar_selector</item>
@@ -61,13 +76,13 @@
 
     <style name="TextAppearance.BottomNavigationViewInactive" parent="">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/silabs_subtle_text</item>
+        <item name="android:textColor">@color/silabs_inactive</item>
         <item name="android:textSize">@dimen/bottom_navigation_text_size</item>
     </style>
 
     <style name="TextAppearance.BottomNavigationViewActive" parent="">
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/silabs_blue</item>
+        <item name="android:textColor">@color/blue_primary</item>
         <item name="android:textSize">@dimen/bottom_navigation_text_size</item>
     </style>
 
@@ -82,14 +97,6 @@
         <item name="android:textColor">@color/silabs_white</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:background">@drawable/btn_rounded_blue</item>
-        <item name="textAllCaps">false</item>
-    </style>
-
-    <style name="ButtonRed" parent="Widget.AppCompat.Button.Colored">
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/silabs_white</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:background">@drawable/btn_rounded_red</item>
         <item name="textAllCaps">false</item>
     </style>
 
@@ -253,11 +260,6 @@
         <item name="android:textSize">@dimen/text_size_ML</item>
     </style>
 
-    <style name="tb_robo_regular_18dp_grey" parent="tb_text_color_grey">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textSize">@dimen/text_size_ML</item>
-    </style>
-
     <style name="tb_robo_regular_14dp_grey" parent="tb_text_color_grey">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textSize">@dimen/text_size_SM</item>
@@ -281,6 +283,194 @@
     <style name="tb_robo_medium_14dp_blue" parent="tb_text_color_blue">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">@dimen/text_size_SM</item>
+    </style>
+
+    <!-- REDESIGN 07/22 -->
+    <style name="full_page_info">
+        <item name="android:textSize">@dimen/full_screen_info_text_size</item>
+        <item name="android:textColor">@color/full_screen_info</item>
+    </style>
+
+    <style name="ExtendedFloatingActionButton.Shape" >
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/extended_fab_corner_size</item>
+    </style>
+
+    <style name="ExtendedFloatingActionButton.Color">
+        <item name="colorOnSecondary">@android:color/white</item>
+    </style>
+
+    <style name="filter_fragment_setting_header">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/filter_header_bold_text_size</item>
+        <item name="android:textColor">@color/silabs_primary_text</item>
+    </style>
+
+    <style name="filter_fragment_status_setting_choices">
+        <item name="android:layoutDirection">rtl</item>
+        <item name="android:textSize">@dimen/filter_checkbox_text_size</item>
+        <item name="android:textColor">@color/silabs_black</item>
+        <item name="android:paddingVertical">@dimen/space_S</item>
+        <item name="android:layout_marginEnd">@dimen/space_XS</item>
+    </style>
+
+    <!-- Dialog styles -->
+    <style name="dialog_card" parent="@style/Theme.MaterialComponents.Dialog">
+        <item name="cardCornerRadius">@dimen/dialog_corner_radius</item>
+    </style>
+
+    <style name="dialog_margins">
+        <item name="android:layout_marginTop">@dimen/dialog_margin_top</item>
+        <item name="android:layout_marginBottom">@dimen/dialog_margin_bottom</item>
+    </style>
+
+    <style name="dialog_title">
+        <item name="android:textSize">@dimen/dialog_title_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/silabs_primary_text</item>
+    </style>
+
+    <style name="dialog_text_info">
+        <item name="android:textSize">@dimen/dialog_text_info_size</item>
+        <item name="android:textColor">@color/silabs_primary_text</item>
+    </style>
+
+    <style name="dialog_button_positive_action" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:backgroundTint">@color/dialog_positive_button_selector</item>
+        <item name="android:textColor">@color/silabs_white</item>
+        <item name="android:textSize">@dimen/dialog_button_text_size</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="dialog_button_neutral_action" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/silabs_primary_text</item>
+        <item name="android:textSize">@dimen/dialog_button_text_size</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="dialog_button_negative_action" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/blue_primary</item>
+        <item name="android:textSize">@dimen/dialog_button_text_size</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+
+
+    <style name="seekbar_range_text_views">
+        <item name="android:layout_width">@dimen/seekbar_range_text_view_width</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingVertical">@dimen/space_XS</item>
+        <item name="android:textSize">@dimen/filter_rssi_min_max_text_size</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:background">@drawable/rssi_min_max_text_border</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="full_line_checkbox_view">
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:layoutDirection">rtl</item>
+        <item name="android:background">@drawable/beacon_filter_background</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+
+    </style>
+
+    <style name="button_external_link" parent="@style/Widget.MaterialComponents.Button.OutlinedButton" >
+        <item name="android:textSize">@dimen/ota_config_dialog_text_size</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="button_with_states" parent="@style/Widget.MaterialComponents.Button" >
+        <item name="android:backgroundTint">@color/main_action_button_selector</item>
+        <item name="android:textSize">@dimen/connect_button_text_size</item>
+    </style>
+
+    <style name="card_view_action_icon" >
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="tint">@color/action_icon</item>
+    </style>
+
+    <style name="info_bar_text_action">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/text_bar_action_size</item>
+        <item name="android:background">?android:selectableItemBackground</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:padding">@dimen/info_bar_padding</item>
+    </style>
+
+    <style name="expand_arrow">
+        <item name="android:padding">4dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="tint">@color/blue_primary</item>
+    </style>
+
+    <style name="edit_text_box">
+        <item name="android:background">@drawable/edit_text_box</item>
+        <item name="android:paddingHorizontal">@dimen/space_XS</item>
+        <item name="android:paddingVertical">@dimen/space_S</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="edit_text_content">
+        <item name="android:background">@android:color/transparent</item> <!-- to remove default "underscore" -->
+        <item name="android:textSize">@dimen/edit_text_text_size</item>
+        <item name="android:textColor">@color/blue_primary</item>
+        <item name="android:textColorHint">@color/blue_primary</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="property_text_view">
+        <item name="android:textSize">@dimen/property_icon_text_size</item>
+        <item name="android:textColor">@color/silabs_black</item>
+    </style>
+
+    <!-- List items -->
+    <style name="list_item_card_view_box">
+        <item name="cardCornerRadius">@dimen/card_view_corner_radius</item>
+        <item name="android:background">@color/list_item_card_view_box</item>
+    </style>
+
+    <style name="list_item_card_view_container_margins">
+        <item name="android:layout_marginHorizontal">@dimen/card_view_margin_horizontal</item>
+        <item name="android:layout_marginTop">@dimen/card_view_margin_vertical</item>
+    </style>
+
+    <style name="list_item_card_view_details_container">
+        <item name="android:background">@color/list_item_card_view_details</item>
+    </style>
+
+    <style name="list_item_card_view_title">
+        <item name="android:textSize">@dimen/card_view_title_size</item>
+        <item name="android:textColor">@color/blue_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="list_item_card_view_title_not_ellipsized">
+        <item name="android:textSize">@dimen/card_view_title_size</item>
+        <item name="android:textColor">@color/blue_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="list_item_card_view_text_info">
+        <item name="android:textSize">@dimen/card_view_text_info_size</item>
+        <item name="android:textColor">@color/silabs_primary_text</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="list_item_card_view_text_info_ellipsized" parent="list_item_card_view_text_info">
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="list_item_card_view_text_info_subtle">
+        <item name="android:textSize">@dimen/card_view_text_info_size</item>
+        <item name="android:textColor">@color/silabs_subtle_text</item>
+        <item name="android:fontFamily">sans-serif</item>
     </style>
 
 </resources>

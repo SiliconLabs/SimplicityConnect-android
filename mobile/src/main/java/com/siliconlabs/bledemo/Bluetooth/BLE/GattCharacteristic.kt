@@ -1,10 +1,10 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
 import android.bluetooth.BluetoothGattCharacteristic
 import androidx.annotation.StringRes
-import com.siliconlabs.bledemo.Bluetooth.BLE.Values.ByteArrayValue
-import com.siliconlabs.bledemo.Bluetooth.BLE.Values.TemperatureValue
-import com.siliconlabs.bledemo.Bluetooth.BLE.Values.ValueFactory
+import com.siliconlabs.bledemo.bluetooth.ble.values.ByteArrayValue
+import com.siliconlabs.bledemo.bluetooth.ble.values.TemperatureValue
+import com.siliconlabs.bledemo.bluetooth.ble.values.ValueFactory
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.utils.UuidUtils.parseIntFromUuidStart
 import java.util.*
@@ -131,7 +131,6 @@ enum class GattCharacteristic {
         this.format = format
         valueFactory = null
         uuid = UUID.fromString(String.format(Locale.US, FORMAT_STR, number))
-        BluetoothLEGatt.GATT_CHARACTER_DESCS.put(number, this)
     }
 
     constructor(number: Int, type: String, valueFactory: ValueFactory<*>?) {
@@ -140,7 +139,6 @@ enum class GattCharacteristic {
         format = -1
         this.valueFactory = valueFactory
         uuid = UUID.fromString(String.format(Locale.US, FORMAT_STR, number))
-        BluetoothLEGatt.GATT_CHARACTER_DESCS.put(number, this)
     }
 
     constructor(uuid: String?, type: String, format: Int = 0, customNameId: Int? = null) {
@@ -149,13 +147,7 @@ enum class GattCharacteristic {
         this.format = format
         valueFactory = null
         this.uuid = UUID.fromString(uuid)
-        BluetoothLEGatt.GATT_CHARACTER_DESCS.put(number, this)
         this.customNameId = customNameId
-    }
-
-    fun <T> createValue(valueBytes: BluetoothGattCharacteristic?): T {
-        checkNotNull(valueFactory) { "valueFactory is null" }
-        return valueFactory.create(valueBytes!!) as T
     }
 
     companion object {

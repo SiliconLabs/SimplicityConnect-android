@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <!-- to enable release push -->
@@ -18,118 +19,77 @@
         android:required="true" />
 
     <application
-        android:name=".Application.SiliconLabsDemoApplication"
+        android:name=".application.SiliconLabsDemoApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/efr_redesign_launcher"
         android:label="@string/app_name_EFR_Connect"
         android:requestLegacyExternalStorage="true"
-        android:theme="@style/AppTheme">
+        android:supportsRtl="true"
+        android:theme="@style/MainAppTheme">
         <activity
-            android:name=".gatt_configurator.activities.GattConfiguratorActivity"
-            android:label="@string/title_GATT_Configurator" />
-        <activity
-            android:name=".gatt_configurator.activities.GattServerActivity"
+            android:name="com.siliconlabs.bledemo.features.configure.gatt_configurator.activities.GattServerActivity"
             android:label="@string/title_new_GATT_Server" />
         <activity
-            android:name=".Advertiser.Activities.AdvertiserConfigActivity"
+            android:name="com.siliconlabs.bledemo.features.configure.advertiser.activities.AdvertiserConfigActivity"
             android:label="@string/title_Advertiser" />
         <activity
-            android:name=".Advertiser.Activities.AdvertiserActivity"
-            android:label="@string/title_Advertiser" />
+            android:name="com.siliconlabs.bledemo.features.scan.browser.activities.UuidDictionaryActivity"
+            android:label="@string/title_uuid_dictionary" />
         <activity
-            android:name=".Browser.Activities.MappingDictionaryActivity"
-            android:label="@string/title_Mappings_dictionary" />
-        <activity
-            android:name=".HealthThermometer.Activities.HealthThermometerActivity"
+            android:name="com.siliconlabs.bledemo.features.demo.health_thermometer.activities.HealthThermometerActivity"
             android:label="@string/title_Health_Thermometer"
-            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".blinky.activities.BlinkyActivity"
+            android:name="com.siliconlabs.bledemo.features.demo.blinky.activities.BlinkyActivity"
             android:label="@string/title_Blinky"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ConnectedLighting.Activities.ConnectedLightingActivity"
+            android:name="com.siliconlabs.bledemo.features.demo.connected_lighting.activities.ConnectedLightingActivity"
             android:label="@string/title_Connected_Lighting"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".RangeTest.Activities.RangeTestActivity"
+            android:name="com.siliconlabs.bledemo.features.demo.range_test.activities.RangeTestActivity"
             android:label="@string/title_Range_Test"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".throughput.activities.ThroughputActivity"
+            android:name="com.siliconlabs.bledemo.features.demo.throughput.activities.ThroughputActivity"
             android:label="@string/title_Throughput"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".wifi_commissioning.activities.WifiCommissioningActivity"
+            android:name="com.siliconlabs.bledemo.features.demo.wifi_commissioning.activities.WifiCommissioningActivity"
             android:label="@string/wifi_commissioning_label"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:screenOrientation="portrait" />
 
-        <service android:name=".Bluetooth.Services.BluetoothService" />
-        <service android:name=".Advertiser.Services.AdvertiserService" />
+        <service android:name=".bluetooth.services.BluetoothService"
+            android:exported="true"/>
+        <service android:name="com.siliconlabs.bledemo.features.configure.advertiser.services.AdvertiserService"
+            android:exported="true"/>
 
-        <receiver android:name=".Bluetooth.Services.BluetoothService$Receiver">
-            <intent-filter>
-                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
-                <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED" />
-            </intent-filter>
-        </receiver>
+        <service android:name="com.siliconlabs.bledemo.features.scan.browser.services.ShareLogServices"
+            android:exported="true"/>
 
         <activity
-            android:name=".MainMenu.Activities.MainMenuActivity"
-            android:label="@string/app_name_EFR_Connect"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <service android:name=".Bluetooth.Services.BluetoothLeService" />
-        <service android:name=".Browser.Services.ShareLogServices" />
-
+            android:name="com.siliconlabs.bledemo.features.scan.browser.activities.DeviceServicesActivity"
+            android:screenOrientation="portrait" />
         <activity
-            android:name=".Browser.Activities.BrowserActivity"
-            android:label="@string/title_Browser"
-            android:parentActivityName=".MainMenu.Activities.MainMenuActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".Browser.Activities.DeviceServicesActivity"
-            android:label="@string/title_Browser"
-            android:parentActivityName=".Browser.Activities.BrowserActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".iop_test.activities.IOPTestActivity"
+            android:name="com.siliconlabs.bledemo.features.iop_test.activities.IOPTestActivity"
             android:label="@string/title_Interoperability_Test"
-            android:parentActivityName=".iop_test.activities.IOPTestActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:screenOrientation="portrait" />
         <activity
-            android:name=".motion.activities.MotionActivity"
+            android:name="com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.activities.MotionActivity"
             android:label="@string/motion_demo_title"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".environment.activities.EnvironmentActivity"
+            android:name="com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.activities.EnvironmentActivity"
             android:label="@string/environment_demo_title"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".blinky_thunderboard.activities.BlinkyThunderboardActivity"
+            android:name="com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.activities.BlinkyThunderboardActivity"
             android:label="@string/title_Blinky"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".rssi_graph.activities.RssiGraphActivity"
-            android:label="@string/rssi_graph_label"
             android:screenOrientation="portrait" />
 
         <provider
@@ -141,13 +101,28 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"/>
         </provider>
-        <!--
- ATTENTION: This was auto-generated to add Google Play services to your project for
-     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
-        -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+
+        <!-- REDESIGN 07/22 -->
+        <activity android:name=".home_screen.activities.MainActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop" >
+        </activity>
+
+        <activity android:name=".home_screen.activities.SplashActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".features.configure.advertiser.activities.PendingServerConnectionActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/FullscreenTheme" >
+        </activity>
+
     </application>
 
 </manifest>

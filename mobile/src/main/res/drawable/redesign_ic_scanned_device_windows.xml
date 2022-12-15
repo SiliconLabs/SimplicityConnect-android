@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/card_view_main_icon_dimension"
+    android:height="@dimen/card_view_main_icon_dimension"
+    android:viewportWidth="34"
+    android:viewportHeight="34">
+  <path
+      android:pathData="M17,17m-17,0a17,17 0,1 1,34 0a17,17 0,1 1,-34 0"
+      android:fillColor="@color/list_item_card_view_icon_background"/>
+  <path
+      android:pathData="M10.5,10.5h6v6h-6z"
+      android:fillColor="@color/list_item_card_view_icon_foreground"/>
+  <path
+      android:pathData="M10.5,17.5h6v6h-6z"
+      android:fillColor="@color/list_item_card_view_icon_foreground"/>
+  <path
+      android:pathData="M17.5,10.5h6v6h-6z"
+      android:fillColor="@color/list_item_card_view_icon_foreground"/>
+  <path
+      android:pathData="M17.5,17.5h6v6h-6z"
+      android:fillColor="@color/list_item_card_view_icon_foreground"/>
+</vector>

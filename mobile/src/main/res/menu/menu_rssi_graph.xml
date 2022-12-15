@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/rssi_csv_export"
+        android:title="@string/button_export"
+        android:icon="@drawable/redesign_ic_menu_export"
+        app:iconTint="@color/menu_icon"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/rssi_filter_icon"
+        android:title="@string/button_filter"
+        android:icon="@drawable/redesign_ic_menu_scanner_filter"
+        app:iconTint="@color/menu_icon"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/rssi_sort_icon"
+        android:title="@string/button_sort"
+        android:icon="@drawable/redesign_ic_menu_scanner_sort"
+        app:iconTint="@color/menu_icon"
+        app:showAsAction="ifRoom" />
+
+</menu>

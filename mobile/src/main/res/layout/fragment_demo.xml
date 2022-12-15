@@ -1,9 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainMenu.Fragments.DemoFragment">
+    android:orientation="vertical"
+    tools:context=".home_screen.fragments.DemoFragment">
+
+    <com.siliconlabs.bledemo.home_screen.views.LocationPermissionBar
+        android:id="@+id/location_permission_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.siliconlabs.bledemo.home_screen.views.BluetoothEnableBar
+        android:id="@+id/bluetooth_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.siliconlabs.bledemo.home_screen.views.LocationEnableBar
+        android:id="@+id/location_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_demo_menu"
@@ -12,4 +34,4 @@
         android:padding="4dp"
         android:splitMotionEvents="false" />
 
-</FrameLayout>
+</LinearLayout>

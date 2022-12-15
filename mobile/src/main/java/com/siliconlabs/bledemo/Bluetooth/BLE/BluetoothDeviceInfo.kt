@@ -1,47 +1,27 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
 import android.bluetooth.BluetoothDevice
 import android.util.Log
-import com.siliconlabs.bledemo.BeaconUtils.BleFormat
-import com.siliconlabs.bledemo.BeaconUtils.BleFormat.Companion.getFormat
+import androidx.core.util.isEmpty
+import com.siliconlabs.bledemo.bluetooth.beacon_utils.BleFormat
+import com.siliconlabs.bledemo.bluetooth.beacon_utils.BleFormat.Companion.getFormat
 import java.util.*
 import kotlin.math.min
 
-open class BluetoothDeviceInfo : Cloneable {
-    lateinit var device: BluetoothDevice
+class BluetoothDeviceInfo(var device: BluetoothDevice, var isFavorite: Boolean = false) : Cloneable {
 
-    protected var hasAdvertDetails = false
-    private var connected = false
+    var connectionState = ConnectionState.DISCONNECTED
     var isConnectable = false
-    var serviceDiscoveryFailed = false
-    var areServicesBeingDiscovered = false
-    var isNotOfInterest = false
-    var isOfInterest = false
 
-    private var bleFormat: BleFormat? = null
+    var bleFormat: BleFormat? = null
     var scanInfo: ScanResultCompat? = null
     var rawData: String? = null
-    var gattHandle: Any? = null
 
     var intervalNanos = 0L
     var count = 0
     var timestampLast: Long = 0
 
 
-    fun hasUnknownStatus(): Boolean {
-        return !serviceDiscoveryFailed && !isNotOfInterest && !isOfInterest
-    }
-
-    fun isUnDiscovered(): Boolean {
-        return gattHandle == null && hasUnknownStatus()
-    }
-
-    fun discover(bluetoothLEGatt: BluetoothLEGatt?) {
-        isOfInterest = false
-        isNotOfInterest = isOfInterest
-        serviceDiscoveryFailed = isNotOfInterest
-        gattHandle = bluetoothLEGatt
-    }
 
     public override fun clone(): BluetoothDeviceInfo {
         val retVal: BluetoothDeviceInfo
@@ -49,28 +29,23 @@ open class BluetoothDeviceInfo : Cloneable {
             retVal = super.clone() as BluetoothDeviceInfo
             retVal.device = device
             retVal.scanInfo = scanInfo
-            retVal.isOfInterest = isOfInterest
-            retVal.isNotOfInterest = isNotOfInterest
-            retVal.serviceDiscoveryFailed = serviceDiscoveryFailed
             retVal.bleFormat = bleFormat
-            retVal.gattHandle = null
-            retVal.connected = connected
+            retVal.connectionState = connectionState
             retVal.isConnectable = isConnectable
+            retVal.isFavorite = isFavorite
             retVal.rawData = rawData
-            retVal.hasAdvertDetails = hasAdvertDetails
-            retVal.areServicesBeingDiscovered = areServicesBeingDiscovered
             return retVal
         } catch (e: CloneNotSupportedException) {
             Log.e("clone", "Could not clone$e")
         }
-        return BluetoothDeviceInfo()
+        return BluetoothDeviceInfo(device)
     }
 
     override fun equals(other: Any?): Boolean {
         if (other !is BluetoothDeviceInfo) {
             return false
         }
-        return device == other.device && isOfInterest == other.isOfInterest && isNotOfInterest == other.isNotOfInterest && serviceDiscoveryFailed == other.serviceDiscoveryFailed
+        return device == other.device
     }
 
     override fun hashCode(): Int {
@@ -81,8 +56,9 @@ open class BluetoothDeviceInfo : Cloneable {
         return scanInfo.toString()
     }
 
-    fun getBleFormat(): BleFormat {
-        if (bleFormat == null) {
+    fun getBleFormat(shouldCheckAgain: Boolean): BleFormat {
+        if (bleFormat == null || shouldCheckAgain) {
+            // device can be programmed to advertise changing data, switching between BLE formats
             bleFormat = getFormat(this)
         }
         return bleFormat!!
@@ -103,24 +79,42 @@ open class BluetoothDeviceInfo : Cloneable {
 
 
     val advertData: ArrayList<String?>
-        get() = if (scanInfo != null) {
-            scanInfo?.advertData!!
-        } else ArrayList()
-
-    fun setConnected(connected: Boolean) {
-        this.connected = connected
-    }
+        get() = scanInfo?.advertData ?: arrayListOf()
 
     var rssi: Int
-        get() = scanInfo?.rssi!!
+        get() = scanInfo?.rssi ?: 0
         set(rssi) {
             scanInfo?.rssi = rssi
         }
 
-    val name: String?
-        get() = device.name
+    val name: String
+        get() = device.name ?: "N/A"
 
-    val address: String?
+    val address: String
         get() = device.address
+
+    val manufacturer: DeviceManufacturer
+        get() = scanInfo?.scanRecord?.manufacturerSpecificData?.let {
+            if (it.isEmpty()) DeviceManufacturer.UNKNOWN
+            else when (it.keyAt(0)) {
+                MANUFACTURER_VALUE_WINDOWS -> DeviceManufacturer.WINDOWS
+                else -> DeviceManufacturer.UNKNOWN
+            }
+        } ?: DeviceManufacturer.UNKNOWN
+
+    enum class DeviceManufacturer {
+        WINDOWS,
+        UNKNOWN
+    }
+
+    enum class ConnectionState {
+        CONNECTED,
+        CONNECTING,
+        DISCONNECTED
+    }
+
+    companion object {
+        private const val MANUFACTURER_VALUE_WINDOWS = 6
+    }
 
 }

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.siliconlabs.bledemo.home_screen.views.LocationPermissionBar
+        android:id="@+id/location_permission_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.siliconlabs.bledemo.home_screen.views.BluetoothEnableBar
+        android:id="@+id/bluetooth_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.siliconlabs.bledemo.home_screen.views.LocationEnableBar
+        android:id="@+id/location_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/active_filters_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/space_XS"
+        android:paddingHorizontal="12dp"
+        android:visibility="gone"
+        android:background="@color/silabs_white"
+        android:textColor="@color/silabs_black"
+        android:maxLines="1"
+        android:ellipsize="end"
+        tools:text="> 50 dBm, connectible"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/rssi_label_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_SM"
+            android:visibility="visible"
+            android:layout_gravity="center"
+            android:paddingVertical="24dp"
+            android:textSize="@dimen/text_size_L"
+            android:textColor="@color/silabs_subtle_text"
+            android:text="@string/rssi_graph_scan_not_started_label" />
+
+        <HorizontalScrollView
+            android:id="@+id/rssi_label_with_devices"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:scrollbars="none"
+            android:visibility="gone" >
+
+            <!-- needed for properly displaying all labels of scanned devices -->
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rssi_legend_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+            </RelativeLayout>
+        </HorizontalScrollView>
+    </LinearLayout>
+
+    <com.siliconlabs.bledemo.common.views.HorizontalShadow
+        android:id="@+id/browser_shadow_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="75" >
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/rssi_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="24dp"/>
+
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="4dp">
+
+        <ImageView
+            android:layout_height="32dp"
+            android:layout_width="32dp"
+            android:id="@+id/rssi_graph_time_arrow_start"
+            android:visibility="invisible"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/ic_chevron_left"
+            app:tint="@color/silabs_black" />
+
+        <ImageView
+            android:id="@+id/rssi_graph_time_arrow_end"
+            android:layout_height="32dp"
+            android:layout_width="32dp"
+            android:visibility="invisible"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_chevron_left"
+            app:tint="@color/silabs_black"
+            android:rotation="180" />
+
+    </RelativeLayout>
+
+    <com.siliconlabs.bledemo.common.views.MainActionButton
+        android:id="@+id/rssi_graph_btn_scanning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="@dimen/extended_fab_margin"
+        android:layout_marginBottom="@dimen/extended_fab_margin"
+        android:text="@string/button_start_scanning" />
+
+</LinearLayout>

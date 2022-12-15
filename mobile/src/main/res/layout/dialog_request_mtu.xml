@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    style="@style/dialog_card" >
+
+    <LinearLayout
+        style="@style/dialog_margins"
+        android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            style="@style/dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
+            android:text="@string/request_mtu" />
+
+
+        <TextView
+            style="@style/dialog_text_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/space_SM"
+            android:text="@string/request_mtu_description" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/requested_mtu_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_XS"
+                android:layout_gravity="center_horizontal"
+                android:textSize="14sp"
+                android:textColor="@color/blue_primary"
+                android:text="@string/min_mtu_value" />
+
+                <SeekBar
+                    android:id="@+id/request_mtu_seekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/space_XS"
+                    android:background="@drawable/seekbar_background"
+                    android:paddingVertical="@dimen/space_S"
+                    android:layout_gravity="center_vertical" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_XS">
+
+                <TextView
+                    style="@style/seekbar_range_text_views"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/mtu_min"
+                    android:fontFamily="sans-serif" />
+
+                <TextView
+                    style="@style/seekbar_range_text_views"
+                    android:layout_alignParentEnd="true"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/mtu_max" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/dialog_button_margin_top"
+            android:layout_marginHorizontal="@dimen/dialog_margin_horizontal_plus_button_margin_end"
+            android:gravity="end">
+
+            <Button android:id="@+id/cancel_request"
+                style="@style/dialog_button_negative_action"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="@dimen/dialog_margin_between_buttons"
+                android:text="@string/button_cancel" />
+
+            <Button android:id="@+id/request"
+                style="@style/dialog_button_positive_action"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="@dimen/dialog_button_margin_end"
+                android:text="@string/Request" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

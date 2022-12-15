@@ -3,68 +3,37 @@
 
     <!-- Styles -->
     <dimen name="text_size_increased_twice">26sp</dimen>
-    <dimen name="text_size_headline">24sp</dimen>
     <dimen name="text_size_subhead">17sp</dimen>
 
     <!-- Health thermometer mode-->
     <dimen name="thermo_graph_padding">36dp</dimen>
-    <dimen name="thermo_graph_spacing">74dp</dimen>
-    <dimen name="thermo_graph_line_margin">20dp</dimen>
     <dimen name="thermo_graph_time_text_size">16sp</dimen>
-    <dimen name="thermo_graph_temp_primary_text_size">32sp</dimen>
-    <dimen name="thermo_graph_temp_secondary_text_size">20sp</dimen>
-    <dimen name="thermo_graph_temp_margin">14dp</dimen>
-    <dimen name="thermo_padding">@dimen/thermo_graph_padding</dimen>
-    <dimen name="thermo_padding_extra">24dp</dimen>
-    <dimen name="thermo_large_temp_primary_text_size">140sp</dimen>
-    <dimen name="thermo_large_temp_secondary_text_size">70sp</dimen>
+    <dimen name="thermo_large_temp_primary_text_size">112sp</dimen>
+    <dimen name="thermo_large_temp_secondary_text_size">56sp</dimen>
     <dimen name="thermo_label_text_size">16sp</dimen>
     <dimen name="thermo_value_text_size">24sp</dimen>
-    <dimen name="empty_thermo_header_text_size">32sp</dimen>
     <dimen name="empty_thermo_subheader_text_size">24sp</dimen>
-    <dimen name="empty_thermo_header_margin">35dp</dimen>
-    <dimen name="empty_thermo_subheader_margin">18dp</dimen>
-    <dimen name="thermo_actions_padding">130dp</dimen>
-    <dimen name="thermo_red_bar_padding">24dp</dimen>
 
     <!-- Debug Mode -->
-    <dimen name="characteristic_text_left_margin">5dp</dimen>
-    <dimen name="ad_dialog_extra_ad_info_scroll_height">275dp</dimen>
-    <dimen name="ad_dialog_extra_ad_info_textview_padding">15dp</dimen>
-    <dimen name="ad_dialog_extra_ad_info_text_size">16sp</dimen>
     <dimen name="about_bluegiga_dialog_height">350dp</dimen>
-    <dimen name="help_dialog_title_text_size">18sp</dimen>
 
     <!-- Dialog: about silicon labs blue gecko -->
     <dimen name="about_blue_giga_dialog_title_height">50dp</dimen>
     <dimen name="about_blue_giga_dialog_close_btn_height">50dp</dimen>
 
     <!-- Dialog: write characteristic (spinner for enumerated values/textfields for raw) -->
-    <dimen name="characteristic_dialog_header_padding_bottom">15dp</dimen>
-    <dimen name="characteristic_dialog_header_padding_top">15dp</dimen>
-    <dimen name="characteristic_spinner_dialog_header_padding_right">20dp</dimen>
     <dimen name="characteristic_spinner_dialog_spinner_scroll_height">250dp</dimen>
-    <dimen name="encoded_values_horizontal_margin">5dp</dimen>
-    <dimen name="encoded_label_text_size">12sp</dimen>
     <dimen name="encoded_value_text_size">14sp</dimen>
-    <dimen name="encoded_label_width">50dp</dimen>
     <dimen name="dialog_writable_fields_container_padding">25dp</dimen>
 
     <!-- Dialog: select device (health thermometer) -->
-    <dimen name="device_selection_max_height">700dp</dimen>
-    <integer name="device_selection_columns">1</integer>
     <dimen name="device_selection_item_padding">16dp</dimen>
     <dimen name="device_selection_item_margin">16dp</dimen>
 
     <!-- Dialog: write characteristic raw val/enumerated val as spinner -->
-    <dimen name="characteristic_write_dialog_width">440dp</dimen>
 
     <!-- Dialog: advertisement details -->
-    <dimen name="advertisement_details_title_padding_left">20dp</dimen>
-    <dimen name="advertisement_details_title_padding_top">20dp</dimen>
     <dimen name="advertisement_details_title_text_size">18sp</dimen>
-    <dimen name="advertisement_details_device_name_padding_left">20dp</dimen>
-    <dimen name="advertisement_details_device_name_padding_bottom">15dp</dimen>
     <dimen name="advertisement_details_device_name_padding_top">5dp</dimen>
     <dimen name="advertisement_details_device_name_text_size">16sp</dimen>
 
@@ -88,33 +57,10 @@
     <dimen name="dialog_loading_card_height">140dp</dimen>
     <dimen name="dialog_loading_card_corner_radius">5dp</dimen>
     <dimen name="dialog_loading_card_elevation">6dp</dimen>
-    <dimen name="dialog_loading_card_padding">10dp</dimen>
     <dimen name="dialog_loading_image_and_text_spacing">10dp</dimen>
 
-    <!-- Devices list/Device item-->
-    <dimen name="swipe_refresh_devices_horizontal_padding">80dp</dimen>
-
-    <!-- Characteristic item -->
-    <dimen name="characteristic_item_container_padding">5dp</dimen>
-    <dimen name="characteristic_info_text_margin_left">8dp</dimen>
-    <dimen name="characteristic_property_padding_right">8dp</dimen>
-    <dimen name="service_info_container_margin_left">10dp</dimen>
-    <dimen name="services_spacing">10dp</dimen>
-
     <!-- Scanning state help message-->
-    <dimen name="no_devices_found_label_top_margin">10dp</dimen>
     <dimen name="scanning_animation_bar_height">64dp</dimen>
-    <dimen name="scanning_animation_bar_textsize">20sp</dimen>
-    <dimen name="device_scanning_bgnd_graphic_text_spacing">20dp</dimen>
-
-    <!-- General list item devices/services/characteristics -->
-    <dimen name="list_item_extra_vertical_padding">12dp</dimen>
-
-    <!-- General-->
-    <dimen name="item_margin">24dp</dimen>
-
-    <!-- Other/misc-->
-    <dimen name="bluetooth_enable_bar_padding">10dp</dimen>
 
     <!-- Tablet only dimens -->
     <dimen name="tablet_dialog_help_demo_item_width">450dp</dimen>
@@ -122,9 +68,5 @@
     <!-- Programmatically generated views -->
     <dimen name="characteristic_list_item_value_text_size">16sp</dimen>
     <dimen name="characteristic_list_item_value_label_text_size">14sp</dimen>
-    <dimen name="characteristic_property_text_size">12sp</dimen>
-
-    <!-- Toolbar common dimensions -->
-    <dimen name="toolbar_min_height">80dp</dimen>
 
 </resources>

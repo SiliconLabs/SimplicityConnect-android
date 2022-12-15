@@ -1,35 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Browser.Fragment.FilterFragment">
-
-    <com.siliconlabs.bledemo.Views.HorizontalShadow
-        android:id="@+id/browser_shadow_top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    android:background="@android:color/white"
+    android:orientation="vertical">
 
     <ScrollView
         android:id="@+id/scrollview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/view_separator">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="@dimen/filters_margin_horizontal">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp">
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/search_packet_name_container"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/filter_fragment_setting_header"
+                android:text="@string/filter_search_label" />
+
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:layout_margin="8dp"
-                android:background="@drawable/search_box_background"
-                android:gravity="center_vertical"
+                android:layout_height="1dp"
+                android:layout_marginVertical="@dimen/space_XS"
+                android:background="@color/silabs_black" />
+
+            <LinearLayout android:id="@+id/search_packet_name_container"
+                style="@style/edit_text_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/space_XS"
+                android:layout_marginTop="@dimen/space_XS"
+                android:layout_marginBottom="@dimen/space_SM"
                 android:orientation="horizontal">
+
+                <EditText android:id="@+id/et_search_device_name"
+                    style="@style/edit_text_content"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="@string/filter_edit_text_search_criteria"
+                    android:imeOptions="actionDone"
+                    android:inputType="text" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -37,368 +56,172 @@
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
                     android:src="@drawable/ic_search_off"
+                    android:contentDescription="@string/content_desc_search_icon"
                     app:tint="#333333" />
 
-                <EditText
-                    android:id="@+id/et_search_device_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:gravity="center_vertical"
-                    android:hint="@string/Search_by_device_name_or_address"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:paddingStart="2dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="0dp"
-                    android:paddingBottom="8dp"
-                    android:singleLine="true"
-                    android:textColor="@color/silabs_primary_text"
-                    android:textColorHint="@color/silabs_primary_text"
-                    android:textSize="@dimen/filter_edit_search_text_size" />
+            </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/iv_clear_device_name"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/filter_fragment_setting_header"
+                android:text="@string/RSSI" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="@dimen/space_XS"
+                android:background="@color/silabs_black"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_SM">
+
+                <TextView
+                    android:id="@+id/tv_rssi_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:src="@drawable/ic_small_x"
-                    android:visibility="gone" />
-            </LinearLayout>
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/space_XSS"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/filter_rssi_not_set"
+                    android:textColor="@color/blue_primary"
+                    android:textSize="@dimen/filter_rssi_value_text_size" />
+
+                <SeekBar
+                    android:id="@+id/sb_rssi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_rssi_value"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:max="@integer/rssi_value_range"
+                    android:paddingVertical="@dimen/space_S"
+                    android:background="@drawable/seekbar_background"
+                    android:progressTint="@color/seekbar_progress"
+                    android:thumbTint="@color/blue_primary" />
+
+                <TextView
+                    style="@style/seekbar_range_text_views"
+                    android:id="@+id/textview_seekbar_min"
+                    android:layout_below="@id/sb_rssi"
+                    android:text="@string/filter_seekbar_min" />
+
+                <TextView
+                    style="@style/seekbar_range_text_views"
+                    android:id="@+id/textview_seekbar_max"
+                    android:layout_below="@id/sb_rssi"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/filter_seekbar_max" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/textview_beacon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/filter_fragment_setting_header"
+                android:text="@string/Beacon_Type" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="@dimen/space_XS"
+                android:background="@color/silabs_black"/>
 
             <LinearLayout
-                android:id="@+id/search_packet_content_container"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:layout_below="@id/search_packet_name_container"
-                android:layout_margin="8dp"
-                android:background="@drawable/search_box_background"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_SM">
 
-                <ImageView
-                    android:layout_width="wrap_content"
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/beacon_type_unspecified"
+                    style="@style/full_line_checkbox_view"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:src="@drawable/ic_search_off"
-                    app:tint="#333333" />
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/advertiser_setting_beacon_unspecified" />
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/beacon_type_iBeacon"
+                    style="@style/full_line_checkbox_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/ibeacon"/>
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/beacon_type_altBeacon"
+                    style="@style/full_line_checkbox_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/alt_beacon"/>
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/beacon_type_eddystone"
+                    style="@style/full_line_checkbox_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/eddystone" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="0x"
-                    android:textColor="@color/silabs_primary_text"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/et_search_packet_content"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:digits="0123456789abcdefABCDEF"
-                    android:gravity="center_vertical"
-                    android:hint="@string/Search_by_raw_advertising_data"
-                    android:imeOptions="actionSearch"
-                    android:maxLines="1"
-                    android:paddingStart="2dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="0dp"
-                    android:paddingBottom="8dp"
-                    android:singleLine="true"
-                    android:textColor="@color/silabs_primary_text"
-                    android:textColorHint="@color/silabs_primary_text"
-                    android:textSize="@dimen/filter_edit_search_text_size" />
-
-                <ImageView
-                    android:id="@+id/iv_clear_packet_content"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:src="@drawable/ic_small_x"
-                    android:visibility="gone" />
             </LinearLayout>
 
-            <RelativeLayout
-                android:id="@+id/relativelayout_rssi"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/search_packet_content_container"
-                android:layout_margin="8dp"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/imageview_rssi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_wifi"
-                    app:tint="@color/silabs_primary_icon" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/imageview_rssi"
-                    android:fontFamily="sans-serif-medium"
-                    android:padding="8dp"
-                    android:text="@string/RSSI"
-                    android:textColor="@color/silabs_primary_text"
-                    android:textSize="@dimen/filter_header_bold_text_size" />
-            </RelativeLayout>
-
-
             <TextView
-                android:id="@+id/tv_rssi_value"
+                android:id="@+id/textview_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/relativelayout_rssi"
-                android:layout_centerHorizontal="true"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/min_dBm"
-                android:textColor="@color/silabs_blue"
-                android:textSize="@dimen/filter_rssi_value_text_size" />
+                style="@style/filter_fragment_setting_header"
+                android:text="@string/filter_status_label" />
 
-            <SeekBar
-                android:id="@+id/sb_rssi"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_rssi_value"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:progressTint="@color/silabs_blue"
-                android:thumbTint="@color/silabs_blue" />
+                android:layout_height="1dp"
+                android:layout_marginVertical="@dimen/space_XS"
+                android:background="@color/silabs_black"/>
 
-
-            <TextView
-                android:id="@+id/textview_seekbar_min"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/sb_rssi"
-                android:layout_marginStart="16dp"
-                android:layout_marginBottom="8dp"
-                android:text="-100"
-                android:textSize="@dimen/filter_rssi_min_max_text_size" />
-
-            <TextView
-                android:id="@+id/textview_seekbar_max"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/sb_rssi"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/zero"
-                android:textSize="@dimen/filter_rssi_min_max_text_size" />
-
-
-            <RelativeLayout
-                android:id="@+id/relativelayout_beacon"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/textview_seekbar_max"
-                android:layout_margin="8dp">
+                android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/imageview_beacon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_beacon"
-                    app:tint="@color/silabs_primary_icon" />
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cb_only_favourites"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/only_favorites"
+                    style="@style/filter_fragment_status_setting_choices"/>
 
-                <TextView
-                    android:id="@+id/textview_beacon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/imageview_beacon"
-                    android:fontFamily="sans-serif-medium"
-                    android:padding="8dp"
-                    android:text="@string/Beacon_Type"
-                    android:textColor="@color/silabs_primary_text"
-                    android:textSize="@dimen/filter_header_bold_text_size" />
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cb_only_connectable"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/only_connectible"
+                    style="@style/filter_fragment_status_setting_choices" />
 
-                <ImageView
-                    android:id="@+id/iv_beacon_arrow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_arrow_up_on"
-                    android:tag="ARROW_UP" />
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cb_only_bonded"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/only_bonded"
+                    style="@style/filter_fragment_status_setting_choices" />
 
-            </RelativeLayout>
+            </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_beacon_type"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_below="@id/relativelayout_beacon"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:scrollbars="vertical" />
-
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/cb_only_favourites"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_below="@id/rv_beacon_type"
-                android:layout_margin="8dp"
-                android:layout_marginStart="10dp"
-                android:gravity="start|center_vertical"
-                android:paddingStart="@dimen/dialog_device_filter_title_padding_horizontal"
-                android:paddingEnd="@dimen/dialog_device_filter_title_padding_horizontal"
-                android:text="@string/Only_Favourites"
-                android:textColor="@color/silabs_subtle_text"
-                android:textSize="@dimen/filter_checkbox_text_size" />
-
-
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/cb_only_connectable"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_below="@id/cb_only_favourites"
-                android:layout_margin="8dp"
-                android:gravity="start|center_vertical"
-                android:paddingStart="@dimen/dialog_device_filter_title_padding_horizontal"
-                android:paddingEnd="@dimen/dialog_device_filter_title_padding_horizontal"
-                android:text="@string/Only_Connectable"
-                android:textColor="@color/silabs_subtle_text"
-                android:textSize="@dimen/filter_checkbox_text_size" />
-
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/cb_only_bonded"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_below="@id/cb_only_connectable"
-                android:layout_margin="8dp"
-                android:gravity="start|center_vertical"
-                android:paddingStart="@dimen/dialog_device_filter_title_padding_horizontal"
-                android:paddingEnd="@dimen/dialog_device_filter_title_padding_horizontal"
-                android:text="@string/Only_Bonded"
-                android:textColor="@color/silabs_subtle_text"
-                android:textSize="@dimen/filter_checkbox_text_size" />
-
-            <RelativeLayout
-                android:id="@+id/relativelayout_saved_searches"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/cb_only_bonded"
-                android:layout_margin="8dp">
-
-                <ImageView
-                    android:id="@+id/imageview_save"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_save" />
-
-                <TextView
-                    android:id="@+id/textview_save"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/imageview_save"
-                    android:fontFamily="sans-serif-medium"
-                    android:padding="8dp"
-                    android:text="@string/Saved_Searches"
-                    android:textColor="@color/silabs_primary_text"
-                    android:textSize="@dimen/filter_header_bold_text_size" />
-
-                <ImageView
-                    android:id="@+id/iv_save_arrow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_arrow_up_on"
-                    android:tag="ARROW_UP" />
-
-            </RelativeLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_saved_searches"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_below="@id/relativelayout_saved_searches"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:scrollbars="vertical" />
-
-        </RelativeLayout>
+        </LinearLayout>
 
     </ScrollView>
 
-    <View
-        android:id="@+id/view_separator"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_above="@id/relativelayout_bottom"
-        android:background="@color/silabs_secondary_background" />
-
-    <RelativeLayout
-        android:id="@+id/relativelayout_bottom"
-        android:layout_width="match_parent"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_apply_filters"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp">
-
-        <Button
-            android:id="@+id/btn_search"
-            style="@style/ButtonBlue"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_margin="4dp"
-            android:text="@string/button_search" />
-
-        <Button
-            android:id="@+id/btn_save"
-            style="@style/ButtonBorderlessBlue"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="4dp"
-            android:layout_toEndOf="@id/btn_search"
-            android:text="@string/button_save" />
-
-        <Button
-            android:id="@+id/btn_reset"
-            style="@style/ButtonBorderlessBlue"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/btn_save"
-            android:text="@string/button_reset" />
-
-        <ImageView
-            android:id="@+id/iv_close"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:padding="10dp"
-            android:src="@drawable/ic_small_x" />
-    </RelativeLayout>
-</RelativeLayout>
+        android:textAllCaps="false"
+        android:layout_gravity="center"
+        android:paddingVertical="@dimen/space_S"
+        app:backgroundTint="@color/blue_primary"
+        android:layout_marginVertical="16dp"
+        android:text="@string/filter_btn_apply_filters" />
+</LinearLayout>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@color/blue_primary"
+    android:layout_height="@dimen/scanning_animation_bar_height">
+
+    <TextView
+        android:id="@+id/connecting_label_textview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:textColor="@color/silabs_white"
+        android:textSize="@dimen/connecting_bar_text_size"
+        tools:text="@string/debug_mode_device_selection_connecting_bar"/>
+
+    <LinearLayout
+        android:id="@+id/translation_animation_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="@dimen/scanning_animation_bar_height"
+            android:src="@drawable/bar_animation_indicator"
+            android:contentDescription="@string/content_desc_translation_anim_indicator"/>
+    </LinearLayout>
+</RelativeLayout>

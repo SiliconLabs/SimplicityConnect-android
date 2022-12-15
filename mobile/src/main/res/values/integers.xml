@@ -6,4 +6,8 @@
     <integer name="led0_on">1</integer>
     <integer name="led1_on">4</integer>
 
+    <integer name="rssi_value_range">130</integer>
+    <integer name="mtu_min_value">23</integer>
+    <integer name="mtu_max_value">250</integer>
+
 </resources>

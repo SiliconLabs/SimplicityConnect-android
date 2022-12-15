@@ -121,53 +121,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/ll_advertising_interval_low_api"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:orientation="horizontal">
-
-            <TextView
-                style="@style/TitleSmall"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/advertiser_label_advertising_interval"
-                android:textColor="@color/silabs_subtle_text" />
-
-            <Spinner
-                android:id="@+id/sp_advertising_interval_low_api"
-                style="@style/CustomSpinner"
-                android:layout_width="150dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_tx_power_low_api"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:orientation="horizontal">
-
-            <TextView
-                style="@style/TitleSmall"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/advertiser_label_tx_power"
-                android:textColor="@color/silabs_subtle_text" />
-
-            <Spinner
-                android:id="@+id/sp_tx_power_low_api"
-                style="@style/CustomSpinner"
-                android:layout_width="150dp" />
-        </LinearLayout>
-
         <TextView
             style="@style/TextViewNoteInfo"
             android:layout_width="wrap_content"

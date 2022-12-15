@@ -1,7 +1,6 @@
 package com.siliconlabs.bledemo.utils
 
-import android.view.MenuItem
-import com.siliconlabs.bledemo.Browser.Models.Logs.Log
+import com.siliconlabs.bledemo.features.scan.browser.models.logs.Log
 import java.util.*
 
 object Constants {
@@ -9,9 +8,5 @@ object Constants {
     const val BOTTOM_NAVI_DEVELOP = "Develop"
     const val BOTTOM_NAVI_DEMO = "Demo"
 
-    var LOGS: MutableList<Log> = LinkedList()
-    var ota_button: MenuItem? = null
-    fun clearLogs() {
-        LOGS.clear()
-    }
+    var LOGS: List<Log> = LinkedList()
 }

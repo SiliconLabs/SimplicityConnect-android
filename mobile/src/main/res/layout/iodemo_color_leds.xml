@@ -70,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.siliconlabs.bledemo.blinky_thunderboard.ui.ColorLEDs
+                <com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.ui.ColorLEDs
                     android:id="@+id/iodemo_color_leds"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/color_led_height" />
@@ -97,7 +97,7 @@
 
                 style="@style/block">
 
-                <com.siliconlabs.bledemo.blinky_thunderboard.ui.HueBackgroundView
+                <com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.ui.HueBackgroundView
                     android:id="@+id/iodemo_hue_background"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/space_SM"

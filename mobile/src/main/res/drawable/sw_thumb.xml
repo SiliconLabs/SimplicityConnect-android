@@ -1,14 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <layer-list>
-            <item android:bottom="2dp" android:left="2dp" android:right="2dp" android:top="2dp">
-                <shape android:shape="rectangle">
-                    <solid android:color="@color/silabs_white" />
-                    <size android:width="20dp" android:height="20dp" />
-                    <corners android:radius="3dp" />
-                </shape>
-            </item>
-        </layer-list>
+    <item
+        android:state_enabled="true"
+        android:state_checked="true">
+        <shape android:shape="oval">
+            <size
+                android:height="@dimen/switch_height"
+                android:width="@dimen/switch_height" />
+            <solid android:color="@color/silabs_white" />
+            <stroke
+                android:width="@dimen/switch_border_width"
+                android:color="@color/silabs_blue" />
+        </shape>
+    </item>
+
+    <item
+        android:state_enabled="true"
+        android:state_checked="false">
+        <shape android:shape="oval">
+            <size
+                android:height="@dimen/switch_height"
+                android:width="@dimen/switch_height"/>
+            <solid android:color="@color/silabs_white" />
+            <stroke
+                android:width="@dimen/switch_border_width"
+                android:color="@color/silabs_ripple_blue"/>
+        </shape>
+    </item>
+
+    <item
+        android:state_enabled="false"
+        android:state_checked="false">
+        <shape android:shape="oval">
+            <size
+                android:height="@dimen/switch_height"
+                android:width="@dimen/switch_height"/>
+            <solid android:color="@color/thumb_disabled" />
+        </shape>
     </item>
 </selector>

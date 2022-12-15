@@ -2,17 +2,15 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/writable_container_top_margin">
+    android:layout_marginTop="@dimen/space_XS">
 
     <TextView
         android:id="@+id/characteristic_field_value"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:textSize="@dimen/characteristic_list_item_value_text_size"
         android:background="@color/silabs_white"
         android:textColor="@color/silabs_primary_text"
@@ -20,10 +18,8 @@
 
     <TextView
         android:id="@id/characteristic_field_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/writable_container_bottom_margin"
-
         android:textSize="@dimen/characteristic_list_item_value_label_text_size"
         android:background="@color/silabs_white"
         android:textColor="@color/silabs_subtle_text"

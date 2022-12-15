@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:id="@+id/fragment_main_view"
+        layout="@layout/fragment_main_view"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="1" />
+
+    <com.siliconlabs.bledemo.features.configure.gatt_configurator.views.ExportBar
+        android:id="@+id/bottom_bar_export"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+
+</LinearLayout>

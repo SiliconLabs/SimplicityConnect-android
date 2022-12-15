@@ -1,58 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp">
+    style="@style/dialog_card">
 
     <LinearLayout
+        style="@style/dialog_margins"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/silabs_dialog_title_background"
+        android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
         android:orientation="vertical">
 
         <TextView
-            style="@style/DialogHeaderText"
+            style="@style/dialog_title"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
             android:text="@string/Location_service" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/silabs_transparent" />
-
-        <ScrollView
+        <TextView
+            style="@style/dialog_text_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/white">
+            android:fontFamily="sans-serif"
+            android:text="@string/location_service_info" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:padding="24dp"
-                android:text="@string/location_service_info"
-                android:textColor="@color/silabs_primary_text"
-                android:textSize="14sp" />
-
-        </ScrollView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button android:id="@+id/btn_ok"
+            style="@style/dialog_button_neutral_action"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/dialog_button_margin_top"
+            android:layout_marginEnd="@dimen/dialog_button_margin_end"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/button_ok" />
 
-            <Button
-                android:id="@+id/btn_ok"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/btn_red_selector"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/button_ok"
-                android:textColor="@color/silabs_white"
-                android:textSize="@dimen/dialog_location_service_button_text_size" />
-        </LinearLayout>
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>

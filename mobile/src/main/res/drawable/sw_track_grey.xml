@@ -18,7 +18,7 @@
             <size
                 android:width="30dp"
                 android:height="20dp" />
-            <solid android:color="@color/silabs_track_gray" />
+            <solid android:color="@color/blue_primary" />
             <corners android:radius="20dp" />
         </shape>
     </item>

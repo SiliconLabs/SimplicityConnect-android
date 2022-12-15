@@ -1,6 +1,6 @@
 package com.siliconlabs.bledemo.utils
 
-import com.siliconlabs.bledemo.Bluetooth.Parsing.Consts
+import com.siliconlabs.bledemo.bluetooth.parsing.Consts
 import java.util.*
 
 object UuidUtils {

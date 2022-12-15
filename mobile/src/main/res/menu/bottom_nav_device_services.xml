@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/services_nav_remote"
+        android:icon="@drawable/redesign_ic_device_navigation_client"
+        android:title="@string/services_nav_remote" />
+    <item
+        android:id="@+id/services_nav_local"
+        android:icon="@drawable/redesign_ic_device_navigation_server"
+        android:title="@string/services_nav_local" />
+</menu>

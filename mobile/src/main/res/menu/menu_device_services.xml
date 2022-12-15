@@ -4,38 +4,22 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/bond_manage"
-        android:orderInCategory="96"
-        android:text="@string/create_bond"
-        android:title="@string/create_bond"
-        android:visible="false"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/refresh_services"
-        android:orderInCategory="97"
-        android:text="@string/Refresh_Services"
-        android:title="@string/Refresh_Services"
-        android:visible="true"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/request_mtu"
-        android:orderInCategory="98"
-        android:text="@string/Request_MTU"
-        android:title="@string/Request_MTU"
-        android:visible="true"
-        app:showAsAction="never" />
+        android:id="@+id/show_logs"
+        android:title="@string/logs"
+        android:icon="@drawable/redesign_ic_menu_device_services_logs"
+        app:iconTint="@color/menu_icon"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/request_priority"
-        android:orderInCategory="99"
-        android:text="@string/Connection_Interval"
-        android:title="@string/Connection_Interval"
-        android:visible="true"
-        app:showAsAction="never" />
+        android:title="@string/connection_interval"
+        android:icon="@drawable/redesign_ic_menu_device_services_connection_interval"
+        app:iconTint="@color/menu_icon"
+        app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/OTA_button"
-        android:orderInCategory="100"
-        android:text="@string/OTA_DFU"
-        android:title="@string/OTA_DFU"
-        android:visible="false"
-        app:showAsAction="never" />
+        android:id="@+id/request_mtu"
+        android:title="@string/request_mtu"
+        android:icon="@drawable/redesign_ic_menu_device_services_mtu"
+        app:iconTint="@color/menu_icon"
+        app:showAsAction="ifRoom" />
+
 </menu>

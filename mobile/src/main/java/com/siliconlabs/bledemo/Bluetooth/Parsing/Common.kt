@@ -14,17 +14,17 @@
  * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
  */
-package com.siliconlabs.bledemo.Bluetooth.Parsing
+package com.siliconlabs.bledemo.bluetooth.parsing
 
+import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
-import com.google.common.math.IntMath.pow
-import com.siliconlabs.bledemo.Bluetooth.BLE.GattCharacteristic
-import com.siliconlabs.bledemo.Bluetooth.BLE.GattService
+import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
+import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Property
 import com.siliconlabs.bledemo.utils.Converters.calculateDecimalValue
 import com.siliconlabs.bledemo.utils.Converters.getDecimalValue
 import com.siliconlabs.bledemo.utils.Converters.getTwosComplementFromUnsignedInt
-import timber.log.Timber
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -87,20 +87,17 @@ object Common {
         return uuida.compareTo(uuidb) == 0
     }
 
-    // Gets properties as human readable text
-    fun getProperties(context: Context, properties: Int): String {
-        var props = StringBuilder()
-        val propertyNames = context.resources.getStringArray(R.array.properties_array)
-        for (i in 0..7) {
-            if (properties shr i and 1 != 0) {
-                props.append(propertyNames[i]).append(", ")
-            }
-        }
-        // remove last comma
-        if (props.isNotEmpty()) {
-            props = StringBuilder(props.substring(0, props.length - 2))
-        }
-        return props.toString()
+    fun getPropertiesList(propertiesEncoding: Int) : MutableList<Property> {
+        return (mutableListOf<Property>().apply {
+            if (propertiesEncoding and BluetoothGattCharacteristic.PROPERTY_BROADCAST != 0) add(Property.BROADCAST)
+            if (propertiesEncoding and BluetoothGattCharacteristic.PROPERTY_EXTENDED_PROPS != 0) add(Property.EXTENDED_PROPS)
+            if (propertiesEncoding and BluetoothGattCharacteristic.PROPERTY_INDICATE != 0) add(Property.INDICATE)
+            if (propertiesEncoding and BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0) add(Property.NOTIFY)
+            if (propertiesEncoding and BluetoothGattCharacteristic.PROPERTY_READ != 0) add(Property.READ)
+            if (propertiesEncoding and BluetoothGattCharacteristic.PROPERTY_WRITE != 0) add(Property.WRITE)
+            if (propertiesEncoding and BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE != 0) add(Property.WRITE_WITHOUT_RESPONSE)
+            if (propertiesEncoding and BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE != 0) add(Property.RELIABLE_WRITE)
+        })
     }
 
     // Checks if given property is set
@@ -181,10 +178,15 @@ object Common {
     }
 
     private fun checkForCustomServiceName(uuid: UUID?, context: Context): String {
-        return context.getString(GattService.values()
-                .find { it.number == uuid }?.
-                customNameId ?: R.string.unknown_service
+        return context.getString(GattService.values().find { it.number == uuid }
+                ?.customNameId ?: R.string.unknown_service
         )
+    }
+
+    fun getCustomServiceName(uuid: UUID?, context: Context) : String? {
+        return GattService.values().find { it.number == uuid }?.customNameId?.let {
+            context.getString(it)
+        }
     }
 
     private fun checkForCustomCharacteristicName(uuid: UUID?, context: Context): String {
@@ -192,6 +194,12 @@ object Common {
                 .find { it.uuid == uuid }
                 ?.customNameId ?: R.string.unknown_characteristic_label
         )
+    }
+
+    fun getCustomCharacteristicName(uuid: UUID?, context: Context): String? {
+        return GattCharacteristic.values().find { it.uuid == uuid }?.customNameId?.let {
+            context.getString(it)
+        }
     }
 
     enum class PropertyType(val value: Int) {

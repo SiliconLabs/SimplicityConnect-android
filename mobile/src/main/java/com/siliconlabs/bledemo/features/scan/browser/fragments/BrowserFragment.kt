@@ -1,0 +1,543 @@
+/*
+ * Bluegiga’s Bluetooth Smart Android SW for Bluegiga BLE modules
+ * Contact: support@bluegiga.com.
+ *
+ * This is free software distributed under the terms of the MIT license reproduced below.
+ *
+ * Copyright (c) 2013, Bluegiga Technologies
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files ("Software")
+ * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF
+ * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A  PARTICULAR PURPOSE.
+ */
+package com.siliconlabs.bledemo.features.scan.browser.fragments
+
+import android.bluetooth.*
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.TextUtils
+import android.view.*
+import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
+import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
+import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes.getDeviceDisconnectedMessage
+import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes.getFailedConnectingToDeviceMessage
+import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
+import com.siliconlabs.bledemo.features.scan.browser.*
+import com.siliconlabs.bledemo.features.scan.browser.adapters.DebugModeDeviceAdapter
+import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.utils.SharedPrefUtils
+import com.siliconlabs.bledemo.features.scan.browser.fragments.*
+import com.siliconlabs.bledemo.features.scan.browser.view_states.ScannerFragmentViewState
+import com.siliconlabs.bledemo.databinding.FragmentBrowserBinding
+import com.siliconlabs.bledemo.home_screen.activities.MainActivity
+import com.siliconlabs.bledemo.common.other.CardViewListDecoration
+import com.siliconlabs.bledemo.home_screen.base.BaseMainMenuFragment
+import com.siliconlabs.bledemo.home_screen.fragments.ScanFragment
+import com.siliconlabs.bledemo.home_screen.base.ViewPagerFragment
+import com.siliconlabs.bledemo.features.scan.browser.activities.DeviceServicesActivity
+import com.siliconlabs.bledemo.features.scan.browser.activities.UuidDictionaryActivity
+import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
+import com.siliconlabs.bledemo.features.scan.browser.adapters.DebugModeCallback
+import kotlinx.android.synthetic.main.fragment_browser.*
+
+class BrowserFragment : BaseMainMenuFragment(),
+        OnRefreshListener {
+
+    private lateinit var viewModel: ScanFragmentViewModel
+    private lateinit var viewBinding: FragmentBrowserBinding
+    private lateinit var bluetoothService: BluetoothService
+
+    private lateinit var sharedPrefUtils: SharedPrefUtils
+    private var devicesAdapter: DebugModeDeviceAdapter? = null
+    private lateinit var handler: Handler
+
+    private var deviceToConnect: BluetoothDeviceInfo? = null
+    private var blockConnectionAttempts = false
+
+    override fun onBluetoothStateChanged(isOn: Boolean) {
+        toggleBluetoothBar(isOn, viewBinding.bluetoothBar)
+        viewBinding.btnScanning.isEnabled = isOn
+
+        viewModel.let {
+            it.setIsScanningOn(isOn)
+            if (!isOn) {
+                it.reset()
+                it.shouldResetChart = true
+            }
+        }
+    }
+
+    override fun onLocationStateChanged(isOn: Boolean) {
+        toggleLocationBar(isOn, viewBinding.locationBar)
+    }
+
+    override fun onLocationPermissionStateChanged(isGranted: Boolean) {
+        viewBinding.apply {
+            toggleLocationPermissionBar(isGranted, locationPermissionBar)
+            btnScanning.isEnabled = isGranted
+        }
+    }
+
+    private val viewPagerFragmentListener = object : ViewPagerFragment.ViewPagerListener {
+        override fun refreshPage() {
+            getScanFragment().apply {
+                viewModel.updateConnectionStates()
+                setScanFragmentListener(scanFragmentListener)
+                refreshViewState(viewModel.getScannerFragmentViewState())
+            }
+        }
+    }
+
+    private val  scanFragmentListener = object: ScanFragment.ScanFragmentListener{
+        override fun onScanningStateChanged(isOn: Boolean) {
+            toggleMainView(isOn, viewModel.isAnyDeviceDiscovered.value ?: false)
+            toggleScanningButton(isOn)
+            toggleRefreshInfoRunnable(isOn)
+
+            if (!isOn) handler.removeCallbacks(refreshScanRunnable)
+        }
+    }
+
+
+    private val refreshScanRunnable = Runnable {
+        viewModel.let {
+            if (!it.getIsScanningOn()) {
+                it.setIsScanningOn(true)
+            } else {
+                getScanFragment().toggleScannerState(true)
+            }
+        }
+    }
+
+    private fun getScanFragment() = (parentFragment as ViewPagerFragment).getScanFragment()
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        viewModel = getScanFragment().viewModel
+        bluetoothService = (activity as MainActivity).bluetoothService!!
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View {
+        setHasOptionsMenu(true)
+        viewBinding = FragmentBrowserBinding.inflate(inflater)
+        return viewBinding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        activity?.title = getString(R.string.fragment_scan_label)
+        sharedPrefUtils = SharedPrefUtils(requireContext())
+        handler = Handler(Looper.getMainLooper())
+
+        observeChanges()
+        setUiListeners()
+
+        initFullPageInfoViews()
+        initDevicesRecyclerView()
+        initSwipeRefreshLayout()
+
+        (activity as MainActivity).onScanFragmentPrepared()
+        viewBinding.locationBar.setLocationInfoFragmentManager(childFragmentManager)
+
+        bluetoothService.apply {
+            registerGattServerCallback(gattServerCallback)
+            registerGattCallback(gattCallback)
+        }
+    }
+
+
+    private fun initFullPageInfoViews() {
+        viewBinding.lookingForDevicesBackground.apply {
+            image.setImageResource(R.drawable.redesign_ic_main_view_browser_scanning)
+            textPrimary.text = getString(R.string.device_scanning_background_message)
+            textSecondary.visibility = View.GONE
+        }
+    }
+
+    private fun observeChanges() {
+        viewModel.apply {
+            filteredDevices.observe(viewLifecycleOwner, Observer {
+                devicesAdapter?.updateDevices(getBluetoothInfoViewsState())
+            })
+            isAnyDeviceDiscovered.observe(viewLifecycleOwner, Observer {
+                toggleMainView(getIsScanningOn(), it)
+            })
+            deviceToInsert.observe(viewLifecycleOwner, Observer {
+                devicesAdapter?.addNewDevice(it)
+            })
+            activeFiltersDescription.observe(viewLifecycleOwner, Observer {
+                toggleFilterDescriptionView(it)
+            })
+        }
+    }
+
+    private fun toggleMainView(isScanningOn: Boolean, isAnyDeviceDiscovered: Boolean) {
+        viewBinding.apply {
+            if (isAnyDeviceDiscovered) {
+                rvDebugDevices.visibility = View.VISIBLE
+                lookingForDevicesBackground.root.visibility = View.GONE
+            } else {
+                rvDebugDevices.visibility = View.GONE
+                lookingForDevicesBackground.apply {
+                    root.visibility = View.VISIBLE
+                    if (isScanningOn) {
+                        image.setImageResource(R.drawable.redesign_ic_main_view_browser_scanning)
+                        textPrimary.text = getString(R.string.device_scanning_background_message)
+                    } else {
+                        image.setImageResource(R.drawable.graphic_loading)
+                        textPrimary.text = getString(R.string.no_devices_found_title_copy)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun toggleFilterDescriptionView(description: String?) {
+        viewBinding.activeFiltersDescription.apply {
+            description?.let {
+                visibility = View.VISIBLE
+                text = it
+            } ?: run { visibility = View.GONE }
+        }
+    }
+
+    private fun toggleRefreshInfoRunnable(isOn: Boolean) {
+        handler.let {
+            if (isOn) {
+                it.removeCallbacks(updateScanInfoRunnable)
+                it.postDelayed(updateScanInfoRunnable, SCAN_UPDATE_PERIOD)
+            }
+            else it.removeCallbacks(updateScanInfoRunnable)
+        }
+    }
+
+    private val updateScanInfoRunnable = object : Runnable {
+        override fun run() {
+            devicesAdapter?.updateDevices(viewModel.getBluetoothInfoViewsState())
+            handler.postDelayed(this, SCAN_UPDATE_PERIOD)
+        }
+    }
+
+    private fun setUiListeners() {
+        viewBinding.btnScanning.setOnClickListener { viewModel.toggleScanningState() }
+    }
+/*
+    private fun changeToolbarSortIcon(mode: SortMode) {
+        viewBinding.bluetoothBrowserToolbar.ivSort.apply {
+            setImageDrawable(ContextCompat.getDrawable(requireContext(), mode.resId))
+            if (btToolbarOpenedName == ToolbarName.SORT) {
+                DrawableCompat.setTint(drawable, ContextCompat.getColor(requireContext(), R.color.silabs_blue))
+            }
+        }
+    }
+*/
+
+    override fun onResume() {
+        super.onResume()
+        bluetoothService.apply {
+            registerGattServerCallback(gattServerCallback)
+            registerGattCallback(gattCallback)
+        }
+
+        viewBinding.btnScanning.visibility = View.VISIBLE
+        (parentFragment as ViewPagerFragment).setViewPagerFragmentListener(viewPagerFragmentListener)
+    }
+
+    private fun refreshViewState(viewState: ScannerFragmentViewState) {
+        toggleMainView(viewState.isScanningOn, viewState.devicesToShow.isNotEmpty())
+        toggleScanningButton(viewState.isScanningOn)
+        devicesAdapter?.updateDevices(viewState.devicesToShow)
+    }
+
+    private fun toggleScanningButton(isScanningOn: Boolean) {
+        viewBinding.btnScanning.apply {
+            text = getString(
+                    if (isScanningOn) R.string.button_stop_scanning
+                    else R.string.button_start_scanning
+            )
+            setIsActionOn(isScanningOn)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        bluetoothService.apply {
+            unregisterGattServerCallback()
+            unregisterGattCallback()
+        }
+    }
+/*
+    override fun onBackPressed() {
+        if (connecting_container.visibility == View.VISIBLE) {
+            Log.d("onBackPressed", "Called")
+            hideConnectingAnimation()
+        } else {
+            super.onBackPressed()
+        }
+    }
+*/
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
+        inflater.inflate(R.menu.menu_browser, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_filter -> {
+                viewModel.setIsFilterViewOn(true)
+                true
+            }
+            R.id.menu_sort -> {
+                viewModel.let { model ->
+                    devicesAdapter?.let { adapter ->
+                        model.sortDevices()
+                        adapter.updateDevices(model.getBluetoothInfoViewsState(), withMoves = true)
+                        viewBinding.rvDebugDevices.scrollToPosition(0)
+                        Toast.makeText(requireContext(), getString(R.string.devices_sorted_by_descending_rssi),
+                                Toast.LENGTH_SHORT).show()
+                    }
+                }
+                true
+            }
+            R.id.menu_uuid_dictionary -> {
+                startActivity(Intent(requireContext(), UuidDictionaryActivity::class.java))
+                true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onRefresh() {
+        if (activityViewModel?.getIsBluetoothOn() == true &&
+                activityViewModel?.getIsLocationPermissionGranted() == true) {
+            getScanFragment().toggleScannerState(false)
+
+            viewModel.apply {
+                reset()
+                shouldResetChart = true
+                setTimestamps()
+            }
+
+            toggleScanningButton(true)
+            toggleMainView(isScanningOn = true, isAnyDeviceDiscovered = false)
+
+            handler.removeCallbacks(refreshScanRunnable)
+            handler.postDelayed(refreshScanRunnable, RESTART_SCAN_TIMEOUT)
+        } else {
+            if (activityViewModel?.getIsBluetoothOn() != true) {
+                Toast.makeText(requireContext(), getString(R.string.bluetooth_disabled), Toast.LENGTH_SHORT).show()
+            } else if (activityViewModel?.getIsLocationPermissionGranted() != true) {
+                Toast.makeText(requireContext(), getString(R.string.location_permission_not_granted), Toast.LENGTH_SHORT).show()
+            }
+        }
+        viewBinding.swipeRefreshContainer.post { viewBinding.swipeRefreshContainer.isRefreshing = false }
+    }
+
+    private fun initDevicesRecyclerView() {
+        devicesAdapter = DebugModeDeviceAdapter(mutableListOf(), debugModeCallback)
+        viewBinding.rvDebugDevices.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            addItemDecoration(CardViewListDecoration())
+            adapter = devicesAdapter
+        }
+    }
+
+    private fun initSwipeRefreshLayout() {
+        viewBinding.swipeRefreshContainer.apply {
+            setOnRefreshListener(this@BrowserFragment)
+            setColorSchemeColors(
+                    ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark),
+                    ContextCompat.getColor(requireContext(), android.R.color.holo_orange_dark),
+                    ContextCompat.getColor(requireContext(), android.R.color.holo_orange_light),
+                    ContextCompat.getColor(requireContext(), android.R.color.holo_red_light)
+            )
+        }
+    }
+
+    private fun showConnectingAnimation() {
+        activity?.runOnUiThread {
+            viewBinding.apply {
+                btnScanning.visibility = View.GONE
+                flyInBar.visibility = View.VISIBLE
+                flyInBar.startFlyInAnimation(getString(R.string.debug_mode_device_selection_connecting_bar))
+            }
+        }
+    }
+
+    private fun hideConnectingAnimation() {
+        activity?.runOnUiThread {
+            devicesAdapter?.notifyDataSetChanged()
+            viewBinding.apply {
+                flyInBar.clearBarAnimation()
+                flyInBar.visibility = View.GONE
+                btnScanning.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private val gattCallback = object : TimeoutGattCallback() {
+        override fun onTimeout() {
+            Toast.makeText(requireContext(), getString(R.string.toast_connection_timed_out), Toast.LENGTH_SHORT).show()
+            hideConnectingAnimation()
+            deviceToConnect = null
+        }
+
+        override fun onMaxRetriesExceeded(gatt: BluetoothGatt) {
+            handleDisconnection(gatt, status = 133)
+        }
+
+        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+            super.onConnectionStateChange(gatt, status, newState)
+            activity?.runOnUiThread {
+                viewModel.updateActiveConnections(bluetoothService.getActiveConnections())
+            }
+
+            when (newState) {
+                BluetoothGatt.STATE_CONNECTED -> {
+                    if (status == BluetoothGatt.GATT_SUCCESS) handleSuccessfulConnection(gatt)
+                }
+                BluetoothGatt.STATE_DISCONNECTED -> {
+                    when (status) {
+                        133 -> {
+                            (activity as MainActivity).showMessage(R.string.connection_failed_reconnecting)
+                            showConnectingAnimation()
+                        }
+                        else -> handleDisconnection(gatt, status)
+                    }
+                }
+            }
+        }
+
+    }
+
+    private fun handleSuccessfulConnection(gatt: BluetoothGatt) {
+        hideConnectingAnimation()
+        if (bluetoothService.isGattConnected()) {
+            deviceToConnect?.let { bluetoothService.updateConnectionInfo(it) }
+            viewModel.setDeviceConnectionState(gatt.device.address, BluetoothDeviceInfo.ConnectionState.CONNECTED)
+
+            handler.removeCallbacks(startActivityRunnable)
+            handler.postDelayed(startActivityRunnable, START_ACTIVITY_DELAY)
+            blockConnectionAttempts = true
+        }
+    }
+
+    private fun handleDisconnection(gatt: BluetoothGatt, status: Int) {
+        hideConnectingAnimation()
+        viewModel.setDeviceConnectionState(gatt.device.address, BluetoothDeviceInfo.ConnectionState.DISCONNECTED)
+        activity?.runOnUiThread {
+            val deviceName = if (TextUtils.isEmpty(gatt.device.name)) getString(R.string.not_advertising_shortcut) else gatt.device.name
+            if (deviceToConnect != null && deviceToConnect?.address!! == gatt.device.address) {
+                deviceToConnect = null
+                Toast.makeText(requireContext(), getFailedConnectingToDeviceMessage(deviceName, status), Toast.LENGTH_LONG).show()
+            } else {
+                (activity as MainActivity).showLongMessage(
+                        if (status == 0) getString(R.string.device_disconnected_successfully, getDeviceName(gatt))
+                        else getDeviceDisconnectedMessage(deviceName, status)
+                )
+            }
+        }
+    }
+
+    private val startActivityRunnable = Runnable {
+        deviceToConnect?.let {
+            Intent(requireContext(), DeviceServicesActivity::class.java).apply {
+                putExtra(DeviceServicesActivity.CONNECTED_DEVICE, it.device)
+            }.also {
+                activityResultCallback.launch(it)
+            }
+        }
+        deviceToConnect = null
+        blockConnectionAttempts = false
+    }
+
+    private val activityResultCallback =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == DeviceServicesActivity.REFRESH_INFO_RESULT_CODE) {
+                result.data?.let { intent ->
+                    val device = intent.getParcelableExtra<BluetoothDevice>(
+                            DeviceServicesActivity.CONNECTED_DEVICE)
+                    val connectionState = intent.getIntExtra(
+                            DeviceServicesActivity.CONNECTION_STATE,
+                            BluetoothGatt.STATE_DISCONNECTED)
+                    device?.let { viewModel.refreshConnectedDeviceInfo(device, connectionState) }
+                }
+            }
+        }
+
+    /* Getting connection from other device when on BrowserFragment */
+    private val gattServerCallback = object : BluetoothGattServerCallback() {
+        override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
+            super.onConnectionStateChange(device, status, newState)
+            if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
+                if (!bluetoothService.isAnyConnectionPending() && !blockConnectionAttempts) {
+                    deviceToConnect = BluetoothDeviceInfo(device)
+                    bluetoothService.connectGatt(device, requestRssiUpdates = true)
+                }
+            }
+        }
+    }
+
+    private val debugModeCallback = object : DebugModeCallback {
+        override fun connectToDevice(position: Int, deviceInfo: BluetoothDeviceInfo) {
+            if (viewModel.getIsScanningOn()) {
+                viewModel.setIsScanningOn(false)
+            }
+
+            viewModel.setDeviceConnectionState(position, connectionState = BluetoothDeviceInfo.ConnectionState.CONNECTING)
+            deviceToConnect = deviceInfo
+            showConnectingAnimation()
+
+            handler.postDelayed({
+                bluetoothService.connectGatt(deviceInfo.device, true, gattCallback)
+            }, ANIMATION_DELAY)
+        }
+
+        override fun disconnectDevice(position: Int, device: BluetoothDevice) {
+            viewModel.setDeviceConnectionState(position, connectionState = BluetoothDeviceInfo.ConnectionState.DISCONNECTED)
+            bluetoothService.disconnectGatt(device.address)
+        }
+
+        override fun addToFavorites(deviceAddress: String) {
+            viewModel.toggleIsFavorite(deviceAddress)
+            sharedPrefUtils.addDeviceToFavorites(deviceAddress)
+        }
+
+        override fun removeFromFavorites(deviceAddress: String) {
+            viewModel.toggleIsFavorite(deviceAddress)
+            sharedPrefUtils.removeDeviceFromFavorites(deviceAddress)
+        }
+
+
+        override fun toggleViewExpansion(position: Int) {
+            viewModel.toggleViewExpansion(position)
+        }
+    }
+
+    private fun getDeviceName(gatt: BluetoothGatt) : String {
+        return gatt.device.name ?: getString(R.string.not_advertising_shortcut)
+    }
+
+
+    companion object {
+        private const val RESTART_SCAN_TIMEOUT = 1000L
+        private const val SCAN_UPDATE_PERIOD = 1000L //ms
+        private const val START_ACTIVITY_DELAY = 250L
+        private const val ANIMATION_DELAY = 1000L // give time to display animation
+    }
+}

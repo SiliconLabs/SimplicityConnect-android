@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.tabs.TabLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabMode="fixed">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tab_iop_test" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <com.siliconlabs.bledemo.home_screen.views.LocationPermissionBar
+        android:id="@+id/location_permission_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.siliconlabs.bledemo.home_screen.views.BluetoothEnableBar
+        android:id="@+id/bluetooth_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.siliconlabs.bledemo.home_screen.views.LocationEnableBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/location_bar"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <include
+        android:id="@+id/fragment_main_view"
+        layout="@layout/fragment_main_view" />
+
+</LinearLayout>

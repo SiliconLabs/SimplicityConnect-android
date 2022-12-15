@@ -16,8 +16,8 @@
             android:height="@dimen/dialog_loading_spinner_diameter" />
 
         <gradient
-            android:centerColor="@color/silabs_red"
-            android:endColor="@color/silabs_red_dark"
+            android:centerColor="@color/blue_primary"
+            android:endColor="@color/spinner_end_gradient"
             android:startColor="@color/dialog_loading_spinner_start"
             android:type="sweep"
             android:useLevel="false" />

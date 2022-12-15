@@ -1,9 +1,8 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
-import android.os.Build
-import com.siliconlabs.bledemo.Bluetooth.Parsing.ScanRecordParser
+import com.siliconlabs.bledemo.bluetooth.parsing.ScanRecordParser
 import com.siliconlabs.bledemo.utils.Constants.NA
 import com.siliconlabs.bledemo.utils.Objects.toString
 import java.util.*
@@ -16,7 +15,7 @@ class ScanResultCompat {
     var rssi = 0
     var scanRecord: ScanRecordCompat? = null
     var timestampNanos: Long = 0
-    lateinit var advertData: ArrayList<String?>
+    var advertData: ArrayList<String?> = arrayListOf()
 
     var isConnectable = false
     var isLegacy = true
@@ -41,28 +40,23 @@ class ScanResultCompat {
     }
 
     companion object {
-        fun from(lollipopScanResult: Any?): ScanResultCompat? {
-            if (lollipopScanResult == null) {
-                return null
-            }
-
-            val sr = lollipopScanResult as ScanResult
+        fun from(scanResult: ScanResult): ScanResultCompat {
 
             return ScanResultCompat().apply {
-                device = sr.device
-                rssi = sr.rssi
-                scanRecord = ScanRecordCompat.from(sr.scanRecord)
-                advertData = ScanRecordParser.getAdvertisements(sr.scanRecord?.bytes)
-                timestampNanos = sr.timestampNanos
+                device = scanResult.device
+                rssi = scanResult.rssi
+                scanRecord = ScanRecordCompat.from(scanResult.scanRecord)
+                advertData = ScanRecordParser.getAdvertisements(scanResult.scanRecord?.bytes)
+                timestampNanos = scanResult.timestampNanos
 
-                isConnectable = sr.isConnectable
-                isLegacy = sr.isLegacy
-                dataStatus = sr.dataStatus
-                primaryPhy = sr.primaryPhy
-                secondaryPhy = sr.secondaryPhy
-                advertisingSetID = sr.advertisingSid
-                txPower = sr.txPower
-                periodicAdvertisingInterval = sr.periodicAdvertisingInterval
+                isConnectable = scanResult.isConnectable
+                isLegacy = scanResult.isLegacy
+                dataStatus = scanResult.dataStatus
+                primaryPhy = scanResult.primaryPhy
+                secondaryPhy = scanResult.secondaryPhy
+                advertisingSetID = scanResult.advertisingSid
+                txPower = scanResult.txPower
+                periodicAdvertisingInterval = scanResult.periodicAdvertisingInterval
             }
         }
     }

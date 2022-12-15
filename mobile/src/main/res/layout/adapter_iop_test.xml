@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+
+    style="@style/list_item_card_view_box"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp">
+    android:layout_height="wrap_content">
 
     <RelativeLayout
+        style="@style/list_item_card_view_container_margins"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:layout_marginBottom="@dimen/card_view_margin_vertical"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,21 +24,19 @@
 
             <TextView
                 android:id="@+id/tv_test_title"
+                style="@style/list_item_card_view_title_not_ellipsized"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="@color/silabs_black"
-                android:textSize="18sp"
                 tools:text="Test 1" />
 
             <TextView
                 android:id="@+id/tv_test_description"
+                style="@style/list_item_card_view_text_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:textColor="@color/silabs_dark_gray_text"
                 tools:text="Text 1" />
         </LinearLayout>
 
@@ -58,11 +58,10 @@
 
             <TextView
                 android:id="@+id/tv_test_status"
+                style="@style/list_item_card_view_text_info_subtle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="12sp"
                 tools:text="Text 2" />
 
             <ProgressBar
@@ -74,4 +73,4 @@
                 android:visibility="gone" />
         </LinearLayout>
     </RelativeLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

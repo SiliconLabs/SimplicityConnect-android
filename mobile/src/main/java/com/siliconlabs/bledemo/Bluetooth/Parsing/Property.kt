@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Bluetooth.Parsing
+package com.siliconlabs.bledemo.bluetooth.parsing
 
 enum class Property {
     READ,

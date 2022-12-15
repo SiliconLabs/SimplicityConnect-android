@@ -1,150 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".Browser.Fragment.LoggerFragment">
-
-    <com.siliconlabs.bledemo.Views.HorizontalShadow
-        android:id="@+id/browser_shadow_top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <LinearLayout
-        android:id="@+id/ll_search_log_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:elevation="1dp"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:layout_margin="16dp"
-            android:background="@drawable/search_box_background"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:src="@drawable/ic_search_off"
-                app:tint="#333333" />
-
-            <EditText
-                android:id="@+id/et_search"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:fontFamily="sans-serif"
-                android:gravity="center_vertical"
-                android:hint="@string/Filter_hint"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:maxLines="1"
-                android:paddingStart="2dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="0dp"
-                android:paddingBottom="8dp"
-                android:singleLine="true"
-                android:textColor="@color/silabs_primary_text"
-                android:textColorHint="@color/silabs_primary_text"
-                android:textSize="@dimen/log_edit_search_text_size" />
-
-            <ImageView
-                android:id="@+id/iv_search_log_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:src="@drawable/ic_small_x"
-                android:visibility="gone" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <com.siliconlabs.bledemo.Views.HorizontalShadow
-        android:id="@+id/log_separator"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/ll_search_log_container"
-        android:visibility="gone" />
-
+    android:orientation="vertical" >
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_log"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/view_separator"
-        android:layout_below="@id/ll_search_log_container"
         android:scrollbars="vertical" />
 
-    <View
-        android:id="@+id/view_separator"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_above="@id/rl_bottom"
-        android:background="@color/silabs_secondary_background" />
-
-    <RelativeLayout
-        android:id="@+id/rl_bottom"
-        android:layout_width="match_parent"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_share"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="@dimen/extended_fab_margin"
+        android:layout_marginEnd="@dimen/extended_fab_margin"
+        app:srcCompat="@drawable/ic_share_white"
+        app:tint="@android:color/white"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_toStartOf="@id/iv_close"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_share"
-                style="@style/ButtonBlue"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="4dp"
-                android:drawableStart="@drawable/ic_share_white"
-                android:text="@string/button_share" />
-
-            <Button
-                android:id="@+id/btn_clear_log"
-                style="@style/ButtonBorderlessBlue"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="4dp"
-                android:text="@string/button_clear_log" />
-
-            <Button
-                android:id="@+id/btn_filter_log"
-                style="@style/ButtonBorderlessBlue"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:text="@string/button_filter_log" />
-
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/iv_close"
-            android:layout_width="46dp"
-            android:layout_height="46dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:padding="10dp"
-            android:src="@drawable/ic_small_x" />
-    </RelativeLayout>
 </RelativeLayout>

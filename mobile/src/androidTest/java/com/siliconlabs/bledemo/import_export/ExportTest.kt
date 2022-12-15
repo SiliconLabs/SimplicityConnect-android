@@ -1,8 +1,8 @@
 package com.siliconlabs.bledemo.import_export
 
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import com.siliconlabs.bledemo.gatt_configurator.models.GattServer
-import com.siliconlabs.bledemo.gatt_configurator.import_export.GattServerExporter
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.GattServer
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.import_export.GattServerExporter
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

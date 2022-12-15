@@ -1,4 +1,4 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
 import com.siliconlabs.bledemo.utils.Converters
 
@@ -8,7 +8,7 @@ object ErrorCodes {
     }
 
     fun getOneOctetErrorCodeHexAsString(status: Int): String {
-        return "0x" + Converters.getHexValue(status.toByte())
+        return "0x${Converters.getHexValue(status.toByte())}"
     }
 
     private fun getConnectionErrorFlagAsString(status: Int): String {

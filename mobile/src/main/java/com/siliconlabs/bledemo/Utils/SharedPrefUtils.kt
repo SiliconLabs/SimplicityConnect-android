@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.siliconlabs.bledemo.Browser.Models.Mapping
+import com.siliconlabs.bledemo.features.scan.browser.models.Mapping
 import java.util.*
 
 class SharedPrefUtils(context: Context) {
@@ -14,7 +14,6 @@ class SharedPrefUtils(context: Context) {
 
     companion object {
         private const val MAP_KEY = "MAP_KEY"
-        private const val LAST_FILTER_KEY = "LAST_FILTER_KEY"
         private const val FAVORITES_DEVICES_KEY = "FAVORITES_DEVICES_KEY"
         private const val TEMPORARY_FAVORITES_DEVICES_KEY = "TEMPORARY_FAVORITES_DEVICES_KEY"
         private const val DISPLAY_APPLICATION_LEAVE_DIALOG_KEY = "DISPLAY_APPLICATION_LEAVE_DIALOG_KEY"
@@ -27,17 +26,10 @@ class SharedPrefUtils(context: Context) {
         mPrefs = context.getSharedPreferences("MODEL_PREFERENCES", Context.MODE_PRIVATE)
         editor = mPrefs.edit()
         gson = Gson()
+        mergeTmpDevicesToFavorites() // for backward compatibility; only one list of favorites left
     }
 
-    val mapFilter: HashMap<String, FilterDeviceParams?>
-        get() = if (getString(MAP_KEY) == null) {
-            HashMap()
-        } else {
-            val type = object : TypeToken<HashMap<String?, FilterDeviceParams?>?>() {}.type
-            gson.fromJson(getString(MAP_KEY), type)
-        }
-
-    val favoritesDevices: LinkedHashSet<String>
+    private val favoritesDevices: LinkedHashSet<String>
         get() = if (getString(FAVORITES_DEVICES_KEY) == null) {
             LinkedHashSet()
         } else {
@@ -45,7 +37,7 @@ class SharedPrefUtils(context: Context) {
             gson.fromJson(getString(FAVORITES_DEVICES_KEY), type)
         }
 
-    val temporaryFavoritesDevices: LinkedHashSet<String>
+    private val temporaryFavoritesDevices: LinkedHashSet<String>
         get() = if (getString(TEMPORARY_FAVORITES_DEVICES_KEY) == null) {
             LinkedHashSet()
         } else {
@@ -53,7 +45,7 @@ class SharedPrefUtils(context: Context) {
             gson.fromJson(getString(TEMPORARY_FAVORITES_DEVICES_KEY), type)
         }
 
-    fun mergeTmpDevicesToFavorites() {
+    private fun mergeTmpDevicesToFavorites() {
         val favoritesDevices = favoritesDevices
         val temporaryFavoritesDevices = temporaryFavoritesDevices
         favoritesDevices.addAll(temporaryFavoritesDevices)
@@ -70,23 +62,21 @@ class SharedPrefUtils(context: Context) {
         editor.commit()
     }
 
-    fun addDeviceToTemporaryFavorites(device: String) {
-        val temporaryFavoritesDevices = temporaryFavoritesDevices
-        temporaryFavoritesDevices.add(device)
-        val json = gson.toJson(temporaryFavoritesDevices)
-        editor.putString(TEMPORARY_FAVORITES_DEVICES_KEY, json)
-        editor.commit()
-    }
-
     fun removeDeviceFromFavorites(device: String?) {
         val favoritesDevices = favoritesDevices
         favoritesDevices.remove(device)
         val json = gson.toJson(favoritesDevices)
         editor.putString(FAVORITES_DEVICES_KEY, json)
         editor.commit()
+
+        removeDeviceFromTemporaryFavorites(device) // ensure backward compatibility
     }
 
-    fun removeDeviceFromTemporaryFavorites(device: String?) {
+    fun isFavorite(device: String?): Boolean {
+        return if (getString(FAVORITES_DEVICES_KEY) == null) false else favoritesDevices.contains(device)
+    }
+
+    private fun removeDeviceFromTemporaryFavorites(device: String?) {
         val temporaryFavoritesDevices = temporaryFavoritesDevices
         temporaryFavoritesDevices.remove(device)
         val json = gson.toJson(temporaryFavoritesDevices)
@@ -94,46 +84,9 @@ class SharedPrefUtils(context: Context) {
         editor.commit()
     }
 
-    fun isFavorite(device: String?): Boolean {
-        return if (getString(FAVORITES_DEVICES_KEY) == null) false else favoritesDevices.contains(device)
-    }
-
-    fun isTemporaryFavorite(device: String?): Boolean {
-        return if (getString(TEMPORARY_FAVORITES_DEVICES_KEY) == null) false else temporaryFavoritesDevices.contains(device)
-    }
-
     private fun getString(key: String): String? {
         return mPrefs.getString(key, null)
     }
-
-    fun addToMapFilterAndSave(key: String, filterDeviceParam: FilterDeviceParams?) {
-        val mapFilter = mapFilter
-        mapFilter[key] = filterDeviceParam
-        val json = gson.toJson(mapFilter)
-        editor.putString(MAP_KEY, json)
-        editor.commit()
-    }
-
-    fun updateMapFilter(currentMap: HashMap<String, FilterDeviceParams?>?) {
-        val json = gson.toJson(currentMap)
-        editor.putString(MAP_KEY, json)
-        editor.commit()
-    }
-
-    var lastFilter: FilterDeviceParams?
-        get() {
-            if (getString(LAST_FILTER_KEY) != null) {
-                val filterDeviceParams = gson.fromJson(getString(LAST_FILTER_KEY), FilterDeviceParams::class.java)
-                return if (filterDeviceParams.isEmptyFilter) null else filterDeviceParams
-            }
-            return null
-        }
-        set(lastFilter) {
-            val json = gson.toJson(lastFilter)
-            editor.putString(LAST_FILTER_KEY, json)
-            editor.commit()
-        }
-
 
     val characteristicNamesMap: HashMap<String, Mapping>
         get() {

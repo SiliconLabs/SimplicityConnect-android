@@ -5,16 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusableInTouchMode="true"
-    tools:context=".Advertiser.Activities.AdvertiserConfigActivity">
+    tools:context=".features.configure.advertiser.activities.AdvertiserConfigActivity">
 
-    <include
-        android:id="@+id/toolbar_advertiser"
-        layout="@layout/actionbar" />
+    <com.siliconlabs.bledemo.common.views.HorizontalShadow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_advertiser">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -43,10 +42,5 @@
             </androidx.cardview.widget.CardView>
         </LinearLayout>
     </ScrollView>
-
-    <com.siliconlabs.bledemo.Views.HorizontalShadow
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar_advertiser" />
 
 </RelativeLayout>

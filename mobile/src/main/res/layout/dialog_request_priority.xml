@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical"
+    style="@style/dialog_card" >
+
+    <LinearLayout
+        style="@style/dialog_margins"
+        android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            style="@style/dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
+            android:text="@string/connection_priority" />
+
+        <TextView
+            style="@style/dialog_text_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/space_SM"
+            android:text="@string/connection_priority_description" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/low_priority"
+                style="@style/full_line_checkbox_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="@string/low_priority"/>
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/balanced_priority"
+                style="@style/full_line_checkbox_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="@string/balanced_priority"/>
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/high_priority"
+                style="@style/full_line_checkbox_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/high_priority"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/dialog_button_margin_top"
+            android:layout_marginEnd="@dimen/dialog_margin_horizontal"
+            android:gravity="end">
+
+            <Button android:id="@+id/cancel_request"
+                style="@style/dialog_button_negative_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dialog_margin_between_buttons"
+                android:text="@string/button_cancel" />
+
+
+            <Button android:id="@+id/request"
+                style="@style/dialog_button_positive_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dialog_button_margin_end"
+                android:text="@string/Request" />
+        </LinearLayout>
+
+
+
+
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

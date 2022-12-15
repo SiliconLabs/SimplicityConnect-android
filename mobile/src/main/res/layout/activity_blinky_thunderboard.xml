@@ -42,14 +42,14 @@
                         android:layout_gravity="center_vertical"
                         android:layout_alignParentEnd="true">
 
-                            <com.siliconlabs.bledemo.blinky_thunderboard.control.SwitchControl
+                            <com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.control.SwitchControl
                                 android:id="@+id/switch_0"
                                 android:layout_width="@dimen/space_L"
                                 android:layout_height="match_parent"
                                 android:layout_marginTop="@dimen/space_XXS"
                                 android:layout_marginEnd="@dimen/space_XXS"/>
 
-                            <com.siliconlabs.bledemo.blinky_thunderboard.control.SwitchControl
+                            <com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.control.SwitchControl
                                 android:layout_marginStart="@dimen/space_XXS"
                                 android:id="@+id/switch_1"
                                 android:layout_width="@dimen/space_L"
@@ -120,7 +120,7 @@
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
-        <com.siliconlabs.bledemo.blinky_thunderboard.control.ColorLEDControl
+        <com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.control.ColorLEDControl
             android:id="@+id/color_led_control"
             style="@style/block"
             android:layout_marginTop="@dimen/space_S"

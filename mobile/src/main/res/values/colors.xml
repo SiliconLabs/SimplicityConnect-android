@@ -2,7 +2,6 @@
 <resources>
 
     <color name="primary">@color/silabs_red</color>
-    <color name="primaryDarker">@color/silabs_red</color>
 
     <color name="silabs_blue">#0086D9</color>
     <color name="silabs_red">#D91E2A</color>
@@ -16,9 +15,7 @@
     <color name="silabs_red_selected">#FFA1171F</color>
     <color name="silabs_red_dark">#FFA1171F</color>
 
-    <color name="silabs_card_background">#FFFFFF</color>
     <color name="silabs_background">#ECECEC</color>
-    <color name="silabs_secondary_background">#CCCCCC</color>
 
     <color name="silabs_inactive">#7C7C7C</color>
     <color name="silabs_inactive_light">#AFAFAF</color>
@@ -32,10 +29,6 @@
     <color name="silabs_dialog_title_background">#F2F2F2</color>
     <color name="silabs_divider">#CCCCCC</color>
 
-    <color name="silabs_track_gray">#7C7C7C</color>
-
-    <color name="silabs_button_inactive">#555555</color>
-
     <color name="silabs_speedmeter_start">#0086D9</color>
     <color name="silabs_speedmeter_center">#921084</color>
     <color name="silabs_speedmeter_end">#D91E2A</color>
@@ -44,62 +37,19 @@
     <color name="dialog_loading_spinner_center">#FF999999</color>
     <color name="dialog_loading_spinner_end">#FF666666</color>
     <color name="dialog_loading_spinner_start">#FFE6E6E6</color>
-    <color name="dialog_loading_veil_gradient_center">#22D1D1D1</color>
-    <color name="dialog_loading_veil_gradient_end">#883F3F3F</color>
-    <color name="dialog_loading_veil_gradient_start">#22D1D1D1</color>
-
-    <color name="silabs_connecting_background">#CC111111</color>
 
     <color name="silabs_click_grey">#28000000</color>
 
     <!--============================= DELETE IN THE FUTURE ==============================-->
     <color name="gallery">#FFF1EFEF</color>
-    <color name="gallery_light">#FFF8F6F6</color>
     <color name="masala">#FF504E4E</color>
-    <color name="masala_50a">#7F504E4E</color>
     <color name="boulder">#FF7A7878</color>
 
 
-    <!-- ================================= Thunderboard ================================ -->
-
-
-    <color name="teal_2">#ff00aeff</color>
-
-    <color name="primary_color">@color/sl_silicon_grey</color>
-
     <color name="transparent">#00000000</color>
-
-    <color name="sl_dark_grey">#ff333333</color>
-    <color name="sl_silicon_grey">#ff555555</color>
-    <color name="sl_grey">#ffc1c1c1</color>
     <color name="sl_light_grey">#ffefefef</color>
     <color name="sl_white">#ffffffff</color>
-
-    <color name="sl_yellow">#ffffcc00</color>
-    <color name="sl_yellow_orange">#ffffa200</color>
-    <color name="sl_bromine_orange">#ffff7100</color>
-    <color name="sl_red_orange">#ffe65100</color>
-    <color name="sl_red">#fffb2f3c</color>
-    <color name="sl_blue">#ff00aeff</color>
-    <color name="sl_light_blue">#ff78d6ff</color>
-
-    <color name="sl_bright_green">#ffcaf200</color>
-    <color name="sl_terbium_green">#ffa1b92e</color>
-    <color name="sl_medium_green">#ff87a10d</color>
-    <color name="sl_violet">#ff9196ff</color>
-    <color name="sl_dark_violet">#ff857cff</color>
-    <color name="sl_light_violet">#ffc3caf8</color>
-    <color name="sl_white_violet">#ffe9e3ff</color>
-    <color name="sl_pink">#ffff7469</color>
-    <color name="sl_light_peach">#fffff4f1</color>
-    <color name="sl_pinky_peach">#ffae9d</color>
-    <color name="sl_peach_gold">#ffffe7cf</color>
-
     <color name="silicon_grey">#ff797777</color>
-
-    <color name="settings_text_background">@color/silicon_grey</color>
-    <color name="text_color">@color/silabs_white</color>
-
     <color name="divider_line">@color/silicon_grey</color>
 
     <!--RESKINNING-->
@@ -110,12 +60,48 @@
     <color name="tb_green_dot">#32d74b</color>
     <color name="tb_blue">#0086d9</color>
     <color name="tb_grey">#cccccc</color>
-    <!-- WiFi Commissioning -->
 
-    <color name="light_grey">#C0C0C0</color>
+    <!-- WiFi Commissioning -->
     <color name="grey">#808080</color>
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 
+
+    <!-- REDESIGN 07/22 -->
+    <color name="blue_primary">#0f62f3</color>
+    <color name="blue_dark">#A00f62f3</color>
+    <color name="blue_teal">#bff3ff</color>
+
+    <color name="gray_background">#D7D7D7</color>
+
+    <color name="full_screen_info">#5089b2</color>
+
+    <color name="gray_subtle">#e1e1e1</color>
+    <color name="btn_action_on">#D91E2A</color>
+    <color name="btn_disabled">#c2c2c2</color>
+
+    <color name="menu_icon">@android:color/white</color>
+    <color name="action_icon">@color/silabs_dark_gray_icon</color>
+
+    <color name="list_item_card_view_box">@android:color/white</color>
+    <color name="list_item_card_view_details">@color/gray_subtle</color>
+    <color name="list_item_card_view_icon_background">#E7E7E7</color>
+    <color name="list_item_card_view_icon_foreground">@android:color/black</color>
+
+    <color name="bar_with_additional_info">@color/white</color>
+
+    <color name="track_disabled">#80C0C0C0</color>
+    <color name="thumb_disabled">#80FFFFFF</color>
+
+    <color name="fly_in_bar_gradient">#B3B3FF</color>
+    <color name="spinner_end_gradient">@color/blue_dark</color>
+    <color name="seekbar_progress">@color/blue_dark</color>
+    <color name="seekbar_background">@color/gray_background</color>
+    <color name="beacon_filter_background">#F0F0F0</color>
+
+    <color name="splash_screen_end_gradient">#6CCFFF</color>
+    <color name="splash_screen_start_gradient">#0F62FE</color>
+
+    <color name="graph_label_inactive">#E0E0E0</color>
 </resources>

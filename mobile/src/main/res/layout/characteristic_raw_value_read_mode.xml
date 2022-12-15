@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/search_packet_name_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/space_S"
+    android:padding="@dimen/space_XS"
+    android:background="@drawable/edit_text_box"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <EditText
+        android:id="@+id/et_char_value_read_mode"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:gravity="center_vertical"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:layout_marginEnd="@dimen/space_XS"
+        android:textColor="@color/silabs_primary_text"
+        android:textColorHint="@color/silabs_subtle_text"
+        android:textSize="@dimen/filter_edit_search_text_size"
+        tools:hint="Hex"/>
+
+    <ImageView
+        android:id="@+id/iv_copy_char_value_read_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_copy"
+        android:background="@drawable/btn_blue_ripple_effect"
+        android:contentDescription="@string/content_desc_copy_icon"
+        app:tint="@color/silabs_blue" />
+
+</LinearLayout>

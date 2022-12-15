@@ -1,8 +1,6 @@
-package com.siliconlabs.bledemo.Bluetooth.BLE
+package com.siliconlabs.bledemo.bluetooth.ble
 
-import android.annotation.TargetApi
 import android.bluetooth.le.ScanRecord
-import android.os.Build
 import android.os.ParcelUuid
 import android.util.Log
 import android.util.SparseArray
@@ -21,11 +19,15 @@ class ScanRecordCompat {
     var txPowerLevel = 0
 
     internal constructor()
-    private constructor(serviceUuids: List<ParcelUuid>?,
-                        manufacturerData: SparseArray<ByteArray>?,
-                        serviceData: Map<ParcelUuid, ByteArray>?,
-                        advertiseFlag: Int, txPowerLevel: Int,
-                        deviceName: String?, bytes: ByteArray) {
+    private constructor(
+            serviceUuids: List<ParcelUuid>?,
+            manufacturerData: SparseArray<ByteArray>?,
+            serviceData: Map<ParcelUuid, ByteArray>?,
+            advertiseFlag: Int,
+            txPowerLevel: Int,
+            deviceName: String?,
+            bytes: ByteArray
+    ) {
         this.serviceUuids = serviceUuids
         this.manufacturerSpecificData = manufacturerData
         this.serviceData = serviceData
@@ -64,21 +66,19 @@ class ScanRecordCompat {
         private const val DATA_TYPE_MANUFACTURER_SPECIFIC_DATA = 0xFF
         private var sr: ScanRecord? = null
 
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-        fun from(lollipopScanRecord: Any?): ScanRecordCompat? {
-            if (lollipopScanRecord == null) {
-                return null
-            }
-            sr = lollipopScanRecord as ScanRecord?
+        fun from(bleScanRecord: ScanRecord?): ScanRecordCompat? {
+            return bleScanRecord?.let {
+                sr = bleScanRecord
 
-            return ScanRecordCompat().apply {
-                advertiseFlags = sr?.advertiseFlags!!
-                bytes = sr?.bytes!!
-                deviceName = sr?.deviceName
-                manufacturerSpecificData = sr?.manufacturerSpecificData
-                serviceData = sr?.serviceData
-                serviceUuids = sr?.serviceUuids
-                txPowerLevel = sr?.txPowerLevel!!
+                ScanRecordCompat().apply {
+                    advertiseFlags = it.advertiseFlags
+                    bytes = it.bytes
+                    deviceName = it.deviceName
+                    manufacturerSpecificData = it.manufacturerSpecificData
+                    serviceData = it.serviceData
+                    serviceUuids = it.serviceUuids
+                    txPowerLevel = it.txPowerLevel
+                }
             }
         }
 

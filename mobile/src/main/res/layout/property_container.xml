@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/property_container"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingEnd="@dimen/property_container_padding_end"
+    android:paddingVertical="16dp"
+    android:gravity="center_vertical"
+    android:drawablePadding="@dimen/property_icon_text_padding">
+
+    <ImageView
+        android:id="@+id/property_icon"
+        android:layout_width="@dimen/property_icon_width"
+        android:layout_height="@dimen/property_icon_height"
+        android:layout_margin="@dimen/property_icon_text_padding"
+        android:contentDescription="@string/content_desc_property_icon"
+        app:tint="@color/silabs_dark_gray_icon"
+        tools:src="@drawable/redesign_ic_property_read" />
+
+    <TextView
+        android:id="@+id/property_text"
+        style="@style/property_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Property" />
+
+
+
+</LinearLayout>

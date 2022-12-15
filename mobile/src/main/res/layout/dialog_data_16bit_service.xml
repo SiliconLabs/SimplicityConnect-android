@@ -43,9 +43,9 @@
 
             <Button
                 android:id="@+id/btn_bluetooth_gatt_services"
-                style="@style/ButtonBlueWithBorders"
+                style="@style/button_external_link"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/button_bluetooth_gatt_services" />
@@ -63,7 +63,7 @@
                 android:id="@+id/btn_clear"
                 style="@style/ButtonBorderlessBlue"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="8dp"
@@ -73,7 +73,7 @@
                 android:id="@+id/btn_cancel"
                 style="@style/ButtonBorderlessBlue"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="8dp"
@@ -83,7 +83,7 @@
                 android:id="@+id/btn_save"
                 style="@style/ButtonBlue"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:enabled="false"

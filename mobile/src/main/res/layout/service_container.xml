@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:id="@+id/service_info_card_view"
+    style="@style/list_item_card_view_box"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            style="@style/list_item_card_view_container_margins"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/card_view_margin_vertical"
+            android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/service_title"
+                        style="@style/list_item_card_view_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        tools:text="@string/services_list_service_name_default" />
+
+                    <TextView
+                        android:id="@+id/tv_rename_service"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center"
+                        android:layout_alignParentEnd="true"
+                        app:drawableStartCompat="@drawable/redesign_ic_card_view_action_icon_rename"
+                        app:drawableTint="@color/blue_primary"
+                        android:drawablePadding="@dimen/property_icon_text_padding"
+                        android:textSize="@dimen/card_view_text_info_size"
+                        android:textColor="@color/blue_primary"
+                        android:fontFamily="sans-serif"
+                        android:text="@string/rename"
+                        android:contentDescription="@string/content_desc_rename_icon"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/service_uuid"
+                    style="@style/list_item_card_view_text_info_ellipsized"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/default_uuid_of_service" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider"
+                    android:layout_marginVertical="@dimen/space_S"
+                    android:layout_marginHorizontal="@dimen/space_XXS" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tv_more_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/more_info"
+                        android:textColor="@android:color/black" />
+
+                    <com.siliconlabs.bledemo.common.views.ExpandArrow
+                        android:id="@+id/expand_arrow"
+                        style="@style/expand_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:src="@drawable/ic_arrow_down_on"
+                        android:contentDescription="@string/content_desc_dropdown_arrow" />
+
+                </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/service_characteristics_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

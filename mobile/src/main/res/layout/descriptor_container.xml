@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="@dimen/space_XS">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tv_name"
+            style="@style/TextMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/descriptor_container_entries_vertical_separation"
+            android:textStyle="bold"
+            tools:text="Descriptor name" />
+
+        <LinearLayout
+            android:id="@+id/container_descriptor_uuid"
+            android:layout_marginBottom="@dimen/descriptor_container_entries_vertical_separation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                style="@style/TextMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="@string/UUID_colon_space" />
+
+            <TextView
+                android:id="@+id/tv_uuid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:textColor="@color/silabs_dark_gray_text"
+                tools:text="ABCDEFGH-1234-23432"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/container_descriptor_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible" >
+
+            <TextView
+                style="@style/TextMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/value_colon_space"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:textColor="@color/silabs_dark_gray_text"
+                tools:text="0x1234"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/tv_read"
+        style="@style/property_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/space_S"
+        android:gravity="center"
+        android:text="@string/device_services_label_read"
+        app:drawableStartCompat="@drawable/redesign_ic_property_read"
+        app:drawableTint="@color/silabs_dark_gray_icon"
+        android:drawablePadding="@dimen/property_icon_text_padding" />
+
+</LinearLayout>

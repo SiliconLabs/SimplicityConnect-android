@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:state_enabled="true"
+        app:is_action_on="true"
+        android:color="@color/btn_action_on" />
+    <item
+        android:state_enabled="true"
+        android:color="@color/blue_primary" />
+    <item android:color="@color/btn_disabled"
+        android:alpha="@dimen/btn_disabled_alpha"/>
+
+</selector>

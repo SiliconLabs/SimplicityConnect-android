@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+
+    style="@style/list_item_card_view_box"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        style="@style/list_item_card_view_container_margins"
+        android:layout_marginBottom="@dimen/card_view_margin_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/linear_layout_charac_service"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_view_name"
+                style="@style/list_item_card_view_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_XXS"
+                android:text="@string/unknown_characteristic_label" />
+
+            <TextView
+                android:id="@+id/text_view_uuid"
+                style="@style/list_item_card_view_text_info_ellipsized"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/dictionary_uuid" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/image_view_edit_charac_service"
+            style="@style/card_view_action_icon"
+            android:layout_width="@dimen/card_view_action_icon_container_width"
+            android:layout_height="@dimen/card_view_action_icon_container_height"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@string/label_rename"
+            android:src="@drawable/redesign_ic_card_view_action_icon_rename" />
+
+        <ImageButton
+            android:id="@+id/image_button_delete"
+            style="@style/card_view_action_icon"
+            android:layout_width="@dimen/card_view_action_icon_container_width"
+            android:layout_height="@dimen/card_view_action_icon_container_height"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/label_remove"
+            android:src="@drawable/redesign_ic_card_view_action_icon_delete" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

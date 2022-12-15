@@ -1,72 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:cardElevation="0dp"
-    app:cardCornerRadius="16dp">
+    android:layout_gravity="center_horizontal"
+    style="@style/dialog_card" >
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <LinearLayout
+        style="@style/dialog_margins"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/linear_layout"
+        <TextView
+            style="@style/dialog_title"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="@string/select_device"
+            android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom" />
+
+        <TextView
+            android:id="@+id/dialog_text_info"
+            style="@style/dialog_text_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_above="@id/button_cancel"
-            android:orientation="vertical">
+            android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
+            android:text="@string/soc_must_be_connected" />
 
-            <include layout="@layout/include_device_list_header" />
+        <TextView
+            android:id="@+id/devices_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
+            android:layout_marginVertical="@dimen/space_SM"
+            android:text="@string/DEVICE_LIST"
+            android:textSize="18sp"
+            android:textColor="@color/silabs_primary_text" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/silabs_divider" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/dialog_margin_horizontal"
+            android:orientation="vertical"
+            android:background="@color/blue_teal" >
 
             <LinearLayout
+                android:id="@+id/no_devices_found"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:paddingVertical="@dimen/space_S"
+                tools:ignore="UseCompoundDrawables"
+                tools:visibility="gone" >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/redesign_ic_warning"
+                    android:layout_marginEnd="@dimen/space_S"
+                    android:contentDescription="@string/content_desc_no_devices_discovered"/>
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:textColor="@color/silabs_subtle_text"
-                    android:paddingStart="24dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="24dp"
-                    android:paddingBottom="8dp"
-                    android:text="@string/DEVICE_LIST"
-                    android:textSize="14sp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/silabs_divider" />
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:text="@string/please_connect_a_device"
+                    android:textColor="@color/silabs_primary_text"
+                    android:textSize="16sp"/>
 
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@android:id/list"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@android:color/white"
-                android:splitMotionEvents="false" />
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
         </LinearLayout>
 
-        <Button
-            android:id="@+id/button_cancel"
-            android:layout_width="match_parent"
+        <Button android:id="@+id/button_cancel"
+            style="@style/dialog_button_negative_action"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/btn_blue_selector"
-            android:fontFamily="sans-serif-medium"
-            android:text="@string/CANCEL"
-            android:textColor="@color/silabs_white"
-            android:textSize="14sp" />
-    </RelativeLayout>
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/dialog_button_margin_top"
+            android:layout_marginEnd="@dimen/dialog_margin_horizontal_plus_button_margin_end"
+            android:text="@string/button_cancel" />
+
+    </LinearLayout>
+
 </androidx.cardview.widget.CardView>

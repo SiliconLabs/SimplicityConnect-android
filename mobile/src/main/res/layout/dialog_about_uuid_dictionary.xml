@@ -1,0 +1,36 @@
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/dialog_card">
+
+    <LinearLayout
+        style="@style/dialog_margins"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
+            android:text="@string/about_mappings_about" />
+
+        <TextView
+            style="@style/dialog_text_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dialog_about_mappings_info_section_and_body_separation"
+            android:text="@string/about_mappings_note" />
+
+        <Button android:id="@+id/btn_ok"
+            style="@style/dialog_button_neutral_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/dialog_button_margin_end"
+            android:layout_gravity="end"
+            android:text="@string/button_ok" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
