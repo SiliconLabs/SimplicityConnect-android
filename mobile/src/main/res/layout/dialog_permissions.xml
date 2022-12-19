@@ -19,10 +19,11 @@
             android:text="@string/permissions_needed" />
 
         <TextView
+            android:id="@+id/rationale_text"
             style="@style/dialog_text_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/permissions_rationale"/>
+            android:text="@string/permissions_rationale_sdk_31_and_above"/>
 
         <Button android:id="@+id/btn_understood"
             style="@style/dialog_button_positive_action"

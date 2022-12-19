@@ -130,6 +130,7 @@
     <string name="location_info">Info</string>
     <string name="location_enable">Enable</string>
     <string name="Location_disabled">Location disabled.</string>
+    <string name="bluetooth_permissions_disabled">Bluetooth permissions disabled</string>
     <string name="Location_service">Location service</string>
     <string name="location_service_info">On some Android phones you have to enable Location
         service in order to scan for Bluetooth Low Energy devices. If you can\'t find any
@@ -896,11 +897,19 @@
     <string name="location_permission_not_granted">Location permission not granted.</string>
     <string name="device_disconnected_successfully">Device \"%s\" disconnected successfully</string>
     <string name="permissions_needed">Permissions needed</string>
-    <string name="permissions_rationale">We will kindly ask you in a moment to grant permissions
+    <string name="permissions_rationale_sdk_30_and_below">We will kindly ask you in a moment to
+        grant permissions
         for this app - \"Location\" and \"Write external storage\". First one ensures proper
         functioning of the bluetooth scanner and second one enables remote device\'s firmware
         update using Over the Air mechanism with files chosen by the user.
-        \n\nYou can always turn them on and off is your device\'s settings.
+        \n\nYou can always turn them on and off in your device\'s settings.
+    </string>
+    <string name="permissions_rationale_sdk_31_and_above">We will kindly ask you in a moment to grant permissions
+        for this app - \"Location\", \"Write external storage\" and \"Nearby devices\". First one
+        ensures proper functioning of the bluetooth scanner and second one enables remote
+        device\'s firmware update using Over the Air mechanism with files chosen by the user.
+        Last one covers all bluetooth-related operations and is crucial for this app to launch.
+        \n\nYou can always turn them on and off in your device\'s settings.
     </string>
     <string name="btn_understood">Understood</string>
     <string name="permission_missing">Permission missing</string>
@@ -1021,5 +1030,9 @@
 
     <!-- TestFragment -->
     <string name="tab_iop_test">Interoperability test</string>
+
+
+    <string name="bluetooth_permissions_needed">Bluetooth-related permissions are needed
+        for this app</string>
 
 </resources>
