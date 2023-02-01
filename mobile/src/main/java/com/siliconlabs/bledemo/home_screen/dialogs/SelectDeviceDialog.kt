@@ -453,35 +453,21 @@ class SelectDeviceDialog(
     }
 
     private fun getIntent(connectType: GattConnectType?): Intent? {
-        return when (connectType) {
-            GattConnectType.THERMOMETER -> {
-                Intent(activity, HealthThermometerActivity::class.java)
-            }
-            GattConnectType.LIGHT -> {
-                Intent(activity, ConnectedLightingActivity::class.java)
-            }
-            GattConnectType.BLINKY -> {
-                Intent(activity, BlinkyActivity::class.java)
-            }
-            GattConnectType.BLINKY_THUNDERBOARD -> {
-                Intent(activity, BlinkyThunderboardActivity::class.java)
-            }
-            GattConnectType.THROUGHPUT_TEST -> {
-                Intent(activity, ThroughputActivity::class.java)
-            }
-            GattConnectType.WIFI_COMMISSIONING -> {
-                Intent(activity, WifiCommissioningActivity::class.java)
-            }
-            GattConnectType.IOP_TEST -> {
-                Intent(activity, IOPTestActivity::class.java)
-            }
-            GattConnectType.MOTION -> {
-                Intent(activity, MotionActivity::class.java)
-            }
-            GattConnectType.ENVIRONMENT -> {
-                Intent(activity, EnvironmentActivity::class.java)
-            }
+        val clazz = when (connectType) {
+            GattConnectType.THERMOMETER -> HealthThermometerActivity::class.java
+            GattConnectType.LIGHT -> ConnectedLightingActivity::class.java
+            GattConnectType.BLINKY -> BlinkyActivity::class.java
+            GattConnectType.BLINKY_THUNDERBOARD -> BlinkyThunderboardActivity::class.java
+            GattConnectType.THROUGHPUT_TEST -> ThroughputActivity::class.java
+            GattConnectType.WIFI_COMMISSIONING -> WifiCommissioningActivity::class.java
+            GattConnectType.IOP_TEST -> IOPTestActivity::class.java
+            GattConnectType.MOTION -> MotionActivity::class.java
+            GattConnectType.ENVIRONMENT ->EnvironmentActivity::class.java
             else -> null
+        }
+
+        return clazz?.let {
+            Intent(activity, clazz)
         }
     }
 

@@ -49,14 +49,11 @@ class UpdateTest(private val service: BluetoothService?,
     //region Preparing transmission
 
     private fun setStates(isNotificationsChecked: Boolean) {
-        if (isNotificationsChecked) {
-            uploadMode = Mode.Notifications
-            uploadCharacteristic = getLocalThroughputCharacteristic(GattCharacteristic.ThroughputNotifications)
-        }
-        else {
-            uploadMode = Mode.Indications
-            uploadCharacteristic = getLocalThroughputCharacteristic(GattCharacteristic.ThroughputIndications)
-        }
+        uploadMode = if (isNotificationsChecked) Mode.Notifications else Mode.Indications
+        uploadCharacteristic = getLocalThroughputCharacteristic(
+                if (isNotificationsChecked) GattCharacteristic.ThroughputNotifications
+                else GattCharacteristic.ThroughputIndications
+        )
     }
 
     private fun preparePayload() : ByteArray {
@@ -96,8 +93,8 @@ class UpdateTest(private val service: BluetoothService?,
         executor.execute {
             getLocalThroughputCharacteristic(GattCharacteristic.ThroughputTransmissionOn)?.let {
                 it.value = convertToggleToMessage(toggleOn)
-                service?.bluetoothGattServer?.notifyCharacteristicChanged(service.connectedGatt?.device,
-                        it, false)
+                service?.bluetoothGattServer?.notifyCharacteristicChanged(
+                        service.connectedGatt?.device ?: return@execute, it, false)
             }
         }
     }
@@ -132,7 +129,7 @@ class UpdateTest(private val service: BluetoothService?,
         uploadCharacteristic?.let {
             updatePayload(it)
             service?.bluetoothGattServer?.notifyCharacteristicChanged(
-                    service.connectedGatt?.device, it, uploadMode == Mode.Indications)
+                    service.connectedGatt?.device ?: return, it, uploadMode == Mode.Indications)
             viewModel.addBitsToCount(it.value.size)
         }
     }

@@ -3,7 +3,6 @@ package com.siliconlabs.bledemo.bluetooth.ble
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import com.siliconlabs.bledemo.bluetooth.parsing.ScanRecordParser
-import com.siliconlabs.bledemo.utils.Constants.NA
 import com.siliconlabs.bledemo.utils.Objects.toString
 import java.util.*
 
@@ -29,8 +28,7 @@ class ScanResultCompat {
     var periodicAdvertisingInterval = 0
 
     fun getDisplayName(): String {
-        val name = device?.name
-        return name ?: NA
+        return device?.name ?: "N/A"
     }
 
     override fun toString(): String {

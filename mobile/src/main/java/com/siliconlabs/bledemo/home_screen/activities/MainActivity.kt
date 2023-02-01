@@ -16,8 +16,10 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.home_screen.dialogs.PermissionsDialog
 import com.siliconlabs.bledemo.home_screen.fragments.*
 import com.siliconlabs.bledemo.home_screen.viewmodels.MainActivityViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 
+@AndroidEntryPoint
 open class MainActivity : BaseActivity(),
         BluetoothService.ServicesStateListener
 {

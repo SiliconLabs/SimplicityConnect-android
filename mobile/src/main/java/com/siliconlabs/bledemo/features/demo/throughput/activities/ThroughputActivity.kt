@@ -178,7 +178,8 @@ class ThroughputActivity : BaseDemoActivity() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
             if (newState == BluetoothGatt.STATE_DISCONNECTED) {
-                runOnUiThread { onDeviceDisconnect() }
+                updateTest?.stopTransmitting()
+                onDeviceDisconnected()
             }
         }
 
@@ -243,13 +244,6 @@ class ThroughputActivity : BaseDemoActivity() {
             if (viewModel.isUploadActive) {
                 updateTest?.updateUpload()
             }
-        }
-    }
-
-    private fun onDeviceDisconnect() {
-        if (!isFinishing) {
-            showMessage(R.string.device_has_disconnected)
-            finish()
         }
     }
 

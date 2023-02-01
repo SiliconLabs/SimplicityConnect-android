@@ -4,9 +4,8 @@ import com.siliconlabs.bledemo.features.scan.browser.models.logs.Log
 import java.util.*
 
 object Constants {
-    const val NA = "N/A"
-    const val BOTTOM_NAVI_DEVELOP = "Develop"
-    const val BOTTOM_NAVI_DEMO = "Demo"
-
+    /* TODO: pass a list of logs to service through intent parcelable instead of a constant from
+        object. Requires further revising Log hierarchy class to be able to make them parcelable
+        and pass to intent. */
     var LOGS: List<Log> = LinkedList()
 }

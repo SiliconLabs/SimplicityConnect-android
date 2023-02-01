@@ -170,18 +170,11 @@ class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListen
         getDescriptor(LED_MASK_DESCRIPTOR)
     }
 
-    private fun onDeviceDisconnect() {
-        if (!this.isFinishing) {
-            showMessage(R.string.device_has_disconnected)
-            finish()
-        }
-    }
-
     override val gattCallback: TimeoutGattCallback = object : TimeoutGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
             if (newState == BluetoothGatt.STATE_DISCONNECTED) {
-                onDeviceDisconnect()
+                onDeviceDisconnected()
             }
         }
 

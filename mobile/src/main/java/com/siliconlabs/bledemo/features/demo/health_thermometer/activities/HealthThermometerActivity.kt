@@ -29,7 +29,7 @@ class HealthThermometerActivity : BaseDemoActivity() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
             if (newState == BluetoothGatt.STATE_DISCONNECTED) {
-                runOnUiThread { onDeviceDisconnect() }
+                onDeviceDisconnected()
             }
         }
 
@@ -95,7 +95,7 @@ class HealthThermometerActivity : BaseDemoActivity() {
     override fun onResume() {
         super.onResume()
         if (serviceHasBeenSet && service == null || service != null && !service?.isGattConnected()!!) {
-            onDeviceDisconnect()
+            onDeviceDisconnected()
         }
     }
 
@@ -123,13 +123,6 @@ class HealthThermometerActivity : BaseDemoActivity() {
         serviceHasBeenSet = true
         service?.registerGattCallback(true, gattCallback)
         service?.discoverGattServices()
-    }
-
-    private fun onDeviceDisconnect() {
-        if (!isFinishing) {
-            showMessage(R.string.device_has_disconnected)
-            finish()
-        }
     }
 
     override fun onNewIntent(intent: Intent) {

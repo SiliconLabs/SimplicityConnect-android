@@ -4,10 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,7 +43,7 @@ class LogFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        setHasOptionsMenu(false)
+        setHasOptionsMenu(true)
         _binding = FragmentLogBinding.inflate(inflater)
         return _binding.root
     }
@@ -61,12 +58,34 @@ class LogFragment : Fragment() {
         setupUiListeners()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return if (item.itemId == android.R.id.home) {
-            requireActivity().onBackPressed()
-            true
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_logs, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        with(menu) {
+            findItem(R.id.show_logs)?.isVisible = false
+            findItem(R.id.request_priority)?.isVisible = false
+            findItem(R.id.request_mtu)?.isVisible = false
         }
-        else super.onOptionsItemSelected(item)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_icon_clear_logs -> {
+                clearLogs()
+                logAdapter?.let {
+                    it.setLogList(getLogs())
+                    it.notifyDataSetChanged()
+                }
+                true
+            }
+            android.R.id.home -> {
+                requireActivity().onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setupRecyclerView() {
@@ -98,6 +117,12 @@ class LogFragment : Fragment() {
         return service?.connectedGatt?.let {
             service?.getLogsForDevice(it.device.address)
         } ?: emptyList()
+    }
+
+    private fun clearLogs() {
+        service?.connectedGatt?.let {
+            service?.clearLogsForDevice(it.device.address)
+        }
     }
 
     override fun onResume() {

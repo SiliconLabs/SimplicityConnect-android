@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="24dp"
+    android:paddingHorizontal="24dp"
+    android:paddingVertical="16dp"
     android:orientation="horizontal"
     tools:background="@color/silabs_ripple_blue">
 
@@ -13,6 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"
+        android:layout_gravity="center"
         android:layout_marginEnd="16dp"
         android:textStyle="bold"
         android:text="@string/log_example_time"

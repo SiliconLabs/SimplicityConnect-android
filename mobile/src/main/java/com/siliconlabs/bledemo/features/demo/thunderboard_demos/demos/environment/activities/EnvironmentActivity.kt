@@ -147,11 +147,17 @@ class EnvironmentActivity : ThunderboardActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_settings) {
-            showSettings()
-            return true
+        return when (item.itemId) {
+            android.R.id.home -> {
+                service?.connectedGatt?.disconnect()
+                true
+            }
+            R.id.action_settings -> {
+                showSettings()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun showSettings() {
@@ -305,18 +311,11 @@ class EnvironmentActivity : ThunderboardActivity() {
         }
     }
 
-    private fun onDeviceDisconnect() {
-        if (!this.isFinishing) {
-            showMessage(R.string.device_has_disconnected)
-            finish()
-        }
-    }
-
     override val gattCallback: TimeoutGattCallback = object : TimeoutGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
             if (newState == BluetoothGatt.STATE_DISCONNECTED) {
-                onDeviceDisconnect()
+                onDeviceDisconnected()
             }
         }
 

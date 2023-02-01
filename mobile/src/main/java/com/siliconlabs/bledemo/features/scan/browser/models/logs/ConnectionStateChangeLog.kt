@@ -3,27 +3,27 @@ package com.siliconlabs.bledemo.features.scan.browser.models.logs
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothProfile
 
-class ConnectionStateChangeLog(gatt: BluetoothGatt, status: Int, newState: Int) : Log() {
-    private fun parseNewState(newState: Int): String {
+class ConnectionStateChangeLog(
+        gatt: BluetoothGatt,
+        private val status: Int,
+        private val newState: Int
+) : Log(gatt) {
+
+
+    override fun generateLogInfo() : String {
+        return StringBuilder().apply {
+            append("Connection state changed for device ${parseDeviceInfo()}")
+            append("\nChange status: ${parseStatus(status)}, new state: ${parseNewState()}")
+        }.toString()
+    }
+
+    private fun parseNewState(): String {
         return when (newState) {
-            BluetoothProfile.STATE_DISCONNECTED -> "State Disconnected"
-            BluetoothProfile.STATE_CONNECTING -> "State Connecting"
-            BluetoothProfile.STATE_CONNECTED -> "Successful connect to device"
-            BluetoothProfile.STATE_DISCONNECTING -> "State Disconnecting"
+            BluetoothProfile.STATE_DISCONNECTED -> "Disconnected"
+            BluetoothProfile.STATE_CONNECTING -> "Connecting"
+            BluetoothProfile.STATE_CONNECTED -> "Connected"
+            BluetoothProfile.STATE_DISCONNECTING -> "Disconnecting"
             else -> newState.toString()
         }
-    }
-
-    private fun parseStatus(status: Int): String {
-        return if (status == BluetoothGatt.GATT_SUCCESS) {
-            "Success"
-        } else status.toString()
-    }
-
-    init {
-        logTime = getTime()
-        logInfo = (gatt.device.address + " (" + getDeviceName(gatt.device.name) + "): "
-                + parseNewState(newState) + ". Status: " + parseStatus(status))
-        deviceAddress = gatt.device.address
     }
 }

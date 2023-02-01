@@ -8,13 +8,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
+import com.siliconlabs.bledemo.databinding.ActivityWifiCommissioningBinding
 import com.siliconlabs.bledemo.utils.Converters
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.adapters.AccessPointsAdapter
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.AccessPoint
@@ -27,11 +26,8 @@ import java.util.*
  * Created by harika on 18-04-2016.
  */
 class WifiCommissioningActivity : BaseDemoActivity() {
-    private var accessPointConnectedView: LinearLayout? = null
-    private var accessPointConnectedMessage: TextView? = null
-    private var disconnectButton: Button? = null
-    private var accessPointsListView: RecyclerView? = null
-    private var firmwareVersion: TextView? = null
+
+    private lateinit var _binding: ActivityWifiCommissioningBinding
     private var progressDialog: ProgressDialog? = null
 
     private var accessPointsAdapter: AccessPointsAdapter? = null
@@ -53,38 +49,39 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     private val sleepForWrite: Long = 500
     private val sleepForRead: Long = 500
 
-    private var bluetoothService: BluetoothService? = null
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_wifi_commissioning)
-        initViews()
+        _binding = ActivityWifiCommissioningBinding.inflate(layoutInflater)
+        setContentView(_binding.root)
+
+        setupRecyclerView()
+        setupUiListeners()
     }
 
 
     override fun onBluetoothServiceBound() {
         service?.also {
             it.registerGattCallback(mBluetoothGattCallback)
-            it.connectedGatt!!.discoverServices()
+            it.connectedGatt?.discoverServices()
         }
         showProgressDialog(getString(R.string.ble_detail_device_connection))
     }
 
-    private fun initViews() {
-        firmwareVersion = findViewById(R.id.firmware_version_tv)
+    private fun setupRecyclerView() {
         accessPointsAdapter = AccessPointsAdapter(accessPoints, object : AccessPointsAdapter.OnItemClickListener {
             override fun onItemClick(itemView: View?, position: Int) {
                 onAccessPointClicked(position)
             }
         })
-        accessPointsListView = findViewById(R.id.wifi_access_pts_list)
-        accessPointsListView?.adapter = accessPointsAdapter
-        accessPointsListView?.layoutManager = LinearLayoutManager(applicationContext)
-        accessPointConnectedView = findViewById(R.id.ap_connected_layout)
-        accessPointConnectedMessage = findViewById(R.id.ap_name)
-        disconnectButton = findViewById(R.id.disconnect_btn)
-        disconnectButton?.setOnClickListener { showDisconnectionDialog() }
+        _binding.wifiAccessPtsList.apply {
+            adapter = accessPointsAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+    }
+
+    private fun setupUiListeners() {
+        _binding.disconnectBtn.setOnClickListener { showDisconnectionDialog() }
     }
 
     private fun showProgressDialog(message: String) {
@@ -99,7 +96,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     }
 
     override fun onBackPressed() {
-        bluetoothService?.clearConnectedGatt()
+        service?.clearConnectedGatt()
         super.onBackPressed()
     }
 
@@ -112,13 +109,6 @@ class WifiCommissioningActivity : BaseDemoActivity() {
 
     private fun showToastOnUi(message: String) {
         runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_SHORT).show() }
-    }
-
-    private fun onDeviceDisconnect() {
-        if (!isFinishing) {
-            showToastOnUi(getString(R.string.device_has_disconnected))
-            finish()
-        }
     }
 
     fun onAccessPointScanned(accessPoint: AccessPoint) {
@@ -146,10 +136,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
             connectedAccessPoint = null
             showToastOnUi(getString(R.string.ap_disconnect_success))
             scanForAccessPoints()
-            runOnUiThread {
-                accessPointConnectedView?.visibility = View.GONE
-                accessPointsListView?.visibility = View.VISIBLE
-            }
+            toggleMainView(isAccessPointConnected = false)
         } else {
             showToastOnUi(getString(R.string.ap_disconnect_fail))
         }
@@ -161,7 +148,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
             if (isItemClicked) { /* Board already connected when clicking on item */
                 showDisconnectionDialog()
             } else { /* Board connected when entering the app */
-                showAccessPointConnectedMessage()
+                toggleMainView(isAccessPointConnected = true)
             }
         } else {
             clickedAccessPoint?.let { /* No board connected when clicking on item */
@@ -176,15 +163,14 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     }
 
     fun onFirmwareVersionReceived(firmwareVersion: String) {
-        runOnUiThread { this@WifiCommissioningActivity.firmwareVersion?.text = firmwareVersion }
+        runOnUiThread { _binding.firmwareVersionTv.text = firmwareVersion }
         writeCommand(BoardCommand.Send.CHECK_CONNECTION)
     }
 
-    private fun showAccessPointConnectedMessage() {
+    private fun toggleMainView(isAccessPointConnected: Boolean) {
         runOnUiThread {
-            accessPointConnectedMessage?.text = getString(R.string.device_already_connected)
-            accessPointsListView?.visibility = View.GONE
-            accessPointConnectedView?.visibility = View.VISIBLE
+            _binding.apConnectedLayout.visibility = if (isAccessPointConnected) View.VISIBLE else View.GONE
+            _binding.wifiAccessPtsList.visibility = if (isAccessPointConnected) View.GONE else View.VISIBLE
         }
     }
 
@@ -255,7 +241,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             Timber.d("onConnectionStateChange; status = $status, newState = $newState")
             if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                onDeviceDisconnect()
+                onDeviceDisconnected()
             }
         }
 
@@ -394,7 +380,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
         Thread {
             var writeStatus = false
             while (!writeStatus) {
-                writeStatus = writeToCharacteristic(bluetoothService?.connectedGatt, characteristicWrite, dataToWrite)
+                writeStatus = writeToCharacteristic(service?.connectedGatt, characteristicWrite, dataToWrite)
                 Thread.sleep(sleepForWrite)
             }
             Timber.d("Command $sendCommand written successfully")
@@ -418,7 +404,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
 
     private fun readOperation() {
         Thread {
-            bluetoothService?.connectedGatt?.readCharacteristic(characteristicRead)
+            service?.connectedGatt?.readCharacteristic(characteristicRead)
             Thread.sleep(sleepForRead)
         }.start()
     }

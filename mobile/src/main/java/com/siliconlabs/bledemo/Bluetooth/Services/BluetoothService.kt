@@ -139,7 +139,7 @@ class BluetoothService : LocalService<BluetoothService>() {
 
     private val connectionTimeoutRunnable = Runnable {
         connectedGatt?.let { gatt ->
-            addConnectionLog(TimeoutLog(gatt.device))
+            addDeviceLog(TimeoutLog(gatt))
             gatt.disconnect()
             reconnectionRunnable?.let { handler.removeCallbacks(it) }
             reconnectionRunnable = null
@@ -396,10 +396,6 @@ class BluetoothService : LocalService<BluetoothService>() {
         return connectedGatt
     }
 
-    fun getConnectedGatts() : List<BluetoothGatt> {
-        return activeConnections.values.map { it.connection.gatt!! }
-    }
-
     fun connectGatt(
             device: BluetoothDevice,
             requestRssiUpdates: Boolean,
@@ -431,7 +427,6 @@ class BluetoothService : LocalService<BluetoothService>() {
 
     private fun clearGattConnection(address: String) {
         getActiveConnection(address)?.let {
-            addConnectionLog(DisconnectByButtonLog(address))
             it.connection.gatt?.close()
             removeActiveConnection(it.connection.gatt?.device?.address)
             if (connectedGatt?.device?.address == address) {
@@ -497,10 +492,8 @@ class BluetoothService : LocalService<BluetoothService>() {
 
     fun getActiveConnection(address: String) = activeConnections[address]
     fun getActiveConnections() = activeConnections.values.toList()
-    fun getNumberOfConnections() = activeConnections.size
-    fun isAnyDeviceConnected() = activeConnections.isNotEmpty()
 
-    fun addConnectionLog(log: Log) {
+    fun addDeviceLog(log: Log) {
         synchronized(connectionLogs) {
             connectionLogs.add(log)
         }
@@ -509,6 +502,12 @@ class BluetoothService : LocalService<BluetoothService>() {
     fun getLogsForDevice(address: String) : List<Log> {
         return synchronized(connectionLogs) {
             connectionLogs.filter { it.deviceAddress == address }
+        }
+    }
+
+    fun clearLogsForDevice(address: String) {
+        return synchronized(connectionLogs) {
+            connectionLogs.removeIf { it.deviceAddress == address }
         }
     }
 
@@ -526,7 +525,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
             Timber.d("onConnectionStateChange(): gatt device = ${gatt.device.address}, status = $status, newState = $newState")
-            addConnectionLog(ConnectionStateChangeLog(gatt, status, newState))
+            addDeviceLog(ConnectionStateChangeLog(gatt, status, newState))
 
             when (newState) {
                 BluetoothProfile.STATE_CONNECTED -> {
@@ -558,7 +557,8 @@ class BluetoothService : LocalService<BluetoothService>() {
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             super.onServicesDiscovered(gatt, status)
             Timber.d("onServicesDiscovered(): gatt device = ${gatt.device.address}, status = $status")
-            addConnectionLog(ServicesDiscoveredLog(gatt, status))
+            addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.SERVICES_DISCOVERED,
+                    status))
             extraGattCallback?.onServicesDiscovered(gatt, status)
         }
 
@@ -566,7 +566,8 @@ class BluetoothService : LocalService<BluetoothService>() {
             super.onCharacteristicRead(gatt, characteristic, status)
             Timber.d("onCharacteristicRead(): gatt device = ${gatt.device.address}, uuid = ${
                 characteristic.uuid}, value = ${characteristic.value?.contentToString()}")
-            addConnectionLog(GattOperationWithDataLog("onCharacteristicRead", gatt, status, characteristic))
+            addDeviceLog(GattOperationWithDataLog(gatt, GattOperationLog.Type.READ_CHARACTERISTIC,
+                    status, characteristic.uuid, characteristic.value))
             extraGattCallback?.onCharacteristicRead(gatt, characteristic, status)
         }
 
@@ -574,7 +575,8 @@ class BluetoothService : LocalService<BluetoothService>() {
             super.onCharacteristicWrite(gatt, characteristic, status)
             Timber.d("onCharacteristicWrite(): gatt device = ${gatt.device.address}, uuid = ${
                 characteristic.uuid}, status = $status, value = ${characteristic.value?.contentToString()}")
-            addConnectionLog(GattOperationWithDataLog("onCharacteristicWrite", gatt, status, characteristic))
+            addDeviceLog(GattOperationWithDataLog(gatt, GattOperationLog.Type.WRITE_CHARACTERISTIC,
+                    status, characteristic.uuid, characteristic.value))
             extraGattCallback?.onCharacteristicWrite(gatt, characteristic, status)
         }
 
@@ -582,7 +584,8 @@ class BluetoothService : LocalService<BluetoothService>() {
             super.onCharacteristicChanged(gatt, characteristic)
             Timber.d("onCharacteristicChanged(): gatt device = ${gatt.device.address}, uuid = ${
                 characteristic.uuid}, value = ${characteristic.value?.contentToString()}")
-            addConnectionLog(GattOperationWithDataLog("onCharacteristicChanged", gatt, null, characteristic))
+            addDeviceLog(GattOperationWithDataLog(gatt, GattOperationLog.Type.CHARACTERISTIC_CHANGED,
+                    null, characteristic.uuid, characteristic.value))
             extraGattCallback?.onCharacteristicChanged(gatt, characteristic)
         }
 
@@ -591,7 +594,8 @@ class BluetoothService : LocalService<BluetoothService>() {
             Timber.d("onDescriptorRead(): gatt device = ${gatt.device.address}, uuid = ${
                 descriptor.uuid}, descriptor's characteristic = ${
                 descriptor.characteristic.uuid}, value = ${descriptor.value?.contentToString()}")
-            addConnectionLog(CommonLog("onDescriptorRead, device: ${gatt.device.address}, status: $status", gatt.device.address))
+            addDeviceLog(GattOperationWithDataLog(gatt, GattOperationLog.Type.READ_DESCRIPTOR,
+                    status, descriptor.uuid, descriptor.value))
             extraGattCallback?.onDescriptorRead(gatt, descriptor, status)
         }
 
@@ -600,22 +604,24 @@ class BluetoothService : LocalService<BluetoothService>() {
             Timber.d("onDescriptorWrite(): gatt device = ${gatt.device.address}, uuid = ${
                 descriptor.uuid}, descriptor's characteristic = ${
                 descriptor.characteristic.uuid}, value = ${descriptor.value?.contentToString()}")
-            addConnectionLog(CommonLog("onDescriptorWrite, device: ${gatt.device.address}, status: $status", gatt.device.address))
+            addDeviceLog(GattOperationWithDataLog(gatt, GattOperationLog.Type.WRITE_DESCRIPTOR,
+                    status, descriptor.uuid, descriptor.value))
             extraGattCallback?.onDescriptorWrite(gatt, descriptor, status)
         }
 
         override fun onReliableWriteCompleted(gatt: BluetoothGatt, status: Int) {
             super.onReliableWriteCompleted(gatt, status)
             Timber.d("onReliableWriteCompleted(): gatt device = ${gatt.device.address}, status = $status")
-            addConnectionLog(CommonLog("onReliableWriteCompleted, device: ${gatt.device.address}, status: $status", gatt.device.address))
+            addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.RELIABLE_WRITE_COMPLETED,
+                    status))
             extraGattCallback?.onReliableWriteCompleted(gatt, status)
         }
 
         override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {
             super.onReadRemoteRssi(gatt, rssi, status)
             Timber.d("onReadRemoteRssi(): gatt device = ${gatt.device.address}, rssi = $rssi, status = $status")
-            addConnectionLog(CommonLog("onReadRemoteRssi, device: ${gatt.device.address}, status: $status, rssi: $rssi", gatt.device.address))
-
+            addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.READ_RSSI,
+                    status, "rssi = $rssi"))
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 updateConnectionRssi(gatt, rssi)
                 extraGattCallback?.onReadRemoteRssi(gatt, rssi, status)
@@ -625,15 +631,17 @@ class BluetoothService : LocalService<BluetoothService>() {
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
             super.onMtuChanged(gatt, mtu, status)
             Timber.d("onMtuChanged(): gatt device =${gatt.device.address}, mtu = $mtu")
-            addConnectionLog(CommonLog("onMtuChanged, device: ${gatt.device.address}, status: $status, mtu: $mtu", gatt.device.address))
+            addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.MTU_CHANGED,
+                    status, "mtu = $mtu"))
             extraGattCallback?.onMtuChanged(gatt, mtu, status)
         }
 
-        @SuppressLint("BinaryOperationInTimber")
-        override fun onPhyUpdate(gatt: BluetoothGatt?, txPhy: Int, rxPhy: Int, status: Int) {
+        override fun onPhyUpdate(gatt: BluetoothGatt, txPhy: Int, rxPhy: Int, status: Int) {
             super.onPhyUpdate(gatt, txPhy, rxPhy, status)
-            Timber.d("onPhyUpdate(): gatt device = ${gatt?.device?.address}, txPhy = $txPhy, " +
-                    "rxPhy = $rxPhy, status = $status")
+            Timber.d("onPhyUpdate(): gatt device = ${gatt.device?.address}, txPhy = ${
+                    txPhy}, rxPhy = $rxPhy, status = $status")
+            addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.PHY_UPDATED,
+                    status, "txPhy = $txPhy, rxPhy = $rxPhy"))
             extraGattCallback?.onPhyUpdate(gatt, txPhy, rxPhy, status)
         }
     }

@@ -197,7 +197,7 @@ class BlinkyActivity : BaseDemoActivity() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
             if (newState == BluetoothGatt.STATE_DISCONNECTED) {
-                runOnUiThread { onDeviceDisconnect() }
+                onDeviceDisconnected()
             }
         }
 
@@ -261,10 +261,4 @@ class BlinkyActivity : BaseDemoActivity() {
         }
     }
 
-    private fun onDeviceDisconnect() {
-        if (!isFinishing) {
-            showMessage(R.string.device_has_disconnected)
-            finish()
-        }
-    }
 }

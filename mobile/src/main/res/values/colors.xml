@@ -11,8 +11,6 @@
 
     <color name="silabs_ripple_blue">#400086D9</color>
 
-    <color name="silabs_blue_selected">#00619C</color>
-    <color name="silabs_red_selected">#FFA1171F</color>
     <color name="silabs_red_dark">#FFA1171F</color>
 
     <color name="silabs_background">#ECECEC</color>

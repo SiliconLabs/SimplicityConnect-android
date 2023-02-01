@@ -62,7 +62,8 @@ class AdvertiserService : Service() {
     private fun prepareNotification(): Notification {
         createNotificationChannel()
         val notificationIntent = Intent(this, AdvertiserFragment::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
+        val pendingIntent = PendingIntent.getActivity(
+                this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("EFR Connect")

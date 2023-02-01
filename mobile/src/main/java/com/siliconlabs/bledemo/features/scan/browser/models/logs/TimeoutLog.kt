@@ -1,17 +1,12 @@
 package com.siliconlabs.bledemo.features.scan.browser.models.logs
 
-import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
 
-class TimeoutLog : Log {
-    constructor(device: BluetoothDevice) {
-        logTime = getTime()
-        logInfo = (device.address + " (" + getDeviceName(device.name) + "): "
-                + "Connection timeout")
-        deviceAddress = device.address
-    }
+class TimeoutLog(gatt: BluetoothGatt) : Log(gatt) {
 
-    constructor() {
-        logTime = getTime()
-        logInfo = "Connection timeout"
+    override fun generateLogInfo(): String {
+        return StringBuilder().apply {
+            append("Connection timeout for device ${parseDeviceInfo()}")
+        }.toString()
     }
 }

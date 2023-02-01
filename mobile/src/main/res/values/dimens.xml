@@ -139,10 +139,7 @@
     <dimen name="space_M">32dp</dimen>
     <dimen name="space_ML">40dp</dimen>
     <dimen name="space_L">48dp</dimen>
-    <dimen name="space_XL">56dp</dimen>
-    <dimen name="space_XXL">88dp</dimen>
-    <dimen name="space_XXXL">112dp</dimen>
-    <dimen name="space_XXXXL">156dp</dimen>
+
 
     <dimen name="text_size_XS">8sp</dimen>
     <dimen name="text_size_S">12sp</dimen>
@@ -150,8 +147,6 @@
     <dimen name="text_size_M">16sp</dimen>
     <dimen name="text_size_ML">18sp</dimen>
     <dimen name="text_size_L">20sp</dimen>
-    <dimen name="text_size_LXL">30sp</dimen>
-    <dimen name="text_size_XL">34sp</dimen>
 
     <!-- Material Dimensions -->
     <dimen name="material_listitem_height">72dp</dimen>

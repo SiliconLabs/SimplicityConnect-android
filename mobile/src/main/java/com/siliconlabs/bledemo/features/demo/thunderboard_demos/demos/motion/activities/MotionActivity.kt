@@ -158,20 +158,13 @@ class MotionActivity : GdxActivity() {
         car_animation.addView(gdx3dView)
     }
 
-    private fun onDeviceDisconnect() {
-        if (!this.isFinishing) {
-            showMessage(R.string.device_has_disconnected)
-            finish()
-        }
-    }
-
     private fun showBrokenSensorsMessage(brokenSensors: Set<ThunderboardSensor>) {
         AlertDialog.Builder(this).apply {
             setTitle(getString(R.string.sensor_malfunction_dialog_title))
             setMessage(getString(R.string.critical_sensor_malfunction_dialog_message,
                     TextUtils.join(", ", brokenSensors)))
             setPositiveButton(getString(R.string.button_ok)) { _, _ ->
-                service?.connectedGatt?.disconnect() ?: onDeviceDisconnect()
+                service?.connectedGatt?.disconnect() ?: onDeviceDisconnected()
             }
             setCancelable(false)
             runOnUiThread { show() }
@@ -194,7 +187,7 @@ class MotionActivity : GdxActivity() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
             if (newState == BluetoothGatt.STATE_DISCONNECTED) {
-                onDeviceDisconnect()
+                onDeviceDisconnected()
             }
         }
 

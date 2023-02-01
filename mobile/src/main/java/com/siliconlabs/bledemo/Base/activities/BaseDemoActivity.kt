@@ -64,14 +64,16 @@ abstract class BaseDemoActivity : BaseActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
+        return if (item.itemId == android.R.id.home) {
+            service?.connectedGatt?.disconnect()
+            true
+        } else super.onOptionsItemSelected(item)
+    }
 
-                service?.connectedGatt?.disconnect()
-                onBackPressed()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+    protected fun onDeviceDisconnected() {
+        if (!isFinishing) {
+            showMessage(R.string.device_has_disconnected)
+            finish()
         }
     }
 
