@@ -86,10 +86,9 @@
 
     <!-- Dialog help -->
     <dimen name="help_text_padding">22dp</dimen>
-    <dimen name="help_text_size">14sp</dimen>
+    <dimen name="help_text_size">16sp</dimen>
     <dimen name="help_button_height">50dp</dimen>
     <dimen name="help_section_and_body_separation">10dp</dimen>
-    <dimen name="help_body_and_version_separation">10dp</dimen>
     <dimen name="help_dialog_ok_btn_text_size">14sp</dimen>
 
     <!-- Dialog About Mappings Dictionary -->
@@ -103,7 +102,7 @@
     <dimen name="filter_header_bold_text_size">14sp</dimen>
     <dimen name="filter_rssi_value_text_size">14sp</dimen>
     <dimen name="filter_rssi_min_max_text_size">14sp</dimen>
-    <dimen name="filter_checkbox_text_size">12sp</dimen>
+    <dimen name="filter_checkbox_text_size">14sp</dimen>
 
     <!-- Dialog: select device (health thermometer) -->
     <dimen name="device_selection_item_padding">8dp</dimen>
@@ -240,8 +239,8 @@
     <dimen name="main_view_icon_width">96dp</dimen>
     <dimen name="main_view_icon_height">120dp</dimen>
     <dimen name="main_view_square_icon_dimension">96dp</dimen>
-    <dimen name="card_view_main_icon_dimension">48dp</dimen>
-    <dimen name="card_view_feature_icon_dimension">20dp</dimen>
+    <dimen name="card_view_main_icon_dimension">32dp</dimen>
+    <dimen name="card_view_feature_icon_dimension">16dp</dimen>
     <dimen name="property_icon_width">16dp</dimen>
     <dimen name="property_icon_height">12dp</dimen>
     <dimen name="card_view_action_icon_width">16dp</dimen>
@@ -271,5 +270,12 @@
     <dimen name="info_bar_padding">12dp</dimen>
 
     <dimen name="filters_margin_horizontal">16dp</dimen>
+
+    <dimen name="settings_subtitle_margin">8dp</dimen>
+    <dimen name="settings_version_margin">8dp</dimen>
+    <dimen name="settings_subtitle_size">18sp</dimen>
+    <dimen name="settings_link_button_height">120dp</dimen>
+    <dimen name="settings_link_button_width">160dp</dimen>
+
 
 </resources>

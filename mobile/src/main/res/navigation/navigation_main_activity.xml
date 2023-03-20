@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/scanFragment">
+
+    <fragment
+        android:id="@+id/scanFragment"
+        android:name="com.siliconlabs.bledemo.home_screen.fragments.ScanFragment"
+        android:label="ScanFragment"
+        tools:layout="@layout/fragment_scan">
+    </fragment>
+    <fragment
+        android:id="@+id/configureFragment"
+        android:name="com.siliconlabs.bledemo.home_screen.fragments.ConfigureFragment"
+        android:label="ConfigureFragment"
+        tools:layout="@layout/fragment_configure"/>
+    <fragment
+        android:id="@+id/testFragment"
+        android:name="com.siliconlabs.bledemo.home_screen.fragments.TestFragment"
+        android:label="TestFragment"
+        tools:layout="@layout/fragment_test"/>
+    <fragment
+        android:id="@+id/demoFragment"
+        android:name="com.siliconlabs.bledemo.home_screen.fragments.DemoFragment"
+        android:label="DemoFragment"
+        tools:layout="@layout/fragment_demo"/>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.siliconlabs.bledemo.home_screen.fragments.SettingsFragment"
+        android:label="SettingsFragment"
+        tools:layout="@layout/fragment_settings"/>
+</navigation>

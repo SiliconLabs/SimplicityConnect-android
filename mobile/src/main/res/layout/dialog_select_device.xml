@@ -28,15 +28,27 @@
             android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
             android:text="@string/soc_must_be_connected" />
 
-        <TextView
-            android:id="@+id/devices_number"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
-            android:layout_marginVertical="@dimen/space_SM"
-            android:text="@string/DEVICE_LIST"
-            android:textSize="18sp"
-            android:textColor="@color/silabs_primary_text" />
+            android:layout_marginVertical="@dimen/space_SM">
+
+            <TextView
+                android:id="@+id/devices_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/DEVICE_LIST"
+                android:textSize="18sp"
+                android:textColor="@color/silabs_primary_text" />
+
+            <ProgressBar android:id="@+id/demo_scan_progress_bar"
+                android:layout_width="32dp"
+                android:layout_height="32dp" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

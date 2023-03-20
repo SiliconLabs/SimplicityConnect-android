@@ -35,6 +35,7 @@ class FilterFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         activity?.title = getString(R.string.button_filter)
         setListeners()
+        initSeekbarValues()
         loadFilterValues()
     }
 
@@ -53,13 +54,23 @@ class FilterFragment : DialogFragment() {
         }
     }
 
+    private fun initSeekbarValues() {
+        viewBinding.seekBarRssi.apply {
+            textviewSeekbarMin.text = getString(R.string.filter_seekbar_min)
+            textviewSeekbarMax.text = getString(R.string.filter_seekbar_max)
+            seekControlBar.max = resources.getInteger(R.integer.rssi_value_range)
+            seekControlBar.progress = 0
+            seekControlText.text = getString(R.string.filter_rssi_not_set)
+        }
+    }
+
     private fun loadFilterValues() {
         viewModel.activeFilters.value?.let {
             viewBinding.apply {
                 etSearchDeviceName.setText(it.name)
                 if (it.isRssiFlag) {
-                    sbRssi.progress = getSeekbarProgress(it.rssiValue)
-                    tvRssiValue.text = getString(R.string.n_dBm, it.rssiValue)
+                    seekBarRssi.seekControlBar.progress = getSeekbarProgress(it.rssiValue)
+                    seekBarRssi.seekControlText.text = getString(R.string.n_dBm, it.rssiValue)
                 }
                 if (it.bleFormats.contains(BleFormat.UNSPECIFIED)) beaconTypeUnspecified.isChecked = true
                 if (it.bleFormats.contains(BleFormat.ALT_BEACON)) beaconTypeAltBeacon.isChecked = true
@@ -76,9 +87,9 @@ class FilterFragment : DialogFragment() {
     private fun resetFilters() {
         viewBinding.apply {
             etSearchDeviceName.text.clear()
-            sbRssi.progress = 0
+            seekBarRssi.seekControlBar.progress = 0
             rssiFlag = false
-            tvRssiValue.text = getString(R.string.filter_rssi_not_set)
+            seekBarRssi.seekControlText.text = getString(R.string.filter_rssi_not_set)
             clearCheckBoxes()
             cbOnlyConnectable.isChecked = false
             cbOnlyBonded.isChecked = false
@@ -95,20 +106,22 @@ class FilterFragment : DialogFragment() {
         }
     }
 
+    private fun getScanFragment() = parentFragment as ScanFragment
+
     private fun setListeners() {
         viewBinding.apply {
             btnApplyFilters.setOnClickListener {
                 viewModel.apply {
-                    updateFiltering(prepareFilters(), buildDescription())
-                    setIsFilterViewOn(false)
+                    updateFiltering(prepareFilters())
+                    getScanFragment().toggleFilterFragment(shouldShowFilterFragment = false)
                 }
             }
 
-            sbRssi.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            seekBarRssi.seekControlBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                     rssiFlag = true
                     val rssi = getRssiValue(progress)
-                    tvRssiValue.text = getString(R.string.n_dBm, rssi)
+                    seekBarRssi.seekControlText.text = getString(R.string.n_dBm, rssi)
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar) {}
@@ -139,7 +152,7 @@ class FilterFragment : DialogFragment() {
 
     private fun prepareFilters(): FilterDeviceParams? {
         val name = viewBinding.etSearchDeviceName.text.toString()
-        val rssi = getRssiValue(viewBinding.sbRssi.progress)
+        val rssi = getRssiValue(viewBinding.seekBarRssi.seekControlBar.progress)
         val activeFilter = FilterDeviceParams(
                 if (name.isNotBlank()) name else null,
                 rssi,
@@ -152,27 +165,4 @@ class FilterFragment : DialogFragment() {
         return if (!activeFilter.isEmpty) activeFilter else null
     }
 
-    private fun buildDescription() : String? {
-        val name = et_search_device_name.text.toString()
-        val rssi = getRssiValue(sb_rssi.progress)
-
-        val description = StringBuilder().apply {
-            if (name.isNotBlank()) append("\"$name\", ")
-            if (rssiFlag) append("> $rssi dBm, ")
-            if (selectedBeacons.isNotEmpty()) {
-                selectedBeacons.forEach { append(getString(it.nameResId)).append(", ") }
-            }
-            if (cb_only_favourites.isChecked) {
-                append(getString(R.string.only_favorites)).append(", ")
-            }
-            if (cb_only_connectable.isChecked) {
-                append(getString(R.string.only_connectible)).append(", ")
-            }
-            if (cb_only_bonded.isChecked) {
-                append(getString(R.string.only_bonded)).append(", ")
-            }
-        }.toString()
-
-        return if (description.isEmpty()) null else description.substring(0, description.count() - 2)
-    }
 }

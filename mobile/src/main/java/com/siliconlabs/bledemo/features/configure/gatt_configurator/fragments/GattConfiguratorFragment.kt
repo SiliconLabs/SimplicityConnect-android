@@ -209,14 +209,16 @@ class GattConfiguratorFragment : Fragment(), OnClickListener {
     }
 
     private fun openFileChooser() {
-        val requestFileIntent = Intent(ACTION_GET_CONTENT)
-        requestFileIntent.type = "text/xml"
-        startActivityForResult(requestFileIntent, IMPORT_GATT_SERVER_CODE)
+        Intent(ACTION_GET_CONTENT)
+            .apply { type = "text/xml" }
+            .also { startActivityForResult(createChooser(it,
+                getString(R.string.gatt_configurator_choose_file_for_import)), IMPORT_GATT_SERVER_CODE) }
     }
 
     private fun openLocationChooser() {
-        val requestLocationIntent = Intent(ACTION_OPEN_DOCUMENT_TREE)
-        startActivityForResult(requestLocationIntent, EXPORT_GATT_SERVER_CODE)
+        Intent(ACTION_OPEN_DOCUMENT_TREE).also {
+            startActivityForResult(it, EXPORT_GATT_SERVER_CODE)
+        }
     }
 
     private fun startGattServerActivityForResult(activity: FragmentActivity, position: Int, gattServer: GattServer) {
@@ -263,12 +265,15 @@ class GattConfiguratorFragment : Fragment(), OnClickListener {
     private fun onExportLocationChosen(intent: Intent?) {
         intent?.data?.let {
             DocumentFile.fromTreeUri(activity?.applicationContext!!, it)?.let { location ->
-                GattServerExporter().export(
-                        viewModel.gattServers.value?.filter { it.isCheckedForExport }!!
+                GattServerExporter().export(viewModel.gattServers.value?.filter { server ->
+                    server.isCheckedForExport
+                }!!
                 ).forEach { server ->
                     location.createFile("text/xml", server.key)?.let { singleFile ->
-                        activity?.contentResolver?.openOutputStream(
-                                singleFile.uri)?.write(server.value.toByteArray())
+                        activity?.contentResolver?.openOutputStream(singleFile.uri)?.let { stream ->
+                            stream.write(server.value.toByteArray())
+                            stream.close()
+                        }
                     }
                 }
                 Toast.makeText(activity, getString(R.string

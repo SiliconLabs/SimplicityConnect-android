@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/fav_icon_with_padding_grey" android:state_checked="false" />
-    <item android:drawable="@drawable/fav_icon_with_padding_blue" android:state_checked="true" />
-    <item android:drawable="@drawable/fav_icon_with_padding_grey" />
+    <item android:drawable="@drawable/ic_star_grey_24dp" android:state_checked="false" />
+    <item android:drawable="@drawable/ic_star_blue_24dp" android:state_checked="true" />
+    <item android:drawable="@drawable/ic_star_grey_24dp" />
 </selector>

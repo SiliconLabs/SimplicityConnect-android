@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.utils
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
@@ -7,6 +8,7 @@ import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import java.util.*
 
+@SuppressLint("MissingPermission")
 object BLEUtils {
 
 

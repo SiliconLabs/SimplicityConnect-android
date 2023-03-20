@@ -1,8 +1,10 @@
 package com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothProfile
 
+@SuppressLint("MissingPermission")
 class ThunderBoardDevice(device: BluetoothDevice) {
     var name: String = device.name
     var batteryLevel = 0

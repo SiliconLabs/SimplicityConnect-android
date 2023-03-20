@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.scan.browser.adapters
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -141,6 +142,7 @@ class DebugModeDeviceAdapter(
 
     private class AdvertisementData(val rows: List<Pair<String, String>>)
 
+    @SuppressLint("MissingPermission")
     class ViewHolder(
             private val context: Context,
             private val viewBinding: AdapterBrowserDeviceBinding

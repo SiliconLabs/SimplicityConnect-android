@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.connected_lighting.activities
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
@@ -16,6 +17,7 @@ import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
 import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.utils.Notifications
 
+@SuppressLint("MissingPermission")
 class ConnectedLightingActivity : BaseDemoActivity(), BluetoothController {
     private var presenter: ConnectedLightingPresenter? = null
     private var gattService: GattService? = null
@@ -28,8 +30,8 @@ class ConnectedLightingActivity : BaseDemoActivity(), BluetoothController {
     private val gattCallback: TimeoutGattCallback = object : TimeoutGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
-            if (newState == BluetoothGatt.STATE_DISCONNECTED || newState == BluetoothGatt.STATE_DISCONNECTING) {
-                runOnUiThread { disconnectWithModal() }
+            if (newState == BluetoothGatt.STATE_DISCONNECTED) {
+                onDeviceDisconnected()
             }
         }
 
@@ -37,7 +39,7 @@ class ConnectedLightingActivity : BaseDemoActivity(), BluetoothController {
             super.onServicesDiscovered(gatt, status)
             val characteristic = getLightCharacteristic()
             if (characteristic != null) {
-                val success = service?.connectedGatt?.readCharacteristic(characteristic)!!
+                val success = gatt.readCharacteristic(characteristic)
                 if (!success) {
                     disconnectWithModal()
                 }
@@ -159,7 +161,7 @@ class ConnectedLightingActivity : BaseDemoActivity(), BluetoothController {
     override fun onResume() {
         super.onResume()
         //get out if the service has stopped, or if the gatt connection is dead
-        if (serviceHasBeenSet && service == null || service != null && !service?.isGattConnected()!!) {
+        if (serviceHasBeenSet && service == null || service != null && !service?.isGattConnected(connectionAddress)!!) {
             disconnectWithModal()
         }
     }
@@ -167,7 +169,7 @@ class ConnectedLightingActivity : BaseDemoActivity(), BluetoothController {
     override fun onBluetoothServiceBound() {
         serviceHasBeenSet = true
         service?.registerGattCallback(true, gattCallback)
-        service?.refreshGattServices()
+        service?.refreshGattServices(gatt)
     }
 
     private fun disconnectWithModal() {
@@ -179,7 +181,7 @@ class ConnectedLightingActivity : BaseDemoActivity(), BluetoothController {
     override fun setLightValue(lightOn: Boolean): Boolean {
         val characteristic = getLightCharacteristic() ?: return false
         characteristic.setValue(if (lightOn) 1 else 0, GattCharacteristic.Light.format, 0)
-        return service?.connectedGatt?.writeCharacteristic(characteristic)!!
+        return gatt?.writeCharacteristic(characteristic)!!
     }
 
     override fun setPresenter(presenter: ConnectedLightingPresenter?) {
@@ -188,17 +190,16 @@ class ConnectedLightingActivity : BaseDemoActivity(), BluetoothController {
 
     override fun getLightValue(): Boolean {
         val characteristic = getLightCharacteristic()
-        return characteristic != null && service?.connectedGatt?.readCharacteristic(characteristic)!!
+        return characteristic != null && gatt?.readCharacteristic(characteristic)!!
     }
 
     private fun getLightCharacteristic(): BluetoothGattCharacteristic? {
         if (service == null) {
             return null
         }
-        if (!service?.isGattConnected()!!) {
+        if (!service?.isGattConnected(connectionAddress)!!) {
             return null
         }
-        val gatt = service?.connectedGatt
         gattService = getGattService()
 
         if (gattService != null) {
@@ -215,7 +216,6 @@ class ConnectedLightingActivity : BaseDemoActivity(), BluetoothController {
     }
 
     private fun getGattService(): GattService? {
-        val gatt = service?.connectedGatt
         return when {
             gatt?.getService(GattService.ProprietaryLightService.number) != null -> {
                 GattService.ProprietaryLightService

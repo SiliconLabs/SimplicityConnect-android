@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.bluetooth.ble
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -12,6 +13,7 @@ import timber.log.Timber
  */
 class BluetoothScanCallback(private val service: BluetoothService) : BroadcastReceiver() {
 
+    @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == BluetoothDevice.ACTION_FOUND) { // device discovered
 

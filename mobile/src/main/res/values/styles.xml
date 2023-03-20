@@ -12,7 +12,7 @@
         <item name="extendedFloatingActionButtonStyle">@style/ExtendedFloatingActionButton</item>
     </style>
 
-    <style name="SplashTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="CustomSplashTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_screen_gradient</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
@@ -24,6 +24,12 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
+    <!-- override system splash screen with just a matching color background -->
+    <style name="SystemSplashTheme" parent="Theme.SplashScreen">
+        <item name="android:windowBackground">@drawable/splash_screen_gradient</item>
+        <item name="postSplashScreenTheme">@style/CustomSplashTheme</item>
     </style>
 
 
@@ -62,26 +68,25 @@
     </style>
 
     <style name="BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
-        <item name="android:backgroundTint">@android:color/white</item>
         <item name="android:paddingBottom">@dimen/bottom_navigation_bottom_padding</item>
-        <item name="itemBackground">@drawable/bottom_item_selector</item>
+        <item name="itemBackground">@drawable/bottom_navigation_ripple</item>
         <item name="itemIconTint">@drawable/nav_bar_selector</item>
-        <item name="itemTextAppearanceActive">@style/TextAppearance.BottomNavigationViewActive
-        </item>
+        <item name="itemTextAppearanceActive">@style/TextAppearance.BottomNavigationViewActive</item>
         <item name="itemTextAppearanceInactive">@style/TextAppearance.BottomNavigationViewInactive
         </item>
     </style>
 
-    <style name="TextAppearance.BottomNavigationViewInactive" parent="">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/silabs_inactive</item>
+    <style name="TextAppearance.BottomNavigationView" parent="">
         <item name="android:textSize">@dimen/bottom_navigation_text_size</item>
+        <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="TextAppearance.BottomNavigationViewActive" parent="">
-        <item name="android:fontFamily">sans-serif-medium</item>
+    <style name="TextAppearance.BottomNavigationViewInactive" parent="TextAppearance.BottomNavigationView">
+        <item name="android:textColor">@color/silabs_inactive</item>
+    </style>
+
+    <style name="TextAppearance.BottomNavigationViewActive" parent="TextAppearance.BottomNavigationView">
         <item name="android:textColor">@color/blue_primary</item>
-        <item name="android:textSize">@dimen/bottom_navigation_text_size</item>
     </style>
 
     <style name="TextAppearance.ToolbarTitle" parent="">
@@ -346,6 +351,12 @@
     </style>
 
 
+    <style name="seek_control_bar" parent="block">
+        <item name="android:paddingVertical">@dimen/space_S</item>
+        <item name="android:background">@drawable/seekbar_background</item>
+        <item name="android:progressTint">@color/seekbar_progress</item>
+        <item name="android:thumbTint">@color/blue_primary</item>
+    </style>
 
     <style name="seekbar_range_text_views">
         <item name="android:layout_width">@dimen/seekbar_range_text_view_width</item>
@@ -461,6 +472,21 @@
         <item name="android:textSize">@dimen/card_view_text_info_size</item>
         <item name="android:textColor">@color/silabs_subtle_text</item>
         <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <!-- END OF REDESIGN -->
+
+    <style name="settings_subtitle">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">@dimen/settings_subtitle_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="settings_link_button">
+        <item name="android:layout_width">@dimen/settings_link_button_width</item>
+        <item name="android:layout_height">@dimen/settings_link_button_height</item>
+        <item name="android:layout_marginHorizontal">8dp</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
 </resources>

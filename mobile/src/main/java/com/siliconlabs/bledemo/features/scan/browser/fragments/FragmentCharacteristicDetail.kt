@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.scan.browser.fragments
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
@@ -9,6 +10,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock.uptimeMillis
 import android.util.TypedValue
 import android.view.*
 import android.widget.*
@@ -28,11 +30,13 @@ import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 
+@SuppressLint("MissingPermission")
 open class FragmentCharacteristicDetail : Fragment() {
 
     var isRemote: Boolean = true
     var writeType = WriteType.REMOTE_WRITE
     private var currRefreshInterval = REFRESH_INTERVAL
+    private var lastNotificationTime = uptimeMillis()
 
     private val rawValueViews = ArrayList<EditText>()
     private val hidableViews = ArrayList<View>()
@@ -146,20 +150,27 @@ open class FragmentCharacteristicDetail : Fragment() {
     }
 
     private fun updateValueView(withNotification: Boolean) {
-        activity?.runOnUiThread {
-
-            if (withNotification) {
+        if (withNotification) {
+            offset = 0
+            value = mBluetoothCharact?.value?.clone() ?: byteArrayOf()
+            if (uptimeMillis() - lastNotificationTime >= MIN_NOTIFICATION_UPDATE_INTERVAL) {
+                activity?.runOnUiThread {
+                    valuesLayout.removeAllViews()
+                    loadValueViews()
+                    if (value.isNotEmpty()) previousValue = value.clone()
+                }
+                lastNotificationTime = uptimeMillis()
+            } else {
+                if (value.isNotEmpty()) previousValue = value.clone()
+            }
+        }
+        else {
+            if (currRefreshInterval >= REFRESH_INTERVAL) {
+                currRefreshInterval = 0
                 offset = 0
                 value = mBluetoothCharact?.value?.clone() ?: byteArrayOf()
-                valuesLayout.removeAllViews()
-                loadValueViews()
-            }
-            else {
-                if (currRefreshInterval >= REFRESH_INTERVAL) {
-                    currRefreshInterval = 0
-                    offset = 0
-                    value = mBluetoothCharact?.value?.clone() ?: byteArrayOf()
 
+                activity?.runOnUiThread {
                     if (value.contentEquals(previousValue)) {
                         hideValues()
                         handler.removeCallbacks(postDisplayValues)
@@ -169,9 +180,11 @@ open class FragmentCharacteristicDetail : Fragment() {
                         handler.removeCallbacks(postLoadValueViews)
                         handler.postDelayed(postLoadValueViews, 50)
                     }
+                    if (value.isNotEmpty()) previousValue = value.clone()
                 }
+            } else {
+                if (value.isNotEmpty()) previousValue = value.clone()
             }
-            if (value.isNotEmpty()) previousValue = value.clone()
         }
     }
 
@@ -478,6 +491,7 @@ open class FragmentCharacteristicDetail : Fragment() {
 
     companion object {
         private const val REFRESH_INTERVAL = 500
+        private const val MIN_NOTIFICATION_UPDATE_INTERVAL = 200
         private const val REG_CERT_DATA_LIST_NAME = "IEEE 11073-20601 Regulatory Certification Data List"
         const val CGM_SPECIFIC_OPS_CONTROL_POINT_UUID = "2aac"
     }

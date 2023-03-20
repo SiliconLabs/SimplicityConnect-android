@@ -114,13 +114,15 @@ class LogFragment : Fragment() {
     }
 
     private fun getLogs() : List<Log> {
-        return service?.connectedGatt?.let {
+        val gatt = (activity as DeviceServicesActivity).bluetoothGatt
+        return gatt?.let {
             service?.getLogsForDevice(it.device.address)
         } ?: emptyList()
     }
 
     private fun clearLogs() {
-        service?.connectedGatt?.let {
+        val gatt = (activity as DeviceServicesActivity).bluetoothGatt
+        gatt?.let {
             service?.clearLogsForDevice(it.device.address)
         }
     }

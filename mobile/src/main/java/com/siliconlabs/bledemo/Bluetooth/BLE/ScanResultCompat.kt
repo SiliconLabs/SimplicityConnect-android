@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.bluetooth.ble
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import com.siliconlabs.bledemo.bluetooth.parsing.ScanRecordParser
@@ -27,6 +28,7 @@ class ScanResultCompat {
     var txPower = 0
     var periodicAdvertisingInterval = 0
 
+    @SuppressLint("MissingPermission")
     fun getDisplayName(): String {
         return device?.name ?: "N/A"
     }

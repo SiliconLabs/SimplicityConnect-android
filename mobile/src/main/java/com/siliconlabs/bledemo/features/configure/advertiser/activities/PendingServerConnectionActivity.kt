@@ -77,6 +77,11 @@ class PendingServerConnectionActivity : BaseActivity() {
                 }
             } else { showMessage(R.string.connection_failed) }
         }
+
+        override fun onMaxRetriesExceeded(gatt: BluetoothGatt) {
+            super.onMaxRetriesExceeded(gatt)
+            finish()
+        }
     }
 
     companion object {

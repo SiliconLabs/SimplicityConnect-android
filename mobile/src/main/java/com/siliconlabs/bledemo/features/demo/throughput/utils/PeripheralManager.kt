@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.throughput.utils
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
@@ -13,6 +14,7 @@ import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.utils.UuidConsts
 import timber.log.Timber
 
+@SuppressLint("MissingPermission")
 object PeripheralManager {
 
 

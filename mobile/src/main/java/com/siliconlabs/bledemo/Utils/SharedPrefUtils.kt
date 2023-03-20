@@ -18,6 +18,7 @@ class SharedPrefUtils(context: Context) {
         private const val TEMPORARY_FAVORITES_DEVICES_KEY = "TEMPORARY_FAVORITES_DEVICES_KEY"
         private const val DISPLAY_APPLICATION_LEAVE_DIALOG_KEY = "DISPLAY_APPLICATION_LEAVE_DIALOG_KEY"
         private const val DISPLAY_UNBOND_DEVICE_DIALOG_KEY = "DISPLAY_UNBOND_DEVICE_DIALOG_KEY"
+        private const val DISPLAY_MANUAL_UNBOND_DEVICE_DIALOG_KEY = "DISPLAY_MANUAL_UNBOND_DEVICE_DIALOG_KEY"
         private const val CHARACTERISTIC_NAMES_KEY = "CHARACTERISTIC_NAMES_KEY"
         private const val SERVICE_NAMES_KEY = "SERVICE_NAMES_KEY"
     }
@@ -125,12 +126,28 @@ class SharedPrefUtils(context: Context) {
         editor.apply()
     }
 
+    fun shouldDisplayManualUnbondDeviceDialog(): Boolean {
+        return shouldDisplayDialog(DISPLAY_MANUAL_UNBOND_DEVICE_DIALOG_KEY)
+    }
+
+    fun setShouldDisplayManualUnbondDeviceDialog(displayDialog: Boolean) {
+        setShouldDisplayDialog(displayDialog, DISPLAY_MANUAL_UNBOND_DEVICE_DIALOG_KEY)
+    }
+
     fun shouldDisplayUnbondDeviceDialog(): Boolean {
-        return mPrefs.getBoolean(DISPLAY_UNBOND_DEVICE_DIALOG_KEY, true)
+        return shouldDisplayDialog(DISPLAY_UNBOND_DEVICE_DIALOG_KEY)
     }
 
     fun setShouldDisplayUnbondDeviceDialog(displayDialog: Boolean) {
-        editor.putBoolean(DISPLAY_UNBOND_DEVICE_DIALOG_KEY, displayDialog)
+        setShouldDisplayDialog(displayDialog, DISPLAY_UNBOND_DEVICE_DIALOG_KEY)
+    }
+
+    private fun shouldDisplayDialog(key: String): Boolean {
+        return mPrefs.getBoolean(key, true)
+    }
+
+    fun setShouldDisplayDialog(displayDialog: Boolean, key: String) {
+        editor.putBoolean(key, displayDialog)
         editor.apply()
     }
 }

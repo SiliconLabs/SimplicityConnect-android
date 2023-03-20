@@ -4,29 +4,29 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.widget.LinearLayout
-import androidx.fragment.app.FragmentManager
-import com.siliconlabs.bledemo.home_screen.dialogs.LocationInfoDialog
-import com.siliconlabs.bledemo.databinding.LocationEnableBarBinding
+import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.home_screen.dialogs.WarningBarInfoDialog
 
-class LocationEnableBar(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs) {
+class LocationEnableBar(context: Context, attrs: AttributeSet) : NoServiceWarningBar(context, attrs) {
 
-    private val viewBinding = LocationEnableBarBinding.inflate(LayoutInflater.from(context), this, true)
-    private var fragmentManager: FragmentManager? = null
 
-    init {
-        viewBinding.apply {
-            enableLocation.setOnClickListener { context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) }
-            locationInfo.setOnClickListener {
-                fragmentManager?.let { LocationInfoDialog().show(it, "location_info_dialog") }
-            }
-        }
-
+    override fun initTexts() {
+        _binding.apply { with(context) {
+            warningBarMessage.text = getString(R.string.location_disabled)
+            warningBarActionButton.text = getString(R.string.action_settings)
+            warningBarInfoButton.text = getString(R.string.warning_bar_additional_info)
+        } }
     }
 
-    fun setLocationInfoFragmentManager(fragmentManager: FragmentManager) {
-        this.fragmentManager = fragmentManager
+    override fun initClickListeners() {
+        _binding.apply {
+            warningBarActionButton.setOnClickListener {
+                context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+            warningBarInfoButton.setOnClickListener {
+                showInfoDialog(WarningBarInfoDialog.Type.LOCATION)
+            }
+        }
     }
 
 }

@@ -34,9 +34,9 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginHorizontal="@dimen/space_XS"
-                    android:orientation="vertical" >
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/device_name"
@@ -60,6 +60,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:insetTop="0dp"
+                    android:insetBottom="8dp"
+                    android:minHeight="@dimen/card_view_main_icon_dimension"
                     tools:text="@string/button_connect" />
 
             </LinearLayout>
@@ -67,8 +70,8 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="@dimen/card_view_first_horizontal_separator_margin_top"
-                android:layout_marginBottom="@dimen/space_S"
+                android:layout_marginTop="@dimen/space_XS"
+                android:layout_marginBottom="@dimen/space_XS"
                 android:background="?android:attr/listDivider" />
 
             <LinearLayout
@@ -85,7 +88,6 @@
                     <ImageView
                         android:layout_width="@dimen/card_view_feature_icon_dimension"
                         android:layout_height="@dimen/card_view_feature_icon_dimension"
-                        android:layout_marginBottom="@dimen/space_XXS"
                         android:contentDescription="@string/advertiser_label_tx_power"
                         android:src="@drawable/redesign_ic_wifi"
                         android:layout_gravity="center"
@@ -115,9 +117,8 @@
                     tools:ignore="UseCompoundDrawables">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginBottom="@dimen/space_XXS"
+                        android:layout_width="@dimen/card_view_feature_icon_dimension"
+                        android:layout_height="@dimen/card_view_feature_icon_dimension"
                         android:layout_gravity="center_horizontal"
                         android:contentDescription="@string/advertiser_label_interval"
                         android:src="@drawable/redesign_ic_clock"
@@ -148,10 +149,9 @@
                     tools:ignore="UseCompoundDrawables">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="@dimen/card_view_feature_icon_dimension"
+                        android:layout_height="@dimen/card_view_feature_icon_dimension"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginBottom="@dimen/space_XXS"
                         android:contentDescription="@string/advertiser_label_interval"
                         android:src="@drawable/ic_beacon_ibeacon"
                         app:tint="@color/silabs_dark_gray_icon" />
@@ -183,7 +183,6 @@
                         android:layout_width="@dimen/card_view_feature_icon_dimension"
                         android:layout_height="@dimen/card_view_feature_icon_dimension"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginBottom="@dimen/space_XXS"
                         android:contentDescription="@string/advertiser_label_interval"
                         android:src="@drawable/redesign_ic_bluetooth"
                         app:tint="@color/silabs_dark_gray_icon" />
@@ -203,23 +202,25 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="@dimen/space_S"
+                android:layout_marginVertical="@dimen/space_XS"
                 android:background="?android:attr/listDivider" />
 
             <RelativeLayout
                 android:id="@+id/firstRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/card_view_margin_vertical"
+                android:layout_marginBottom="@dimen/space_XS"
                 android:gravity="center_vertical">
 
                 <androidx.appcompat.widget.AppCompatCheckBox
                     android:id="@+id/favorite_btn"
                     android:layout_width="wrap_content"
-                    android:layout_alignParentStart="true"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:backgroundTint="@color/silabs_white"
                     android:button="@drawable/fav_star"
-                    android:backgroundTint="@color/silabs_white"/>
+                    android:minWidth="24dp"
+                    android:minHeight="24dp" />
 
                 <TextView
                     android:id="@+id/tv_is_bonded"
@@ -228,8 +229,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:gravity="center_horizontal"
-                    tools:text="Bonded"
-                    tools:ignore="RelativeOverlap" />
+                    tools:ignore="RelativeOverlap"
+                    tools:text="Bonded" />
 
                 <com.siliconlabs.bledemo.common.views.ExpandArrow
                     android:id="@+id/expand_arrow"
@@ -238,8 +239,9 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/ic_arrow_down_on"
-                    android:contentDescription="@string/content_desc_dropdown_arrow" />
+                    android:contentDescription="@string/content_desc_dropdown_arrow"
+                    android:padding="0dp"
+                    android:src="@drawable/ic_arrow_down_on" />
 
             </RelativeLayout>
 

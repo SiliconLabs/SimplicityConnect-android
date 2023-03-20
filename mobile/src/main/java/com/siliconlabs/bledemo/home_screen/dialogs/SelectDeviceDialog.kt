@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.home_screen.dialogs
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.le.ScanFilter
@@ -44,8 +45,8 @@ import com.siliconlabs.bledemo.features.demo.throughput.utils.PeripheralManager
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models.ThunderBoardDevice
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.activities.WifiCommissioningActivity
 import timber.log.Timber
-import java.util.*
 
+@SuppressLint("MissingPermission")
 class SelectDeviceDialog(
         private var bluetoothService: BluetoothService?
 ) : BaseDialogFragment(
@@ -161,6 +162,7 @@ class SelectDeviceDialog(
         getIntent(connectType)?.let { intent ->
             boardType?.let { intent.putExtra(MODEL_TYPE_EXTRA, it) }
             powerSource?.let { intent.putExtra(POWER_SOURCE_EXTRA, it) }
+            currentDeviceInfo?.let { intent.putExtra(DEVICE_ADDRESS_EXTRA, it.device.address) }
             startActivity(intent)
         }
         (activity as BaseActivity).dismissModalDialog()
@@ -329,9 +331,11 @@ class SelectDeviceDialog(
             if (isAnyDeviceDiscovered) {
                 list.visibility = View.VISIBLE
                 noDevicesFound.visibility = View.GONE
+                demoScanProgressBar.visibility = View.GONE
             } else {
                 list.visibility = View.GONE
                 noDevicesFound.visibility = View.VISIBLE
+                demoScanProgressBar.visibility = View.INVISIBLE
             }
         }
     }
@@ -445,7 +449,7 @@ class SelectDeviceDialog(
 
         bluetoothService?.let { service ->
             (activity as BaseActivity).showModalDialog(BaseActivity.ConnectionStatus.CONNECTING, DialogInterface.OnCancelListener {
-                service.clearConnectedGatt()
+                currentDeviceInfo?.let { service.disconnectGatt(it.address) }
             })
             service.isNotificationEnabled = false
             service.connectGatt(deviceInfo.device, false, timeoutGattCallback)
@@ -485,6 +489,7 @@ class SelectDeviceDialog(
 
         const val MODEL_TYPE_EXTRA = "model_type"
         const val POWER_SOURCE_EXTRA = "power_source"
+        const val DEVICE_ADDRESS_EXTRA = "device_address"
         private const val SCAN_UPDATE_PERIOD = 2000L //ms
 
         fun newDialog(connectType: GattConnectType?, service: BluetoothService? = null) : SelectDeviceDialog {
@@ -503,6 +508,10 @@ class SelectDeviceDialog(
     override fun onDiscoveryFailed() {
         viewModel.setIsScanningOn(false)
         dismiss()
+    }
+
+    override fun onDiscoveryTimeout() {
+        /* Scanning through this dialog is always indefinite. */
     }
 
 }

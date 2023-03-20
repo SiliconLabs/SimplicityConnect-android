@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.throughput.activities
 
+import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.os.*
 import androidx.lifecycle.ViewModelProvider
@@ -17,6 +18,7 @@ import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
+@SuppressLint("MissingPermission")
 class ThroughputActivity : BaseDemoActivity() {
     private lateinit var viewModel: ThroughputViewModel
     private var processor = GattProcessor()
@@ -39,8 +41,8 @@ class ThroughputActivity : BaseDemoActivity() {
         service?.also {
             it.registerGattCallback(false, processor)
             it.registerGattServerCallback(serverProcessor)
-            it.discoverGattServices()
         }
+        gatt?.discoverServices()
     }
 
     private class GattCommand(val type: Type, val gatt: BluetoothGatt?, val characteristic: BluetoothGattCharacteristic?) {
@@ -63,12 +65,12 @@ class ThroughputActivity : BaseDemoActivity() {
     }
 
     private fun getRemoteThroughputCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        val gattService = service?.connectedGatt?.getService(GattService.ThroughputTestService.number)
+        val gattService = gatt?.getService(GattService.ThroughputTestService.number)
         return gattService?.getCharacteristic(characteristic.uuid)
     }
 
     private fun getRemoteThroughputInformationCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        val gattService = service?.connectedGatt?.getService(GattService.ThroughputInformationService.number)
+        val gattService = gatt?.getService(GattService.ThroughputInformationService.number)
         return gattService?.getCharacteristic(characteristic.uuid)
     }
 

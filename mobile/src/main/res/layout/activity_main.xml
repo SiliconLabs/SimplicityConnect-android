@@ -7,18 +7,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.siliconlabs.bledemo.home_screen.views.BluetoothPermissionsEnableBar
-        android:id="@+id/bluetooth_permissions_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
-    <FrameLayout
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/main_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+
+        app:navGraph="@navigation/navigation_main_activity"
+        app:defaultNavHost="true"
+        tools:layout="@layout/fragment_scan"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/main_navigation"

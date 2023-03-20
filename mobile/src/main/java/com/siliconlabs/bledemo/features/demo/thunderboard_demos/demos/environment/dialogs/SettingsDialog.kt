@@ -1,9 +1,14 @@
 package com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.dialogs
 
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
+import com.siliconlabs.bledemo.databinding.DialogSettingsBinding
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.model.TemperatureScale
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.utils.PreferenceManager
 import kotlinx.android.synthetic.main.dialog_settings.*
@@ -11,19 +16,29 @@ import kotlinx.android.synthetic.main.dialog_settings.*
 class SettingsDialog(
         context: Context,
         private val settingsHandler: SettingsHandler
-) : AlertDialog(context) {
+) : BaseDialogFragment(
+        hasCustomWidth = true,
+        isCanceledOnTouchOutside = true
+) {
 
     private val prefsManager = PreferenceManager(context)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.dialog_settings)
-        env_settings_go_back.setOnClickListener {
-            handleSave()
-            dismiss()
-        }
-        setOnCancelListener { handleSave() }
+    private lateinit var _binding: DialogSettingsBinding
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View {
+        _binding = DialogSettingsBinding.inflate(inflater)
+        return _binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         loadPersonalize()
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        handleSave()
     }
 
     private fun handleSave() {

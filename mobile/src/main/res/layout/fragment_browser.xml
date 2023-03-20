@@ -13,69 +13,77 @@
     android:orientation="vertical"
     android:background="@android:color/white" >
 
-        <com.siliconlabs.bledemo.home_screen.views.LocationPermissionBar
-            android:id="@+id/location_permission_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+    <com.siliconlabs.bledemo.home_screen.views.BluetoothEnableBar
+        android:id="@+id/bluetooth_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.siliconlabs.bledemo.home_screen.views.BluetoothPermissionsBar
+        android:id="@+id/bluetooth_permissions_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.siliconlabs.bledemo.home_screen.views.LocationEnableBar
+        android:id="@+id/location_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.siliconlabs.bledemo.home_screen.views.LocationPermissionBar
+        android:id="@+id/location_permission_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+
+    <TextView
+        android:id="@+id/active_filters_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/space_XS"
+        android:paddingHorizontal="12dp"
+        android:visibility="gone"
+        android:textColor="@color/silabs_black"
+        android:maxLines="1"
+        android:ellipsize="end"
+        tools:text="> 50 dBm, connectible"
+        tools:visibility="visible" />
+
+    <RelativeLayout
+        android:id="@+id/debug_body"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/silabs_background">
+
+        <include
+            android:id="@+id/looking_for_devices_background"
+            layout="@layout/full_screen_info"
             android:visibility="gone"
-            tools:visibility="visible" />
+            tools:visibility="visible"/>
 
-        <com.siliconlabs.bledemo.home_screen.views.BluetoothEnableBar
-            android:id="@+id/bluetooth_bar"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            android:layout_height="match_parent"
+            android:background="@color/silabs_transparent">
 
-        <com.siliconlabs.bledemo.home_screen.views.LocationEnableBar
-            android:id="@+id/location_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-        <TextView
-            android:id="@+id/active_filters_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="@dimen/space_XS"
-            android:paddingHorizontal="12dp"
-            android:visibility="gone"
-            android:textColor="@color/silabs_black"
-            android:maxLines="1"
-            android:ellipsize="end"
-            tools:text="> 50 dBm, connectible"
-            tools:visibility="visible" />
-
-        <RelativeLayout
-            android:id="@+id/debug_body"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/silabs_background">
-
-            <include
-                android:id="@+id/looking_for_devices_background"
-                layout="@layout/full_screen_info"
-                android:visibility="gone"
-                tools:visibility="visible"/>
-
-            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                android:id="@+id/swipe_refresh_container"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_debug_devices"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/silabs_transparent">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_debug_devices"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/silabs_transparent"
-                    android:scrollbarFadeDuration="0"
-                    android:scrollbarStyle="outsideOverlay"
-                    android:scrollbars="vertical"
-                    android:splitMotionEvents="false" />
-            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                android:background="@color/silabs_transparent"
+                android:scrollbarFadeDuration="0"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbars="vertical"
+                android:splitMotionEvents="false" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
             <com.siliconlabs.bledemo.common.views.MainActionButton
                 android:id="@+id/btn_scanning"
@@ -84,15 +92,17 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_margin="@dimen/extended_fab_margin"
+                android:visibility="gone"
+                tools:visibility="visible"
                 tools:text="@string/btn_create_new" />
 
-        </RelativeLayout>
+    </RelativeLayout>
 
-        <com.siliconlabs.bledemo.common.views.FlyInBar
-            android:id="@+id/fly_in_bar"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/scanning_animation_bar_height"
-            android:visibility="gone"
-            tools:visibility="visible"/>
+    <com.siliconlabs.bledemo.common.views.FlyInBar
+        android:id="@+id/fly_in_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/scanning_animation_bar_height"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
 </LinearLayout>

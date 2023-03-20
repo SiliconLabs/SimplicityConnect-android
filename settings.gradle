@@ -1,1 +1,1 @@
-include ':mobile',':libraries:materialdesign'
+include ':mobile'

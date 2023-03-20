@@ -52,7 +52,10 @@ class ServiceItemContainer(
 
 
             if (service.characteristics.isEmpty()) {
-                serviceInfoCardView.setBackgroundColor(Color.LTGRAY)
+                characteristicsSeparator.visibility = GONE
+                tvMoreInfo.visibility = GONE
+                expandArrow.visibility = GONE
+                tvNoCharacteristics.visibility = VISIBLE
             }
         }
     }

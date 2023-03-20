@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.bluetooth.ble
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.util.Log
 import androidx.core.util.isEmpty
@@ -88,6 +89,7 @@ class BluetoothDeviceInfo(var device: BluetoothDevice, var isFavorite: Boolean =
         }
 
     val name: String
+        @SuppressLint("MissingPermission")
         get() = device.name ?: "N/A"
 
     val address: String

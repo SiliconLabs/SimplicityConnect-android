@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.configure.advertiser.activities
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
@@ -555,6 +556,7 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
         layout.addView(baseContainer)
     }
 
+    @SuppressLint("MissingPermission")
     private fun addCompleteLocalNameData(layout: ViewGroup, baseContainer: View, mode: DataMode) {
         val itemContainer = prepareItemContainer(baseContainer, BluetoothAdapter.getDefaultAdapter().name)
         itemContainer.ib_remove.visibility = View.GONE

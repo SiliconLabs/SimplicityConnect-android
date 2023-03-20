@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.activities
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
@@ -99,7 +100,7 @@ class MotionActivity : GdxActivity() {
         calibrate.setOnClickListener {
             popupCalibratingDialog()
             Handler(Looper.getMainLooper()).postDelayed({
-                viewModel.calibrate(service?.connectedGatt)
+                viewModel.calibrate(gatt)
             }, 600)
         }
     }
@@ -158,13 +159,14 @@ class MotionActivity : GdxActivity() {
         car_animation.addView(gdx3dView)
     }
 
+    @SuppressLint("MissingPermission")
     private fun showBrokenSensorsMessage(brokenSensors: Set<ThunderboardSensor>) {
         AlertDialog.Builder(this).apply {
             setTitle(getString(R.string.sensor_malfunction_dialog_title))
             setMessage(getString(R.string.critical_sensor_malfunction_dialog_message,
                     TextUtils.join(", ", brokenSensors)))
             setPositiveButton(getString(R.string.button_ok)) { _, _ ->
-                service?.connectedGatt?.disconnect() ?: onDeviceDisconnected()
+                gatt?.disconnect() ?: onDeviceDisconnected()
             }
             setCancelable(false)
             runOnUiThread { show() }
@@ -180,7 +182,7 @@ class MotionActivity : GdxActivity() {
     }
 
     private fun getMotionCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        return service?.connectedGatt?.getService(GattService.Motion.number)?.getCharacteristic(characteristic.uuid)
+        return gatt?.getService(GattService.Motion.number)?.getCharacteristic(characteristic.uuid)
     }
 
     override val gattCallback: TimeoutGattCallback = object : TimeoutGattCallback() {

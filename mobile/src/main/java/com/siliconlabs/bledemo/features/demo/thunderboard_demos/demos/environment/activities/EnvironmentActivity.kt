@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.activities
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
@@ -30,11 +31,11 @@ import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.utils.Senso
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.activities.ThunderboardActivity
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models.ThunderBoardDevice
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.utils.SensorChecker
+import com.siliconlabs.bledemo.features.scan.browser.activities.DeviceServicesActivity
 import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.utils.Converters
 import kotlinx.android.synthetic.main.activity_environment.*
 import timber.log.Timber
-import java.util.*
 
 class EnvironmentActivity : ThunderboardActivity() {
 
@@ -146,10 +147,11 @@ class EnvironmentActivity : ThunderboardActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    @SuppressLint("MissingPermission")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                service?.connectedGatt?.disconnect()
+                gatt?.disconnect()
                 true
             }
             R.id.action_settings -> {
@@ -167,7 +169,9 @@ class EnvironmentActivity : ThunderboardActivity() {
                 gattQueue.clear() // show temperature scale change immediately (it's the first message to queue)
                 queueReadingEnvironmentalData()
             }
-        }).show()
+        }).also {
+            it.show(supportFragmentManager, SETTINGS_DIALOG_FRAGMENT)
+        }
     }
 
     private fun startReadings() {
@@ -249,17 +253,17 @@ class EnvironmentActivity : ThunderboardActivity() {
     }
 
     private fun getEnvironmentalSensingCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        return service?.connectedGatt?.getService(GattService.EnvironmentalSensing.number)?.
+        return gatt?.getService(GattService.EnvironmentalSensing.number)?.
         getCharacteristic(characteristic.uuid)
     }
 
     private fun getAirQualityCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        return service?.connectedGatt?.getService(GattService.IndoorAirQuality.number)?.
+        return gatt?.getService(GattService.IndoorAirQuality.number)?.
         getCharacteristic(characteristic.uuid)
     }
 
     private fun getHallEffectCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        return service?.connectedGatt?.getService(GattService.HallEffect.number)?.
+        return gatt?.getService(GattService.HallEffect.number)?.
         getCharacteristic(characteristic.uuid)
     }
 
@@ -267,7 +271,7 @@ class EnvironmentActivity : ThunderboardActivity() {
         val lightReact = getEnvironmentalSensingCharacteristic(GattCharacteristic.AmbientLightReact)
         if (lightReact != null) return lightReact
 
-        val lightReact2 = BLEUtils.getCharacteristic(service?.connectedGatt, GattService.AmbientLight,
+        val lightReact2 = BLEUtils.getCharacteristic(gatt, GattService.AmbientLight,
                 GattCharacteristic.AmbientLightReact)
         if (lightReact2 != null) return lightReact2
 
@@ -479,5 +483,6 @@ class EnvironmentActivity : ThunderboardActivity() {
 
     companion object {
         private const val MAX_AMBIENT_LIGHT = 99999
+        private const val SETTINGS_DIALOG_FRAGMENT = "settings_dialog_fragment"
     }
 }

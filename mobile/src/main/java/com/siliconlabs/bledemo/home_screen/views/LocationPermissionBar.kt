@@ -1,23 +1,28 @@
 package com.siliconlabs.bledemo.home_screen.views
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.widget.LinearLayout
-import com.siliconlabs.bledemo.databinding.LocationPermissionBarBinding
+import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.home_screen.dialogs.WarningBarInfoDialog
 
-class LocationPermissionBar(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
+class LocationPermissionBar(context: Context, attrs: AttributeSet?) : NoServiceWarningBar(context, attrs) {
 
-    private val _binding = LocationPermissionBarBinding.inflate(LayoutInflater.from(context), this, true)
+    override fun initTexts() {
+        _binding.apply { with(context) {
+            warningBarMessage.text = getString(R.string.location_permission_denied)
+            warningBarActionButton.text = getString(R.string.action_settings)
+            warningBarInfoButton.text = getString(R.string.warning_bar_additional_info)
+        } }
+    }
 
-    init {
-        _binding.btnSettings.setOnClickListener {
-            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    .apply { data = Uri.fromParts("package", context.packageName, null) }
-                    .also { context.startActivity(it) }
+    override fun initClickListeners() {
+        _binding.apply {
+            warningBarActionButton.setOnClickListener {
+                showAppSettingsScreen()
+            }
+            warningBarInfoButton.setOnClickListener {
+                showInfoDialog(WarningBarInfoDialog.Type.LOCATION_PERMISSION)
+            }
         }
     }
 

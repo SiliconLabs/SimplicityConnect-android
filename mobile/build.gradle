@@ -48,8 +48,8 @@ android {
         blueGecko {
             dimension "version"
             applicationId "com.siliconlabs.bledemo"
-            versionCode 30
-            versionName "2.6.1"
+            versionCode 32
+            versionName "2.6.2"
         }
     }
 
@@ -105,11 +105,11 @@ dependencies {
     annotationProcessor 'com.github.frankiesardo:auto-parcel-processor:0.3'
 
     'hilt'
-    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02"
-    kapt "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02"
-    kapt "androidx.hilt:hilt-compiler:1.0.0-alpha02"
-    implementation "com.google.dagger:hilt-android:2.28-alpha"
-    kapt "com.google.dagger:hilt-android-compiler:2.28-alpha"
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    kapt "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    kapt "androidx.hilt:hilt-compiler:1.0.0"
+    implementation "com.google.dagger:hilt-android:$dagger_hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$dagger_hilt_version"
 
     'instrumented tests'
     testImplementation('junit:junit:4.13')
@@ -117,9 +117,6 @@ dependencies {
     androidTestImplementation('androidx.test:runner:1.1.0')
     androidTestImplementation('androidx.test:rules:1.1.0')
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-
-    'materialdesign'
-    implementation project(':libraries:materialdesign')
 
     'timber'
     implementation 'com.jakewharton.timber:timber:4.7.1'
@@ -147,4 +144,20 @@ dependencies {
 
     'open csv'
     implementation 'com.opencsv:opencsv:5.6'
+
+    'flexbox'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
+
+    'splash screen'
+    implementation 'androidx.core:core-splashscreen:1.0.0'
+
+    def nav_version = "2.3.0"
+
+    // Kotlin
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    // Feature module Support
+    implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
+
 }

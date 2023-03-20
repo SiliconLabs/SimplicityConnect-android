@@ -16,9 +16,11 @@
  */
 package com.siliconlabs.bledemo.features.scan.browser.fragments
 
+import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -27,7 +29,6 @@ import android.view.*
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
@@ -35,30 +36,29 @@ import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
 import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes.getDeviceDisconnectedMessage
 import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes.getFailedConnectingToDeviceMessage
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
-import com.siliconlabs.bledemo.features.scan.browser.*
 import com.siliconlabs.bledemo.features.scan.browser.adapters.DebugModeDeviceAdapter
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.utils.SharedPrefUtils
-import com.siliconlabs.bledemo.features.scan.browser.fragments.*
 import com.siliconlabs.bledemo.features.scan.browser.view_states.ScannerFragmentViewState
 import com.siliconlabs.bledemo.databinding.FragmentBrowserBinding
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity
 import com.siliconlabs.bledemo.common.other.CardViewListDecoration
-import com.siliconlabs.bledemo.home_screen.base.BaseMainMenuFragment
+import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
 import com.siliconlabs.bledemo.home_screen.fragments.ScanFragment
 import com.siliconlabs.bledemo.home_screen.base.ViewPagerFragment
 import com.siliconlabs.bledemo.features.scan.browser.activities.DeviceServicesActivity
 import com.siliconlabs.bledemo.features.scan.browser.activities.UuidDictionaryActivity
 import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
 import com.siliconlabs.bledemo.features.scan.browser.adapters.DebugModeCallback
-import kotlinx.android.synthetic.main.fragment_browser.*
+import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
+import com.siliconlabs.bledemo.home_screen.base.LocationDependent
 
-class BrowserFragment : BaseMainMenuFragment(),
+class BrowserFragment : BaseServiceDependentMainMenuFragment(),
         OnRefreshListener {
 
     private lateinit var viewModel: ScanFragmentViewModel
     private lateinit var viewBinding: FragmentBrowserBinding
-    private lateinit var bluetoothService: BluetoothService
+    private var bluetoothService: BluetoothService? = null
 
     private lateinit var sharedPrefUtils: SharedPrefUtils
     private var devicesAdapter: DebugModeDeviceAdapter? = null
@@ -67,41 +67,65 @@ class BrowserFragment : BaseMainMenuFragment(),
     private var deviceToConnect: BluetoothDeviceInfo? = null
     private var blockConnectionAttempts = false
 
-    override fun onBluetoothStateChanged(isOn: Boolean) {
-        toggleBluetoothBar(isOn, viewBinding.bluetoothBar)
-        viewBinding.btnScanning.isEnabled = isOn
+    override val bluetoothDependent = object : BluetoothDependent {
 
-        viewModel.let {
-            it.setIsScanningOn(isOn)
-            if (!isOn) {
-                it.reset()
-                it.shouldResetChart = true
+        override fun onBluetoothStateChanged(isBluetoothOn: Boolean) {
+            toggleBluetoothBar(isBluetoothOn, viewBinding.bluetoothBar)
+            viewBinding.btnScanning.isEnabled = isBluetoothOperationPossible()
+
+            getScanFragment().setScanFragmentListener(scanFragmentListener)
+            viewModel.let {
+                it.setIsScanningOn(isBluetoothOperationPossible())
+                if (!isBluetoothOn) {
+                    it.reset()
+                    it.shouldResetChart = true
+                }
             }
         }
-    }
 
-    override fun onLocationStateChanged(isOn: Boolean) {
-        toggleLocationBar(isOn, viewBinding.locationBar)
-    }
+        override fun onBluetoothPermissionsStateChanged(arePermissionsGranted: Boolean) {
+            toggleBluetoothPermissionsBar(arePermissionsGranted, viewBinding.bluetoothPermissionsBar)
+            viewBinding.btnScanning.isEnabled = isBluetoothOperationPossible()
 
-    override fun onLocationPermissionStateChanged(isGranted: Boolean) {
-        viewBinding.apply {
-            toggleLocationPermissionBar(isGranted, locationPermissionBar)
-            btnScanning.isEnabled = isGranted
-        }
-    }
-
-    private val viewPagerFragmentListener = object : ViewPagerFragment.ViewPagerListener {
-        override fun refreshPage() {
-            getScanFragment().apply {
-                viewModel.updateConnectionStates()
-                setScanFragmentListener(scanFragmentListener)
-                refreshViewState(viewModel.getScannerFragmentViewState())
+            viewModel.let {
+                it.setIsScanningOn(isBluetoothOperationPossible())
+                if (!arePermissionsGranted) {
+                    it.reset()
+                    it.shouldResetChart = true
+                }
             }
         }
+
+        override fun refreshBluetoothDependentUi(isBluetoothOperationPossible: Boolean) {
+            /* Not needed */
+        }
+
+        override fun setupBluetoothPermissionsBarButtons() {
+            viewBinding.bluetoothPermissionsBar.setFragmentManager(childFragmentManager)
+        }
     }
 
-    private val  scanFragmentListener = object: ScanFragment.ScanFragmentListener{
+    override val locationDependent = object : LocationDependent {
+
+        override fun onLocationStateChanged(isLocationOn: Boolean) {
+            toggleLocationBar(isLocationOn, viewBinding.locationBar)
+        }
+        override fun onLocationPermissionStateChanged(isPermissionGranted: Boolean) {
+            viewBinding.apply {
+                toggleLocationPermissionBar(isPermissionGranted, locationPermissionBar)
+                btnScanning.isEnabled = isPermissionGranted
+            }
+        }
+        override fun setupLocationBarButtons() {
+            viewBinding.locationBar.setFragmentManager(childFragmentManager)
+        }
+
+        override fun setupLocationPermissionBarButtons() {
+            viewBinding.locationPermissionBar.setFragmentManager(childFragmentManager)
+        }
+    }
+
+    private val scanFragmentListener = object: ScanFragment.ScanFragmentListener{
         override fun onScanningStateChanged(isOn: Boolean) {
             toggleMainView(isOn, viewModel.isAnyDeviceDiscovered.value ?: false)
             toggleScanningButton(isOn)
@@ -127,7 +151,6 @@ class BrowserFragment : BaseMainMenuFragment(),
     override fun onAttach(context: Context) {
         super.onAttach(context)
         viewModel = getScanFragment().viewModel
-        bluetoothService = (activity as MainActivity).bluetoothService!!
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -150,10 +173,9 @@ class BrowserFragment : BaseMainMenuFragment(),
         initDevicesRecyclerView()
         initSwipeRefreshLayout()
 
-        (activity as MainActivity).onScanFragmentPrepared()
-        viewBinding.locationBar.setLocationInfoFragmentManager(childFragmentManager)
+        getScanFragment().setScanFragmentListener(scanFragmentListener) // for initial app enter
 
-        bluetoothService.apply {
+        bluetoothService?.apply {
             registerGattServerCallback(gattServerCallback)
             registerGattCallback(gattCallback)
         }
@@ -162,7 +184,10 @@ class BrowserFragment : BaseMainMenuFragment(),
 
     private fun initFullPageInfoViews() {
         viewBinding.lookingForDevicesBackground.apply {
-            image.setImageResource(R.drawable.redesign_ic_main_view_browser_scanning)
+            image.apply {
+                setImageResource(R.drawable.redesign_ic_main_view_browser_scanning_spinner)
+                (drawable as? AnimatedVectorDrawable)?.start()
+            }
             textPrimary.text = getString(R.string.device_scanning_background_message)
             textSecondary.visibility = View.GONE
         }
@@ -170,18 +195,26 @@ class BrowserFragment : BaseMainMenuFragment(),
 
     private fun observeChanges() {
         viewModel.apply {
-            filteredDevices.observe(viewLifecycleOwner, Observer {
+            filteredDevices.observe(viewLifecycleOwner) {
                 devicesAdapter?.updateDevices(getBluetoothInfoViewsState())
-            })
-            isAnyDeviceDiscovered.observe(viewLifecycleOwner, Observer {
+            }
+            isAnyDeviceDiscovered.observe(viewLifecycleOwner) {
                 toggleMainView(getIsScanningOn(), it)
-            })
-            deviceToInsert.observe(viewLifecycleOwner, Observer {
+            }
+            deviceToInsert.observe(viewLifecycleOwner) {
                 devicesAdapter?.addNewDevice(it)
-            })
-            activeFiltersDescription.observe(viewLifecycleOwner, Observer {
+            }
+            activeFiltersDescription.observe(viewLifecycleOwner) {
                 toggleFilterDescriptionView(it)
-            })
+            }
+            activityViewModel?.isSetupFinished?.observe(viewLifecycleOwner) {
+                if (it) {
+                    bluetoothService = (activity as? MainActivity)?.bluetoothService
+                    (parentFragment as ViewPagerFragment).setBluetoothService(bluetoothService)
+                    viewBinding.btnScanning.visibility = View.VISIBLE
+                    refreshViewState(viewModel.getScannerFragmentViewState())
+                }
+            }
         }
     }
 
@@ -195,7 +228,8 @@ class BrowserFragment : BaseMainMenuFragment(),
                 lookingForDevicesBackground.apply {
                     root.visibility = View.VISIBLE
                     if (isScanningOn) {
-                        image.setImageResource(R.drawable.redesign_ic_main_view_browser_scanning)
+                        image.setImageResource(R.drawable.redesign_ic_main_view_browser_scanning_spinner)
+                        (image.drawable as AnimatedVectorDrawable).start()
                         textPrimary.text = getString(R.string.device_scanning_background_message)
                     } else {
                         image.setImageResource(R.drawable.graphic_loading)
@@ -235,26 +269,19 @@ class BrowserFragment : BaseMainMenuFragment(),
     private fun setUiListeners() {
         viewBinding.btnScanning.setOnClickListener { viewModel.toggleScanningState() }
     }
-/*
-    private fun changeToolbarSortIcon(mode: SortMode) {
-        viewBinding.bluetoothBrowserToolbar.ivSort.apply {
-            setImageDrawable(ContextCompat.getDrawable(requireContext(), mode.resId))
-            if (btToolbarOpenedName == ToolbarName.SORT) {
-                DrawableCompat.setTint(drawable, ContextCompat.getColor(requireContext(), R.color.silabs_blue))
-            }
-        }
-    }
-*/
 
     override fun onResume() {
         super.onResume()
-        bluetoothService.apply {
+        bluetoothService?.apply {
             registerGattServerCallback(gattServerCallback)
             registerGattCallback(gattCallback)
         }
 
-        viewBinding.btnScanning.visibility = View.VISIBLE
-        (parentFragment as ViewPagerFragment).setViewPagerFragmentListener(viewPagerFragmentListener)
+        if (activityViewModel?.getIsSetupFinished() == true) {
+            viewModel.updateConnectionStates()
+            getScanFragment().setScanFragmentListener(scanFragmentListener)
+            refreshViewState(viewModel.getScannerFragmentViewState())
+        }
     }
 
     private fun refreshViewState(viewState: ScannerFragmentViewState) {
@@ -275,21 +302,11 @@ class BrowserFragment : BaseMainMenuFragment(),
 
     override fun onPause() {
         super.onPause()
-        bluetoothService.apply {
+        bluetoothService?.apply {
             unregisterGattServerCallback()
             unregisterGattCallback()
         }
     }
-/*
-    override fun onBackPressed() {
-        if (connecting_container.visibility == View.VISIBLE) {
-            Log.d("onBackPressed", "Called")
-            hideConnectingAnimation()
-        } else {
-            super.onBackPressed()
-        }
-    }
-*/
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
@@ -299,7 +316,7 @@ class BrowserFragment : BaseMainMenuFragment(),
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_filter -> {
-                viewModel.setIsFilterViewOn(true)
+                getScanFragment().toggleFilterFragment(shouldShowFilterFragment = true)
                 true
             }
             R.id.menu_sort -> {
@@ -323,7 +340,7 @@ class BrowserFragment : BaseMainMenuFragment(),
     }
 
     override fun onRefresh() {
-        if (activityViewModel?.getIsBluetoothOn() == true &&
+        if (isBluetoothOperationPossible() &&
                 activityViewModel?.getIsLocationPermissionGranted() == true) {
             getScanFragment().toggleScannerState(false)
 
@@ -341,8 +358,10 @@ class BrowserFragment : BaseMainMenuFragment(),
         } else {
             if (activityViewModel?.getIsBluetoothOn() != true) {
                 Toast.makeText(requireContext(), getString(R.string.bluetooth_disabled), Toast.LENGTH_SHORT).show()
+            } else if (activityViewModel?.getAreBluetoothPermissionsGranted() != true) {
+                Toast.makeText(requireContext(), getString(R.string.bluetooth_permissions_denied), Toast.LENGTH_SHORT).show()
             } else if (activityViewModel?.getIsLocationPermissionGranted() != true) {
-                Toast.makeText(requireContext(), getString(R.string.location_permission_not_granted), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.location_permission_denied), Toast.LENGTH_SHORT).show()
             }
         }
         viewBinding.swipeRefreshContainer.post { viewBinding.swipeRefreshContainer.isRefreshing = false }
@@ -404,7 +423,7 @@ class BrowserFragment : BaseMainMenuFragment(),
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
             activity?.runOnUiThread {
-                viewModel.updateActiveConnections(bluetoothService.getActiveConnections())
+                viewModel.updateActiveConnections(bluetoothService?.getActiveConnections())
             }
 
             when (newState) {
@@ -427,8 +446,8 @@ class BrowserFragment : BaseMainMenuFragment(),
 
     private fun handleSuccessfulConnection(gatt: BluetoothGatt) {
         hideConnectingAnimation()
-        if (bluetoothService.isGattConnected()) {
-            deviceToConnect?.let { bluetoothService.updateConnectionInfo(it) }
+        if (bluetoothService?.isGattConnected(deviceToConnect?.address) == true) {
+            deviceToConnect?.let { bluetoothService?.updateConnectionInfo(it) }
             viewModel.setDeviceConnectionState(gatt.device.address, BluetoothDeviceInfo.ConnectionState.CONNECTED)
 
             handler.removeCallbacks(startActivityRunnable)
@@ -437,6 +456,7 @@ class BrowserFragment : BaseMainMenuFragment(),
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun handleDisconnection(gatt: BluetoothGatt, status: Int) {
         hideConnectingAnimation()
         viewModel.setDeviceConnectionState(gatt.device.address, BluetoothDeviceInfo.ConnectionState.DISCONNECTED)
@@ -485,9 +505,9 @@ class BrowserFragment : BaseMainMenuFragment(),
         override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
             super.onConnectionStateChange(device, status, newState)
             if (status == BluetoothGatt.GATT_SUCCESS && newState == BluetoothProfile.STATE_CONNECTED) {
-                if (!bluetoothService.isAnyConnectionPending() && !blockConnectionAttempts) {
+                if (bluetoothService?.isAnyConnectionPending() == false && !blockConnectionAttempts) {
                     deviceToConnect = BluetoothDeviceInfo(device)
-                    bluetoothService.connectGatt(device, requestRssiUpdates = true)
+                    bluetoothService?.connectGatt(device, requestRssiUpdates = true)
                 }
             }
         }
@@ -504,13 +524,16 @@ class BrowserFragment : BaseMainMenuFragment(),
             showConnectingAnimation()
 
             handler.postDelayed({
-                bluetoothService.connectGatt(deviceInfo.device, true, gattCallback)
+                bluetoothService?.let {
+                    it.isNotificationEnabled = false
+                    bluetoothService?.connectGatt(deviceInfo.device, true, gattCallback)
+                }
             }, ANIMATION_DELAY)
         }
 
         override fun disconnectDevice(position: Int, device: BluetoothDevice) {
             viewModel.setDeviceConnectionState(position, connectionState = BluetoothDeviceInfo.ConnectionState.DISCONNECTED)
-            bluetoothService.disconnectGatt(device.address)
+            bluetoothService?.disconnectGatt(device.address)
         }
 
         override fun addToFavorites(deviceAddress: String) {
@@ -529,6 +552,7 @@ class BrowserFragment : BaseMainMenuFragment(),
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun getDeviceName(gatt: BluetoothGatt) : String {
         return gatt.device.name ?: getString(R.string.not_advertising_shortcut)
     }

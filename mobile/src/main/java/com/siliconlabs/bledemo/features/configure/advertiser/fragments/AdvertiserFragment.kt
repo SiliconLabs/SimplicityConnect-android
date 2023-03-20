@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.configure.advertiser.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -23,10 +24,11 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.FragmentAdvertiserBinding
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity
 import com.siliconlabs.bledemo.common.other.CardViewListDecoration
-import com.siliconlabs.bledemo.home_screen.base.BaseMainMenuFragment
+import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
+import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 
 
-class AdvertiserFragment : BaseMainMenuFragment(), AdvertiserAdapter.OnItemClickListener {
+class AdvertiserFragment : BaseServiceDependentMainMenuFragment(), AdvertiserAdapter.OnItemClickListener {
 
     private var advertiserAdapter: AdvertiserAdapter? = null
     private var viewModel: AdvertiserViewModel? = null
@@ -92,14 +94,25 @@ class AdvertiserFragment : BaseMainMenuFragment(), AdvertiserAdapter.OnItemClick
         })
     }
 
-    override fun onBluetoothStateChanged(isOn: Boolean) {
-        toggleBluetoothBar(isOn, viewBinding.bluetoothEnable)
-        advertiserAdapter?.notifyDataSetChanged()
-        if (!isOn) viewModel?.switchAllItemsOff()
-    }
+    override val bluetoothDependent = object : BluetoothDependent {
 
-    override fun onLocationStateChanged(isOn: Boolean) { /* not utilized */ }
-    override fun onLocationPermissionStateChanged(isGranted: Boolean) { /* not utilized */ }
+        override fun onBluetoothStateChanged(isBluetoothOn: Boolean) {
+            toggleBluetoothBar(isBluetoothOn, viewBinding.bluetoothEnable)
+            advertiserAdapter?.toggleIsBluetoothOperationPossible(isBluetoothOperationPossible())
+            if (!isBluetoothOn) viewModel?.switchAllItemsOff()
+        }
+        override fun onBluetoothPermissionsStateChanged(arePermissionsGranted: Boolean) {
+            toggleBluetoothPermissionsBar(arePermissionsGranted, viewBinding.bluetoothPermissionsBar)
+            advertiserAdapter?.toggleIsBluetoothOperationPossible(isBluetoothOperationPossible())
+            if (!arePermissionsGranted) viewModel?.switchAllItemsOff()
+        }
+        override fun refreshBluetoothDependentUi(isBluetoothOperationPossible: Boolean) {
+            advertiserAdapter?.toggleIsBluetoothOperationPossible(isBluetoothOperationPossible)
+        }
+        override fun setupBluetoothPermissionsBarButtons() {
+            viewBinding.bluetoothPermissionsBar.setFragmentManager(childFragmentManager)
+        }
+    }
 
     private fun initAdapter() {
         advertiserAdapter = AdvertiserAdapter(viewModel?.advertisers?.value ?: arrayListOf(), this)
@@ -108,6 +121,7 @@ class AdvertiserFragment : BaseMainMenuFragment(), AdvertiserAdapter.OnItemClick
             addItemDecoration(CardViewListDecoration())
             adapter = advertiserAdapter
         }
+        advertiserAdapter?.toggleIsBluetoothOperationPossible(isBluetoothOperationPossible())
     }
 
 
@@ -118,11 +132,9 @@ class AdvertiserFragment : BaseMainMenuFragment(), AdvertiserAdapter.OnItemClick
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.device_name -> {
-                if (service.bluetoothAdapter?.isEnabled == true) {
-                    showDeviceNameDialog()
-                } else {
-                    showToastLengthShort(getString(R.string.bluetooth_disabled))
-                }
+                if (isBluetoothOperationPossible()) showDeviceNameDialog()
+                else showWarningToast()
+
                 true
             }
             R.id.switch_all_off -> {
@@ -157,6 +169,14 @@ class AdvertiserFragment : BaseMainMenuFragment(), AdvertiserAdapter.OnItemClick
         viewModel?.switchItemOff(position)
     }
 
+    private fun showWarningToast() {
+        if (activityViewModel?.getIsBluetoothOn() == false) {
+            showToastLengthShort(getString(R.string.bluetooth_disabled))
+        } else if (activityViewModel?.getAreBluetoothPermissionsGranted() == false) {
+            showToastLengthShort(getString(R.string.bluetooth_permissions_denied))
+        }
+    }
+
     private fun toggleMainView(areAnyAdvertisers: Boolean) {
         viewBinding.fragmentMainView.apply {
             if (areAnyAdvertisers) {
@@ -174,6 +194,7 @@ class AdvertiserFragment : BaseMainMenuFragment(), AdvertiserAdapter.OnItemClick
         else AdvertiserService.stopService(requireContext())
     }
 
+    @SuppressLint("MissingPermission")
     private fun showDeviceNameDialog() {
         val currentAdapterName = service.bluetoothAdapter?.name ?: "Unknown name"
         DeviceNameDialog(currentAdapterName, object : DeviceNameDialog.DeviceNameCallback {
@@ -188,11 +209,6 @@ class AdvertiserFragment : BaseMainMenuFragment(), AdvertiserAdapter.OnItemClick
                 } ?: showToastLengthLong(getString(R.string.local_bluetooth_name_change_unsuccessful))
             }
         }).show(childFragmentManager, "dialog_device_name")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        advertiserAdapter?.notifyDataSetChanged()
     }
 
     private fun startAdvertiserConfigActivityForResult(data: AdvertiserData, position: Int) {

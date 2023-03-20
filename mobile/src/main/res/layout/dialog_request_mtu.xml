@@ -27,50 +27,8 @@
             android:layout_marginBottom="@dimen/space_SM"
             android:text="@string/request_mtu_description" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/requested_mtu_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/space_XS"
-                android:layout_gravity="center_horizontal"
-                android:textSize="14sp"
-                android:textColor="@color/blue_primary"
-                android:text="@string/min_mtu_value" />
-
-                <SeekBar
-                    android:id="@+id/request_mtu_seekBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/space_XS"
-                    android:background="@drawable/seekbar_background"
-                    android:paddingVertical="@dimen/space_S"
-                    android:layout_gravity="center_vertical" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/space_XS">
-
-                <TextView
-                    style="@style/seekbar_range_text_views"
-                    android:layout_alignParentStart="true"
-                    android:text="@string/mtu_min"
-                    android:fontFamily="sans-serif" />
-
-                <TextView
-                    style="@style/seekbar_range_text_views"
-                    android:layout_alignParentEnd="true"
-                    android:fontFamily="sans-serif"
-                    android:text="@string/mtu_max" />
-
-            </RelativeLayout>
-
-        </LinearLayout>
+        <include layout="@layout/seek_control"
+            android:id="@+id/seek_bar_mtu" />
 
         <LinearLayout
             android:layout_width="match_parent"

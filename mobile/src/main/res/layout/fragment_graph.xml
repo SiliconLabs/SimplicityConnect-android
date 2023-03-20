@@ -6,13 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.siliconlabs.bledemo.home_screen.views.LocationPermissionBar
-        android:id="@+id/location_permission_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
     <com.siliconlabs.bledemo.home_screen.views.BluetoothEnableBar
         android:id="@+id/bluetooth_bar"
         android:layout_width="match_parent"
@@ -20,8 +13,22 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
+    <com.siliconlabs.bledemo.home_screen.views.BluetoothPermissionsBar
+        android:id="@+id/bluetooth_permissions_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <com.siliconlabs.bledemo.home_screen.views.LocationEnableBar
         android:id="@+id/location_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.siliconlabs.bledemo.home_screen.views.LocationPermissionBar
+        android:id="@+id/location_permission_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"

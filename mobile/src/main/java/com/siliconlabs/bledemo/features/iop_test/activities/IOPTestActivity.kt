@@ -69,7 +69,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
 
-@SuppressLint("LogNotTimber")
+@SuppressLint("LogNotTimber", "MissingPermission")
 class IOPTestActivity : AppCompatActivity() {
     private var reconnectTimer: Timer? = Timer()
     private var handler: Handler? = null
@@ -704,6 +704,7 @@ class IOPTestActivity : AppCompatActivity() {
         handler = null
 
         mBluetoothService?.clearConnectedGatt()
+        mBluetoothService?.isNotificationEnabled = true
         unregisterBroadcastReceivers()
     }
 
@@ -868,11 +869,10 @@ class IOPTestActivity : AppCompatActivity() {
      * Add Fragment have not yet list item test.
      */
     private fun addChildrenView() {
-        supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.container, newInstance(), IOPTestFragment::class.java.name)
-                .disallowAddToBackStack()
-                .commit()
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.container, newInstance(), IOPTestFragment::class.java.name)
+            disallowAddToBackStack()
+        }.commit()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -1689,9 +1689,10 @@ class IOPTestActivity : AppCompatActivity() {
 
     private val fileSelectionListener = object : OtaFileSelectionDialog.FileSelectionListener {
         override fun onSelectFileButtonClicked() {
-            val requestFileIntent = Intent(Intent.ACTION_GET_CONTENT)
-            requestFileIntent.type = "*/*"
-            startActivityForResult(requestFileIntent, GBL_FILE_CHOICE_REQUEST_CODE)
+            Intent(Intent.ACTION_GET_CONTENT)
+                .apply { type = "*/*" }
+                .also { startActivityForResult(Intent.createChooser(it,
+                getString(R.string.ota_choose_file)), GBL_FILE_CHOICE_REQUEST_CODE) }
         }
 
         override fun onOtaButtonClicked() {

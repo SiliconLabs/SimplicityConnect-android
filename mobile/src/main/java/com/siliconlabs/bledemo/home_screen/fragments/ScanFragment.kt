@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.siliconlabs.bledemo.bluetooth.ble.ScanResultCompat
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
@@ -17,16 +16,21 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity
 import com.siliconlabs.bledemo.home_screen.viewmodels.MainActivityViewModel
 import com.siliconlabs.bledemo.home_screen.base.ViewPagerFragment
+import com.siliconlabs.bledemo.home_screen.utils.SettingsStorage
 
 class ScanFragment : Fragment(), BluetoothService.ScanListener {
 
-    private lateinit var btService: BluetoothService
+    private lateinit var settingsPreferences: SettingsStorage
+
+    private var btService: BluetoothService? = null
     lateinit var viewModel: ScanFragmentViewModel
         private set
     private var activityViewModel: MainActivityViewModel? = null
 
     private var scanFragmentListener: ScanFragmentListener? = null
     private val viewPagerFragment = ViewPagerFragment()
+
+    private var isFilterViewOn = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -35,7 +39,7 @@ class ScanFragment : Fragment(), BluetoothService.ScanListener {
         activity?.let {
             activityViewModel = ViewModelProvider(it).get(MainActivityViewModel::class.java)
         }
-        btService = (activity as MainActivity).bluetoothService!!
+        settingsPreferences = SettingsStorage(context)
         setupBackStackCallbacks()
     }
 
@@ -50,15 +54,17 @@ class ScanFragment : Fragment(), BluetoothService.ScanListener {
 
         observeChanges()
 
-        childFragmentManager.beginTransaction().apply {
-            add(R.id.child_fragment_container, viewPagerFragment)
-            commit()
+        if (!viewPagerFragment.isAdded) {
+            childFragmentManager.beginTransaction().apply {
+                add(R.id.child_fragment_container, viewPagerFragment)
+                commit()
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.updateActiveConnections(btService.getActiveConnections())
+        viewModel.updateActiveConnections(btService?.getActiveConnections())
     }
 
     override fun onPause() {
@@ -75,16 +81,16 @@ class ScanFragment : Fragment(), BluetoothService.ScanListener {
     }
 
     private fun observeChanges() {
-        viewModel.isFilterViewOn.observe(viewLifecycleOwner, Observer {
-            toggleFilterFragment(it)
-        })
-        viewModel.isScanningOn.observe(viewLifecycleOwner, Observer {
+        viewModel.isScanningOn.observe(viewLifecycleOwner) {
             if (activityViewModel?.isLocationPermissionGranted?.value == true) {
                 toggleScannerState(it)
                 if (it) viewModel.setTimestamps()
                 scanFragmentListener?.onScanningStateChanged(it)
             }
-        })
+            activityViewModel?.isSetupFinished?.observe(viewLifecycleOwner) {
+                btService = (activity as? MainActivity)?.bluetoothService
+            }
+        }
     }
 
     fun toggleScannerState(isOn: Boolean) {
@@ -96,7 +102,7 @@ class ScanFragment : Fragment(), BluetoothService.ScanListener {
         (activity as MainActivity).bluetoothService?.let {
             it.removeListener(this)
             it.addListener(this)
-            it.startDiscovery(emptyList())
+            it.startDiscovery(emptyList(), convertScanSetting())
         }
     }
 
@@ -107,30 +113,35 @@ class ScanFragment : Fragment(), BluetoothService.ScanListener {
         }
     }
 
-    private fun toggleFilterFragment(isFilterViewOn: Boolean) {
-        childFragmentManager.apply {
-            if (isFilterViewOn) {
-                beginTransaction().apply {
-                    hide(viewPagerFragment)
-                    add(R.id.child_fragment_container, FilterFragment())
-                    addToBackStack(null)
-                    commit()
-                }
-            } else {
-                popBackStack()
-                activity?.title = getString(R.string.fragment_scan_label)
+    private fun convertScanSetting() : Int? {
+        val scanPreference = settingsPreferences.loadScanSetting()
+        return if (scanPreference != 0) scanPreference else null
+
+    }
+
+    fun toggleFilterFragment(shouldShowFilterFragment: Boolean) {
+        if (shouldShowFilterFragment) {
+            childFragmentManager.beginTransaction().apply {
+                hide(viewPagerFragment)
+                add(R.id.child_fragment_container, FilterFragment())
+                addToBackStack(null)
+                commit()
             }
+        } else {
+            childFragmentManager.popBackStack()
+            activity?.title = getString(R.string.fragment_scan_label)
         }
         (activity as MainActivity).apply {
-            toggleMainNavigation(!isFilterViewOn)
-            toggleHomeIcon(isFilterViewOn)
+            toggleMainNavigation(!shouldShowFilterFragment)
+            toggleHomeIcon(shouldShowFilterFragment)
         }
+        isFilterViewOn = !isFilterViewOn
     }
 
     private val backPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (viewModel.getIsFilterViewOn()) {
-                viewModel.setIsFilterViewOn(false)
+            if (isFilterViewOn) {
+                toggleFilterFragment(shouldShowFilterFragment = false)
             }
             else {
                 isEnabled = false
@@ -144,6 +155,10 @@ class ScanFragment : Fragment(), BluetoothService.ScanListener {
     }
 
     override fun onDiscoveryFailed() {
+        viewModel.setIsScanningOn(false)
+    }
+
+    override fun onDiscoveryTimeout() {
         viewModel.setIsScanningOn(false)
     }
 

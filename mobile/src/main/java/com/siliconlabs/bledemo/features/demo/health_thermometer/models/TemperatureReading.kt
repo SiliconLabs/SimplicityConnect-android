@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothGattCharacteristic
 import com.siliconlabs.bledemo.R
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.pow
 
 class TemperatureReading(val type: Type, val temperature: Double, private val readingTime: Long) {
     enum class Type(var normalizedMin: Float, var normalizedMax: Float) {
@@ -56,10 +55,7 @@ class TemperatureReading(val type: Type, val temperature: Double, private val re
         fun fromCharacteristic(characteristic: BluetoothGattCharacteristic): TemperatureReading {
             val flags = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
             val type = if (flags and 0x01 > 0) Type.FAHRENHEIT else Type.CELSIUS
-            val tempData = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT32, 1)
-            val exponent = tempData shr 24
-            val mantissa = tempData and 0x00FFFFFF
-            val actualTemp = mantissa.toDouble() * 10.0.pow(exponent.toDouble())
+            val temperatureFloat = characteristic.getFloatValue(BluetoothGattCharacteristic.FORMAT_FLOAT, 1)
             val time: Long
             if (flags and 0x02 > 0) {
                 val year = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 5)
@@ -80,7 +76,7 @@ class TemperatureReading(val type: Type, val temperature: Double, private val re
             } else {
                 time = System.currentTimeMillis()
             }
-            return TemperatureReading(type, actualTemp, time)
+            return TemperatureReading(type, temperatureFloat.toDouble(), time)
         }
 
         fun getSampleReading(): TemperatureReading {

@@ -4,7 +4,7 @@
     <string name="app_name_EFR_Connect">EFR Connect</string>
 
     <!-- Bluetooth bar -->
-    <string name="bluetooth_adapter_bar_disabled">Bluetooth adapter is disabled.</string>
+    <string name="bluetooth_adapter_bar_disabled">Bluetooth adapter disabled</string>
     <string name="toast_bluetooth_not_enabled">Bluetooth not enabled!</string>
     <string name="toast_bluetooth_enabled">Bluetooth enabled!</string>
     <string name="bluetooth_adapter_bar_turning_on">Turning on Bluetooth adapter…</string>
@@ -33,6 +33,7 @@
     <string name="only_connectible">Connectible</string>
     <string name="only_bonded">Bonded</string>
     <string name="Descriptors_colon">Descriptors:</string>
+    <string name="no_characteristics">No characteristics in service</string>
     <string name="more_info">More Info</string>
     <string name="Less_Info">Less Info</string>
     <string name="log_example_time">Example log time</string>
@@ -97,14 +98,24 @@
     <!-- Main Menu -->
     <string name="main_menu_title">Menu title</string>
     <string name="main_menu_description">Short description of menu tile</string>
-    <string name="location_info">Info</string>
+    <string name="warning_bar_additional_info">Info</string>
     <string name="location_enable">Enable</string>
-    <string name="Location_disabled">Location disabled.</string>
-    <string name="bluetooth_permissions_disabled">Bluetooth permissions disabled</string>
+    <string name="location_disabled">Location disabled</string>
+    <string name="bluetooth_permissions_denied">Bluetooth permissions denied</string>
     <string name="Location_service">Location service</string>
     <string name="location_service_info">On some Android phones you have to enable Location
         service in order to scan for Bluetooth Low Energy devices. If you can\'t find any
         Bluetooth devices, please ensure you have enabled Location service.</string>
+    <string name="location_permission">Location permission</string>
+    <string name="location_permission_info">In order for this app to use the Location service,
+        you have to grant a permission first. Please keep in mind, that on some Android
+        devices this service is needed for proper Bluetooth Low Energy device discovery.</string>
+    <string name="bluetooth_permissions">Bluetooth permissions</string>
+    <string name="bluetooth_permissions_info">Since Android 12, performing BLE-related operations
+        (such as scanning, advertising or connecting) requires the user to explicitly grant the
+        \"Nearby devices\" permission for the app. Please keep in mind that this app relies
+        heavily on these system features and its capabilities will be severely reduced without them.
+    </string>
     <string name="text_advertiser_purpose_explanation">Utilize this device as a Bluetooth \n Low
         Energy peripheral</string>
     <string name="main_menu_description_thermometer">View readings from the Health Thermometer service</string>
@@ -196,6 +207,7 @@
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
     <string name="button_ok">@android:string/ok</string>
+    <string name="button_proceed">Proceed</string>
     <string name="button_yes">Yes</string>
     <string name="button_no">No</string>
     <string name="button_run_test">Run Test</string>
@@ -301,8 +313,10 @@
     <string name="bonding">BONDING…</string>
     <string name="not_bonded">NOT BONDED</string>
     <string name="device_bonded_successfully">Device bonded successfully</string>
+    <string name="device_services_title_unbond_device_manual">Manual unbonding required</string>
+    <string name="device_services_note_unbond_device_manual">Unbonding unsuccessful. Click to proceed to settings in order to unbond manually.</string>
     <string name="device_services_title_unbond_device">Unbond device?</string>
-    <string name="device_services_note_unbond_device">You have to unbond your device manually in Bluetooth Settings. After unbonding your device will disconnect and this is normal behavior.</string>
+    <string name="device_services_note_unbond_device">After unbonding your device will disconnect.</string>
     <string name="device_services_label_read">Read</string>
     <string name="services_nav_remote">Remote (Client)</string>
     <string name="services_nav_local">Local (Server)</string>
@@ -487,7 +501,7 @@
 
     <!-- Blinky -->
     <string name="blinky_note_light">Tap the light to toggle the LED on the kit</string>
-    <string name="blinky_note_button">Press the button on the kit to see the virtual button state changing in sync</string>
+    <string name="blinky_note_button">Press the \"BTN0\" button on the kit to see the virtual button state changing in sync</string>
     <string name="blinky_label_light_bulb">light bulb</string>
     <string name="blinky_label_button">button</string>
 
@@ -569,6 +583,7 @@
     <string name="gatt_configurator_toast_export_successful">Export successful</string>
     <string name="gatt_configurator_toast_export_unsuccessful">Export unsuccessful</string>
     <string name="gatt_configurator_toast_import_file_not_found">File not found</string>
+    <string name="gatt_configurator_choose_file_for_import">Choose file for import</string>
     <string name="gatt_configurator_popup_import_successful_title">Successful import</string>
     <string name="gatt_configurator_popup_import_successful_content">Created 1 configuration from the XML file</string>
     <string name="gatt_configurator_popup_import_unsuccessful_title">Import with error</string>
@@ -765,35 +780,29 @@
     <string name="content_desc_property_icon">Property icon</string>
     <string name="content_desc_copy_icon">Copy icon</string>
     <string name="content_desc_translation_anim_indicator">Translation animation indicator</string>
+    <string name="content_desc_settings_config_help">Configuration help icon</string>
 
-    <string name="location_permission_not_granted">Location permission not granted.</string>
+    <string name="location_permission_denied">Location permission denied</string>
     <string name="device_disconnected_successfully">Device \"%s\" disconnected successfully</string>
     <string name="permissions_needed">Permissions needed</string>
-    <string name="permissions_rationale_sdk_30_and_below">We will kindly ask you in a moment to
-        grant permissions
-        for this app - \"Location\" and \"Write external storage\". First one ensures proper
-        functioning of the bluetooth scanner and second one enables remote device\'s firmware
-        update using Over the Air mechanism with files chosen by the user.
-        \n\nYou can always turn them on and off in your device\'s settings.
-    </string>
-    <string name="permissions_rationale_sdk_31_and_above">We will kindly ask you in a moment to grant permissions
-        for this app - \"Location\", \"Write external storage\" and \"Nearby devices\". First one
-        ensures proper functioning of the bluetooth scanner and second one enables remote
-        device\'s firmware update using Over the Air mechanism with files chosen by the user.
-        Last one covers all bluetooth-related operations and is crucial for this app to launch.
-        \n\nYou can always turn them on and off in your device\'s settings.
-    </string>
+    <string name="permissions_rationale_html">We will ask you in a moment to
+        grant permissions for this app:&lt;br>&lt;br>%s&lt;br>&lt;br>You can always turn them on and off in
+        your device\'s settings.</string>
+    <string name="permissions_rationale_nearby_devices_html">\u2022 &lt;b>nearby devices&lt;/b> -
+        makes all bluetooth-related operations (scanning, advertising, connecting) possible;
+        crucial for this app to work as intended</string>
+    <string name="permissions_rationale_location_html">\u2022 &lt;b>location&lt;/b> - ensures proper
+        functioning of the bluetooth scanner</string>
     <string name="btn_understood">Understood</string>
-    <string name="permission_missing">Permission missing</string>
-    <string name="permission_external_storage_missing">This feature is currently disabled. You
-        must grant this app a \"Write external storage\" permission in order to upload chosen
-        firmware files.</string>
 
     <string name="string_placeholder">%s</string>
     <string name="scanned_device_bonded">Bonded</string>
     <string name="scanned_device_not_bonded">Not bonded</string>
 
     <string name="scan_failed_error_code">Scan failed: error code = %d</string>
+    <string name="scan_failed_application_registration_failed">Scan failed: app cannot be registered</string>
+    <string name="scan_failed_feature_unsupported">Scan failed: feature is not supported</string>
+    <string name="scan_failed_internal_error">Scan failed: internal error</string>
     <string name="scan_failed_le_scanner_unavailable">Scan failed: LE scanner unavailable</string>
     <string name="scan_failed_bluetooth_adapter_unavailable">Scan failed: bluetooth adapter
     unavailable</string>
@@ -814,13 +823,12 @@
     <string name="connection_failed">Connection failed</string>
 
     <string name="demo_firmware_name_health_thermometer">Bluetooth - SoC Thermometer</string>
-    <string name="demo_firmware_name_connected_lighting">Bluetooth RAIL DMP - SoC Light
-        Standard Micrium OS</string>
+    <string name="demo_firmware_name_connected_lighting">Bluetooth RAIL DMP - SoC Light Standard\" or \"Connect Bluetooth DMP - SoC Light</string>
     <string name="demo_firmware_name_range_test">RAIL Bluetooth DMP - SoC Range Test</string>
     <string name="demo_firmware_name_throughput">Bluetooth - SoC Throughput</string>
     <string name="soc_wifi_commissioning_must_be_connected"> A circuit board (SoC) and the
         evaluation board (EVK) must be connected and running proper firmwares. See &lt;a
-        href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-pc/update-evk-firmware">here&lt;/a> and &lt;a href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-efx32/"> here&lt;/a> for more information.
+        href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-pc/update-evk-firmware">here&lt;/a>, &lt;a href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-efx32/"> here&lt;/a> and &lt;a href="https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk/tree/master/examples/snippets/wlan_ble/wlan_station_ble_provisioning"> here&lt;/a> for more information.
     </string>
     <string name="soc_blinky_must_be_connected">A circuit board (SoC) must be
         connected and running \"Bluetooth - SoC Blinky\" firmware or firmware with a title
@@ -884,6 +892,7 @@
     <string name="tab_scanner_label">Scanner</string>
     <string name="tab_rssi_graph_label">Graph</string>
     <string name="tab_connections_label">(%d) active connections</string>
+    <string name="toast_scan_timeout">Scanning timed out</string>
 
     <!-- ConfigureFragment -->
     <string name="tab_advertiser_label">Advertiser</string>
@@ -899,6 +908,38 @@
 
     <!-- TestFragment -->
     <string name="tab_iop_test">Interoperability test</string>
+
+    <!-- SettingsFragment -->
+    <string name="configuration_subtitle">Configuration</string>
+    <string name="links_subtitle">Useful links</string>
+
+    <string name="scan_timeout">Scan timeout</string>
+    <string name="report_issue">Report an issue</string>
+    <string name="scan_timeout_value_in_seconds">Timeout value [s]: </string>
+
+    <string name="settings_link_more_information">More \ninformation</string>
+    <string name="settings_link_support">Support</string>
+    <string name="settings_link_source_code">Source code</string>
+    <string name="settings_link_users_guide">User\'s guide</string>
+    <string name="settings_link_release_notes">Release notes</string>
+    <string name="settings_link_additional_documentation">Additional \ndocumentation</string>
+    <string name="settings_link_other_silabs_apps">Other \nSilabs apps</string>
+
+    <string name="scan_timeout_help_dialog_title">Scan timeout</string>
+    <string name="scan_timeout_help_dialog_description">Since the process of scanning for
+        Bluetooth device can be battery consuming, it\'s possible to set it up to end after a
+        specified period of time. Choosing the \"No timeout\" option will result in ending the
+        scan only when leaving the \"Scan\" feature or the app itself.
+    </string>
+
+    <string-array name="scan_timeout_options">
+        <item name="scan_timeout_15s">15 seconds</item>
+        <item name="scan_timeout_1m">1 minute</item>
+        <item name="scan_timeout_2m">2 minutes</item>
+        <item name="scan_timeout_5m">5 minutes</item>
+        <item name="scan_timeout_10m">10 minutes</item>
+        <item name="scan_timeout_no_timeout">No timeout</item>
+    </string-array>
 
 
     <string name="bluetooth_permissions_needed">Bluetooth-related permissions are needed

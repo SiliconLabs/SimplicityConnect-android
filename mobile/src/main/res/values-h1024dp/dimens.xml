@@ -40,7 +40,7 @@
     <!-- Dialog: help -->
     <dimen name="help_dialog_ok_btn_text_size">16sp</dimen>
     <dimen name="help_text_padding">36dp</dimen>
-    <dimen name="help_text_size">16sp</dimen>
+    <dimen name="help_text_size">20sp</dimen>
     <dimen name="help_button_height">50dp</dimen>
     <dimen name="help_section_and_body_separation">10dp</dimen>
 

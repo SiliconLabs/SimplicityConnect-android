@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.scan.active_connections.adapters
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -101,6 +102,7 @@ class ConnectionsAdapter(
             val newState: ScanFragmentViewModel.ConnectionViewState
     )
 
+    @SuppressLint("MissingPermission")
     inner class ConnectionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(viewState: ScanFragmentViewModel.ConnectionViewState) {

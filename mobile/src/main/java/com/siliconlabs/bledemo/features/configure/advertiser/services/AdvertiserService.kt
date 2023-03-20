@@ -6,8 +6,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.siliconlabs.bledemo.features.configure.advertiser.fragments.AdvertiserFragment
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.AdvertiserStorage
@@ -15,7 +15,8 @@ import com.siliconlabs.bledemo.R
 
 class AdvertiserService : Service() {
     companion object {
-        const val CHANNEL_ID = "ForegroundAdvertiserService"
+        private const val CHANNEL_ID = "ForegroundAdvertiserService"
+        private const val ADVERTISER_NOTIFICATION_REQUEST_CODE = 127
 
         fun startService(context: Context) {
             val serviceIntent = Intent(context, AdvertiserService::class.java)
@@ -63,15 +64,18 @@ class AdvertiserService : Service() {
         createNotificationChannel()
         val notificationIntent = Intent(this, AdvertiserFragment::class.java)
         val pendingIntent = PendingIntent.getActivity(
-                this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+                this, ADVERTISER_NOTIFICATION_REQUEST_CODE, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("EFR Connect")
-                .setContentText("Advertiser is running...")
-                .setSmallIcon(R.mipmap.efr_redesign_launcher)
-                .setContentIntent(pendingIntent)
-                .setShowWhen(false)
-                .build()
+        return Notification.Builder(this, CHANNEL_ID).apply {
+            setContentTitle("EFR Connect")
+            setContentText("Advertiser is running...")
+            setSmallIcon(R.mipmap.efr_redesign_launcher)
+            setContentIntent(pendingIntent)
+            setShowWhen(false)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
+            }
+        }.build()
     }
 
     private val receiver = object : BroadcastReceiver() {

@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.health_thermometer.views
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
@@ -9,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.siliconlabs.bledemo.features.demo.health_thermometer.models.TemperatureReading
 import com.siliconlabs.bledemo.R
+import kotlin.math.round
 
 class TemperatureDisplay : LinearLayout {
     private var mainTempText: TextView? = null
@@ -65,14 +67,13 @@ class TemperatureDisplay : LinearLayout {
             it.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize)
             it.setTextColor(context.getColor(R.color.blue_primary))
         }
-
-        temp?.let { setTemperature(it) }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setTemperature(temperature: Double) {
-        temp = temperature
-        mainTempText?.text = temperature.toInt().toString() + "."
-        decimalText?.text = ((temperature * 10).toInt() % 10).toString()
+        val rounded = round(temperature * 10) / 10
+        mainTempText?.text = (rounded.toString().split(".").elementAtOrNull(0) ?: "0") + "."
+        decimalText?.text = (rounded.toString().split(".").elementAtOrNull(1) ?: "0")
 
     }
 

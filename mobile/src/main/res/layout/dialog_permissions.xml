@@ -23,7 +23,7 @@
             style="@style/dialog_text_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/permissions_rationale_sdk_31_and_above"/>
+            android:text="@string/permissions_rationale_html"/>
 
         <Button android:id="@+id/btn_understood"
             style="@style/dialog_button_positive_action"

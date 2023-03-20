@@ -10,26 +10,26 @@ import android.os.Looper
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
 import com.siliconlabs.bledemo.features.scan.browser.view_states.GraphFragmentViewState
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.FragmentGraphBinding
-import com.siliconlabs.bledemo.home_screen.base.BaseMainMenuFragment
+import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
 import com.siliconlabs.bledemo.home_screen.fragments.ScanFragment
 import com.siliconlabs.bledemo.home_screen.base.ViewPagerFragment
 import com.siliconlabs.bledemo.features.scan.rssi_graph.adapters.GraphLabelAdapter
 import com.siliconlabs.bledemo.features.scan.rssi_graph.utils.GraphDataExporter
 import com.siliconlabs.bledemo.features.scan.rssi_graph.views.ChartView
+import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
+import com.siliconlabs.bledemo.home_screen.base.LocationDependent
 import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
-class RssiGraphFragment : BaseMainMenuFragment() {
+class RssiGraphFragment : BaseServiceDependentMainMenuFragment() {
 
     private lateinit var viewModel: ScanFragmentViewModel
     private lateinit var _binding: FragmentGraphBinding
@@ -47,30 +47,61 @@ class RssiGraphFragment : BaseMainMenuFragment() {
 
     private fun getScanFragment() = (parentFragment as ViewPagerFragment).getScanFragment()
 
-    override fun onBluetoothStateChanged(isOn: Boolean) {
-        toggleBluetoothBar(isOn, _binding.bluetoothBar)
-        _binding.rssiGraphBtnScanning.isEnabled = isOn
-        if (isInitialBluetoothStateObserved) {
-            /* LiveData sends its initial value to an observer which starts scan when creating
-             this fragment - even if global scanning state is false. This flag prevents that. */
-            viewModel.setIsScanningOn(isOn)
+
+    override val bluetoothDependent = object : BluetoothDependent {
+
+        override fun onBluetoothStateChanged(isBluetoothOn: Boolean) {
+            toggleBluetoothBar(isBluetoothOn, _binding.bluetoothBar)
+            _binding.rssiGraphBtnScanning.isEnabled = isBluetoothOperationPossible()
+            if (isInitialBluetoothStateObserved) {
+                /* LiveData sends its initial value to an observer which starts scan when creating
+                 this fragment - even if global scanning state is false. This flag prevents that. */
+                viewModel.setIsScanningOn(isBluetoothOperationPossible())
+            }
+
+            if (!isBluetoothOn) {
+                viewModel.reset()
+                chartView.reset()
+            }
+            isInitialBluetoothStateObserved = true
         }
 
-        if (!isOn) {
-            viewModel.reset()
-            chartView.reset()
+        override fun onBluetoothPermissionsStateChanged(arePermissionsGranted: Boolean) {
+            toggleBluetoothPermissionsBar(arePermissionsGranted, _binding.bluetoothPermissionsBar)
+            _binding.rssiGraphBtnScanning.isEnabled = isBluetoothOperationPossible()
+
+            if (!arePermissionsGranted) {
+                viewModel.reset()
+                chartView.reset()
+            }
         }
-        isInitialBluetoothStateObserved = true
+
+        override fun refreshBluetoothDependentUi(isBluetoothOperationPossible: Boolean) {
+            _binding.rssiGraphBtnScanning.isEnabled = isBluetoothOperationPossible
+        }
+
+        override fun setupBluetoothPermissionsBarButtons() {
+            _binding.bluetoothPermissionsBar.setFragmentManager(childFragmentManager)
+        }
     }
 
-    override fun onLocationStateChanged(isOn: Boolean) {
-        toggleLocationBar(isOn, _binding.locationBar)
-    }
+    override val locationDependent = object : LocationDependent {
 
-    override fun onLocationPermissionStateChanged(isGranted: Boolean) {
-        _binding.apply {
-            toggleLocationPermissionBar(isGranted, locationPermissionBar)
-            rssiGraphBtnScanning.isEnabled = isGranted
+        override fun onLocationStateChanged(isLocationOn: Boolean) {
+            toggleLocationBar(isLocationOn, _binding.locationBar)
+        }
+        override fun onLocationPermissionStateChanged(isPermissionGranted: Boolean) {
+            _binding.apply {
+                toggleLocationPermissionBar(isPermissionGranted, locationPermissionBar)
+                rssiGraphBtnScanning.isEnabled = isPermissionGranted
+            }
+        }
+        override fun setupLocationBarButtons() {
+            _binding.locationBar.setFragmentManager(childFragmentManager)
+        }
+
+        override fun setupLocationPermissionBarButtons() {
+            _binding.locationPermissionBar.setFragmentManager(childFragmentManager)
         }
     }
 
@@ -136,33 +167,35 @@ class RssiGraphFragment : BaseMainMenuFragment() {
             }
             rssiGraphTimeArrowEnd.setOnClickListener { chartView.skipToEnd() }
             rssiGraphTimeArrowStart.setOnClickListener { chartView.skipToStart()  }
-            locationBar.setLocationInfoFragmentManager(childFragmentManager)
         }
     }
 
     private fun setupViewModelObservers() {
         viewModel.apply {
-            isAnyDeviceDiscovered.observe(viewLifecycleOwner, Observer {
+            isAnyDeviceDiscovered.observe(viewLifecycleOwner) {
                 toggleLabelView(it, viewModel.getIsScanningOn())
-            })
-            labelToInsert.observe(viewLifecycleOwner, Observer {
+            }
+            labelToInsert.observe(viewLifecycleOwner) {
                 labelAdapter.addNewDeviceLabel(it)
-            })
-            activeFiltersDescription.observe(viewLifecycleOwner, Observer {
+            }
+            activeFiltersDescription.observe(viewLifecycleOwner) {
                 toggleFilterDescriptionView(it)
-            })
-            filteredDevices.observe(viewLifecycleOwner, Observer {
+            }
+            filteredDevices.observe(viewLifecycleOwner) {
                 if (isInitialGraphStateLoaded) {
-                    chartView.updateChartData(viewModel.getGraphDevicesState(), viewModel.highlightedLabel.value)
+                    chartView.updateChartData(
+                        viewModel.getGraphDevicesState(),
+                        viewModel.highlightedLabel.value
+                    )
                     labelAdapter.updateLabels(viewModel.getLabelViewsState())
                 }
-            })
-            highlightedLabel.observe(viewLifecycleOwner, Observer {
+            }
+            highlightedLabel.observe(viewLifecycleOwner) {
                 if (isInitialGraphStateLoaded) {
                     labelAdapter.updateHighlightedDevice(it)
                     chartView.updateChartData(viewModel.getGraphDevicesState(), it)
                 }
-            })
+            }
         }
     }
 
@@ -208,7 +241,7 @@ class RssiGraphFragment : BaseMainMenuFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.rssi_filter_icon -> {
-                viewModel.setIsFilterViewOn(true)
+                getScanFragment().toggleFilterFragment(shouldShowFilterFragment = true)
                 true
             }
             R.id.rssi_sort_icon -> {
@@ -346,28 +379,13 @@ class RssiGraphFragment : BaseMainMenuFragment() {
         }
     }
 
-    private val refilterGraphRunnable = Runnable {
-        /*
-        if (viewModel.activeSortMode.value != SortDialogFragment.SortMode.NONE ||
-                viewModel.activeFilters.value?.isNotEmpty() == true) {
-            viewModel.filterScannedDevices()
-            //runOnUiThread { labelAdapter.updateAllLabels(viewModel.filteredDevices) }
-            chartView.updateChartData(viewModel.filteredDevices, viewModel.highlightedDevice.value)
-        }
-
-         */
-    }
-
     private fun toggleScanningButton(isScanningOn: Boolean) {
         _binding.rssiGraphBtnScanning.apply {
             text = getString(
                     if (isScanningOn) R.string.button_stop_scanning
                     else R.string.button_start_scanning
             )
-            setBackgroundColor(ContextCompat.getColor(requireContext(),
-                    if (isScanningOn) R.color.silabs_red
-                    else R.color.silabs_blue
-            ))
+            setIsActionOn(isScanningOn)
         }
     }
 

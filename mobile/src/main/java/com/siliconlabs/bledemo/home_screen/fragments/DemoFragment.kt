@@ -14,10 +14,11 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.databinding.FragmentDemoBinding
 import com.siliconlabs.bledemo.features.demo.range_test.activities.RangeTestActivity
-import com.siliconlabs.bledemo.home_screen.base.BaseMainMenuFragment
-import kotlinx.android.synthetic.main.fragment_demo.*
+import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
+import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
+import com.siliconlabs.bledemo.home_screen.base.LocationDependent
 
-class DemoFragment : BaseMainMenuFragment(), DemoAdapter.OnDemoItemClickListener, DialogInterface.OnDismissListener {
+class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoItemClickListener, DialogInterface.OnDismissListener {
 
     private lateinit var viewBinding: FragmentDemoBinding
     private var demoAdapter: DemoAdapter? = null
@@ -48,7 +49,6 @@ class DemoFragment : BaseMainMenuFragment(), DemoAdapter.OnDemoItemClickListener
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.title = getString(R.string.main_navigation_demo_title)
-        viewBinding.locationBar.setLocationInfoFragmentManager(childFragmentManager)
         initRecyclerView()
     }
 
@@ -58,22 +58,46 @@ class DemoFragment : BaseMainMenuFragment(), DemoAdapter.OnDemoItemClickListener
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = demoAdapter
         }
-        demoAdapter?.toggleItemsEnabled(activityViewModel?.isBluetoothOn?.value ?: false)
+        demoAdapter?.toggleItemsEnabled(isBluetoothOperationPossible())
     }
 
-    override fun onBluetoothStateChanged(isOn: Boolean) {
-        toggleBluetoothBar(isOn, viewBinding.bluetoothBar)
-        demoAdapter?.toggleItemsEnabled(isOn)
-        if (!isOn) selectDeviceDialog?.dismiss()
-    }
-    override fun onLocationStateChanged(isOn: Boolean) {
-        toggleLocationBar(isOn, viewBinding.locationBar)
+    override val bluetoothDependent = object : BluetoothDependent {
+
+        override fun onBluetoothStateChanged(isBluetoothOn: Boolean) {
+            toggleBluetoothBar(isBluetoothOn, viewBinding.bluetoothBar)
+            demoAdapter?.toggleItemsEnabled(isBluetoothOperationPossible())
+            if (!isBluetoothOn) selectDeviceDialog?.dismiss()
+        }
+        override fun onBluetoothPermissionsStateChanged(arePermissionsGranted: Boolean) {
+            toggleBluetoothPermissionsBar(arePermissionsGranted, viewBinding.bluetoothPermissionsBar)
+            demoAdapter?.toggleItemsEnabled(isBluetoothOperationPossible())
+            if (!arePermissionsGranted) selectDeviceDialog?.dismiss()
+        }
+        override fun refreshBluetoothDependentUi(isBluetoothOperationPossible: Boolean) {
+            demoAdapter?.toggleItemsEnabled(isBluetoothOperationPossible)
+        }
+        override fun setupBluetoothPermissionsBarButtons() {
+            viewBinding.bluetoothPermissionsBar.setFragmentManager(childFragmentManager)
+        }
     }
 
-    override fun onLocationPermissionStateChanged(isGranted: Boolean) {
-        toggleLocationPermissionBar(isGranted, viewBinding.locationPermissionBar)
-        demoAdapter?.toggleItemsEnabled(isGranted)
-        if (!isGranted) selectDeviceDialog?.dismiss()
+    override val locationDependent = object : LocationDependent {
+
+        override fun onLocationStateChanged(isLocationOn: Boolean) {
+            toggleLocationBar(isLocationOn, viewBinding.locationBar)
+        }
+        override fun onLocationPermissionStateChanged(isPermissionGranted: Boolean) {
+            toggleLocationPermissionBar(isPermissionGranted, viewBinding.locationPermissionBar)
+            demoAdapter?.toggleItemsEnabled(isPermissionGranted)
+            if (!isPermissionGranted) selectDeviceDialog?.dismiss()
+        }
+        override fun setupLocationBarButtons() {
+            viewBinding.locationBar.setFragmentManager(childFragmentManager)
+        }
+
+        override fun setupLocationPermissionBarButtons() {
+            viewBinding.locationPermissionBar.setFragmentManager(childFragmentManager)
+        }
     }
 
     override fun onDemoItemClicked(demoItem: DemoMenuItem) {

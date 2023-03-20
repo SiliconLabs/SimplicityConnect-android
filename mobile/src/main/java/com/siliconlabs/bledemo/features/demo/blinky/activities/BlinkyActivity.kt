@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.blinky.activities
 
+import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.os.Bundle
 import android.view.View
@@ -44,23 +45,20 @@ class BlinkyActivity : BaseDemoActivity() {
         if (isDeviceThunderboard) {
             statusFragment = (supportFragmentManager.findFragmentById(R.id
                     .status_fragment) as StatusFragment).apply {
-                viewModel.thunderboardDevice.value =
-                        ThunderBoardDevice(service?.connectedGatt?.device!!)
+                viewModel.thunderboardDevice.value = ThunderBoardDevice(gatt?.device!!)
                 viewModel.state.postValue(BluetoothProfile.STATE_CONNECTED)
             }
             findViewById<LinearLayout>(R.id.thunderboard_fragment_container).visibility = View.VISIBLE
         }
-        service?.also {
-            it.registerGattCallback(true, processor)
-            it.discoverGattServices()
-        }
+        service?.registerGattCallback(true, processor)
+        gatt?.discoverServices()
     }
 
     private fun observeChanges() {
         viewModel.lightState.observe(this, Observer { state ->
             when (state) {
-                LightState.TOGGLING_ON -> service?.connectedGatt?.let { processor.switchLightOn(it) }
-                LightState.TOGGLING_OFF -> service?.connectedGatt?.let { processor.switchLightOff(it) }
+                LightState.TOGGLING_ON -> gatt?.let { processor.switchLightOn(it) }
+                LightState.TOGGLING_OFF -> gatt?.let { processor.switchLightOff(it) }
                 else -> {
                 }
             }
@@ -68,27 +66,27 @@ class BlinkyActivity : BaseDemoActivity() {
     }
 
     private fun getBlinkyCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        val gattService = service?.connectedGatt?.getService(GattService.BlinkyExample.number)
+        val gattService = gatt?.getService(GattService.BlinkyExample.number)
         return gattService?.getCharacteristic(characteristic.uuid)
     }
 
     private fun getFirmwareRevisionCharacteristic(): BluetoothGattCharacteristic? {
-        val gattService = service?.connectedGatt?.getService(GattService.DeviceInformation.number)
+        val gattService = gatt?.getService(GattService.DeviceInformation.number)
         return gattService?.getCharacteristic(GattCharacteristic.FirmwareRevision.uuid)
     }
 
     private fun getPowerSourceCharacteristic(): BluetoothGattCharacteristic? {
-        val gattService = service?.connectedGatt?.getService(GattService.PowerSource.number)
+        val gattService = gatt?.getService(GattService.PowerSource.number)
         return gattService?.getCharacteristic(GattCharacteristic.PowerSource.uuid)
     }
 
     private fun getBatteryLevelCharacteristic(): BluetoothGattCharacteristic? {
-        val gattService = service?.connectedGatt?.getService(GattService.BatteryService.number)
+        val gattService = gatt?.getService(GattService.BatteryService.number)
         return gattService?.getCharacteristic(GattCharacteristic.BatteryLevel.uuid)
     }
 
     private fun getDigitalCharacteristicWithNotify(): BluetoothGattCharacteristic? {
-        val gattService = service?.connectedGatt?.getService(GattService.AutomationIo.number)
+        val gattService = gatt?.getService(GattService.AutomationIo.number)
         gattService?.characteristics?.forEach { // There are 2 "Digital" characteristics on 4184A/B device
             if (it.uuid == GattCharacteristic.Digital.uuid &&
                     it.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY == 0x10) return it
@@ -97,7 +95,7 @@ class BlinkyActivity : BaseDemoActivity() {
     }
 
     private fun getDigitalCharacteristicWithWrite(): BluetoothGattCharacteristic? {
-        val gattService = service?.connectedGatt?.getService(GattService.AutomationIo.number)
+        val gattService = gatt?.getService(GattService.AutomationIo.number)
         gattService?.characteristics?.forEach {
             if (it.uuid == GattCharacteristic.Digital.uuid &&
                     it.properties and BluetoothGattCharacteristic.PROPERTY_WRITE == 0x08) return it
@@ -160,6 +158,7 @@ class BlinkyActivity : BaseDemoActivity() {
             }
         }
 
+        @SuppressLint("MissingPermission")
         private fun processNextCommand() {
             var success = false
             val command = commands.poll()

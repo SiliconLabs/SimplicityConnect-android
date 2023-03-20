@@ -35,12 +35,12 @@ abstract class ThunderboardActivity : BaseDemoActivity() {
 
     override fun onBluetoothServiceBound() {
         service?.also {
-            statusFragment.viewModel.thunderboardDevice.value = (ThunderBoardDevice(it.connectedGatt?.device!!))
+            statusFragment.viewModel.thunderboardDevice.value = (ThunderBoardDevice(gatt?.device!!))
             statusFragment.viewModel.state.postValue(BluetoothProfile.STATE_CONNECTED)
-            gattQueue = GattQueue(it.connectedGatt)
             it.registerGattCallback(gattCallback)
-            it.discoverGattServices()
         }
+        gattQueue = GattQueue(gatt)
+        gatt?.discoverServices()
         showModalDialog(ConnectionStatus.READING_DEVICE_STATE)
     }
 
@@ -59,8 +59,7 @@ abstract class ThunderboardActivity : BaseDemoActivity() {
     }
 
     private fun getDeviceCharacteristic(gattService: GattService, characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        return service?.connectedGatt?.getService(gattService.number)?.
-        getCharacteristic(characteristic.uuid)
+        return gatt?.getService(gattService.number)?.getCharacteristic(characteristic.uuid)
     }
 
 }

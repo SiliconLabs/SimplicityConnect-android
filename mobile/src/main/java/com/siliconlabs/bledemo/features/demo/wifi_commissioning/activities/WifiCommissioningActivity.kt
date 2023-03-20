@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.wifi_commissioning.activities
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.bluetooth.*
@@ -25,6 +26,7 @@ import java.util.*
 /**
  * Created by harika on 18-04-2016.
  */
+@SuppressLint("MissingPermission")
 class WifiCommissioningActivity : BaseDemoActivity() {
 
     private lateinit var _binding: ActivityWifiCommissioningBinding
@@ -61,10 +63,8 @@ class WifiCommissioningActivity : BaseDemoActivity() {
 
 
     override fun onBluetoothServiceBound() {
-        service?.also {
-            it.registerGattCallback(mBluetoothGattCallback)
-            it.connectedGatt?.discoverServices()
-        }
+        service?.registerGattCallback(mBluetoothGattCallback)
+        gatt?.discoverServices()
         showProgressDialog(getString(R.string.ble_detail_device_connection))
     }
 
@@ -93,11 +93,6 @@ class WifiCommissioningActivity : BaseDemoActivity() {
 
     private fun dismissProgressDialog() {
         runOnUiThread { progressDialog?.dismiss() }
-    }
-
-    override fun onBackPressed() {
-        service?.clearConnectedGatt()
-        super.onBackPressed()
     }
 
     private fun onAccessPointClicked(position: Int) {
@@ -380,7 +375,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
         Thread {
             var writeStatus = false
             while (!writeStatus) {
-                writeStatus = writeToCharacteristic(service?.connectedGatt, characteristicWrite, dataToWrite)
+                writeStatus = writeToCharacteristic(gatt, characteristicWrite, dataToWrite)
                 Thread.sleep(sleepForWrite)
             }
             Timber.d("Command $sendCommand written successfully")
@@ -404,7 +399,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
 
     private fun readOperation() {
         Thread {
-            service?.connectedGatt?.readCharacteristic(characteristicRead)
+            gatt?.readCharacteristic(characteristicRead)
             Thread.sleep(sleepForRead)
         }.start()
     }

@@ -1,0 +1,171 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/redesign_ic_main_view_browser_scanning"
+    xmlns:aapt="http://schemas.android.com/aapt" >
+  <target android:name="p-1">
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"
+            android:startOffset="100"/>
+      </aapt:attr>
+  </target>
+  <target android:name="p-2" >
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"
+            android:startOffset="200"/>
+      </aapt:attr>
+  </target>
+  <target android:name="p-3" >
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"
+            android:startOffset="300"/>
+      </aapt:attr>
+  </target>
+  <target android:name="p-4" >
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"
+            android:startOffset="400"/>
+      </aapt:attr>
+  </target>
+  <target android:name="p-5" >
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"
+            android:startOffset="500"/>
+      </aapt:attr>
+  </target>
+  <target android:name="p-6" >
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"
+            android:startOffset="600"/>
+      </aapt:attr>
+  </target>
+  <target android:name="p-7" >
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"
+            android:startOffset="700"/>
+      </aapt:attr>
+  </target>
+  <target android:name="p-8" >
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"
+            android:startOffset="800"/>
+      </aapt:attr>
+  </target>
+  <target android:name="p-9" >
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"
+            android:startOffset="900"/>
+      </aapt:attr>
+  </target>
+  <target android:name="p-10" >
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"
+            android:startOffset="1000"/>
+      </aapt:attr>
+  </target>
+  <target android:name="p-11" >
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"
+            android:startOffset="1100"/>
+      </aapt:attr>
+  </target>
+  <target android:name="p-12" >
+      <aapt:attr name="android:animation">
+        <objectAnimator
+            android:propertyName="fillAlpha"
+            android:duration="600"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType"
+            android:repeatMode="reverse"
+            android:repeatCount="infinite"
+            android:interpolator="@android:anim/linear_interpolator"/>
+      </aapt:attr>
+  </target>
+</animated-vector>

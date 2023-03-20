@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.health_thermometer.activities
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Intent
@@ -18,6 +19,7 @@ import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
 import com.siliconlabs.bledemo.utils.Notifications
 import kotlinx.android.synthetic.main.activity_thermometer.*
 
+@SuppressLint("MissingPermission")
 class HealthThermometerActivity : BaseDemoActivity() {
     private var htmType = HtmType.UNKNOWN
     private var serviceHasBeenSet = false
@@ -94,7 +96,7 @@ class HealthThermometerActivity : BaseDemoActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (serviceHasBeenSet && service == null || service != null && !service?.isGattConnected()!!) {
+        if (serviceHasBeenSet && service == null || service != null && !service?.isGattConnected(connectionAddress)!!) {
             onDeviceDisconnected()
         }
     }
@@ -122,7 +124,7 @@ class HealthThermometerActivity : BaseDemoActivity() {
     override fun onBluetoothServiceBound() {
         serviceHasBeenSet = true
         service?.registerGattCallback(true, gattCallback)
-        service?.discoverGattServices()
+        gatt?.discoverServices()
     }
 
     override fun onNewIntent(intent: Intent) {

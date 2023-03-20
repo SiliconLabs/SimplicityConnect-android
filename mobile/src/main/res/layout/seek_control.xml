@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_SM">
+
+    <TextView
+        android:id="@+id/seek_control_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/space_XSS"
+        android:fontFamily="sans-serif-medium"
+        tools:text="Value"
+        android:textColor="@color/blue_primary"
+        android:textSize="@dimen/filter_rssi_value_text_size" />
+
+    <SeekBar
+        android:id="@+id/seek_control_bar"
+        style="@style/seek_control_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seek_control_text"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:max="@integer/rssi_value_range" />
+
+    <TextView
+        style="@style/seekbar_range_text_views"
+        android:id="@+id/textview_seekbar_min"
+        android:layout_below="@id/seek_control_bar"
+        tools:text="0" />
+
+    <TextView
+        style="@style/seekbar_range_text_views"
+        android:id="@+id/textview_seekbar_max"
+        android:layout_below="@id/seek_control_bar"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="8dp"
+        tools:text="100" />
+
+</RelativeLayout>
+
+            

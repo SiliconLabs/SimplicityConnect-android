@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.scan.browser.models.logs
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import java.text.SimpleDateFormat
 import java.util.*
@@ -12,6 +13,7 @@ abstract class Log(protected val gatt: BluetoothGatt) {
 
     abstract fun generateLogInfo() : String
 
+    @SuppressLint("MissingPermission")
     protected fun parseDeviceInfo() : String {
         return "\"${gatt.device.name}\" (${gatt.device.address})"
     }

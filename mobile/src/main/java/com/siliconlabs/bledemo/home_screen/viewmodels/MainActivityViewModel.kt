@@ -15,6 +15,9 @@ class MainActivityViewModel : ViewModel() {
     private val _areBluetoothPermissionsGranted: MutableLiveData<Boolean> = MutableLiveData()
     val areBluetoothPermissionGranted: LiveData<Boolean> = _areBluetoothPermissionsGranted
 
+    private val _isSetupFinished: MutableLiveData<Boolean> = MutableLiveData()
+    val isSetupFinished: LiveData<Boolean> = _isSetupFinished
+
     fun setIsBluetoothOn(isBluetoothOn: Boolean) {
         _isBluetoothOn.postValue(isBluetoothOn)
     }
@@ -31,7 +34,12 @@ class MainActivityViewModel : ViewModel() {
         _areBluetoothPermissionsGranted.postValue(areGranted)
     }
 
+    fun setIsSetupFinished(isSetupFinished: Boolean) {
+        _isSetupFinished.postValue(isSetupFinished)
+    }
+
     fun getIsBluetoothOn(): Boolean = _isBluetoothOn.value ?: false
     fun getIsLocationPermissionGranted(): Boolean = _isLocationPermissionGranted.value ?: false
     fun getAreBluetoothPermissionsGranted(): Boolean = _areBluetoothPermissionsGranted.value ?: false
+    fun getIsSetupFinished(): Boolean = _isSetupFinished.value ?: false
 }

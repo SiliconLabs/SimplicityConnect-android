@@ -1,8 +1,8 @@
 package com.siliconlabs.bledemo.features.demo.range_test.activities
 
+import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.DialogInterface
-import android.content.IntentFilter
 import android.graphics.Typeface
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -36,6 +36,7 @@ import kotlin.math.abs
 /**
  * @author Comarch S.A.
  */
+@SuppressLint("MissingPermission")
 class RangeTestActivity : BaseDemoActivity(), Controller {
 
     private var activeDeviceId = 1
@@ -269,7 +270,7 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
         setupData = true
         this.service = service
         service?.registerGattCallback(false, processor)
-        service?.refreshGattServices()
+        service?.refreshGattServices(service.connectedGatt)
     }
 
     private fun withGatt(action: GattAction) {

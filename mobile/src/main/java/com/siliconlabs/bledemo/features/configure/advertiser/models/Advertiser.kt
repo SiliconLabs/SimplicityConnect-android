@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.configure.advertiser.models
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.AdvertisingSetCallback
 import android.os.Parcelable
@@ -13,7 +14,7 @@ import kotlin.math.ceil
 @Parcelize
 class Advertiser(var data: AdvertiserData = AdvertiserData(), var isRunning: Boolean = false) : Parcelable {
     lateinit var callback: Any
-    lateinit var runnable: Runnable
+    @Transient lateinit var runnable: Runnable
     var displayDetailsView: Boolean = false
 
     fun isRunnableInitialized(): Boolean {
@@ -48,9 +49,12 @@ class Advertiser(var data: AdvertiserData = AdvertiserData(), var isRunning: Boo
             }
         } catch (e: IllegalArgumentException) {
             errorCallback.onErrorHandled(e.message.toString())
+        } catch (e: SecurityException) {
+            errorCallback.onErrorHandled(e.message.toString())
         }
     }
 
+    @SuppressLint("MissingPermission")
     fun stop() {
         Timber.d("Advertiser stop")
         isRunning = false

@@ -20,13 +20,11 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.FragmentConnectionsBinding
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity
 import com.siliconlabs.bledemo.common.other.CardViewListDecoration
-import com.siliconlabs.bledemo.home_screen.base.BaseMainMenuFragment
 import com.siliconlabs.bledemo.home_screen.base.ViewPagerFragment
-import kotlinx.android.synthetic.main.fragment_connections.*
-import kotlinx.android.synthetic.main.fragment_main_view.view.*
-import kotlinx.android.synthetic.main.full_screen_info.view.*
+import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
+import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 
-class ConnectionsFragment : BaseMainMenuFragment() {
+class ConnectionsFragment : BaseServiceDependentMainMenuFragment() {
 
     private lateinit var _binding: FragmentConnectionsBinding
     private lateinit var service: BluetoothService
@@ -53,16 +51,22 @@ class ConnectionsFragment : BaseMainMenuFragment() {
         setDataObservers()
     }
 
-    override fun onBluetoothStateChanged(isOn: Boolean) {
-        toggleBluetoothBar(isOn, _binding.bluetoothEnable)
-    }
+    override val bluetoothDependent = object : BluetoothDependent {
 
-    override fun onLocationStateChanged(isOn: Boolean) {
-        /* Bluetooth operations in this fragment don't need location */
-    }
+        override fun onBluetoothStateChanged(isBluetoothOn: Boolean) {
+            toggleBluetoothBar(isBluetoothOn, _binding.bluetoothEnable)
+            viewModel.updateActiveConnections(service.getActiveConnections())
+        }
+        override fun onBluetoothPermissionsStateChanged(arePermissionsGranted: Boolean) {
+            toggleBluetoothPermissionsBar(arePermissionsGranted, _binding.bluetoothPermissionsBar)
+        }
 
-    override fun onLocationPermissionStateChanged(isGranted: Boolean) {
-        /* Bluetooth operations in this fragment don't need location */
+        override fun refreshBluetoothDependentUi(isBluetoothOperationPossible: Boolean) {
+            /* Not needed */
+        }
+        override fun setupBluetoothPermissionsBarButtons() {
+            _binding.bluetoothPermissionsBar.setFragmentManager(childFragmentManager)
+        }
     }
 
     override fun onResume() {

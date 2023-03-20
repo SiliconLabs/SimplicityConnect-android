@@ -8,9 +8,11 @@ import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.FragmentTestBinding
 import com.siliconlabs.bledemo.features.iop_test.dialogs.AboutIopDialog
-import com.siliconlabs.bledemo.home_screen.base.BaseMainMenuFragment
+import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
+import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
+import com.siliconlabs.bledemo.home_screen.base.LocationDependent
 
-class TestFragment : BaseMainMenuFragment(), DialogInterface.OnDismissListener {
+class TestFragment : BaseServiceDependentMainMenuFragment(), DialogInterface.OnDismissListener {
 
     private lateinit var viewBinding: FragmentTestBinding
     private var selectDeviceDialog: SelectDeviceDialog? = null
@@ -46,7 +48,6 @@ class TestFragment : BaseMainMenuFragment(), DialogInterface.OnDismissListener {
             selectDeviceDialog = SelectDeviceDialog.newDialog(BluetoothService.GattConnectType.IOP_TEST)
             selectDeviceDialog?.show(childFragmentManager, "select_device_dialog")
         }
-        viewBinding.locationBar.setLocationInfoFragmentManager(childFragmentManager)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -63,20 +64,47 @@ class TestFragment : BaseMainMenuFragment(), DialogInterface.OnDismissListener {
         }
     }
 
-    override fun onBluetoothStateChanged(isOn: Boolean) {
-        toggleBluetoothBar(isOn, viewBinding.bluetoothBar)
-        viewBinding.fragmentMainView.extendedFabMainView.isEnabled = isOn
-        if (!isOn) selectDeviceDialog?.dismiss()
+    override val bluetoothDependent = object : BluetoothDependent {
+
+        override fun onBluetoothStateChanged(isBluetoothOn: Boolean) {
+            toggleBluetoothBar(isBluetoothOn, viewBinding.bluetoothBar)
+            viewBinding.fragmentMainView.extendedFabMainView.isEnabled =
+                isBluetoothOperationPossible()
+            if (!isBluetoothOn) selectDeviceDialog?.dismiss()
+        }
+
+        override fun onBluetoothPermissionsStateChanged(arePermissionsGranted: Boolean) {
+            toggleBluetoothPermissionsBar(arePermissionsGranted, viewBinding.bluetoothPermissionsBar)
+            viewBinding.fragmentMainView.extendedFabMainView.isEnabled =
+                isBluetoothOperationPossible()
+            if (!arePermissionsGranted) selectDeviceDialog?.dismiss()
+        }
+
+        override fun refreshBluetoothDependentUi(isBluetoothOperationPossible: Boolean) {
+            viewBinding.fragmentMainView.extendedFabMainView.isEnabled = isBluetoothOperationPossible
+        }
+        override fun setupBluetoothPermissionsBarButtons() {
+            viewBinding.bluetoothPermissionsBar.setFragmentManager(childFragmentManager)
+        }
     }
 
-    override fun onLocationStateChanged(isOn: Boolean) {
-        toggleLocationBar(isOn, viewBinding.locationBar)
-    }
+    override val locationDependent = object : LocationDependent {
 
-    override fun onLocationPermissionStateChanged(isGranted: Boolean) {
-        toggleLocationPermissionBar(isGranted, viewBinding.locationPermissionBar)
-        viewBinding.fragmentMainView.extendedFabMainView.isEnabled = isGranted
-        if (!isGranted) selectDeviceDialog?.dismiss()
+        override fun onLocationStateChanged(isLocationOn: Boolean) {
+            toggleLocationBar(isLocationOn, viewBinding.locationBar)
+        }
+        override fun onLocationPermissionStateChanged(isPermissionGranted: Boolean) {
+            toggleLocationPermissionBar(isPermissionGranted, viewBinding.locationPermissionBar)
+            viewBinding.fragmentMainView.extendedFabMainView.isEnabled = isPermissionGranted
+            if (!isPermissionGranted) selectDeviceDialog?.dismiss()
+        }
+        override fun setupLocationBarButtons() {
+            viewBinding.locationBar.setFragmentManager(childFragmentManager)
+        }
+
+        override fun setupLocationPermissionBarButtons() {
+            viewBinding.locationPermissionBar.setFragmentManager(childFragmentManager)
+        }
     }
 
     override fun onDismiss(dialogInterface: DialogInterface) {

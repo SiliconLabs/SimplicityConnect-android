@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.scan.browser.fragments
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
@@ -12,6 +13,7 @@ import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Prope
 import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.utils.Notifications
 
+@SuppressLint("MissingPermission")
 class RemoteServicesFragment : ServicesFragment(isRemote = true) {
 
     override var services: List<BluetoothGattService> = bluetoothGatt?.services.orEmpty()

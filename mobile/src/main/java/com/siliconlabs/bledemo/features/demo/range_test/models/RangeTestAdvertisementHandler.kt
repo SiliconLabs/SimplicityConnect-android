@@ -15,6 +15,7 @@ import timber.log.Timber
 /**
  * @author Comarch S.A.
  */
+@SuppressLint("MissingPermission")
 abstract class RangeTestAdvertisementHandler(context: Context, address: String) {
     private val bluetoothAdapter: BluetoothAdapter
     val address: String

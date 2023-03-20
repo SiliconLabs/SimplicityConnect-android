@@ -16,7 +16,7 @@
  */
 package com.siliconlabs.bledemo.features.scan.browser.activities
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.*
 import android.content.*
@@ -31,7 +31,6 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.widget.*
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
@@ -52,6 +51,7 @@ import java.io.*
 import java.util.*
 
 @SuppressWarnings("LogNotTimber")
+@SuppressLint("MissingPermission")
 class DeviceServicesActivity : BaseActivity() {
 
     private lateinit var handler: Handler
@@ -73,7 +73,6 @@ class DeviceServicesActivity : BaseActivity() {
     private var otaProgressDialog: OtaProgressDialog? = null
     private var otaLoadingDialog: OtaLoadingDialog? = null
     private var errorDialog: ErrorDialog? = null
-    private var permissionMissingDialog: PermissionMissingDialog? = null
 
     private var MTU = 247
     private var connectionPriority = BluetoothGatt.CONNECTION_PRIORITY_BALANCED
@@ -94,7 +93,6 @@ class DeviceServicesActivity : BaseActivity() {
     var bluetoothService: BluetoothService? = null
         private set
 
-    private var deviceAddress: String? = null
     private var bluetoothDevice: BluetoothDevice? = null
     var bluetoothGatt: BluetoothGatt? = null
 
@@ -195,6 +193,7 @@ class DeviceServicesActivity : BaseActivity() {
                                 /* Device is reconnecting into ota mode */
                                 showInitializationInfo()
                             }
+                            0 -> {} /* Device reconnecting for another file upload, let it be */
                             else -> showErrorDialog(status)
                         }
                         ViewState.UPLOADING -> showErrorDialog(status)
@@ -393,6 +392,7 @@ class DeviceServicesActivity : BaseActivity() {
             otaProgressDialog = null
             showLoadingDialog(getString(R.string.ota_loading_text))
         }
+        bluetoothGatt?.disconnect()
         handler.postDelayed({ reconnect() }, 500)
     }
 
@@ -428,11 +428,11 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     private fun setupBottomNavigation() {
-        supportFragmentManager.beginTransaction()
-            .add(R.id.services_fragment_container, localServicesFragment)
-            .hide(localServicesFragment)
-            .add(R.id.services_fragment_container, remoteServicesFragment)
-            .commit()
+        supportFragmentManager.beginTransaction().apply {
+            add(R.id.services_fragment_container, localServicesFragment)
+            hide(localServicesFragment)
+            add(R.id.services_fragment_container, remoteServicesFragment)
+        }.commit()
 
         services_bottom_nav.setOnNavigationItemSelectedListener { item ->
             (when (item.itemId) {
@@ -448,10 +448,10 @@ class DeviceServicesActivity : BaseActivity() {
                 }
                 else -> null
             })?.let { newFragment ->
-                supportFragmentManager.beginTransaction()
-                        .hide(activeFragment)
-                        .show(newFragment)
-                        .commit()
+                supportFragmentManager.beginTransaction().apply {
+                    hide(activeFragment)
+                    show(newFragment)
+                }.commit()
                 activeFragment = newFragment
                 true
             } ?: false
@@ -484,23 +484,11 @@ class DeviceServicesActivity : BaseActivity() {
 
     private fun setupUiListeners() {
         tv_ota_firmware.setOnClickListener {
-            val storagePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
-
-            if (ContextCompat.checkSelfPermission(this, storagePermission) != PackageManager.PERMISSION_GRANTED) {
-                if (shouldShowRequestPermissionRationale(storagePermission)) {
-                    requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), WRITE_EXTERNAL_STORAGE_REQUEST_PERMISSION)
-                } else {
-                    permissionMissingDialog = PermissionMissingDialog().also {
-                        it.show(supportFragmentManager, "permission_missing_dialog")
-                    }
-                }
-            } else if (isUiCreated) {
-                checkForOtaCharacteristic()
-            }
+            if (isUiCreated) checkForOtaCharacteristic()
         }
         btn_bond_action.setOnClickListener {
             bluetoothGatt?.device?.let { when (it.bondState) {
-                BluetoothDevice.BOND_BONDED -> unbondDevice(it)
+                BluetoothDevice.BOND_BONDED -> askUnbondDevice(it)
                 BluetoothDevice.BOND_NONE -> it.createBond()
                 else -> { }
             } }
@@ -549,10 +537,6 @@ class DeviceServicesActivity : BaseActivity() {
         }
     }
 
-    private fun getOtaDataCharacteristic(gatt: BluetoothGatt?) : BluetoothGattCharacteristic? {
-        return gatt?.getService(UuidConsts.OTA_SERVICE)?.getCharacteristic(UuidConsts.OTA_DATA)
-    }
-
     private fun getOtaControlCharacteristic() : BluetoothGattCharacteristic? {
         return bluetoothGatt?.getService(UuidConsts.OTA_SERVICE)?.getCharacteristic(UuidConsts.OTA_CONTROL)
     }
@@ -580,11 +564,6 @@ class DeviceServicesActivity : BaseActivity() {
                 finish()
             }
         }
-        permissionMissingDialog?.let {
-            it.dismiss()
-            permissionMissingDialog = null
-            checkForOtaCharacteristic()
-        }
     }
 
     override fun onPause() {
@@ -602,6 +581,7 @@ class DeviceServicesActivity : BaseActivity() {
         errorDialog?.dismiss()
 
         unregisterReceivers()
+        bluetoothService?.isNotificationEnabled = true
         bluetoothBinding?.unbind()
     }
 
@@ -678,18 +658,31 @@ class DeviceServicesActivity : BaseActivity() {
         supportFragmentManager.beginTransaction().apply {
             add(R.id.fragment_container, LogFragment())
             addToBackStack(null)
-            commit()
-        }
+        }.commit()
+
         fragment_container.visibility = View.VISIBLE
         services_container.visibility = View.GONE
         toggleMenuItemsVisibility(areVisible = false)
         isLogFragmentOn = true
     }
 
+    private fun askUnbondDevice(device: BluetoothDevice) {
+        if (SharedPrefUtils(this@DeviceServicesActivity).shouldDisplayUnbondDeviceDialog()) {
+            val dialog = UnbondDeviceDialog(object : UnbondDeviceDialog.Callback {
+                override fun onOkClicked() {
+                    unbondDevice(device)
+                }
+            })
+            dialog.show(supportFragmentManager, "dialog_unbond_device")
+        } else {
+            unbondDevice(device)
+        }
+    }
+
     private fun unbondDevice(device: BluetoothDevice) {
         if (!removeBond(device)) {
-            if (SharedPrefUtils(this@DeviceServicesActivity).shouldDisplayUnbondDeviceDialog()) {
-                val dialog = UnbondDeviceDialog(object : UnbondDeviceDialog.Callback {
+            if (SharedPrefUtils(this@DeviceServicesActivity).shouldDisplayManualUnbondDeviceDialog()) {
+                val dialog = ManualUnbondDeviceDialog(object : ManualUnbondDeviceDialog.Callback {
                     override fun onOkClicked() {
                         try {
                             startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
@@ -765,12 +758,10 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     private fun sendFileChooserIntent() {
-        Intent().apply {
-            type = "*/*"
-            action = Intent.ACTION_GET_CONTENT
-        }.also {
-            startActivityForResult(Intent.createChooser(it, "Choose directory"), FILE_CHOOSER_REQUEST_CODE)
-        }
+        Intent(Intent.ACTION_GET_CONTENT)
+            .apply { type = "*/*" }
+            .also { startActivityForResult(Intent.createChooser(it,
+                getString(R.string.ota_choose_file)), FILE_CHOOSER_REQUEST_CODE) }
     }
 
     private fun hideLoadingDialog() {
@@ -1064,7 +1055,9 @@ class DeviceServicesActivity : BaseActivity() {
                 this@DeviceServicesActivity.bluetoothService = service
 
                 bluetoothService?.apply {
-                    bluetoothGatt = getConnectedGatt(deviceAddress)
+                    bluetoothDevice?.address?.let {
+                        bluetoothGatt = getActiveConnection(it)?.connection?.gatt
+                    }
                     bluetoothGatt?.let {
                         registerGattCallback(true, gattCallback)
                         displayBondState()

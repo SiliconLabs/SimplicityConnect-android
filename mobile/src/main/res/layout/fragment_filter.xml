@@ -73,50 +73,8 @@
                 android:layout_marginVertical="@dimen/space_XS"
                 android:background="@color/silabs_black"/>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/space_SM">
-
-                <TextView
-                    android:id="@+id/tv_rssi_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="@dimen/space_XSS"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/filter_rssi_not_set"
-                    android:textColor="@color/blue_primary"
-                    android:textSize="@dimen/filter_rssi_value_text_size" />
-
-                <SeekBar
-                    android:id="@+id/sb_rssi"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_rssi_value"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:max="@integer/rssi_value_range"
-                    android:paddingVertical="@dimen/space_S"
-                    android:background="@drawable/seekbar_background"
-                    android:progressTint="@color/seekbar_progress"
-                    android:thumbTint="@color/blue_primary" />
-
-                <TextView
-                    style="@style/seekbar_range_text_views"
-                    android:id="@+id/textview_seekbar_min"
-                    android:layout_below="@id/sb_rssi"
-                    android:text="@string/filter_seekbar_min" />
-
-                <TextView
-                    style="@style/seekbar_range_text_views"
-                    android:id="@+id/textview_seekbar_max"
-                    android:layout_below="@id/sb_rssi"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginBottom="8dp"
-                    android:text="@string/filter_seekbar_max" />
-
-            </RelativeLayout>
+            <include layout="@layout/seek_control"
+                android:id="@+id/seek_bar_rssi" />
 
             <TextView
                 android:id="@+id/textview_beacon"
@@ -186,25 +144,35 @@
 
                 <androidx.appcompat.widget.AppCompatCheckBox
                     android:id="@+id/cb_only_favourites"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_weight="0"
                     android:text="@string/only_favorites"
                     style="@style/filter_fragment_status_setting_choices"/>
 
-                <androidx.appcompat.widget.AppCompatCheckBox
-                    android:id="@+id/cb_only_connectable"
+                <View
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_weight="1"/>
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cb_only_connectable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0"
                     android:text="@string/only_connectible"
                     style="@style/filter_fragment_status_setting_choices" />
 
-                <androidx.appcompat.widget.AppCompatCheckBox
-                    android:id="@+id/cb_only_bonded"
+                <View
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_weight="1"/>
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/cb_only_bonded"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0"
                     android:text="@string/only_bonded"
                     style="@style/filter_fragment_status_setting_choices" />
 

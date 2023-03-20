@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.throughput.models
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
@@ -7,6 +8,7 @@ import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.features.demo.throughput.viewmodels.ThroughputViewModel
 import java.util.concurrent.Executors
 
+@SuppressLint("MissingPermission")
 class UpdateTest(private val service: BluetoothService?,
                  private val viewModel: ThroughputViewModel,
                  withNotifications: Boolean) {

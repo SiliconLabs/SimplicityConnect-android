@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.viewmodels
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.os.Handler
@@ -10,6 +11,7 @@ import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.utils.BLEUtils
 
+@SuppressLint("MissingPermission")
 class MotionViewModel : ViewModel() {
 
     val acceleration = MutableLiveData<FloatArray>()

@@ -1,11 +1,13 @@
 package com.siliconlabs.bledemo.bluetooth.services
 
 import android.annotation.SuppressLint
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanCallback.*
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanSettings
 import android.content.BroadcastReceiver
@@ -14,10 +16,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
-import androidx.core.app.NotificationCompat
 import androidx.core.location.LocationManagerCompat
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.ble.*
@@ -39,6 +41,7 @@ import java.util.*
  */
 
 @SuppressWarnings("LogNotTimber")
+@SuppressLint("MissingPermission")
 class BluetoothService : LocalService<BluetoothService>() {
 
     companion object {
@@ -46,6 +49,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         private const val RECONNECTION_DELAY = 1000L //connection drops after ~ 4s when reconnecting without delay
         private const val CONNECTION_TIMEOUT = 20000L
         private const val RSSI_UPDATE_FREQUENCY = 2000L
+        private const val REFRESH_SERVICES_DELAY = 500L // give device time refresh cache
 
         private const val ACTION_GATT_SERVER_DEBUG_CONNECTION = "com.siliconlabs.bledemo.action.GATT_SERVER_DEBUG_CONNECTION"
         private const val ACTION_GATT_SERVER_REMOVE_NOTIFICATION = "com.siliconlabs.bledemo.action.GATT_SERVER_REMOVE_NOTIFICATION"
@@ -92,12 +96,18 @@ class BluetoothService : LocalService<BluetoothService>() {
          */
         fun onDiscoveryFailed()
 
+        /**
+         * Called when scanning ended due to timeout set in app's settings
+         */
+        fun onDiscoveryTimeout()
+
     }
 
     private val scanReceiver: BroadcastReceiver = BluetoothScanCallback(this)
     private val scanListeners = ScanListeners()
 
     var servicesStateListener: ServicesStateListener? = null
+    var areBluetoothPermissionsEnabled = false
 
     private lateinit var bluetoothManager: BluetoothManager
     private lateinit var handler: Handler
@@ -148,6 +158,12 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
     }
 
+    private val scanTimeoutRunnable = Runnable {
+        stopDiscovery()
+        scanListeners.onDiscoveryTimeout()
+        Toast.makeText(this, getString(R.string.toast_scan_timeout), Toast.LENGTH_SHORT).show()
+    }
+
     private var reconnectionRunnable: ReconnectionRunnable? = null
 
     inner class ReconnectionRunnable(val connection: GattConnection) : Runnable {
@@ -183,6 +199,11 @@ class BluetoothService : LocalService<BluetoothService>() {
         initGattServer()
     }
 
+    fun setAreBluetoothPermissionsGranted(areBluetoothPermissionsGranted: Boolean) {
+        areBluetoothPermissionsEnabled = areBluetoothPermissionsGranted
+        initGattServer()
+    }
+
     interface ServicesStateListener {
         fun onBluetoothStateChanged(isOn: Boolean)
         fun onLocationStateChanged(isOn: Boolean)
@@ -199,7 +220,9 @@ class BluetoothService : LocalService<BluetoothService>() {
                         servicesStateListener?.onBluetoothStateChanged(true)
                     }
                     BluetoothAdapter.STATE_OFF -> {
-                        disconnectAllGatts()
+                        /* All connections are terminated and closed already by system at this
+                        point. Only clearing model is necessary for UI purposes. */
+                        activeConnections.clear()
                         servicesStateListener?.onBluetoothStateChanged(false)
                     }
                 }
@@ -224,8 +247,8 @@ class BluetoothService : LocalService<BluetoothService>() {
         return LocationManagerCompat.isLocationEnabled(locationManager)
     }
 
-    private fun initGattServer() {
-        if (bluetoothGattServer == null && bluetoothAdapter != null && bluetoothAdapter?.isEnabled!!) {
+    fun initGattServer() {
+        if (bluetoothGattServer == null && bluetoothAdapter?.isEnabled == true && areBluetoothPermissionsEnabled) {
             bluetoothGattServer = bluetoothManager.openGattServer(this, bluetoothGattServerCallback)
             setGattServer()
         }
@@ -284,26 +307,37 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
     }
 
-    fun startDiscovery(filters: List<ScanFilter>) {
-        bluetoothAdapter?.let {
+    fun startDiscovery(filters: List<ScanFilter>, timeoutInSeconds: Int? = null) {
+        timeoutInSeconds?.let {
+            handler.postDelayed(scanTimeoutRunnable, it.toLong() * 1000)
+        }
+        bluetoothAdapter?.let { adapter ->
             if (useBLE) {
                 bleScannerCallback = BleScanCallback(this)
                 val settings = ScanSettings.Builder()
                         .setLegacy(false)
                         .setReportDelay(0)
                         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
-                it.bluetoothLeScanner?.startScan(
-                        filters, settings, bleScannerCallback
-                ) ?: onDiscoveryFailed(ScanError.LeScannerUnavailable)
+                adapter.bluetoothLeScanner?.startScan(filters, settings, bleScannerCallback)
+                        ?: onDiscoveryFailed(ScanError.LeScannerUnavailable)
             } else {
-                if (!it.startDiscovery()) onDiscoveryFailed(ScanError.BluetoothAdapterUnavailable)
+                if (!adapter.startDiscovery()) onDiscoveryFailed(ScanError.BluetoothAdapterUnavailable)
+                else timeoutInSeconds?.let {
+                    handler.postDelayed(scanTimeoutRunnable, it.toLong() * 1000)
+                }
             }
         } ?: onDiscoveryFailed(ScanError.BluetoothAdapterUnavailable)
     }
 
     fun onDiscoveryFailed(scanError: ScanError, errorCode: Int? = null) {
+        handler.removeCallbacks(scanTimeoutRunnable)
         val message = when (scanError) {
-            ScanError.ScannerError -> getString(R.string.scan_failed_error_code, errorCode)
+            ScanError.ScannerError -> when (errorCode) {
+                SCAN_FAILED_APPLICATION_REGISTRATION_FAILED -> getString(R.string.scan_failed_application_registration_failed)
+                SCAN_FAILED_FEATURE_UNSUPPORTED -> getString(R.string.scan_failed_feature_unsupported)
+                SCAN_FAILED_INTERNAL_ERROR -> getString(R.string.scan_failed_internal_error)
+                else -> getString(R.string.scan_failed_error_code, errorCode)
+            }
             ScanError.LeScannerUnavailable -> getString(R.string.scan_failed_le_scanner_unavailable)
             ScanError.BluetoothAdapterUnavailable -> getString(R.string.scan_failed_bluetooth_adapter_unavailable)
         }
@@ -312,6 +346,7 @@ class BluetoothService : LocalService<BluetoothService>() {
     }
 
     fun stopDiscovery() {
+        handler.removeCallbacks(scanTimeoutRunnable)
         bluetoothAdapter?.let {
             if (useBLE) {
                 it.bluetoothLeScanner?.stopScan(bleScannerCallback as ScanCallback?)
@@ -332,29 +367,19 @@ class BluetoothService : LocalService<BluetoothService>() {
         BluetoothAdapterUnavailable,
     }
 
-    fun discoverGattServices() {
-        connectedGatt?.discoverServices()
-    }
-
-    fun refreshGattServices() {
-        connectedGatt?.let {
-            refreshGattDB(it)
+    fun refreshGattServices(gatt: BluetoothGatt?) {
+        gatt?.let {
+            refreshDeviceCache(it)
+            handler.postDelayed({
+                it.discoverServices()
+            }, REFRESH_SERVICES_DELAY)
         }
     }
 
-    private fun refreshGattDB(gatt: BluetoothGatt) {
-        refreshDeviceCache(gatt)
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                gatt.discoverServices()
-            }
-        }, 500)
-    }
-
-    private fun refreshDeviceCache(gatt: BluetoothGatt?): Boolean {
+    private fun refreshDeviceCache(gatt: BluetoothGatt): Boolean {
         try {
             Timber.d("refreshDevice: Called")
-            val localMethod: Method = gatt?.javaClass?.getMethod("refresh")!!
+            val localMethod: Method = gatt.javaClass.getMethod("refresh")
             val bool: Boolean = (localMethod.invoke(gatt, *arrayOfNulls(0)) as Boolean)
             Timber.d("refreshDevice: bool: $bool")
             return bool
@@ -377,9 +402,11 @@ class BluetoothService : LocalService<BluetoothService>() {
     }
 
     fun isGattConnected(): Boolean {
-        return connectedGatt != null
-                && activeConnections.containsKey(connectedGatt?.device?.address!!)
-                && bluetoothManager.getConnectionState(connectedGatt?.device, BluetoothProfile.GATT) == BluetoothProfile.STATE_CONNECTED
+        return connectedGatt?.let {
+            activeConnections.containsKey(it.device?.address!!)
+                    && bluetoothManager.getConnectionState(
+                it.device, BluetoothProfile.GATT) == BluetoothProfile.STATE_CONNECTED
+        } ?: false
     }
 
     fun isGattConnected(deviceAddress: String?): Boolean {
@@ -761,21 +788,30 @@ class BluetoothService : LocalService<BluetoothService>() {
     private fun getYesPendingIntent(device: BluetoothDevice): PendingIntent {
         val intent = Intent(ACTION_GATT_SERVER_DEBUG_CONNECTION)
         intent.putExtra(EXTRA_BLUETOOTH_DEVICE, device)
+
+        val pendingIntentFlag =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE
+            else PendingIntent.FLAG_CANCEL_CURRENT
+
         return PendingIntent.getBroadcast(
             this,
             GATT_SERVER_DEBUG_CONNECTION_REQUEST_CODE,
             intent,
-            PendingIntent.FLAG_CANCEL_CURRENT
+            pendingIntentFlag
         )
     }
 
     private fun getNoPendingIntent(): PendingIntent {
         val intent = Intent(ACTION_GATT_SERVER_REMOVE_NOTIFICATION)
+        val pendingIntentFlag =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE
+            else PendingIntent.FLAG_CANCEL_CURRENT
+
         return PendingIntent.getBroadcast(
             this,
             GATT_SERVER_REMOVE_NOTIFICATION_REQUEST_CODE,
             intent,
-            PendingIntent.FLAG_CANCEL_CURRENT
+            pendingIntentFlag
         )
     }
 
@@ -788,11 +824,15 @@ class BluetoothService : LocalService<BluetoothService>() {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
 
+        val pendingIntentFlag =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE
+            else PendingIntent.FLAG_ONE_SHOT
+
         return PendingIntent.getActivities(
             this,
             GATT_SERVER_OPEN_CONNECTION_REQUEST_CODE,
             arrayOf(backIntent, intent),
-            PendingIntent.FLAG_ONE_SHOT
+            pendingIntentFlag
         )
     }
 
@@ -800,15 +840,13 @@ class BluetoothService : LocalService<BluetoothService>() {
         val deviceName = device.name ?: getString(R.string.not_advertising_shortcut)
         createNotificationChannel()
 
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+        val notification = Notification.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.mipmap.efr_redesign_launcher)
                 .setContentTitle(getString(R.string.notification_title_device_has_connected, deviceName))
                 .setContentText(getString(R.string.notification_note_debug_connection))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setVibrate(LongArray(0))
-                .addAction(0, getString(R.string.button_yes), getYesPendingIntent(device))
-                .addAction(0, getString(R.string.notification_button_yes_and_open), getYesAndOpenPendingIntent(device))
-                .addAction(0, getString(R.string.button_no), getNoPendingIntent())
+                .addAction(buildAction(getString(R.string.button_yes), getYesPendingIntent(device)))
+                .addAction(buildAction(getString(R.string.notification_button_yes_and_open), getYesAndOpenPendingIntent(device)))
+                .addAction(buildAction(getString(R.string.button_no), getNoPendingIntent()))
                 .build()
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -825,6 +863,14 @@ class BluetoothService : LocalService<BluetoothService>() {
 
         val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
+    }
+
+    private fun buildAction(actionText: String, actionIntent: PendingIntent) : Notification.Action {
+        return Notification.Action.Builder(
+            R.mipmap.efr_redesign_launcher,
+            actionText,
+            actionIntent
+        ).build()
     }
 
     private val gattServerBroadcastReceiver = object : BroadcastReceiver() {
@@ -855,6 +901,10 @@ class BluetoothService : LocalService<BluetoothService>() {
 
         override fun onDiscoveryFailed() {
             forEach { it.onDiscoveryFailed() }
+        }
+
+        override fun onDiscoveryTimeout() {
+            forEach { it.onDiscoveryTimeout() }
         }
     }
 

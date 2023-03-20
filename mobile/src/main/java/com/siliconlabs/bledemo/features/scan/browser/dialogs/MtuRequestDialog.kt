@@ -32,25 +32,27 @@ class MtuRequestDialog(
     }
 
     private fun initSeekbarValues() {
-        _binding.requestMtuSeekBar.apply {
-            max = resources.getInteger(R.integer.mtu_max_value) - resources.getInteger(R.integer.mtu_min_value)
-            progress = getProgressBarValue(currentMTU)
+        _binding.seekBarMtu.apply {
+            textviewSeekbarMin.text = resources.getInteger(R.integer.mtu_min_value).toString()
+            textviewSeekbarMax.text = resources.getInteger(R.integer.mtu_max_value).toString()
+            seekControlBar.max = resources.getInteger(R.integer.mtu_max_value) - resources.getInteger(R.integer.mtu_min_value)
+            seekControlBar.progress = getProgressBarValue(currentMTU)
         }
     }
 
-    private fun setupUiListeners() {
-        _binding.apply {
+    private fun setupUiListeners() {        _binding.apply {
+
             request.setOnClickListener {
-                callback.onMtuRequested(getMtuValue(requestMtuSeekBar.progress))
+                callback.onMtuRequested(getMtuValue(seekBarMtu.seekControlBar.progress))
                 dismiss()
             }
             cancelRequest.setOnClickListener { dismiss() }
 
-            requestMtuSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            seekBarMtu.seekControlBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onStartTrackingTouch(seekBar: SeekBar) {}
                 override fun onStopTrackingTouch(seekBar: SeekBar) {}
                 override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                    requestedMtuValue.text = getMtuValue(progress).toString()
+                    seekBarMtu.seekControlText.text = getMtuValue(progress).toString()
                 }
             })
         }

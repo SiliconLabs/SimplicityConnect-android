@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/location_disabled"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/blue_primary">
+
+    <TextView
+        android:id="@+id/warning_bar_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif-medium"
+        android:layout_marginHorizontal="12dp"
+        tools:text="@string/location_disabled"
+        android:textColor="@color/silabs_white"
+        android:textSize="14sp" />
+
+    <TextView android:id="@+id/warning_bar_action_button"
+        style="@style/info_bar_text_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        tools:text="@string/location_enable" />
+
+    <TextView android:id="@+id/warning_bar_info_button"
+        style="@style/info_bar_text_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        tools:text="@string/warning_bar_additional_info" />
+</LinearLayout>

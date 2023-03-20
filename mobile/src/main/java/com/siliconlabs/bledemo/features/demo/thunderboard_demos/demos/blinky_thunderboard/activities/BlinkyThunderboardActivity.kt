@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.activities
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
@@ -122,6 +123,7 @@ class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListen
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun initControls() {
         if (statusFragment.viewModel.thunderboardDevice.value?.
                 boardType != ThunderBoardDevice.Type.THUNDERBOARD_SENSE &&
@@ -132,7 +134,7 @@ class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListen
         }
 
         getRgbLedMaskDescriptor()?.let {
-            service?.connectedGatt?.readDescriptor(it)
+            gatt?.readDescriptor(it)
         } ?: viewModel.rgbLedMask.postValue(0x0f)
     }
 
@@ -145,14 +147,14 @@ class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListen
     }
 
     private fun getDigitalWriteCharacteristic() : BluetoothGattCharacteristic? {
-        return service?.connectedGatt?.getService(
+        return gatt?.getService(
                 GattService.AutomationIo.number)?.characteristics
                 ?.filter { it.uuid == GattCharacteristic.Digital.uuid } // there are two
                 ?.first { it.properties and BluetoothGattCharacteristic.PROPERTY_WRITE != 0 }
     }
 
     private fun getDigitalNotifyCharacteristic() : BluetoothGattCharacteristic? {
-        return service?.connectedGatt?.getService(
+        return gatt?.getService(
                 GattService.AutomationIo.number)?.characteristics
                 ?.filter { it.uuid == GattCharacteristic.Digital.uuid } // there are two
                 ?.first { it.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY != 0 }
@@ -160,12 +162,12 @@ class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListen
 
 
     private fun getRgbLedCharacteristic() : BluetoothGattCharacteristic? {
-        return service?.connectedGatt?.getService(GattService.UserInterface.number)?.
+        return gatt?.getService(GattService.UserInterface.number)?.
         getCharacteristic(GattCharacteristic.RgbLeds.uuid)
     }
 
     private fun getRgbLedMaskDescriptor() : BluetoothGattDescriptor? {
-        return service?.connectedGatt?.getService(GattService.UserInterface.number)?.
+        return gatt?.getService(GattService.UserInterface.number)?.
         getCharacteristic(GattCharacteristic.RgbLeds.uuid)?.
         getDescriptor(LED_MASK_DESCRIPTOR)
     }

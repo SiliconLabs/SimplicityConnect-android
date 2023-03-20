@@ -1,11 +1,13 @@
 package com.siliconlabs.bledemo.utils
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
+@SuppressLint("MissingPermission")
 class GattQueue(private val gatt: BluetoothGatt?) {
 
     private val commands: Queue<GattCommand> = LinkedList()

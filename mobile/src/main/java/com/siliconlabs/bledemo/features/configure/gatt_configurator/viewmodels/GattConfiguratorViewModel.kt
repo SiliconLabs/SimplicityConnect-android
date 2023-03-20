@@ -1,15 +1,15 @@
 package com.siliconlabs.bledemo.features.configure.gatt_configurator.viewmodels
 
-import androidx.hilt.Assisted
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.GattServer
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.utils.GattConfiguratorStorage
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class GattConfiguratorViewModel @ViewModelInject constructor(val gattConfiguratorStorage: GattConfiguratorStorage, @Assisted private val savedStateHandle: SavedStateHandle) : ViewModel() {
+@HiltViewModel
+class GattConfiguratorViewModel @Inject constructor(val gattConfiguratorStorage: GattConfiguratorStorage) : ViewModel() {
     private val _gattServers: MutableLiveData<ArrayList<GattServer>> = MutableLiveData(gattConfiguratorStorage.loadGattServerList())
     val gattServers: LiveData<ArrayList<GattServer>> = _gattServers
     private val _removedPosition: MutableLiveData<Int> = MutableLiveData()

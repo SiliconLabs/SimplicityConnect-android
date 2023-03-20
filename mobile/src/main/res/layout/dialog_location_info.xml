@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     style="@style/dialog_card">
@@ -12,18 +13,20 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/info_dialog_title"
             style="@style/dialog_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
-            android:text="@string/Location_service" />
+            tools:text="@string/Location_service" />
 
         <TextView
+            android:id="@+id/info_dialog_description"
             style="@style/dialog_text_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="@string/location_service_info" />
+            tools:text="@string/location_service_info" />
 
         <Button android:id="@+id/btn_ok"
             style="@style/dialog_button_neutral_action"

@@ -12,6 +12,13 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
+    <com.siliconlabs.bledemo.home_screen.views.BluetoothPermissionsBar
+        android:id="@+id/bluetooth_permissions_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <include
         android:id="@+id/fragment_main_view"
         layout="@layout/fragment_main_view" />

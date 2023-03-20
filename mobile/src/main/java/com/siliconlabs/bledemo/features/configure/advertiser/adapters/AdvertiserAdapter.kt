@@ -1,6 +1,5 @@
 package com.siliconlabs.bledemo.features.configure.advertiser.adapters
 
-import android.bluetooth.BluetoothAdapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +16,8 @@ class AdvertiserAdapter(
         private val items: ArrayList<Advertiser>,
         private val itemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<AdvertiserAdapter.ViewHolder>() {
+
+    private var isBluetoothOperationPossible = true
 
     init {
         items.map { it.displayDetailsView = false }
@@ -35,6 +36,11 @@ class AdvertiserAdapter(
 
     fun isEmpty(): Boolean {
         return items.isEmpty()
+    }
+
+    fun toggleIsBluetoothOperationPossible(isPossible: Boolean) {
+        isBluetoothOperationPossible = isPossible
+        notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -67,7 +73,7 @@ class AdvertiserAdapter(
 
 
 
-    class ViewHolder(
+    inner class ViewHolder(
             val viewBinding: AdapterAdvertiserBinding,
             clickListener: OnItemClickListener
     ) : RecyclerView.ViewHolder(viewBinding.root) {
@@ -75,7 +81,7 @@ class AdvertiserAdapter(
 
         val switchListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
             withAdapterPositionCheck(this@ViewHolder) {
-                if (BluetoothAdapter.getDefaultAdapter()?.isEnabled == true) {
+                if (isBluetoothOperationPossible) {
                     if (isChecked) clickListener.switchItemOn(adapterPosition)
                     else clickListener.switchItemOff(adapterPosition)
                 } else {
@@ -89,7 +95,7 @@ class AdvertiserAdapter(
             viewBinding.apply {
                 handleDetailsView(item)
                 populateTextViews(item.data)
-                swAdvertiser.isEnabled = BluetoothAdapter.getDefaultAdapter()?.isEnabled ?: false
+                swAdvertiser.isEnabled = isBluetoothOperationPossible
 
                 if (swAdvertiser.isChecked != item.isRunning) {
                     swAdvertiser.apply {

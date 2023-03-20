@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.configure.advertiser.models
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.AdvertiseData
 import android.os.ParcelUuid
@@ -39,6 +40,7 @@ data class DataPacket(
         return 0
     }
 
+    @SuppressLint("MissingPermission")
     private fun getCompleteLocalNameSize(): Int {
         if (includeCompleteLocalName) return BASE + BluetoothAdapter.getDefaultAdapter().name.length
         return 0

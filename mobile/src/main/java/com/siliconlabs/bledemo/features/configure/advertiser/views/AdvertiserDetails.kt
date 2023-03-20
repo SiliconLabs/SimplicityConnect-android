@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.configure.advertiser.views
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.widget.LinearLayout
@@ -83,6 +84,7 @@ class AdvertiserDetails(val context: Context) {
         }.toString()
     }
 
+    @SuppressLint("MissingPermission")
     private fun getCompleteLocalName(context: Context, data: DataPacket): String {
         return if (data.includeCompleteLocalName) BluetoothAdapter.getDefaultAdapter().name
         else context.getString(R.string.not_advertising_shortcut)

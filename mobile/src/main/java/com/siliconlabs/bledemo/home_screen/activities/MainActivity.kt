@@ -5,16 +5,15 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import com.siliconlabs.bledemo.base.activities.BaseActivity
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.home_screen.dialogs.PermissionsDialog
-import com.siliconlabs.bledemo.home_screen.fragments.*
 import com.siliconlabs.bledemo.home_screen.viewmodels.MainActivityViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
@@ -29,15 +28,20 @@ open class MainActivity : BaseActivity(),
     var bluetoothService: BluetoothService? = null
         private set
 
-    private val neededPermissions = arrayOf(
-            Manifest.permission.BLUETOOTH_SCAN,
-            Manifest.permission.BLUETOOTH_ADVERTISE,
-            Manifest.permission.BLUETOOTH_CONNECT,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    private val neededPermissions = mutableListOf(
+            Manifest.permission.ACCESS_FINE_LOCATION
+    )
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private val android12Permissions = listOf(
+        Manifest.permission.BLUETOOTH_SCAN,
+        Manifest.permission.BLUETOOTH_ADVERTISE,
+        Manifest.permission.BLUETOOTH_CONNECT
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.MainAppTheme)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         supportActionBar?.show()
@@ -45,51 +49,23 @@ open class MainActivity : BaseActivity(),
         viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
 
         handlePermissions()
-        observeChanges()
         setupMainNavigationListener()
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.setIsLocationPermissionGranted(isPermissionGranted(neededPermissions[3]))
-        viewModel.setAreBluetoothPermissionsGranted(areBluetoothPermissionsGranted())
-    }
-
-    private fun setupMainNavigationListener() {
-        main_navigation.setOnNavigationItemSelectedListener {
-            val fragmentToSwitch =
-                if (Build.VERSION.SDK_INT > 30 &&
-                        !viewModel.getAreBluetoothPermissionsGranted()) {
-                    Toast.makeText(this, getString(R.string.bluetooth_permissions_needed),
-                            Toast.LENGTH_SHORT).show()
-                    null
-                }
-                else if (main_navigation.selectedItemId == it.itemId) null
-                else {
-                    when (it.itemId) {
-                        R.id.main_navigation_scan -> ScanFragment()
-                        R.id.main_navigation_configure -> ConfigureFragment()
-                        R.id.main_navigation_test -> TestFragment()
-                        R.id.main_navigation_demo -> DemoFragment()
-                        R.id.main_navigation_settings -> SettingsFragment()
-                        else -> null
-                    }
-                }
-
-            fragmentToSwitch?.let { fragment ->
-                switchToFragment(fragment)
-                true
-            } ?: false
+        if (viewModel.getIsSetupFinished()) {
+            viewModel.setIsLocationPermissionGranted(isPermissionGranted(neededPermissions[0]))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                viewModel.setAreBluetoothPermissionsGranted(areBluetoothPermissionsGranted())
+            }
         }
     }
 
-    private fun observeChanges() {
-        viewModel.areBluetoothPermissionGranted.observe(this, Observer { areGranted ->
-            if (areGranted) {
-                bluetooth_permissions_bar.visibility = View.GONE
-                bindBluetoothService()
-            }
-        })
+    private fun setupMainNavigationListener() {
+        val navFragment = supportFragmentManager.findFragmentById(R.id.main_fragment) as NavHostFragment
+        val navController = navFragment.navController
+        NavigationUI.setupWithNavController(main_navigation, navController)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -100,10 +76,6 @@ open class MainActivity : BaseActivity(),
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    fun onScanFragmentPrepared() {
-        setServicesInitialState()
     }
 
     fun toggleMainNavigation(isOn: Boolean) {
@@ -117,35 +89,35 @@ open class MainActivity : BaseActivity(),
         }
     }
 
-
-    private fun switchToFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.main_fragment, fragment)
-            commit()
-        }
-    }
-
     private fun bindBluetoothService() {
         binding = object : BluetoothService.Binding(this) {
             override fun onBound(service: BluetoothService?) {
                 this@MainActivity.bluetoothService = service
                 bluetoothService?.servicesStateListener = this@MainActivity
-                main_navigation.selectedItemId = R.id.main_navigation_scan
+                setServicesInitialState()
             }
         }
         binding.bind()
     }
 
-    private fun handlePermissions() {
-        if (!areAllPermissionsGranted()) askForPermissions()
-        else bindBluetoothService()
-    }
-
     private fun setServicesInitialState() {
-        viewModel.setIsLocationPermissionGranted(isPermissionGranted(neededPermissions[3]))
+        viewModel.setIsLocationPermissionGranted(isPermissionGranted(neededPermissions[0]))
+        viewModel.setAreBluetoothPermissionsGranted(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) areBluetoothPermissionsGranted()
+            else true /* No runtime permissions needed for bluetooth operation in Android 11- */
+        )
         bluetoothService?.let {
             viewModel.setIsBluetoothOn(it.isBluetoothOn())
             viewModel.setIsLocationOn(it.isLocationOn())
+        }
+        observeChanges()
+        viewModel.setIsSetupFinished(isSetupFinished = true)
+    }
+
+    private fun observeChanges() {
+        viewModel.areBluetoothPermissionGranted.observe(this) {
+            bluetoothService?.setAreBluetoothPermissionsGranted(
+                viewModel.getAreBluetoothPermissionsGranted())
         }
     }
 
@@ -157,57 +129,44 @@ open class MainActivity : BaseActivity(),
         viewModel.setIsLocationOn(isOn)
     }
 
+
+    private fun handlePermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            neededPermissions.addAll(android12Permissions)
+        }
+
+        if (neededPermissions.any { !isPermissionGranted(it) }) askForPermissions()
+        else bindBluetoothService()
+    }
+
+    private fun askForPermissions() {
+        val rationalesToShow = neededPermissions.filter { shouldShowRequestPermissionRationale(it) }
+        val permissionsToRequest = neededPermissions.toTypedArray()
+
+        if (rationalesToShow.isNotEmpty()) {
+            PermissionsDialog(rationalesToShow, object : PermissionsDialog.Callback {
+                override fun onDismiss() {
+                    requestPermissions(permissionsToRequest, PERMISSIONS_REQUEST_CODE)
+                }
+            }).show(supportFragmentManager, "permissions_dialog")
+        } else {
+            requestPermissions(permissionsToRequest, PERMISSIONS_REQUEST_CODE)
+        }
+    }
+
     private fun isPermissionGranted(permission: String) : Boolean {
         return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     private fun areBluetoothPermissionsGranted() : Boolean {
-        return isPermissionGranted(neededPermissions[0]) &&
-                isPermissionGranted(neededPermissions[1]) &&
-                isPermissionGranted(neededPermissions[2])
-
+        return android12Permissions.all { isPermissionGranted(it) }
     }
-
-    private fun areAllPermissionsGranted() : Boolean {
-        neededPermissions.forEach {
-            if (!isPermissionGranted(it)) return false
-        }
-        return true
-    }
-
-    private fun shouldShowPermissionRationale() : Boolean {
-        neededPermissions.forEach {
-            if (shouldShowRequestPermissionRationale(it)) return true
-        }
-        return false
-    }
-
-    private fun askForPermissions() {
-        if (shouldShowPermissionRationale()) {
-            PermissionsDialog(object : PermissionsDialog.Callback {
-                override fun onDismiss() {
-                    requestPermissions(neededPermissions, PERMISSIONS_REQUEST_CODE)
-                }
-            }).show(supportFragmentManager, "permissions_dialog")
-        } else {
-            requestPermissions(neededPermissions, PERMISSIONS_REQUEST_CODE)
-        }
-    }
-
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            PERMISSIONS_REQUEST_CODE -> {
-                viewModel.setAreBluetoothPermissionsGranted(areBluetoothPermissionsGranted())
-                if (Build.VERSION.SDK_INT < 31) bindBluetoothService()
-                else {
-                    if (viewModel.getAreBluetoothPermissionsGranted()) bindBluetoothService()
-                    else {
-                        bluetooth_permissions_bar.visibility = View.VISIBLE
-                    }
-                }
-            }
+            PERMISSIONS_REQUEST_CODE -> bindBluetoothService()
         }
     }
 

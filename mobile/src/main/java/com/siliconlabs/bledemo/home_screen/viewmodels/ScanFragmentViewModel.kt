@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.home_screen.viewmodels
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.content.Context
@@ -25,12 +26,10 @@ import com.siliconlabs.bledemo.utils.StringUtils
 import java.util.*
 import kotlin.random.Random
 
-open class ScanFragmentViewModel(context: Context) : ScannerViewModel() {
+class ScanFragmentViewModel(private val context: Context) : ScannerViewModel() {
 
     private val sharedPrefUtils = SharedPrefUtils(context)
 
-    private val _isFilterViewOn: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isFilterViewOn: LiveData<Boolean> = _isFilterViewOn
     private val _activeFiltersDescription: MutableLiveData<String?> = MutableLiveData()
     val activeFiltersDescription: LiveData<String?> = _activeFiltersDescription
     private val _activeFilters: MutableLiveData<FilterDeviceParams?> = MutableLiveData()
@@ -58,12 +57,6 @@ open class ScanFragmentViewModel(context: Context) : ScannerViewModel() {
     var miliTimestamp: Long = 0L
 
     var shouldResetChart = false
-
-    fun setIsFilterViewOn(isFilterViewOn: Boolean) {
-        _isFilterViewOn.value = isFilterViewOn
-    }
-
-    fun getIsFilterViewOn() = _isFilterViewOn.value ?: false
 
     fun getScannerFragmentViewState() : ScannerFragmentViewState {
         return ScannerFragmentViewState(
@@ -123,9 +116,11 @@ open class ScanFragmentViewModel(context: Context) : ScannerViewModel() {
         }
     }
 
-    fun updateActiveConnections(activeConnections: List<ConnectedDeviceInfo>) {
-        _activeConnections.value = activeConnections.toMutableList()
-        _numberOfConnectedDevices.value = _activeConnections.value?.size ?: 0
+    fun updateActiveConnections(activeConnections: List<ConnectedDeviceInfo>?) {
+        activeConnections?.let {
+            _activeConnections.value = it.toMutableList()
+            _numberOfConnectedDevices.value = _activeConnections.value?.size ?: 0
+        }
     }
 
     fun findConnectionByAddress(address: String) : ConnectedDeviceInfo? {
@@ -208,9 +203,9 @@ open class ScanFragmentViewModel(context: Context) : ScannerViewModel() {
         }
     }
 
-    fun updateFiltering(activeFilters: FilterDeviceParams?, activeFiltersDescription: String?) {
+    fun updateFiltering(activeFilters: FilterDeviceParams?) {
         _activeFilters.value = activeFilters
-        _activeFiltersDescription.value = activeFiltersDescription
+        _activeFiltersDescription.value = activeFilters?.buildDescription(context)
         _filteredDevices.value = _filteredDevices.value?.apply {
             clear()
             scannedDevices.values.forEach {
@@ -272,6 +267,7 @@ open class ScanFragmentViewModel(context: Context) : ScannerViewModel() {
     }
 
 
+    @SuppressLint("MissingPermission")
     private fun doesDeviceMatchFilters(device: BluetoothDeviceInfo) : Boolean {
         _activeFilters.value?.let {
             it.name?.let { filterName ->
