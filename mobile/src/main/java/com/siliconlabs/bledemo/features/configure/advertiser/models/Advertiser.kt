@@ -13,7 +13,7 @@ import kotlin.math.ceil
 
 @Parcelize
 class Advertiser(var data: AdvertiserData = AdvertiserData(), var isRunning: Boolean = false) : Parcelable {
-    lateinit var callback: Any
+    @Transient lateinit var callback: AdvertisingSetCallback
     @Transient lateinit var runnable: Runnable
     var displayDetailsView: Boolean = false
 
@@ -60,7 +60,7 @@ class Advertiser(var data: AdvertiserData = AdvertiserData(), var isRunning: Boo
         isRunning = false
 
         val advertiser = BluetoothAdapter.getDefaultAdapter().bluetoothLeAdvertiser
-        if (this::callback.isInitialized) advertiser?.stopAdvertisingSet(callback as AdvertisingSetCallback)
+        if (this::callback.isInitialized) advertiser?.stopAdvertisingSet(callback)
     }
 
     fun deepCopy(): Advertiser {

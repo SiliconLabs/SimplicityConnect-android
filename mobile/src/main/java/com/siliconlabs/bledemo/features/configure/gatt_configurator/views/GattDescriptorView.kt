@@ -1,6 +1,8 @@
 package com.siliconlabs.bledemo.features.configure.gatt_configurator.views
 
 import android.content.Context
+import android.text.Html
+import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,11 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Descriptor
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Property
 import kotlinx.android.synthetic.main.view_gatt_descriptor.view.*
+import kotlinx.android.synthetic.main.view_gatt_descriptor.view.ib_copy
+import kotlinx.android.synthetic.main.view_gatt_descriptor.view.ib_edit
+import kotlinx.android.synthetic.main.view_gatt_descriptor.view.ib_remove
+import kotlinx.android.synthetic.main.view_gatt_descriptor.view.tv_property_read
+import kotlinx.android.synthetic.main.view_gatt_descriptor.view.tv_property_write
 
 class GattDescriptorView(context: Context, attributeSet: AttributeSet? = null) : FrameLayout(context, attributeSet) {
     private var descriptor: Descriptor? = null
@@ -26,9 +33,19 @@ class GattDescriptorView(context: Context, attributeSet: AttributeSet? = null) :
 
     private fun initView(descriptor: Descriptor) {
         tv_descriptor_name.text = descriptor.name
-        tv_descriptor_uuid.text = context.getString(R.string.UUID_colon_space).plus(descriptor.uuid?.getAsFormattedText())
-        tv_descriptor_value.text = context.getString(R.string.value_colon_space).plus(descriptor.value?.getAsFormattedText())
+        tv_descriptor_uuid.text = buildBoldHeaderTextLine(context.getString(R.string.UUID_colon_space), descriptor.uuid?.getAsFormattedText())
+        tv_descriptor_value.text = buildBoldHeaderTextLine(context.getString(R.string.value_colon_space), descriptor.value?.getAsFormattedText())
         showSelectedProperties(descriptor)
+    }
+
+    private fun buildBoldHeaderTextLine(header: String, content: String?): Spanned? {
+        val htmlString = buildString {
+            append("<b>")
+            append(header)
+            append("</b>")
+            append(content)
+        }
+        return Html.fromHtml(htmlString, Html.FROM_HTML_MODE_LEGACY)
     }
 
     fun refreshView() {

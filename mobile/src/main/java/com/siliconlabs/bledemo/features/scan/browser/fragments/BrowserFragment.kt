@@ -26,10 +26,10 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import android.view.*
+import android.view.View.*
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
@@ -52,6 +52,7 @@ import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
 import com.siliconlabs.bledemo.features.scan.browser.adapters.DebugModeCallback
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 import com.siliconlabs.bledemo.home_screen.base.LocationDependent
+import kotlinx.android.synthetic.main.fragment_browser.view.*
 
 class BrowserFragment : BaseServiceDependentMainMenuFragment(),
         OnRefreshListener {
@@ -157,6 +158,7 @@ class BrowserFragment : BaseServiceDependentMainMenuFragment(),
                               savedInstanceState: Bundle?): View {
         setHasOptionsMenu(true)
         viewBinding = FragmentBrowserBinding.inflate(inflater)
+        hidableActionButton = viewBinding.btnScanning
         return viewBinding.root
     }
 
@@ -370,7 +372,7 @@ class BrowserFragment : BaseServiceDependentMainMenuFragment(),
     private fun initDevicesRecyclerView() {
         devicesAdapter = DebugModeDeviceAdapter(mutableListOf(), debugModeCallback)
         viewBinding.rvDebugDevices.apply {
-            layoutManager = LinearLayoutManager(requireContext())
+            layoutManager = getLayoutManagerWithHidingUIElements(requireContext())
             addItemDecoration(CardViewListDecoration())
             adapter = devicesAdapter
         }

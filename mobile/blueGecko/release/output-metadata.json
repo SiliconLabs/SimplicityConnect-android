@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.siliconlabs.bledemo",
+  "variantName": "blueGeckoRelease",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 37,
+      "versionName": "2.6.3",
+      "outputFile": "mobile-blueGecko-release.apk"
+    }
+  ],
+  "elementType": "File"
+}

@@ -114,6 +114,7 @@ class CharacteristicDialog(val listener: CharacteristicChangeListener, val chara
                 sp_initial_value.setSelection(POSITION_INITIAL_VALUE_HEX)
                 et_initial_value_hex.setText(characteristic.value?.value)
             }
+            else -> Unit
         }
     }
 

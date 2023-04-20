@@ -152,6 +152,11 @@
     <string name="title_import">Import</string>
     <string name="title_export">Export</string>
 
+    <!-- Demos - progress dialog messages -->
+    <string name="demo_connection_progress_dialog_connecting">Connecting…</string>
+    <string name="demo_connection_progress_dialog_reading_device_state">"Reading device state…"</string>
+    <string name="demo_connection_progress_dialog_loading">Loading…</string>
+
     <!-- OTA -->
     <string name="Preparing_for_OTA">Preparing for OTA</string>
     <string name="preparing_for_upload">Preparing for upload</string>
@@ -385,6 +390,10 @@
     <string name="advertiser_label_advertising_interval_with_range">Advertising Interval (ms)\n[100 – 10485759]</string>
     <string name="advertiser_label_tx_power_with_range">TX Power (dBm)\n[–127 – 1]</string>
     <string name="advertiser_label_tx_power">Tx Power</string>
+    <string name="advertiser_label_tx_power_unit">Tx Power (dBm)</string>
+    <string name="advertiser_label_tx_power_range">[–127 – 1]</string>
+    <string name="advertiser_label_advertising_interval_unit">Advertising Interval (ms)</string>
+    <string name="advertiser_label_advertising_interval_range">[100 – 10485759]</string>
     <string name="advertiser_setting_beacon_unspecified">Unspecified</string>
     <string name="advertiser_label_advertising_time_limit">Advertising Time Limit</string>
     <string name="advertiser_label_time_no_limit">No Limit (until manually turned off)</string>
@@ -826,9 +835,11 @@
     <string name="demo_firmware_name_connected_lighting">Bluetooth RAIL DMP - SoC Light Standard\" or \"Connect Bluetooth DMP - SoC Light</string>
     <string name="demo_firmware_name_range_test">RAIL Bluetooth DMP - SoC Range Test</string>
     <string name="demo_firmware_name_throughput">Bluetooth - SoC Throughput</string>
-    <string name="soc_wifi_commissioning_must_be_connected"> A circuit board (SoC) and the
-        evaluation board (EVK) must be connected and running proper firmwares. See &lt;a
-        href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-pc/update-evk-firmware">here&lt;/a>, &lt;a href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-efx32/"> here&lt;/a> and &lt;a href="https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk/tree/master/examples/snippets/wlan_ble/wlan_station_ble_provisioning"> here&lt;/a> for more information.
+    <string name="soc_wifi_commissioning_must_be_connected">A circuit board (SoC) and the
+        evaluation board (EVK) must be connected and running proper firmwares. See <a
+        href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-pc/update-evk-firmware">here</a>,
+        <a href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-efx32/">here</a> and
+        <a href="https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk/tree/master/examples/snippets/wlan_ble/wlan_station_ble_provisioning">here</a> for more information.
     </string>
     <string name="soc_blinky_must_be_connected">A circuit board (SoC) must be
         connected and running \"Bluetooth - SoC Blinky\" firmware or firmware with a title
@@ -944,5 +955,6 @@
 
     <string name="bluetooth_permissions_needed">Bluetooth-related permissions are needed
         for this app</string>
+    <string name="dialog_example_hint">Example:</string>
 
 </resources>

@@ -30,8 +30,9 @@
     <dimen name="dialog_loading_card_height">140dp</dimen>
     <dimen name="dialog_loading_card_corner_radius">5dp</dimen>
     <dimen name="dialog_loading_card_elevation">6dp</dimen>
-    <dimen name="dialog_loading_card_padding">24dp</dimen>
-    <dimen name="dialog_loading_image_and_text_spacing">10dp</dimen>
+    <dimen name="dialog_loading_card_padding">8dp</dimen>
+    <dimen name="dialog_loading_text_margin">10dp</dimen>
+    <dimen name="dialog_loading_margin">8dp</dimen>
 
     <!-- Scanning state help message-->
     <dimen name="scanning_animation_bar_height">64dp</dimen>

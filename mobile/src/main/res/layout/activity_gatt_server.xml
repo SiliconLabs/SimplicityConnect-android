@@ -17,17 +17,19 @@
         android:orientation="vertical">
 
         <TextView
-            style="@style/TitleMedium"
+            style="@style/TitleLarge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/gatt_configurator_label_gatt_server_name" />
 
         <EditText
             android:id="@+id/et_gatt_server_name"
-            style="@style/EditTextNormal"
+            style="@style/EditTextSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif-medium"
+            tools:text="New GATT server" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

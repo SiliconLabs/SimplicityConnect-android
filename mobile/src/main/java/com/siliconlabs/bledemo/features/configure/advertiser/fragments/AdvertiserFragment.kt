@@ -9,7 +9,6 @@ import android.os.Looper
 import android.view.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.siliconlabs.bledemo.features.configure.advertiser.activities.AdvertiserConfigActivity
 import com.siliconlabs.bledemo.features.configure.advertiser.adapters.AdvertiserAdapter
 import com.siliconlabs.bledemo.features.configure.advertiser.viewmodels.AdvertiserViewModel
@@ -40,6 +39,7 @@ class AdvertiserFragment : BaseServiceDependentMainMenuFragment(), AdvertiserAda
                               savedInstanceState: Bundle?): View {
         setHasOptionsMenu(true)
         viewBinding = FragmentAdvertiserBinding.inflate(inflater)
+        hidableActionButton = viewBinding.fragmentMainView.extendedFabMainView
         return viewBinding.root
     }
 
@@ -117,7 +117,7 @@ class AdvertiserFragment : BaseServiceDependentMainMenuFragment(), AdvertiserAda
     private fun initAdapter() {
         advertiserAdapter = AdvertiserAdapter(viewModel?.advertisers?.value ?: arrayListOf(), this)
         viewBinding.fragmentMainView.rvMainView.apply {
-            layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+            layoutManager = getLayoutManagerWithHidingUIElements(activity)
             addItemDecoration(CardViewListDecoration())
             adapter = advertiserAdapter
         }

@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.features.scan.browser.activities.DeviceServicesActivity
@@ -40,6 +39,7 @@ class ConnectionsFragment : BaseServiceDependentMainMenuFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentConnectionsBinding.inflate(inflater)
+        hidableActionButton = _binding.fragmentMainView.extendedFabMainView
         return _binding.root
     }
 
@@ -92,7 +92,7 @@ class ConnectionsFragment : BaseServiceDependentMainMenuFragment() {
     private fun initConnectionsAdapter() {
         adapter = ConnectionsAdapter(connectionAdapterCallback)
         _binding.fragmentMainView.rvMainView.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = getLayoutManagerWithHidingUIElements(context)
             addItemDecoration(CardViewListDecoration())
             adapter = this@ConnectionsFragment.adapter
         }
@@ -119,11 +119,15 @@ class ConnectionsFragment : BaseServiceDependentMainMenuFragment() {
             if (isAnyDeviceConnected) {
                 fullScreenInfo.root.visibility = View.GONE
                 rvMainView.visibility = View.VISIBLE
-                extendedFabMainView.visibility = View.VISIBLE
+                if(hidableActionButton == null){
+                    hidableActionButton = extendedFabMainView
+                    extendedFabMainView.show()
+                }
             } else {
                 fullScreenInfo.root.visibility = View.VISIBLE
                 rvMainView.visibility = View.GONE
-                extendedFabMainView.visibility = View.GONE
+                hidableActionButton = null
+                extendedFabMainView.hide()
             }
         }
     }

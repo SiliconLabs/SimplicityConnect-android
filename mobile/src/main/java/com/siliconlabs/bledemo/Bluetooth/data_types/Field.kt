@@ -141,4 +141,8 @@ class Field {
         }
     }
 
+    fun isLastReferenceField(referenceField: Field) : Boolean {
+        return referenceFields.orEmpty().lastIndex == referenceFields.orEmpty().indexOf(referenceField)
+    }
+
 }

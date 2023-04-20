@@ -100,7 +100,7 @@ class DescriptorDialog(val listener: DescriptorChangeListener, val descriptor: D
                 sp_initial_value.setSelection(POSITION_INITIAL_VALUE_HEX)
                 et_initial_value_hex.setText(descriptor.value?.value)
             }
-
+            else -> Unit
         }
     }
 

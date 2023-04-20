@@ -1,58 +1,56 @@
 package com.siliconlabs.bledemo.base.activities
 
 import android.app.Activity
-import android.content.DialogInterface
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.dialogs.ProgressDialogWithSpinner
 
 abstract class BaseActivity : AppCompatActivity() {
-    companion object {
-        protected const val DISMISS_DIALOG_DELAY_MS = 1000
-    }
-
     enum class ConnectionStatus {
-        CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, READING_DEVICE_STATE
+        CONNECTING, READING_DEVICE_STATE
     }
 
     private var connectionStatusModalDialog: ProgressDialogWithSpinner? = null
 
     @JvmOverloads
-    fun showModalDialog(connStat: ConnectionStatus? = null, cancelListener: DialogInterface.OnCancelListener? = null) {
+    fun showModalDialog(
+        connStat: ConnectionStatus? = null,
+        cancelListener: () -> Unit = {},
+    ) {
         dismissModalDialog()
         runOnUiThread {
-            // note that the dialog state is never shown when disconnecting from a device
-            connectionStatusModalDialog = when (connStat) {
-                ConnectionStatus.CONNECTING -> ProgressDialogWithSpinner(this@BaseActivity, "Connecting...", true, -1)
-                ConnectionStatus.CONNECTED -> ProgressDialogWithSpinner(this@BaseActivity, "Connection Successful!", false, R.drawable.ic_check)
-                ConnectionStatus.DISCONNECTING -> ProgressDialogWithSpinner(this@BaseActivity, "Disconnecting...", false, R.drawable.ic_check)
-                ConnectionStatus.DISCONNECTED -> ProgressDialogWithSpinner(this@BaseActivity, "Device Disconnected", false, R.drawable.ic_check)
-                ConnectionStatus.READING_DEVICE_STATE -> ProgressDialogWithSpinner(this@BaseActivity, "Reading device state...", true, -1)
-                null -> ProgressDialogWithSpinner(this@BaseActivity, "Loading...", true, -1)
+            val dialogMessage = when(connStat) {
+                ConnectionStatus.CONNECTING ->
+                    R.string.demo_connection_progress_dialog_connecting
+                ConnectionStatus.READING_DEVICE_STATE ->
+                    R.string.demo_connection_progress_dialog_reading_device_state
+                else -> R.string.demo_connection_progress_dialog_loading
             }
+
+            // note that the dialog state is never shown when disconnecting from a device
+            connectionStatusModalDialog = ProgressDialogWithSpinner(
+                caption = dialogMessage,
+                onCancelAction = cancelListener,
+            )
+
             if (!this@BaseActivity.isFinishing) {
-                if (connStat == ConnectionStatus.CONNECTED || connStat == ConnectionStatus.DISCONNECTED) {
-                    connectionStatusModalDialog?.show(DISMISS_DIALOG_DELAY_MS.toLong())
-                } else {
-                    connectionStatusModalDialog?.show()
-                }
-                connectionStatusModalDialog?.setOnCancelListener(cancelListener)
+                connectionStatusModalDialog?.show(supportFragmentManager, null)
             }
         }
     }
 
-    fun setModalDialogMessage(message: String) {
+    fun setModalDialogMessage(@StringRes message: Int) {
         runOnUiThread { connectionStatusModalDialog?.setCaption(message) }
     }
 
     fun dismissModalDialog() {
         runOnUiThread {
-            if (connectionStatusModalDialog != null && connectionStatusModalDialog?.isShowing!!) {
+            if (connectionStatusModalDialog != null && connectionStatusModalDialog?.isVisible!!) {
                 connectionStatusModalDialog?.dismiss()
-                connectionStatusModalDialog?.clearAnimation()
                 connectionStatusModalDialog = null
             }
         }
@@ -71,7 +69,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun hideKeyboard() {
-        val imm: InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         var view = this.currentFocus
         //If no view currently has focus, create a new one, just so we can grab a window token from it
         if (view == null) view = View(this)

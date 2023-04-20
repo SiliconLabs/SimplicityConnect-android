@@ -1,6 +1,5 @@
 package com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.activities
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -61,64 +60,60 @@ abstract class GdxActivity : ThunderboardActivity(), AndroidApplicationBase {
 
     private fun init(listener: ApplicationListener?, config: AndroidApplicationConfiguration,
                      isForView: Boolean) {
-        if (this.version < 8) {
-            throw GdxRuntimeException("LibGDX requires Android API Level 8 or later.")
-        } else {
-            setApplicationLogger(AndroidApplicationLogger())
-            graphics = AndroidGraphics(this, config,
-                    (if (config.resolutionStrategy == null) FillResolutionStrategy() else config.resolutionStrategy) as ResolutionStrategy)
-            _input = AndroidInputFactory.newAndroidInput(this, this, graphics!!.view, config)
-            audio = AndroidAudio(this, config)
-            this.filesDir
-            files = AndroidFiles(this.assets, this.filesDir.absolutePath)
-            net = AndroidNet(this)
-            this.listener = listener
-            _handler = Handler()
-            useImmersiveMode = config.useImmersiveMode
-            hideStatusBar = config.hideStatusBar
-            clipboard = AndroidClipboard(this)
-            addLifecycleListener(object : LifecycleListener {
-                override fun resume() {}
-                override fun pause() {
-                    audio!!.pause()
-                }
-
-                override fun dispose() {
-                    audio!!.dispose()
-                }
-            })
-            Gdx.app = this
-            Gdx.input = getInput()
-            Gdx.audio = getAudio()
-            Gdx.files = getFiles()
-            Gdx.graphics = getGraphics()
-            Gdx.net = getNet()
-            if (!isForView) {
-                try {
-                    requestWindowFeature(1)
-                } catch (var8: Exception) {
-                    this.log("AndroidApplication",
-                            "Content already displayed, cannot request FEATURE_NO_TITLE", var8)
-                }
-                this.window.setFlags(1024, 1024)
-                this.window.clearFlags(2048)
-                this.setContentView(graphics!!.getView(), createLayoutParams())
+        setApplicationLogger(AndroidApplicationLogger())
+        graphics = AndroidGraphics(this, config,
+                (if (config.resolutionStrategy == null) FillResolutionStrategy() else config.resolutionStrategy) as ResolutionStrategy)
+        _input = AndroidInputFactory.newAndroidInput(this, this, graphics!!.view, config)
+        audio = AndroidAudio(this, config)
+        this.filesDir
+        files = AndroidFiles(this.assets, this.filesDir.absolutePath)
+        net = AndroidNet(this)
+        this.listener = listener
+        _handler = Handler()
+        useImmersiveMode = config.useImmersiveMode
+        hideStatusBar = config.hideStatusBar
+        clipboard = AndroidClipboard(this)
+        addLifecycleListener(object : LifecycleListener {
+            override fun resume() {}
+            override fun pause() {
+                audio!!.pause()
             }
-            createWakeLock(config.useWakelock)
-            hideStatusBar(hideStatusBar)
-            useImmersiveMode(useImmersiveMode)
-            if (useImmersiveMode && this.version >= 19) {
-                try {
-                    val vlistener = Class.forName(
-                            "com.badlogic.gdx.backends.android.AndroidVisibilityListener")
-                    val o = vlistener.newInstance()
-                    val method = vlistener.getDeclaredMethod("createListener",
-                            AndroidApplicationBase::class.java)
-                    method.invoke(o, this)
-                } catch (var7: Exception) {
-                    this.log("AndroidApplication", "Failed to create AndroidVisibilityListener",
-                            var7)
-                }
+
+            override fun dispose() {
+                audio!!.dispose()
+            }
+        })
+        Gdx.app = this
+        Gdx.input = getInput()
+        Gdx.audio = getAudio()
+        Gdx.files = getFiles()
+        Gdx.graphics = getGraphics()
+        Gdx.net = getNet()
+        if (!isForView) {
+            try {
+                requestWindowFeature(1)
+            } catch (var8: Exception) {
+                this.log("AndroidApplication",
+                        "Content already displayed, cannot request FEATURE_NO_TITLE", var8)
+            }
+            this.window.setFlags(1024, 1024)
+            this.window.clearFlags(2048)
+            this.setContentView(graphics!!.getView(), createLayoutParams())
+        }
+        createWakeLock(config.useWakelock)
+        hideStatusBar(hideStatusBar)
+        useImmersiveMode(useImmersiveMode)
+        if (useImmersiveMode) {
+            try {
+                val vlistener = Class.forName(
+                        "com.badlogic.gdx.backends.android.AndroidVisibilityListener")
+                val o = vlistener.newInstance()
+                val method = vlistener.getDeclaredMethod("createListener",
+                        AndroidApplicationBase::class.java)
+                method.invoke(o, this)
+            } catch (var7: Exception) {
+                this.log("AndroidApplication", "Failed to create AndroidVisibilityListener",
+                        var7)
             }
         }
     }
@@ -136,13 +131,10 @@ abstract class GdxActivity : ThunderboardActivity(), AndroidApplicationBase {
     }
 
     protected fun hideStatusBar(hide: Boolean) {
-        if (hide && this.version >= 11) {
+        if (hide) {
             val rootView = this.window.decorView
             try {
                 val m = View::class.java.getMethod("setSystemUiVisibility", Integer.TYPE)
-                if (this.version <= 13) {
-                    m.invoke(rootView, 0)
-                }
                 m.invoke(rootView, 1)
             } catch (var4: Exception) {
                 this.log("AndroidApplication", "Can't hide status bar", var4)
@@ -165,9 +157,8 @@ abstract class GdxActivity : ThunderboardActivity(), AndroidApplicationBase {
         }
     }
 
-    @TargetApi(19)
     override fun useImmersiveMode(use: Boolean) {
-        if (use && this.version >= 19) {
+        if (use) {
             val view = this.window.decorView
             try {
                 val m = View::class.java.getMethod("setSystemUiVisibility", Integer.TYPE)

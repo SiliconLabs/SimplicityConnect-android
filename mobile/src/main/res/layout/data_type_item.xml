@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
-    android:layout_marginEnd="16dp"
-    android:layout_marginBottom="8dp">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingTop="4dp">
 
         <TextView
             android:id="@+id/tv_data_text"
             style="@style/TextSmall"
             android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_marginStart="16dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginEnd="4dp"
             android:layout_weight="1"
-            android:gravity="center_vertical" />
+            android:gravity="center_vertical"
+            tools:text="Lorem Ipsum"/>
 
         <ImageButton
             android:id="@+id/ib_remove"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="32dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center_vertical"
             android:background="@drawable/btn_grey_ripple_effect"
             android:contentDescription="@string/label_remove"
-            android:src="@drawable/ic_trash" />
+            tools:visibility="gone"
+            android:tint="@color/silabs_dark_gray_icon"
+            android:src="@drawable/redesign_ic_card_view_action_icon_delete" />
 
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+</LinearLayout>

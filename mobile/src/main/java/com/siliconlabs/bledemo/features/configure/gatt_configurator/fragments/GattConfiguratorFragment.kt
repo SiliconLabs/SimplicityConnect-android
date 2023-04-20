@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.adapters.GattServerAdapter
@@ -30,12 +29,15 @@ import com.siliconlabs.bledemo.features.configure.gatt_configurator.import_expor
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.utils.removeAsking
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity
 import com.siliconlabs.bledemo.common.other.CardViewListDecoration
+import com.siliconlabs.bledemo.common.other.LinearLayoutManagerWithHidingUIElements
+import com.siliconlabs.bledemo.common.other.WithHidableUIElements
+import com.siliconlabs.bledemo.home_screen.base.BaseMainMenuFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.*
 import java.util.*
 
 @AndroidEntryPoint
-class GattConfiguratorFragment : Fragment(), OnClickListener {
+class GattConfiguratorFragment : BaseMainMenuFragment(), OnClickListener {
     private lateinit var viewModel: GattConfiguratorViewModel
     private lateinit var viewBinding: FragmentGattConfiguratorBinding
     private lateinit var adapter: GattServerAdapter
@@ -56,6 +58,7 @@ class GattConfiguratorFragment : Fragment(), OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this).get(GattConfiguratorViewModel::class.java)
+        hidableActionButton = viewBinding.fragmentMainView.extendedFabMainView
 
         initMainViewValues()
         setUiListeners()
@@ -171,7 +174,7 @@ class GattConfiguratorFragment : Fragment(), OnClickListener {
     private fun initAdapter() {
         adapter = GattServerAdapter(viewModel.gattServers.value!!, this)
         viewBinding.fragmentMainView.rvMainView.apply {
-            layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+            layoutManager = getLayoutManagerWithHidingUIElements(activity)
             addItemDecoration(CardViewListDecoration())
             adapter = this@GattConfiguratorFragment.adapter
         }

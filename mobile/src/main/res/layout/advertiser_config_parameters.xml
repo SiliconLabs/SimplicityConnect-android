@@ -1,205 +1,228 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        style="@style/TitleLarge"
+        android:layout_marginBottom="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/advertiser_title_advertising_parameters" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
 
         <TextView
-            style="@style/TitleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/advertiser_title_advertising_parameters" />
+            style="@style/TextMedium"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/advertiser_label_primary_phy" />
+
+        <Spinner
+            android:id="@+id/sp_primary_phy"
+            tools:listitem="@layout/spinner_item_layout_medium"
+            style="@style/CustomSpinner"
+            android:layout_width="110dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/TextMedium"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/advertiser_label_secondary_phy" />
+
+        <Spinner
+            android:id="@+id/sp_secondary_phy"
+            style="@style/CustomSpinner"
+            tools:listitem="@layout/spinner_item_layout_medium"
+            android:layout_width="110dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_advertising_interval"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:orientation="horizontal">
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
 
             <TextView
-                style="@style/TitleSmall"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/advertiser_label_primary_phy"
-                android:textColor="@color/silabs_subtle_text" />
-
-            <Spinner
-                android:id="@+id/sp_primary_phy"
-                style="@style/CustomSpinner"
-                android:layout_width="110dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:orientation="horizontal">
-
-            <TextView
-                style="@style/TitleSmall"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/advertiser_label_secondary_phy"
-                android:textColor="@color/silabs_subtle_text" />
-
-            <Spinner
-                android:id="@+id/sp_secondary_phy"
-                style="@style/CustomSpinner"
-                android:layout_width="110dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_advertising_interval"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:orientation="horizontal">
-
-            <TextView
-                style="@style/TitleSmall"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/advertiser_label_advertising_interval_with_range"
-                android:textColor="@color/silabs_subtle_text" />
-
-            <EditText
-                android:id="@+id/et_advertising_interval"
-                style="@style/EditTextNormal"
-                android:layout_width="100dp"
+                style="@style/TextMedium"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/et_background"
-                android:gravity="center_horizontal"
-                android:inputType="number"
-                android:maxLength="8" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_tx_power"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:orientation="horizontal">
+                android:text="@string/advertiser_label_advertising_interval_unit" />
 
             <TextView
-                style="@style/TitleSmall"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/advertiser_label_tx_power_with_range"
-                android:textColor="@color/silabs_subtle_text" />
-
-            <EditText
-                android:id="@+id/et_tx_power"
-                style="@style/EditTextNormal"
-                android:layout_width="100dp"
+                style="@style/TextSmall"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/et_background"
-                android:gravity="center_horizontal"
-                android:inputType="numberSigned"
-                android:maxLength="4" />
+                android:text="@string/advertiser_label_advertising_interval_range" />
 
         </LinearLayout>
 
-        <TextView
-            style="@style/TextViewNoteInfo"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/et_advertising_interval"
+            style="@style/EditTextNormalMedium"
+            tools:text="250"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
-            android:text="@string/advertiser_note_tx_power" />
+            android:background="@drawable/et_background"
+            android:inputType="number"
+            android:maxLength="8" />
 
-        <TextView
-            style="@style/TitleSmall"
-            android:layout_width="wrap_content"
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_tx_power"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/advertiser_label_advertising_time_limit"
-            android:textColor="@color/silabs_subtle_text" />
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/advertiser_label_tx_power_unit" />
+
+            <TextView
+                style="@style/TextSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/advertiser_label_tx_power_range" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/et_tx_power"
+            style="@style/EditTextNormalMedium"
+            tools:text="250"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/et_background"
+            android:inputType="numberSigned"
+            android:maxLength="4" />
+
+    </LinearLayout>
+
+    <TextView
+        style="@style/TextSmall"
+        android:layout_marginTop="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/advertiser_note_tx_power" />
+
+    <include
+        layout="@layout/horizontal_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        style="@style/TitleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/advertiser_label_advertising_time_limit" />
+
+    <RadioButton
+        android:id="@+id/rb_no_limit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:checked="true"
+        android:gravity="center_vertical"
+        android:text="@string/advertiser_label_time_no_limit"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <RadioButton
-            android:id="@+id/rb_no_limit"
-            android:layout_width="wrap_content"
+            android:id="@+id/rb_time_limit"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:checked="true"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="@string/advertiser_label_time_no_limit"
-            android:textColor="@color/silabs_subtle_text"
-            android:textSize="12sp" />
+            android:text="@string/advertiser_label_time_limit"
+            android:textSize="14sp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <EditText
+            android:id="@+id/et_time_limit"
+            style="@style/EditTextNormalMedium"
+            tools:text="250"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
+            android:enabled="false"
+            android:layout_gravity="center_vertical"
+            android:inputType="number"
+            android:maxLength="6" />
+    </LinearLayout>
 
-            <RadioButton
-                android:id="@+id/rb_time_limit"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/advertiser_label_time_limit"
-                android:textColor="@color/silabs_subtle_text"
-                android:textSize="12sp" />
+    <LinearLayout
+        android:id="@+id/ll_event_limit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/et_time_limit"
-                style="@style/EditTextNormal"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                android:gravity="center_horizontal"
-                android:inputType="number"
-                android:maxLength="6" />
-        </LinearLayout>
+        <RadioButton
+            android:id="@+id/rb_event_limit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/advertiser_label_event_limit"
+            android:textSize="14sp" />
 
-        <LinearLayout
-            android:id="@+id/ll_event_limit"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/rb_event_limit"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="@string/advertiser_label_event_limit"
-                android:textColor="@color/silabs_subtle_text"
-                android:textSize="12sp" />
-
-            <EditText
-                android:id="@+id/et_event_limit"
-                style="@style/EditTextNormal"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                android:gravity="center_horizontal"
-                android:inputType="number"
-                android:maxLength="3"
-                android:maxLines="1" />
-        </LinearLayout>
+        <EditText
+            android:id="@+id/et_event_limit"
+            style="@style/EditTextNormalMedium"
+            tools:text="250"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:layout_gravity="center_vertical"
+            android:inputType="number"
+            android:maxLength="3"
+            android:maxLines="1" />
     </LinearLayout>
 </LinearLayout>

@@ -18,12 +18,12 @@
         app:defaultNavHost="true"
         tools:layout="@layout/fragment_scan"/>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+    <com.siliconlabs.bledemo.home_screen.views.HidableBottomNavigationView
         android:id="@+id/main_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:menu="@menu/bottom_nav_main"
         app:labelVisibilityMode="labeled" >
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+    </com.siliconlabs.bledemo.home_screen.views.HidableBottomNavigationView>
 
 </LinearLayout>

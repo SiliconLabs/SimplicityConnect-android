@@ -15,9 +15,10 @@ import com.siliconlabs.bledemo.features.configure.gatt_configurator.utils.remove
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.views.GattCharacteristicView
 import kotlinx.android.synthetic.main.adapter_edit_gatt_server.view.*
 
-class EditGattServerViewHolder(view: View, val list: ArrayList<Service>, val listener: ServiceListener) : RecyclerView.ViewHolder(view), View.OnClickListener {
+class EditGattServerViewHolder(view: View, val list: ArrayList<Service>, val listener: ServiceListener) : RecyclerView.ViewHolder(view) {
     private val llCharacteristics = view.ll_characteristics
-    private val tvMoreLessInfo = view.tv_more_less_info
+    private val llCharacteristicsOuter = view.ll_characteristics_outer
+    private val expandArrow = view.expand_arrow
     private val tvName = view.tv_service_name
     private val tvUuid = view.tv_service_uuid
     private val tvType = view.tv_service_type
@@ -27,7 +28,7 @@ class EditGattServerViewHolder(view: View, val list: ArrayList<Service>, val lis
 
     fun bind(service: Service) {
         llCharacteristics.removeAllViews()
-        itemView.setOnClickListener(this)
+        expandArrow.setOnClickListener { expandOrCollapseView() }
         initCharacteristics(service.characteristics)
 
         tvName.text = service.name
@@ -127,17 +128,13 @@ class EditGattServerViewHolder(view: View, val list: ArrayList<Service>, val lis
         }
     }
 
-    override fun onClick(v: View?) {
-        expandOrCollapseView()
-    }
-
     private fun expandOrCollapseView() {
-        if (llCharacteristics.visibility == View.VISIBLE) {
-            tvMoreLessInfo.text = itemView.context.getString(R.string.more_info)
-            llCharacteristics.visibility = View.GONE
+        if (llCharacteristicsOuter.visibility == View.VISIBLE) {
+            expandArrow.setState(false)
+            llCharacteristicsOuter.visibility = View.GONE
         } else {
-            tvMoreLessInfo.text = itemView.context.getString(R.string.Less_Info)
-            llCharacteristics.visibility = View.VISIBLE
+            expandArrow.setState(true)
+            llCharacteristicsOuter.visibility = View.VISIBLE
         }
     }
 

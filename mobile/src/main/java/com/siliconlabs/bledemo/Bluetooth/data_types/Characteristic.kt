@@ -37,4 +37,8 @@ class Characteristic {
     fun getSizeInBytes() : Int {
         return fields.orEmpty().sumBy { it.getSizeInBytes() }
     }
+
+    fun isLastField(field: Field) : Boolean {
+        return fields.orEmpty().lastIndex == fields.orEmpty().indexOf(field)
+    }
 }

@@ -30,6 +30,7 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
 import android.view.*
+import android.view.View.OnScrollChangeListener
 import android.widget.*
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.children
@@ -98,7 +99,15 @@ class DeviceServicesActivity : BaseActivity() {
 
     private var retryAttempts = 0
 
-    private val remoteServicesFragment = RemoteServicesFragment()
+    private val hideFabOnScrollChangeListener = OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+        if (scrollY > oldScrollY) {
+            btn_bond_action.hide()
+        } else {
+            btn_bond_action.show()
+        }
+    }
+
+    private val remoteServicesFragment = RemoteServicesFragment(hideFabOnScrollChangeListener)
     private val localServicesFragment = LocalServicesFragment()
     private var activeFragment: Fragment = remoteServicesFragment
 

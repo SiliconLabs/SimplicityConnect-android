@@ -19,7 +19,7 @@ class LeaveGattServerConfigDialog(val callback: Callback) : BaseDialogFragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tv_dialog_content.text = context?.getString(R.string.title_unsaved_changes)
+        tv_dialog_title.text = context?.getString(R.string.title_unsaved_changes)
         tv_dialog_content.text = context?.getString(R.string.gatt_configurator_leave_config_dialog_content)
 
         btn_ok.text = context?.getString(R.string.button_yes)

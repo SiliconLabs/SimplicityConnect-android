@@ -15,6 +15,7 @@ import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.home_screen.dialogs.PermissionsDialog
 import com.siliconlabs.bledemo.home_screen.viewmodels.MainActivityViewModel
+import com.siliconlabs.bledemo.home_screen.views.HidableBottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -79,7 +80,11 @@ open class MainActivity : BaseActivity(),
     }
 
     fun toggleMainNavigation(isOn: Boolean) {
-        main_navigation.visibility = if (isOn) View.VISIBLE else View.GONE
+        if(isOn) {
+            main_navigation.show(instant = true)
+        } else {
+            main_navigation.hide(instant = true)
+        }
     }
 
     fun toggleHomeIcon(isOn: Boolean) {
@@ -119,6 +124,10 @@ open class MainActivity : BaseActivity(),
             bluetoothService?.setAreBluetoothPermissionsGranted(
                 viewModel.getAreBluetoothPermissionsGranted())
         }
+    }
+
+    fun getMainNavigation(): HidableBottomNavigationView? {
+        return main_navigation
     }
 
     override fun onBluetoothStateChanged(isOn: Boolean) {
@@ -174,7 +183,7 @@ open class MainActivity : BaseActivity(),
         private const val PERMISSIONS_REQUEST_CODE = 400
         // private const val IMPORT_EXPORT_CODE_VERSION = 20
     }
-//TODO: handle migration
+//TODO: handle migration. See BTAPP-1285 for clarification.
 /*
     private fun migrateGattDatabaseIfNeeded() {
         if (BuildConfig.VERSION_CODE <= IMPORT_EXPORT_CODE_VERSION - 1) {

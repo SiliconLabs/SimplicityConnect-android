@@ -11,39 +11,36 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
-import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.siliconlabs.bledemo.home_screen.adapters.ScannedDevicesAdapter
+import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseActivity
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
-import com.siliconlabs.bledemo.home_screen.viewmodels.SelectDeviceViewModel
 import com.siliconlabs.bledemo.bluetooth.ble.*
-import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService.GattConnectType
+import com.siliconlabs.bledemo.databinding.DialogSelectDeviceBinding
+import com.siliconlabs.bledemo.features.demo.blinky.activities.BlinkyActivity
 import com.siliconlabs.bledemo.features.demo.connected_lighting.activities.ConnectedLightingActivity
 import com.siliconlabs.bledemo.features.demo.health_thermometer.activities.HealthThermometerActivity
-import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.features.demo.blinky.activities.BlinkyActivity
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.activities.BlinkyThunderboardActivity
-import com.siliconlabs.bledemo.databinding.DialogSelectDeviceBinding
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.activities.EnvironmentActivity
-import com.siliconlabs.bledemo.features.iop_test.activities.IOPTestActivity
-import com.siliconlabs.bledemo.features.iop_test.models.IOPTest
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.activities.MotionActivity
-import com.siliconlabs.bledemo.home_screen.activities.MainActivity
 import com.siliconlabs.bledemo.features.demo.throughput.activities.ThroughputActivity
 import com.siliconlabs.bledemo.features.demo.throughput.utils.PeripheralManager
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models.ThunderBoardDevice
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.activities.BlinkyThunderboardActivity
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.activities.EnvironmentActivity
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.activities.MotionActivity
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.activities.WifiCommissioningActivity
+import com.siliconlabs.bledemo.features.iop_test.activities.IOPTestActivity
+import com.siliconlabs.bledemo.features.iop_test.models.IOPTest
+import com.siliconlabs.bledemo.home_screen.activities.MainActivity
+import com.siliconlabs.bledemo.home_screen.adapters.ScannedDevicesAdapter
+import com.siliconlabs.bledemo.home_screen.viewmodels.SelectDeviceViewModel
 import timber.log.Timber
 
 @SuppressLint("MissingPermission")
@@ -124,7 +121,7 @@ class SelectDeviceDialog(
                             else -> { Timber.d("Unknown model")}
                         }
                     }
-                    else -> { }
+                    else -> Unit
                 }
             } else if (characteristic?.uuid == GattCharacteristic.PowerSource.uuid) {
                 launchDemo(cachedBoardType, characteristic.getIntValue(GattCharacteristic.PowerSource.format, 0))
@@ -142,20 +139,19 @@ class SelectDeviceDialog(
 
     private fun handleSuccessfulConnection(gatt: BluetoothGatt) {
         when (connectType) {
-            GattConnectType.MOTION -> {
-                (activity as BaseActivity).setModalDialogMessage(getString(R.string.reading_board_type))
-                gatt.discoverServices()
-            }
+            GattConnectType.MOTION -> setReadingDialogMsgAndDiscoverServices(gatt)
             GattConnectType.BLINKY -> {
-                if (gatt.device.name == "Blinky Example") launchDemo()
-                else {
-                    (activity as BaseActivity).setModalDialogMessage(getString(R.string.reading_board_type))
-                    gatt.discoverServices()
-                }
+                if (gatt.device.name == getString(R.string.blinky_service_name)) launchDemo()
+                else setReadingDialogMsgAndDiscoverServices(gatt)
             }
             else -> launchDemo()
         }
         bluetoothService?.isNotificationEnabled = true
+    }
+
+    private fun setReadingDialogMsgAndDiscoverServices(gatt: BluetoothGatt) {
+        (activity as MainActivity).setModalDialogMessage(R.string.reading_board_type)
+        gatt.discoverServices()
     }
 
     private fun launchDemo(boardType: String? = null, powerSource: Int? = null) {
@@ -189,7 +185,7 @@ class SelectDeviceDialog(
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        viewModel = ViewModelProvider(this).get(SelectDeviceViewModel::class.java)
+        viewModel = ViewModelProvider(this)[SelectDeviceViewModel::class.java]
         adapter = ScannedDevicesAdapter(mutableListOf(),
                 this
         ).also { it.setHasStableIds(true) }
@@ -259,19 +255,19 @@ class SelectDeviceDialog(
 
     private fun observeChanges() {
         viewModel.apply {
-            isScanningOn.observe(viewLifecycleOwner, Observer {
+            isScanningOn.observe(viewLifecycleOwner) {
                 toggleScanning(it)
                 toggleRefreshInfoRunnable(it)
-            })
-            isAnyDeviceDiscovered.observe(viewLifecycleOwner, Observer {
+            }
+            isAnyDeviceDiscovered.observe(viewLifecycleOwner) {
                 toggleListView(it)
-            })
-            numberOfDevices.observe(viewLifecycleOwner, Observer {
+            }
+            numberOfDevices.observe(viewLifecycleOwner) {
                 viewBinding.devicesNumber.text = getString(R.string.DEVICE_LIST, it)
-            })
-            deviceToInsert.observe(viewLifecycleOwner, Observer {
+            }
+            deviceToInsert.observe(viewLifecycleOwner) {
                 adapter.addNewDevice(it)
-            })
+            }
         }
     }
 
@@ -292,10 +288,11 @@ class SelectDeviceDialog(
                 GattConnectType.IOP_TEST -> getString(R.string.soc_must_be_connected,
                         getString(R.string.demo_firmware_name_iop))
                 GattConnectType.WIFI_COMMISSIONING -> {
-                    Html.fromHtml(getString(R.string.soc_wifi_commissioning_must_be_connected))
+                    getText(R.string.soc_wifi_commissioning_must_be_connected)
                 }
                 else -> getString(R.string.empty_description)
             }
+
             if (connectType == GattConnectType.WIFI_COMMISSIONING) {
                 movementMethod = LinkMovementMethod.getInstance() // react to clicking the link
             }
@@ -366,74 +363,63 @@ class SelectDeviceDialog(
         }
     }
 
-    private fun applyDemoFilters() : List<ScanFilter> {
-        return mutableListOf<ScanFilter>().apply {
-            when (connectType) {
-                GattConnectType.THERMOMETER -> {
-                    add(buildFilter(GattService.HealthThermometer))
-                }
-                GattConnectType.LIGHT -> {
-                    add(buildFilter(GattService.ProprietaryLightService))
-                    add(buildFilter(GattService.ZigbeeLightService))
-                    add(buildFilter(GattService.ConnectLightService))
-                    add(buildFilter(GattService.ThreadLightService))
-                }
-                GattConnectType.RANGE_TEST -> {
-                    add(buildFilter(GattService.RangeTestService))
-                }
-                GattConnectType.BLINKY -> {
-                    add(buildFilter("Blinky Example"))
-                    add(buildFilter(ManufacturerDataFilter(
-                            id = 71,
-                            data = byteArrayOf(2, 0)
-                    )))
-                }
-                GattConnectType.THROUGHPUT_TEST -> {
-                    add(buildFilter("Throughput Test"))
-                }
-                GattConnectType.WIFI_COMMISSIONING -> {
-                    add(buildFilter("BLE_CONFIGURATOR"))
-                }
-                GattConnectType.IOP_TEST -> {
-                    add(buildFilter("IOP Test"))
-                    add(buildFilter("IOP Test Update"))
-                    add(buildFilter("IOP_Test_1"))
-                    add(buildFilter("IOP_Test_2"))
-                }
-                GattConnectType.MOTION -> {
-                    add(buildFilter(ManufacturerDataFilter(
-                            id = 71,
-                            data = byteArrayOf(2, 0)
-                    )))
-                }
-                GattConnectType.ENVIRONMENT -> {
-                    add(buildFilter(ManufacturerDataFilter(
-                            id = 71,
-                            data = byteArrayOf(2, 0)
-                    )))
-                }
-                else -> { }
+    private fun applyDemoFilters() = buildList {
+        val manufacturerDataFilter = ManufacturerDataFilter(
+            id = 71,
+            data = byteArrayOf(2, 0),
+        )
+
+        when (connectType) {
+            GattConnectType.THERMOMETER -> {
+                add(buildFilter(GattService.HealthThermometer))
             }
+            GattConnectType.LIGHT -> {
+                add(buildFilter(GattService.ProprietaryLightService))
+                add(buildFilter(GattService.ZigbeeLightService))
+                add(buildFilter(GattService.ConnectLightService))
+                add(buildFilter(GattService.ThreadLightService))
+            }
+            GattConnectType.RANGE_TEST -> {
+                add(buildFilter(GattService.RangeTestService))
+            }
+            GattConnectType.BLINKY -> {
+                add(buildFilter(BuildFilterName.BLINKY))
+                add(buildFilter(manufacturerDataFilter))
+            }
+            GattConnectType.THROUGHPUT_TEST -> {
+                add(buildFilter(BuildFilterName.THROUGHPUT_TEST))
+            }
+            GattConnectType.WIFI_COMMISSIONING -> {
+                add(buildFilter(BuildFilterName.BLE_CONFIGURATOR))
+            }
+            GattConnectType.IOP_TEST -> {
+                add(buildFilter(BuildFilterName.IOP_TEST))
+                add(buildFilter(BuildFilterName.IOP_TEST_UPDATE))
+                add(buildFilter(BuildFilterName.IOP_TEST_NO_1))
+                add(buildFilter(BuildFilterName.IOP_TEST_NO_2))
+            }
+            GattConnectType.MOTION,
+            GattConnectType.ENVIRONMENT -> {
+                add(buildFilter(manufacturerDataFilter))
+            }
+            else -> Unit
         }
     }
 
-    private fun buildFilter(name: String) : ScanFilter {
-        return ScanFilter.Builder().apply {
-            setDeviceName(name)
+    private fun buildFilter(name: BuildFilterName) = ScanFilter
+        .Builder().apply {
+            setDeviceName(name.value)
         }.build()
-    }
 
-    private fun buildFilter(service: GattService) : ScanFilter {
-        return ScanFilter.Builder().apply {
+    private fun buildFilter(service: GattService) = ScanFilter
+        .Builder().apply {
             setServiceUuid(ParcelUuid(service.number), ParcelUuid(GattService.UUID_MASK))
         }.build()
-    }
 
-    private fun buildFilter(manufacturerData: ManufacturerDataFilter) : ScanFilter {
-        return ScanFilter.Builder().apply {
-            setManufacturerData(manufacturerData.id, manufacturerData.data, manufacturerData.mask)
+    private fun buildFilter(manufacturerData: ManufacturerDataFilter) = ScanFilter
+        .Builder().apply {
+            manufacturerData.run { setManufacturerData(id, data, mask) }
         }.build()
-    }
 
     override fun onPause() {
         super.onPause()
@@ -448,9 +434,9 @@ class SelectDeviceDialog(
         }
 
         bluetoothService?.let { service ->
-            (activity as BaseActivity).showModalDialog(BaseActivity.ConnectionStatus.CONNECTING, DialogInterface.OnCancelListener {
+            (activity as BaseActivity).showModalDialog(BaseActivity.ConnectionStatus.CONNECTING) {
                 currentDeviceInfo?.let { service.disconnectGatt(it.address) }
-            })
+            }
             service.isNotificationEnabled = false
             service.connectGatt(deviceInfo.device, false, timeoutGattCallback)
         }
@@ -484,6 +470,19 @@ class SelectDeviceDialog(
         this.rangeTestCallback = rangeTestCallback
     }
 
+    override fun handleScanResult(scanResult: ScanResultCompat) {
+        viewModel.handleScanResult(scanResult)
+    }
+
+    override fun onDiscoveryFailed() {
+        viewModel.setIsScanningOn(false)
+        dismiss()
+    }
+
+    override fun onDiscoveryTimeout() {
+        /* Scanning through this dialog is always indefinite. */
+    }
+
     companion object {
         private const val CONN_TYPE_INFO = "_conn_type_info_"
 
@@ -501,17 +500,13 @@ class SelectDeviceDialog(
         }
     }
 
-    override fun handleScanResult(scanResult: ScanResultCompat) {
-        viewModel.handleScanResult(scanResult)
+    private enum class BuildFilterName(val value: String) {
+        BLINKY("Blinky Example"),
+        THROUGHPUT_TEST("Throughput Test"),
+        BLE_CONFIGURATOR("BLE_CONFIGURATOR"),
+        IOP_TEST("IOP Test"),
+        IOP_TEST_UPDATE("IOP Test Update"),
+        IOP_TEST_NO_1("IOP_Test_1"),
+        IOP_TEST_NO_2("IOP_Test_2"),
     }
-
-    override fun onDiscoveryFailed() {
-        viewModel.setIsScanningOn(false)
-        dismiss()
-    }
-
-    override fun onDiscoveryTimeout() {
-        /* Scanning through this dialog is always indefinite. */
-    }
-
 }

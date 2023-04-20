@@ -7,13 +7,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.Html
+import android.text.SpannableString
+import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 import android.text.TextWatcher
+import android.text.style.RelativeSizeSpan
 import android.util.TypedValue
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.Spinner
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.siliconlabs.bledemo.features.configure.advertiser.adapters.DataTypeAdapter
 import com.siliconlabs.bledemo.features.configure.advertiser.presenters.AdvertiserConfigActivityPresenter
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.AdvertiserStorage
@@ -30,6 +34,7 @@ import kotlinx.android.synthetic.main.advertiser_config_parameters.*
 import kotlinx.android.synthetic.main.advertiser_config_type.*
 import kotlinx.android.synthetic.main.advertiser_data_container.view.*
 import kotlinx.android.synthetic.main.data_type_item.view.*
+import kotlinx.android.synthetic.main.data_type_layout.*
 import kotlinx.android.synthetic.main.data_type_layout.view.*
 import kotlinx.android.synthetic.main.data_type_layout.view.ib_remove
 
@@ -70,6 +75,7 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
         loadData()
         handleAdvertisingSetNameChanges()
         handleAdvertisingLimitSelection()
+        updateAdvertisingLimitLabels()
     }
 
     private fun resetInitialSetupFlags() {
@@ -288,12 +294,26 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
         et_event_limit.isEnabled = enabled
     }
 
+    private fun updateAdvertisingLimitLabels(){
+        rb_time_limit.text = buildLabelWithResizedHint(getString(R.string.advertiser_label_time_limit))
+        rb_event_limit.text = buildLabelWithResizedHint(getString(R.string.advertiser_label_event_limit))
+    }
+
+    private fun buildLabelWithResizedHint(labelText: String): SpannableString {
+        val linebreakIndex = labelText.indexOf('\n')
+        val label = SpannableString(labelText)
+        if (linebreakIndex > -1) {
+            label.setSpan(RelativeSizeSpan(12f/14f), linebreakIndex + 1, labelText.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        return label
+    }
+
     override fun onAdvertisingTypesPrepared(isLegacy: Boolean, legacyModes: List<AdvertisingMode>, extendedModes: List<AdvertisingMode>) {
-        val legacyAdapter = ArrayAdapter(this, R.layout.spinner_item_layout, translator.getValuesAsStringList(legacyModes))
+        val legacyAdapter = ArrayAdapter(this, R.layout.spinner_item_layout_medium, translator.getValuesAsStringList(legacyModes))
         legacyAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_layout)
         sp_legacy.adapter = legacyAdapter
 
-        val extendedAdapter = ArrayAdapter(this, R.layout.spinner_item_layout, translator.getValuesAsStringList(extendedModes))
+        val extendedAdapter = ArrayAdapter(this, R.layout.spinner_item_layout_medium, translator.getValuesAsStringList(extendedModes))
         extendedAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_layout)
         sp_extended.adapter = extendedAdapter
 
@@ -311,7 +331,9 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
                     cb_anonymous.isEnabled = sp_extended.selectedItem.toString() == getString(R.string.advertiser_mode_non_connectable_non_scannable)
                     rb_legacy_advertising.isChecked = false
                     sp_legacy.isEnabled = false
+                    sp_legacy.visibility = View.GONE
                     sp_extended.isEnabled = true
+                    sp_extended.visibility = View.VISIBLE
                     cb_include_tx_power.isEnabled = true
                     sp_primary_phy.isEnabled = true
                     sp_secondary_phy.isEnabled = true
@@ -342,7 +364,9 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
             if (isChecked) {
                 rb_extended_advertising.isChecked = false
                 sp_legacy.isEnabled = true
+                sp_legacy.visibility = View.VISIBLE
                 sp_extended.isEnabled = false
+                sp_extended.visibility = View.GONE
                 cb_anonymous.isEnabled = false
                 cb_include_tx_power.isEnabled = false
                 sp_primary_phy.isEnabled = false
@@ -367,11 +391,11 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
     }
 
     override fun onAdvertisingParametersPrepared(isLegacy: Boolean, primaryPhys: List<Phy>, secondaryPhys: List<Phy>) {
-        val primaryPhyAdapter = ArrayAdapter(this, R.layout.spinner_item_layout, translator.getValuesAsStringList(primaryPhys))
+        val primaryPhyAdapter = ArrayAdapter(this, R.layout.spinner_item_layout_medium, translator.getValuesAsStringList(primaryPhys))
         primaryPhyAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_layout)
         sp_primary_phy.adapter = primaryPhyAdapter
 
-        val secondaryPhyAdapter = ArrayAdapter(this, R.layout.spinner_item_layout, translator.getValuesAsStringList(secondaryPhys))
+        val secondaryPhyAdapter = ArrayAdapter(this, R.layout.spinner_item_layout_medium, translator.getValuesAsStringList(secondaryPhys))
         secondaryPhyAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_layout)
         sp_secondary_phy.adapter = secondaryPhyAdapter
     }
@@ -493,63 +517,73 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
     }
 
     private fun addServiceData(layout: ViewGroup, baseContainer: View, mode: DataMode, type: DataType, extra: Any? = null) {
-        baseContainer.ib_remove.setOnClickListener { layout.removeView(baseContainer) }
-        baseContainer.btn_add_service.visibility = View.VISIBLE
-        baseContainer.btn_add_service.text = if (type == DataType.COMPLETE_16_BIT) getString(R.string.advertiser_button_add_16bit_service) else getString(R.string.advertiser_button_add_128bit_service)
-        setDataSpinnerItemState(false, mode, if (type == DataType.COMPLETE_16_BIT) 3 else 4)
-
-        baseContainer.btn_add_service.setOnClickListener {
-            currentFocus?.clearFocus()
-            hideKeyboard()
-            if (type == DataType.COMPLETE_16_BIT) {
-                Service16BitDataDialog(object : Service16BitDataDialog.Callback {
-                    override fun onSave(service: Service16Bit) {
-                        val serviceItem = prepareItemContainer(baseContainer, service.toString())
-                        presenter.include16BitService(mode, service)
-
-                        serviceItem.ib_remove.setOnClickListener {
-                            presenter.exclude16BitService(mode, service)
-                            baseContainer.ll_data.removeView(serviceItem)
-                        }
-
-                        baseContainer.ll_data.addView(serviceItem)
-                    }
-                }).show(supportFragmentManager, "dialog_16bit_service_data")
-            } else {
-                Service128BitDataDialog(object : Service128BitDataDialog.Callback {
-                    override fun onSave(service: Service128Bit) {
-                        val serviceItem = prepareItemContainer(baseContainer, service.uuid.toString())
-                        presenter.include128BitService(mode, service)
-
-                        serviceItem.ib_remove.setOnClickListener {
-                            presenter.exclude128BitService(mode, service)
-                            baseContainer.ll_data.removeView(serviceItem)
-                        }
-
-                        baseContainer.ll_data.addView(serviceItem)
-                    }
-                }).show(supportFragmentManager, "dialog_128bit_service_data")
+        baseContainer.apply {
+            ib_remove.setOnClickListener { layout.removeView(baseContainer) }
+            btn_add_service.apply {
+                visibility = View.VISIBLE
+                text = if (type == DataType.COMPLETE_16_BIT) getString(R.string.advertiser_button_add_16bit_service) else getString(R.string.advertiser_button_add_128bit_service)
             }
-        }
+            ll_data_spacer.visibility = View.VISIBLE
+            (ll_data.layoutParams as ConstraintLayout.LayoutParams).apply {
+                endToEnd = ib_remove.id
+                topToBottom = ib_remove.id
+            }
+            ll_data.requestLayout()
+            setDataSpinnerItemState(false, mode, if (type == DataType.COMPLETE_16_BIT) 3 else 4)
 
-        baseContainer.ib_remove.setOnClickListener {
-            currentFocus?.clearFocus()
-            hideKeyboard()
-            val count = baseContainer.ll_data.childCount
-            removeServicesIfAllowed(layout, baseContainer, count, mode, type)
-        }
+            btn_add_service.setOnClickListener {
+                currentFocus?.clearFocus()
+                hideKeyboard()
+                if (type == DataType.COMPLETE_16_BIT) {
+                    Service16BitDataDialog(object : Service16BitDataDialog.Callback {
+                        override fun onSave(service: Service16Bit) {
+                            val serviceItem = prepareItemContainer(baseContainer, service.toString())
+                            presenter.include16BitService(mode, service)
 
-        extra?.let {
-            for (service in extra as List<*>) {
-                val serviceItem = prepareItemContainer(baseContainer, if (service is Service16Bit) service.toString() else (service as Service128Bit).uuid.toString())
+                            serviceItem.ib_remove.setOnClickListener {
+                                presenter.exclude16BitService(mode, service)
+                                ll_data.removeView(serviceItem)
+                            }
 
-                serviceItem.ib_remove.setOnClickListener {
-                    if (service is Service16Bit) presenter.exclude16BitService(mode, service)
-                    else if (service is Service128Bit) presenter.exclude128BitService(mode, service)
-                    baseContainer.ll_data.removeView(serviceItem)
+                            ll_data.addView(serviceItem)
+                        }
+                    }).show(supportFragmentManager, "dialog_16bit_service_data")
+                } else {
+                    Service128BitDataDialog(object : Service128BitDataDialog.Callback {
+                        override fun onSave(service: Service128Bit) {
+                            val serviceItem = prepareItemContainer(baseContainer, service.uuid.toString())
+                            presenter.include128BitService(mode, service)
+
+                            serviceItem.ib_remove.setOnClickListener {
+                                presenter.exclude128BitService(mode, service)
+                                ll_data.removeView(serviceItem)
+                            }
+
+                            ll_data.addView(serviceItem)
+                        }
+                    }).show(supportFragmentManager, "dialog_128bit_service_data")
                 }
+            }
 
-                baseContainer.ll_data.addView(serviceItem)
+            ib_remove.setOnClickListener {
+                currentFocus?.clearFocus()
+                hideKeyboard()
+                val count = ll_data.childCount
+                removeServicesIfAllowed(layout, baseContainer, count, mode, type)
+            }
+
+            extra?.let {
+                for (service in extra as List<*>) {
+                    val serviceItem = prepareItemContainer(baseContainer, if (service is Service16Bit) service.toString() else (service as Service128Bit).uuid.toString())
+
+                    serviceItem.ib_remove.setOnClickListener {
+                        if (service is Service16Bit) presenter.exclude16BitService(mode, service)
+                        else if (service is Service128Bit) presenter.exclude128BitService(mode, service)
+                        ll_data.removeView(serviceItem)
+                    }
+
+                    ll_data.addView(serviceItem)
+                }
             }
         }
 

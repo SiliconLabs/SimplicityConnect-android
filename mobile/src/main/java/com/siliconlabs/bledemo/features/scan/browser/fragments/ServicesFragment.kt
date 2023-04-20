@@ -28,7 +28,7 @@ import java.util.*
 
 abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layout.fragment_services) {
 
-    private lateinit var _binding: FragmentServicesBinding
+    protected lateinit var binding: FragmentServicesBinding
 
     private lateinit var sharedPrefUtils: SharedPrefUtils
     private lateinit var characteristicNamesMap: HashMap<String, Mapping>
@@ -42,8 +42,8 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        _binding = FragmentServicesBinding.inflate(inflater)
-        return _binding.root
+        binding = FragmentServicesBinding.inflate(inflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -56,7 +56,7 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
     }
 
     private fun setupSwipeRefreshLayout() {
-        _binding.swipeRefreshContainer.apply {
+        binding.swipeRefreshContainer.apply {
             setOnRefreshListener {
                 this.isRefreshing = false
                 (activity as DeviceServicesActivity).refreshServices()
@@ -79,7 +79,7 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
     abstract fun setServicesList(services: List<BluetoothGattService>)
 
     fun clear() {
-        _binding.servicesContainer.removeAllViews()
+        binding.servicesContainer.removeAllViews()
     }
 
     fun updateDescriptorView(descriptor: BluetoothGattDescriptor) {
@@ -186,7 +186,7 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
                 }
 
                 serviceItemContainer.setMargins(position)
-                _binding.servicesContainer.addView(
+                binding.servicesContainer.addView(
                         serviceItemContainer,
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT

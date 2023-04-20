@@ -2,7 +2,6 @@ package com.siliconlabs.bledemo.features.demo.range_test.activities
 
 import android.annotation.SuppressLint
 import android.bluetooth.*
-import android.content.DialogInterface
 import android.graphics.Typeface
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -12,18 +11,18 @@ import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
-import com.siliconlabs.bledemo.features.demo.range_test.fragments.RangeTestFragment
+import com.siliconlabs.bledemo.bluetooth.ble.*
+import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.features.demo.range_test.dialogs.RangeTestModeDialog
+import com.siliconlabs.bledemo.features.demo.range_test.fragments.RangeTestFragment
+import com.siliconlabs.bledemo.features.demo.range_test.models.*
 import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPresenter
 import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPresenter.Controller
 import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPresenter.RangeTestView
+import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
-import com.siliconlabs.bledemo.bluetooth.ble.*
-import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
-import com.siliconlabs.bledemo.features.demo.range_test.models.*
 import com.siliconlabs.bledemo.utils.Notifications
 import kotlinx.android.synthetic.main.activity_range_test.*
 import java.nio.ByteBuffer
@@ -151,13 +150,13 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                 setCallback(object : SelectDeviceDialog.RangeTestCallback {
                     override fun getBluetoothDeviceInfo(info: BluetoothDeviceInfo?) {
                         runOnUiThread {
-                            showModalDialog(ConnectionStatus.CONNECTING, DialogInterface.OnCancelListener {
+                            showModalDialog(ConnectionStatus.CONNECTING) {
                                 presenter.getDeviceInfo()?.address?.let {
                                     service?.clearConnectedGatt()
                                     presenter.resetDeviceAt(which)
                                 }
                                 tvTab.text = getString(R.string.range_test_no_device)
-                            })
+                            }
                             tvTab.text = info?.device?.name
                         }
 
@@ -373,7 +372,7 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
 
     private class GattCommand {
 
-        internal enum class Type {
+        enum class Type {
             Read, Write, Subscribe, ReadDescriptor
         }
 
@@ -715,7 +714,7 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                 }
                 GattCharacteristic.RangeTestPacketsRequired -> {
                     val packetsRequired = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)
-                    var repeat = packetsRequired == RangeTestValues.PACKET_COUNT_REPEAT
+                    val repeat = packetsRequired == RangeTestValues.PACKET_COUNT_REPEAT
 
                     presenter.onPacketRequiredUpdated(gatt.device.address, packetsRequired)
                     presenter.onPacketCountRepeatUpdated(gatt.device.address, repeat)
@@ -775,9 +774,9 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                     val phyConfig = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
                     presenter.onPhyConfigUpdated(gatt.device.address, phyConfig)
 
-                    val gatt = service?.connectedGatt
-                    if (gatt != null) {
-                        queueRead(gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestPayload))
+                    val connectedGatt = service?.connectedGatt
+                    if (connectedGatt != null) {
+                        queueRead(connectedGatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestPayload))
                     }
                 }
                 GattCharacteristic.RangePhyList -> {
@@ -857,12 +856,12 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
         private val characteristic: GattCharacteristic
         private val value: Int
 
-        internal constructor(characteristic: GattCharacteristic, value: Boolean) {
+        constructor(characteristic: GattCharacteristic, value: Boolean) {
             this.characteristic = characteristic
             this.value = if (value) 1 else 0
         }
 
-        internal constructor(characteristic: GattCharacteristic, value: Int) {
+        constructor(characteristic: GattCharacteristic, value: Int) {
             this.characteristic = characteristic
             this.value = value
         }

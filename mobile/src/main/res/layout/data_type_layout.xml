@@ -3,51 +3,76 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:clipToPadding="false"
     android:orientation="vertical"
-    android:paddingBottom="8dp">
-
-    <RelativeLayout
+    android:layout_marginTop="1dp"
+    android:background="@color/gray_subtle">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_data_type"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingVertical="8dp"
+        android:paddingStart="32dp"
+        android:paddingEnd="8dp"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/tv_name"
-            style="@style/TextMedium"
-            android:layout_width="200dp"
+            style="@style/TitleSmall"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="10dp"
-            android:layout_toStartOf="@id/ib_remove"
-            android:gravity="center_vertical"
-            tools:text="0x03 Complete List of 16-bit Service Class UUIDs and maybe something more in the future" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ib_remove"
+            tools:text="0x03 Complete List of 16-bit Service Class UUIDs" />
+
+        <View
+            android:id="@+id/ll_data_spacer"
+            android:layout_width="16dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_name"/>
+
+        <LinearLayout
+            android:id="@+id/ll_data"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/ll_data_spacer"
+            app:layout_constraintTop_toBottomOf="@id/tv_name"
+            app:layout_constraintEnd_toEndOf="@id/tv_name"
+
+            android:orientation="vertical" >
+
+<!--                <include tools:layout="@layout/data_type_item" />-->
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/ib_remove"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_alignParentEnd="true"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="top"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:background="@drawable/btn_grey_ripple_effect"
             android:contentDescription="@string/label_remove"
-            android:src="@drawable/ic_trash" />
+            android:tint="@color/silabs_dark_gray_icon"
+            android:src="@drawable/redesign_ic_card_view_action_icon_delete" />
 
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_data"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="vertical" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
         android:id="@+id/btn_add_service"
-        style="@style/ButtonBlue"
+        style="@style/button_add_data_outlined"
+        tools:text="Add Service"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
         android:layout_marginBottom="8dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_gravity="center_horizontal"
         android:visibility="gone"
         tools:visibility="visible"/>
 

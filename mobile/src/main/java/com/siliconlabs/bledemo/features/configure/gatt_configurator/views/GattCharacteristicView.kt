@@ -1,6 +1,7 @@
 package com.siliconlabs.bledemo.features.configure.gatt_configurator.views
 
 import android.content.Context
+import android.text.Html
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -28,7 +29,13 @@ class GattCharacteristicView(context: Context, attributeSet: AttributeSet? = nul
 
     private fun initView(characteristic: Characteristic) {
         tv_characteristic_name.text = characteristic.name
-        tv_characteristic_uuid.text = context.getString(R.string.UUID_colon_space).plus(characteristic.uuid?.getAsFormattedText())
+        val uuidHtml = buildString {
+            append("<b>")
+            append(context.getString(R.string.UUID_colon_space))
+            append("</b>")
+            append(characteristic.uuid?.getAsFormattedText())
+        }
+        tv_characteristic_uuid.text = Html.fromHtml(uuidHtml, Html.FROM_HTML_MODE_LEGACY)
         showSelectedProperties(characteristic)
         showOrHideDescriptorsLabelWithDivider()
         initDescriptors()
@@ -137,7 +144,6 @@ class GattCharacteristicView(context: Context, attributeSet: AttributeSet? = nul
 
     private fun showOrHideDescriptorsLabelWithDivider() {
         characteristic?.descriptors?.apply {
-            view_descriptors_separator.visibility = if (isEmpty()) View.GONE else View.VISIBLE
             tv_descriptors.visibility = if (isEmpty()) View.GONE else View.VISIBLE
             cv_descriptors.visibility = if (isEmpty()) View.GONE else View.VISIBLE
         }

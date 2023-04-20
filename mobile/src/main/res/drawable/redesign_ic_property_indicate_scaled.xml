@@ -1,0 +1,8 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<item
+    android:drawable="@drawable/redesign_ic_property_indicate"
+    android:left="2dp"
+    android:right="2dp"
+    android:width="12dp"
+    android:height="12dp"/>
+</layer-list >

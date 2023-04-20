@@ -59,7 +59,8 @@
     <dimen name="dialog_loading_card_height">140dp</dimen>
     <dimen name="dialog_loading_card_corner_radius">5dp</dimen>
     <dimen name="dialog_loading_card_elevation">6dp</dimen>
-    <dimen name="dialog_loading_image_and_text_spacing">10dp</dimen>
+    <dimen name="dialog_loading_text_margin">10dp</dimen>
+    <dimen name="dialog_loading_margin">8dp</dimen>
 
     <!-- Services list/Service item-->
 

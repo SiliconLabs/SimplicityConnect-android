@@ -64,6 +64,7 @@ class ScanFragment : Fragment(), BluetoothService.ScanListener {
 
     override fun onResume() {
         super.onResume()
+        (activity as MainActivity).toggleMainNavigation(!isFilterViewOn)
         viewModel.updateActiveConnections(btService?.getActiveConnections())
     }
 

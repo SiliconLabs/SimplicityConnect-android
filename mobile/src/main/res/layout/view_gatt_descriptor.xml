@@ -2,78 +2,83 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/gray_subtle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="16dp">
+    android:paddingTop="8dp">
 
     <TextView
         android:id="@+id/tv_descriptor_name"
-        style="@style/TitleMedium"
+        style="@style/TitleSmallHeavy"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="32dp"
         android:ellipsize="end"
         android:maxLines="2"
-        app:layout_constraintEnd_toStartOf="@id/ib_copy"
+        app:layout_constraintEnd_toStartOf="@id/ib_edit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Descriptor name" />
 
     <ImageButton
-        android:id="@+id/ib_copy"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginEnd="4dp"
+        android:id="@+id/ib_edit"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:background="@drawable/btn_grey_ripple_effect"
-        android:contentDescription="@string/label_copy"
-        android:src="@drawable/ic_copy"
-        app:layout_constraintEnd_toStartOf="@id/ib_edit"
+        android:contentDescription="@string/label_edit"
+        android:tint="@color/silabs_primary_icon"
+        android:src="@drawable/redesign_ic_card_view_action_icon_edit"
+        app:layout_constraintEnd_toStartOf="@id/ib_copy"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/ib_edit"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginEnd="4dp"
+        android:id="@+id/ib_copy"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="8dp"
         android:background="@drawable/btn_grey_ripple_effect"
-        android:contentDescription="@string/label_edit"
-        android:src="@drawable/ic_edit2"
+        android:contentDescription="@string/label_copy"
+        android:tint="@color/silabs_primary_icon"
+        android:src="@drawable/redesign_ic_card_view_action_icon_copy"
         app:layout_constraintEnd_toStartOf="@id/ib_remove"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/ib_remove"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginEnd="16dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/btn_grey_ripple_effect"
         android:contentDescription="@string/label_remove"
-        android:src="@drawable/ic_trash"
+        android:tint="@color/silabs_primary_icon"
+        android:src="@drawable/redesign_ic_card_view_action_icon_delete"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_descriptor_uuid"
-        style="@style/TextMedium"
+        style="@style/TextSmall"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
         android:ellipsize="end"
         android:maxLines="1"
-        app:layout_constraintEnd_toStartOf="@id/ib_copy"
+        app:layout_constraintEnd_toStartOf="@id/ib_edit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_descriptor_name"
         tools:text="UUID: 0x2A1E" />
 
     <TextView
         android:id="@+id/tv_descriptor_value"
-        style="@style/TextMedium"
+        style="@style/TextSmall"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
         android:ellipsize="end"
         android:maxLines="1"
-        app:layout_constraintEnd_toStartOf="@id/ib_copy"
+        app:layout_constraintEnd_toStartOf="@id/ib_edit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_descriptor_uuid"
         tools:text="Value: 0x01" />
@@ -82,44 +87,43 @@
         android:id="@+id/ll_properties"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="4dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_descriptor_value">
 
         <TextView
             android:id="@+id/tv_property_write"
-            style="@style/TitleSmall"
+            style="@style/configurator_property_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
-            android:drawablePadding="6dp"
             android:gravity="center_vertical"
             android:text="@string/gatt_configurator_label_write"
             android:visibility="gone"
-            app:drawableStartCompat="@drawable/ic_edit"
-            app:drawableTint="@color/silabs_primary_icon" />
+            tools:visibility="visible"
+            app:drawableStartCompat="@drawable/redesign_ic_property_write" />
 
         <TextView
             android:id="@+id/tv_property_read"
-            style="@style/TitleSmall"
+            style="@style/configurator_property_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
-            android:drawablePadding="6dp"
             android:gravity="center_vertical"
             android:text="@string/gatt_configurator_label_read"
             android:visibility="gone"
-            app:drawableStartCompat="@drawable/ic_read_off"
-            app:drawableTint="@color/silabs_primary_icon" />
+            tools:visibility="visible"
+            app:drawableStartCompat="@drawable/redesign_ic_property_read_off"/>
     </LinearLayout>
 
     <View
         android:id="@+id/view_descriptor_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/silabs_divider"
+        android:layout_marginTop="8dp"
+        android:background="@color/silabs_white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ll_properties" />

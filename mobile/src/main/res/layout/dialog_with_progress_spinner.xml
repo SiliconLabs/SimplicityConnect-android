@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_view"
@@ -7,32 +7,41 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     card_view:cardCornerRadius="@dimen/dialog_loading_card_corner_radius"
-    card_view:cardElevation="@dimen/dialog_loading_card_elevation"
-    card_view:cardUseCompatPadding="true">
+    card_view:cardElevation="@dimen/dialog_loading_card_elevation" >
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:background="@color/silabs_transparent"
-        android:gravity="center"
-        android:orientation="vertical"
         android:padding="@dimen/dialog_loading_card_padding">
 
-        <ImageView
-            android:id="@+id/progress_spinner"
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/sp_progress_ring" />
+            android:layout_marginStart="@dimen/dialog_loading_margin"
+            android:layout_marginTop="@dimen/dialog_loading_margin"
+            android:layout_marginEnd="@dimen/dialog_loading_margin"
+            android:indeterminate="true"
+            card_view:indicatorColor="@color/blue_primary"
+            card_view:indicatorSize="@dimen/dialog_loading_spinner_diameter"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/dialog_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dialog_loading_image_and_text_spacing"
-            android:gravity="center"
-            android:textColor="@color/silabs_black"
+            android:layout_marginStart="@dimen/dialog_loading_margin"
+            android:layout_marginTop="@dimen/dialog_loading_margin"
+            android:layout_marginEnd="@dimen/dialog_loading_margin"
+            android:layout_marginBottom="@dimen/dialog_loading_margin"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@id/progress_indicator"
             tools:text="Connecting..." />
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

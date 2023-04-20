@@ -3,28 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp">
+    android:layout_marginTop="@dimen/dialog_margin_top"
+    android:layout_marginBottom="@dimen/dialog_margin_bottom"
+    style="@style/dialog_card">
 
     <LinearLayout
+        style="@style/dialog_margins"
+        android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:background="@color/silabs_dialog_title_background"
         android:minWidth="300dp"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
 
         <TextView
             android:id="@+id/tv_header"
-            style="@style/DialogHeaderText"
-            android:layout_width="match_parent"
+            style="@style/dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
             android:text="@string/gatt_configurator_title_add_a_gatt_characteristic" />
 
         <ScrollView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1">
 
             <RelativeLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/silabs_white">
 
@@ -32,7 +37,7 @@
                     android:id="@+id/ll_characteristic_name_uuid"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
+                    android:layout_marginBottom="16dp"
                     android:orientation="vertical">
 
                     <AutoCompleteTextView
@@ -58,7 +63,8 @@
                     layout="@layout/dialog_add_characteristic_properties_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/ll_characteristic_name_uuid" />
+                    android:layout_below="@id/ll_characteristic_name_uuid"
+                    android:layout_marginTop="16dp" />
 
                 <include
                     android:id="@+id/initial_value"
@@ -70,45 +76,43 @@
             </RelativeLayout>
         </ScrollView>
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/ll_buttons"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/silabs_white"
-            android:gravity="center_horizontal"
             android:orientation="horizontal"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp">
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/dialog_button_margin_top">
 
             <Button
                 android:id="@+id/btn_clear"
-                style="@style/ButtonBorderlessBlue"
+                style="@style/dialog_button_negative_action"
                 android:layout_width="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginBottom="8dp"
+                app:layout_constraintTop_toTopOf="parent"
                 android:text="@string/button_clear" />
 
             <Button
                 android:id="@+id/btn_cancel"
-                style="@style/ButtonBorderlessBlue"
+                style="@style/dialog_button_negative_action"
                 android:layout_width="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/btn_clear"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginBottom="8dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="@dimen/dialog_margin_between_buttons"
                 android:text="@string/button_cancel" />
 
             <Button
                 android:id="@+id/btn_save"
-                style="@style/ButtonBlue"
+                style="@style/dialog_button_positive_action"
                 android:layout_width="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/btn_cancel"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="@dimen/dialog_margin_between_buttons"
                 android:enabled="false"
                 android:text="@string/button_save" />
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

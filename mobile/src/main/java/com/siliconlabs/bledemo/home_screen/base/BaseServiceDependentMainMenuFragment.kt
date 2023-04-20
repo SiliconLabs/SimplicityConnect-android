@@ -4,21 +4,19 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.siliconlabs.bledemo.home_screen.viewmodels.MainActivityViewModel
 import com.siliconlabs.bledemo.home_screen.views.BluetoothEnableBar
 import com.siliconlabs.bledemo.home_screen.views.LocationEnableBar
 import com.siliconlabs.bledemo.home_screen.views.LocationPermissionBar
-import com.siliconlabs.bledemo.home_screen.viewmodels.MainActivityViewModel
 import com.siliconlabs.bledemo.home_screen.views.BluetoothPermissionsBar
 
-abstract class BaseServiceDependentMainMenuFragment : Fragment() {
-
-    protected var activityViewModel: MainActivityViewModel? = null
+abstract class BaseServiceDependentMainMenuFragment : BaseMainMenuFragment() {
 
     protected open val bluetoothDependent: BluetoothDependent? = null
     protected open val locationDependent: LocationDependent? = null
+    protected var activityViewModel: MainActivityViewModel? = null
 
     protected fun toggleBluetoothBar(isOn: Boolean, bar: BluetoothEnableBar) {
         bar.visibility = if (isOn) View.GONE else View.VISIBLE

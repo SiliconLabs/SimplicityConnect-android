@@ -18,7 +18,8 @@ import kotlin.math.*
 
 class NormalValueView(context: Context?,
                       field: Field,
-                      fieldValue: ByteArray
+                      fieldValue: ByteArray,
+                      private val allowWriteToEmpty: Boolean = false
 ) : FieldView(context, field, fieldValue) {
 
     override fun createViewForRead(isParsedSuccessfully: Boolean, viewHandler: ViewHandler) {
@@ -51,7 +52,10 @@ class NormalValueView(context: Context?,
                         var currentInput = s.toString()
 
                         if (field.isStringFormat()) {
-                            if (!isFieldSizeExceeded(currentInput.length)) {
+                            if (fieldValue.isEmpty() && allowWriteToEmpty) {
+                                newValue = currentInput.toByteArray()
+                                valueListener.onValueChanged(field, newValue, fieldOffset)
+                            } else if (!isFieldSizeExceeded(currentInput.length)) {
                                 newValue = ByteArray(fieldValue.size)
                                 currentInput.toByteArray().copyInto(newValue, 0)
                                 valueListener.onValueChanged(field, newValue, fieldOffset)

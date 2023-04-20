@@ -18,7 +18,6 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.DialogCharacteristicWriteBinding
 import com.siliconlabs.bledemo.utils.Converters
 import com.siliconlabs.bledemo.utils.UuidUtils
-import java.util.*
 import kotlin.collections.ArrayList
 
 class CharacteristicWriteDialog(
@@ -141,15 +140,7 @@ class CharacteristicWriteDialog(
         }
     }
 
-    private val valueListener = object : ValueView.ValueListener {
-        override fun onValueChanged(field: Field, newValue: ByteArray, fieldOffset: Int) {
-            if (field.isNibbleFormat()) {
-                handleNibbleWrite(field, newValue[0], fieldOffset)
-            } else {
-                newValue.copyInto(value, fieldOffset)
-            }
-        }
-
+    abstract inner class CharacteristicValueListener: ValueView.ValueListener {
         override fun onRawValueChanged(newValue: ByteArray) {
             value = newValue
         }
@@ -172,6 +163,30 @@ class CharacteristicWriteDialog(
 
         override fun addValidityCheck(pair: Pair<Field, Boolean>) {
             fieldsValidMap[pair.first] = pair.second
+        }
+    }
+
+    private val valueListener = object : CharacteristicValueListener() {
+        override fun onValueChanged(field: Field, newValue: ByteArray, fieldOffset: Int) {
+            if (field.isNibbleFormat()) {
+                handleNibbleWrite(field, newValue[0], fieldOffset)
+            } else {
+                newValue.copyInto(value, fieldOffset)
+            }
+        }
+    }
+
+    private val emptyWriteValueListener = object : CharacteristicValueListener() {
+        override fun onValueChanged(field: Field, newValue: ByteArray, fieldOffset: Int) {
+            if (field.isNibbleFormat()) {
+                handleNibbleWrite(field, newValue[0], fieldOffset)
+            } else {
+                val newLength = fieldOffset + newValue.size
+                val newRawValue = ByteArray(newLength)
+                value.copyOfRange(0, fieldOffset).copyInto(newRawValue, 0)
+                newValue.copyInto(newRawValue, fieldOffset)
+                value = newRawValue
+            }
         }
     }
 
@@ -211,18 +226,18 @@ class CharacteristicWriteDialog(
 
     private fun addNormalValue() {
         characteristic?.fields?.forEach {
-            addField(it)
+            addField(it, characteristic.isLastField(it))
             if (GlucoseManagement.isCgmSpecificOpsControlPoint(characteristic) && it.name == "Operand") {
                 return
             }
         }
     }
 
-    private fun addField(field: Field) {
+    private fun addField(field: Field, isLast: Boolean) {
         if (fieldViewHelper.isFieldPresent(field, value)) {
             if (field.referenceFields?.size!! > 0) {
                 for (subField in field.referenceFields!!) {
-                    addField(subField)
+                    addField(subField, isLast && field.isLastReferenceField(subField))
                 }
             } else {
                 if (field.reference == null) {
@@ -245,7 +260,9 @@ class CharacteristicWriteDialog(
                         }
                     }
                     else {
-                        NormalValueView(context, field, currentRange).createViewForWrite(currentOffset, valueListener)
+                        NormalValueView(context, field, currentRange, isLast).createViewForWrite(
+                                currentOffset,
+                                if(isLast and currentRange.isEmpty()) emptyWriteValueListener else valueListener)
                         offset += fieldSize
                     }
                 }

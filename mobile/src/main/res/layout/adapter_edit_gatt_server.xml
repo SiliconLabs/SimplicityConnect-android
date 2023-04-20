@@ -16,56 +16,32 @@
         <TextView
             android:id="@+id/tv_service_name"
             style="@style/TitleLarge"
+            android:textColor="@color/blue_primary"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:ellipsize="end"
             android:maxLines="1"
-            app:layout_constraintEnd_toStartOf="@id/ib_copy"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Service Name" />
 
-        <ImageButton
-            android:id="@+id/ib_copy"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/btn_grey_ripple_effect"
-            android:contentDescription="@string/label_copy"
-            android:src="@drawable/ic_copy"
-            app:layout_constraintEnd_toStartOf="@id/ib_remove"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/ib_remove"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/btn_grey_ripple_effect"
-            android:contentDescription="@string/label_remove"
-            android:src="@drawable/ic_trash"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <TextView
             android:id="@+id/tv_service_uuid"
-            style="@style/TextMedium"
+            style="@style/TextSmall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:ellipsize="end"
             android:maxLines="1"
-            app:layout_constraintEnd_toStartOf="@id/ib_copy"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_service_name"
             tools:text="0x1809" />
 
         <TextView
             android:id="@+id/tv_service_type"
-            style="@style/TextMedium"
+            style="@style/TextSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -73,47 +49,112 @@
             app:layout_constraintTop_toBottomOf="@id/tv_service_uuid"
             tools:text="Primary Service" />
 
-        <TextView
-            android:id="@+id/tv_more_less_info"
-            style="@style/TitleMedium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/more_info"
-            android:textColor="@color/silabs_blue"
+        <include
+            android:id="@+id/sp_service_name"
+            layout="@layout/horizontal_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="6dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_service_type" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cv_characteristics"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginHorizontal="8dp"
+            android:gravity="center_vertical"
+            android:id="@+id/ll_service_icons"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sp_service_name"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/ib_copy"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/btn_grey_ripple_effect"
+                android:contentDescription="@string/label_copy"
+                android:tint="@color/silabs_primary_icon"
+                android:src="@drawable/redesign_ic_card_view_action_icon_copy"
+                app:layout_constraintEnd_toStartOf="@id/ib_remove"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/ib_remove"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/btn_grey_ripple_effect"
+                android:contentDescription="@string/label_remove"
+                android:tint="@color/silabs_primary_icon"
+                android:src="@drawable/redesign_ic_card_view_action_icon_delete"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"/>
+
+
+
+            <com.siliconlabs.bledemo.common.views.ExpandArrow
+                android:id="@+id/expand_arrow"
+                style="@style/expand_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_arrow_down_on"
+                android:contentDescription="@string/content_desc_dropdown_arrow" />
+        </LinearLayout>
+
+        <include
+            android:id="@+id/sp_service_icons_collapsed"
+            layout="@layout/horizontal_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_service_icons" />
+
+
+        <LinearLayout
+            android:id="@+id/ll_characteristics_outer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_more_less_info">
+            app:layout_constraintTop_toBottomOf="@id/ll_service_icons"
+            android:orientation="vertical"
+            tools:visibility="visible"
+            android:visibility="gone">
+
+            <include
+                android:id="@+id/sp_service_icons_expanded"
+                layout="@layout/horizontal_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
 
             <LinearLayout
                 android:id="@+id/ll_characteristics"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone" />
-        </androidx.cardview.widget.CardView>
+                android:orientation="vertical">
+<!--                <include tools:layout="@layout/view_gatt_characteristic"/>-->
+<!--                <include tools:layout="@layout/view_gatt_characteristic"/>-->
+            </LinearLayout>
+        </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_add_characteristic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:text="@string/button_add_characteristic"
+            style="@style/button_add_data"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cv_characteristics" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_characteristics_outer" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

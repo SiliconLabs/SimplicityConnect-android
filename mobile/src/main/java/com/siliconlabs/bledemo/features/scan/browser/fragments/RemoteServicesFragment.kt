@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.content.res.ColorStateList
+import android.os.Bundle
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import com.siliconlabs.bledemo.R
@@ -12,11 +14,17 @@ import com.siliconlabs.bledemo.databinding.PropertyContainerBinding
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Property
 import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.utils.Notifications
+import kotlinx.android.synthetic.main.fragment_services.view.*
 
 @SuppressLint("MissingPermission")
-class RemoteServicesFragment : ServicesFragment(isRemote = true) {
+class RemoteServicesFragment(private val onScrollChangeListener: View.OnScrollChangeListener) : ServicesFragment(isRemote = true) {
 
     override var services: List<BluetoothGattService> = bluetoothGatt?.services.orEmpty()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.swipeRefreshContainer.scrollview.setOnScrollChangeListener(onScrollChangeListener)
+    }
 
     override fun readCharacteristic(bluetoothGattCharacteristic: BluetoothGattCharacteristic) {
         bluetoothGatt?.readCharacteristic(bluetoothGattCharacteristic)

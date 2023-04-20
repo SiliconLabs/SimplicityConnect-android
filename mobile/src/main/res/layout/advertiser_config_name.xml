@@ -2,30 +2,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="16dp">
 
-    <LinearLayout
+    <TextView
+        style="@style/TitleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/advertiser_title_advertising_set_name" />
+
+    <EditText
+        android:id="@+id/et_advertising_set_name"
+        style="@style/EditTextNormal"
+        android:fontFamily="sans-serif-medium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        tools:text="New adv"
+        android:layout_marginTop="16dp" />
 
-        <TextView
-            style="@style/TitleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/advertiser_title_advertising_set_name" />
-
-        <EditText
-            android:id="@+id/et_advertising_set_name"
-            style="@style/EditTextNormal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
-    </LinearLayout>
-
-    <include layout="@layout/horizontal_separator" />
+    <include
+        layout="@layout/horizontal_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>
