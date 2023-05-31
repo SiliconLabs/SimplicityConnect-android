@@ -68,6 +68,7 @@ class DeviceServicesActivity : BaseActivity() {
 
     private var boolFullOTA = false
     var isUiCreated = false
+    private var otaDataCharPresent = false
 
     private var mtuRequestDialog: MtuRequestDialog? = null
     private var otaConfigDialog: OtaConfigDialog? = null
@@ -181,7 +182,8 @@ class DeviceServicesActivity : BaseActivity() {
 
             when (newState) {
                 BluetoothGatt.STATE_CONNECTED -> {
-                    if (viewState == ViewState.INITIALIZING_UPLOAD || viewState == ViewState.REBOOTING_NEW_FIRMWARE) {
+                    if (viewState == ViewState.REBOOTING ||
+                        viewState == ViewState.REBOOTING_NEW_FIRMWARE) {
                         handler.postDelayed({
                             bluetoothGatt = null
                             gatt.discoverServices()
@@ -197,7 +199,7 @@ class DeviceServicesActivity : BaseActivity() {
                                 finish()
                             }
                         }
-                        ViewState.INITIALIZING_UPLOAD -> when (status) {
+                        ViewState.REBOOTING -> when (status) {
                             19 -> {
                                 /* Device is reconnecting into ota mode */
                                 showInitializationInfo()
@@ -252,11 +254,12 @@ class DeviceServicesActivity : BaseActivity() {
                 when (characteristic.uuid) {
                     UuidConsts.OTA_CONTROL -> { when (characteristic.value[0]) {
                         0x00.toByte() -> {
-                            if (viewState == ViewState.INITIALIZING_UPLOAD) {
-                                startOtaUpload()
-                            } else if (viewState == ViewState.IDLE) {
-                                viewState = ViewState.INITIALIZING_UPLOAD
+                            if (viewState == ViewState.REBOOTING) {
                                 reloadDeviceIntoOtaMode()
+                            }
+                            else if (viewState == ViewState.INITIALIZING_UPLOAD) {
+                                viewState = ViewState.UPLOADING
+                                startOtaUpload()
                             }
                         }
                         0x03.toByte() -> {
@@ -303,6 +306,7 @@ class DeviceServicesActivity : BaseActivity() {
             if (status != BluetoothGatt.GATT_SUCCESS) showErrorDialog(status)
             else {
                 printServicesInfo(gatt)
+                otaDataCharPresent = (gatt.getService(UuidConsts.OTA_SERVICE)?.getCharacteristic(UuidConsts.OTA_DATA) != null)
 
                 when (viewState) {
                     ViewState.REFRESHING_SERVICES -> {
@@ -318,7 +322,8 @@ class DeviceServicesActivity : BaseActivity() {
                             gatt.requestMtu(INITIALIZATION_MTU_VALUE)
                         }, GATT_FETCH_ON_SERVICE_DISCOVERED_DELAY)
                     }
-                    ViewState.INITIALIZING_UPLOAD -> {
+                    ViewState.REBOOTING -> {
+                        viewState = ViewState.INITIALIZING_UPLOAD
                         mtuReadType = MtuReadType.UPLOAD_INITIALIZATION
                         bluetoothGatt?.requestMtu(INITIALIZATION_MTU_VALUE)
                     }
@@ -340,13 +345,12 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     private fun startOtaUpload() {
-        hideLoadingDialog()
-
-        viewState = ViewState.UPLOADING
+        hideOtaLoadingDialog()
         otafile = readChosenFile()
         pack = 0
         if (reliable) { setupMtuDivisible() }
 
+        hideOtaProgressDialog()
         showOtaProgressDialog(OtaProgressDialog.OtaInfo(
                 prepareFilename(),
                 otafile?.size,
@@ -363,7 +367,7 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     private fun reloadDeviceIntoOtaMode() {
-        runOnUiThread { showLoadingDialog(getString(R.string.ota_resetting_text)) }
+        showOtaLoadingDialog(getString(R.string.ota_resetting_text))
         reconnect()
     }
 
@@ -393,14 +397,11 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     private fun prepareForNextUpload() {
-        viewState = ViewState.INITIALIZING_UPLOAD
+        viewState = ViewState.REBOOTING
         stackPath = ""
 
-        runOnUiThread {
-            otaProgressDialog?.dismiss()
-            otaProgressDialog = null
-            showLoadingDialog(getString(R.string.ota_loading_text))
-        }
+        hideOtaProgressDialog()
+        showOtaLoadingDialog(getString(R.string.ota_loading_text))
         bluetoothGatt?.disconnect()
         handler.postDelayed({ reconnect() }, 500)
     }
@@ -585,8 +586,8 @@ class DeviceServicesActivity : BaseActivity() {
 
         mtuRequestDialog?.dismiss()
         otaConfigDialog?.dismiss()
-        otaProgressDialog?.dismiss()
-        otaLoadingDialog?.dismiss()
+        hideOtaProgressDialog()
+        hideOtaLoadingDialog()
         errorDialog?.dismiss()
 
         unregisterReceivers()
@@ -595,6 +596,8 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     override fun finish() {
+        hideOtaLoadingDialog()
+        hideOtaProgressDialog()
         setActivityResult()
         super.finish()
     }
@@ -756,9 +759,19 @@ class DeviceServicesActivity : BaseActivity() {
             * 6. Start writing to OTA_DATA characteristic
             * 7. Write 0x03 to OTA_CONTROL to end upload    */
 
-            otaConfigDialog = null
-            reliable = isReliableMode
-            writeOtaControl(OTA_CONTROL_START_COMMAND)
+            if (viewState == ViewState.IDLE) {
+                otaConfigDialog = null
+                reliable = isReliableMode
+
+                if (otaDataCharPresent) {
+                    viewState = ViewState.INITIALIZING_UPLOAD
+                    mtuReadType = MtuReadType.UPLOAD_INITIALIZATION
+                    bluetoothGatt?.requestMtu(INITIALIZATION_MTU_VALUE)
+                } else {
+                    viewState = ViewState.REBOOTING
+                    writeOtaControl(OTA_CONTROL_START_COMMAND)
+                }
+            }
         }
 
         override fun onDialogCancelled() {
@@ -773,27 +786,24 @@ class DeviceServicesActivity : BaseActivity() {
                 getString(R.string.ota_choose_file)), FILE_CHOOSER_REQUEST_CODE) }
     }
 
-    private fun hideLoadingDialog() {
+    private fun hideOtaProgressDialog() {
         runOnUiThread {
-            otaLoadingDialog?.dismiss()
-            otaLoadingDialog = null
+            otaProgressDialog?.dismiss()
+            otaProgressDialog = null
         }
     }
 
     private fun showOtaProgressDialog(info: OtaProgressDialog.OtaInfo) {
-        otaProgressDialog?.dismiss()
-        otaProgressDialog = null
-        otaProgressDialog = OtaProgressDialog(
-                otaProgressCallback,
-                info
-        ).also {
-            it.show(supportFragmentManager, OTA_PROGRESS_DIALOG_FRAGMENT)
+        runOnUiThread {
+            otaProgressDialog = OtaProgressDialog(otaProgressCallback, info).also {
+                it.show(supportFragmentManager, OTA_PROGRESS_DIALOG_FRAGMENT)
+            }
         }
     }
 
     private val otaProgressCallback = object : OtaProgressDialog.Callback {
         override fun onEndButtonClicked() {
-            otaProgressDialog = null
+            hideOtaProgressDialog()
             showMessage(getString(R.string.ota_uploading_successful))
 
             remoteServicesFragment.clear()
@@ -812,9 +822,20 @@ class DeviceServicesActivity : BaseActivity() {
         }
     }
 
-    private fun showLoadingDialog(message: String, header: String? = null) {
-        otaLoadingDialog = OtaLoadingDialog(message, header).also {
-            it.show(supportFragmentManager, OTA_LOADING_DIALOG_FRAGMENT)
+    private fun hideOtaLoadingDialog() {
+        runOnUiThread {
+            otaLoadingDialog?.dismiss()
+            otaLoadingDialog = null
+        }
+    }
+
+    private fun showOtaLoadingDialog(message: String, header: String? = null) {
+        if (otaLoadingDialog == null) {
+            runOnUiThread {
+                otaLoadingDialog = OtaLoadingDialog(message, header).also {
+                    it.show(supportFragmentManager, OTA_LOADING_DIALOG_FRAGMENT)
+                }
+            }
         }
     }
 
@@ -1163,7 +1184,8 @@ class DeviceServicesActivity : BaseActivity() {
     enum class ViewState {
         IDLE,
         REFRESHING_SERVICES,
-        INITIALIZING_UPLOAD,
+        REBOOTING, //rebooting to bootloader or rebooting for second stage upload in full OTA scenario
+        INITIALIZING_UPLOAD, //setting MTU and connection priority
         UPLOADING,
         REBOOTING_NEW_FIRMWARE
     }
