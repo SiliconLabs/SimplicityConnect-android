@@ -68,6 +68,8 @@ import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
+import kotlin.math.ceil
+import kotlin.math.floor
 
 @SuppressLint("LogNotTimber", "MissingPermission")
 class IOPTestActivity : AppCompatActivity() {
@@ -142,6 +144,7 @@ class IOPTestActivity : AppCompatActivity() {
     private var otaMode = false
 
     private var mtu = 247
+    private var currentRxPhy: Int? = null
     private var mtuDivisible = 0
     private var isServiceChangedIndication = 1
     private var isConnecting = false
@@ -366,7 +369,7 @@ class IOPTestActivity : AppCompatActivity() {
                 countReTest = 0
             }
             POSITION_TEST_IOP3_THROUGHPUT -> {
-                val throughputAcceptable = (mPDULength) * 4 * 1000 * 65 / 1500
+                val throughputAcceptable = calculateAcceptableThroughput()
                 itemTestCaseInfo.setThroughputBytePerSec(mByteSpeed, throughputAcceptable)
                 Log.d(TAG, "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT mByteSpeed $mByteSpeed throughputAcceptable $throughputAcceptable")
                 countReTest = 0
@@ -394,6 +397,36 @@ class IOPTestActivity : AppCompatActivity() {
         }
         runOnUiThread { updateUIFooter(isTestRunning) }
         mListener?.updateUi()
+    }
+
+    private fun calculateAcceptableThroughput(): Int {
+        val notLegacyFw = getSiliconLabsTestInfo().firmwareVersion.split('.')[0].let { it != "" && it.toInt() >= 6 }
+        val knownPhy = currentRxPhy in arrayOf(BluetoothDevice.PHY_LE_1M, BluetoothDevice.PHY_LE_2M)
+        return if(notLegacyFw && knownPhy) {
+            try {
+                Log.d(TAG, "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT calculating acceptable throughput (new method)")
+                val connectionParameters = getSiliconLabsTestInfo().connectionParameters!!
+                val pdu = connectionParameters.pdu
+                val tPacketMicroseconds: Int = when(currentRxPhy){
+                    BluetoothDevice.PHY_LE_1M -> (8 * pdu) + 492
+                    else -> (4 * pdu) + 396
+                }
+                val connectionIntervalMs: Double = getSiliconLabsTestInfo().connectionParameters!!.interval
+                val connectionIntervalMicroseconds = connectionIntervalMs * 1000
+                val connectionIntervalSeconds = connectionIntervalMs / 1000
+                val numPacket = floor(connectionIntervalMicroseconds / tPacketMicroseconds)
+                val sizeEffective = mtu - 3
+                val fragmentationCount = ceil(mtu.toFloat() / (pdu - 4))
+                val velExpected = numPacket * sizeEffective / fragmentationCount / connectionIntervalSeconds
+                (0.5 * velExpected).toInt()
+            } catch (e: NullPointerException) {
+                Log.d(TAG, "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT Failed to calculate acceptable throughput")
+                0
+            }
+        } else {
+            Log.d(TAG, "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT calculating acceptable throughput (legacy method)")
+            (mPDULength) * 4 * 1000 * 65 / 1500
+        }
     }
 
     private fun runnable(gatt: BluetoothGatt) {
@@ -1128,7 +1161,6 @@ class IOPTestActivity : AppCompatActivity() {
         when (mIndexRunning) {
             POSITION_TEST_DISCOVER_SERVICE -> {
                 getSiliconLabsTestInfo().firmwareVersion = parseFirmwareVersion(payload)
-                readCharacteristic(testParametersService?.characteristics?.get(1))
             }
             POSITION_TEST_IOP3_OTA_ACK -> {
                 getSiliconLabsTestInfo().firmwareAckVersion = parseFirmwareVersion(payload)
@@ -1138,11 +1170,19 @@ class IOPTestActivity : AppCompatActivity() {
             }
             else -> { }
         }
+        readCharacteristic(testParametersService?.characteristics?.get(1))
+    }
+
+    private fun getFirmwareVersion(): String {
+        for (fwString in listOf(getSiliconLabsTestInfo().firmwareUnackVersion, getSiliconLabsTestInfo().firmwareAckVersion)) {
+            if (fwString != "") { return fwString }
+        }
+        return getSiliconLabsTestInfo().firmwareVersion
     }
 
     private fun readConnectionParameters(payload: ByteArray) {
         var payloadIndex = 0
-        when (getSiliconLabsTestInfo().firmwareVersion) {
+        when (getFirmwareVersion()) {
             "3.2.1", "3.2.2", "3.2.3", "3.2.4" -> {
                 getSiliconLabsTestInfo().iopBoard = IopBoard.fromBoardCode(payload[0])
                 payloadIndex = 2
@@ -1162,11 +1202,13 @@ class IOPTestActivity : AppCompatActivity() {
                         payload.copyOfRange(payloadIndex+6, payloadIndex+8), isBigEndian = false),
                 supervisionTimeout = Converters.calculateDecimalValue(
                         payload.copyOfRange(payloadIndex+8, payloadIndex+10), isBigEndian = false)
-                        .times(10) // Conversion of sent int representation to actual value in ms
+                        .times(10), // Conversion of sent int representation to actual value in ms
         )
-        mIndexStartChildrenTest = 0
-        finishItemTest(POSITION_TEST_DISCOVER_SERVICE, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_DISCOVER_SERVICE])
-        Log.d(TAG, "convertValuesParameters(), finishItemTest(POSITION_TEST_DISCOVER_SERVICE)")
+        if(mIndexRunning == POSITION_TEST_DISCOVER_SERVICE) {
+            mIndexStartChildrenTest = 0
+            finishItemTest(POSITION_TEST_DISCOVER_SERVICE, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_DISCOVER_SERVICE])
+            Log.d(TAG, "convertValuesParameters(), finishItemTest(POSITION_TEST_DISCOVER_SERVICE)")
+        }
     }
 
     private fun parseFirmwareVersion(payload: ByteArray) : String {
@@ -2213,6 +2255,7 @@ class IOPTestActivity : AppCompatActivity() {
                 mBluetoothGatt = gatt
                 handler?.postDelayed({
                     refreshServices()
+                    mBluetoothGatt?.readPhy()
                 }, 2000)
             } else {
                 discoverTimeout = false
@@ -2421,6 +2464,16 @@ class IOPTestActivity : AppCompatActivity() {
         override fun onReliableWriteCompleted(gatt: BluetoothGatt, status: Int) {
             super.onReliableWriteCompleted(gatt, status)
             Log.d(TAG, "onReliableWriteCompleted: ")
+        }
+
+        override fun onPhyUpdate(gatt: BluetoothGatt?, txPhy: Int, rxPhy: Int, status: Int) {
+            super.onPhyUpdate(gatt, txPhy, rxPhy, status)
+            currentRxPhy = rxPhy
+        }
+
+        override fun onPhyRead(gatt: BluetoothGatt?, txPhy: Int, rxPhy: Int, status: Int) {
+            super.onPhyRead(gatt, txPhy, rxPhy, status) // TODO read PHY before starting throughput?
+            currentRxPhy = rxPhy
         }
 
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {

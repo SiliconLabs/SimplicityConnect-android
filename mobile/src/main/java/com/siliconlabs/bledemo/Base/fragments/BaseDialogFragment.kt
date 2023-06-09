@@ -9,11 +9,13 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
 
 open class BaseDialogFragment(
-        private val hasCustomWidth: Boolean? = null,
-        private val isCanceledOnTouchOutside: Boolean? = null
+    private val hasCustomWidth: Boolean? = null,
+    private val isCanceledOnTouchOutside: Boolean? = null
 ) : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -35,6 +37,12 @@ open class BaseDialogFragment(
         }
         isCanceledOnTouchOutside?.let {
             dialog?.setCanceledOnTouchOutside(isCanceledOnTouchOutside)
+        }
+    }
+
+    protected fun showMessage(@StringRes message: Int) {
+        activity?.runOnUiThread {
+            Toast.makeText(context, getString(message), Toast.LENGTH_SHORT).show()
         }
     }
 

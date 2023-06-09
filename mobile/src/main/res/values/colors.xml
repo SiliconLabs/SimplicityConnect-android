@@ -102,4 +102,8 @@
     <color name="splash_screen_start_gradient">#0F62FE</color>
 
     <color name="graph_label_inactive">#E0E0E0</color>
+
+    <!-- ESL Demo -->
+    <color name="esl_led_on">#FBE106</color>
+    <color name="esl_led_off">@color/action_icon</color>
 </resources>

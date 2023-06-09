@@ -26,6 +26,7 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.pow
 
+// TODO: Rewrite to extension functions
 object Converters {
     val HEX_CHARS: CharArray = "0123456789ABCDEF".toCharArray()
 

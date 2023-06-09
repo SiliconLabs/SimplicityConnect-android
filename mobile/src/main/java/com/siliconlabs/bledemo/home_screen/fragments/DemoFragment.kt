@@ -37,6 +37,7 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
             add(Motion(R.drawable.redesign_ic_demo_motion, getString(R.string.motion_demo_title), getString(R.string.motion_demo_description)))
             add(Environment(R.drawable.redesign_ic_demo_environment, getString(R.string.environment_demo_title), getString(R.string.environment_demo_description)))
             add(WifiCommissioning(R.drawable.redesign_ic_demo_wifi_commissioning, getString(R.string.wifi_commissioning_label), getString(R.string.wifi_commissioning_description)))
+            add(EslDemo(R.drawable.redesign_ic_demo_esl, getString(R.string.demo_item_title_esl_demo), getString(R.string.demo_item_description_esl_demo)))
         }
     }
 

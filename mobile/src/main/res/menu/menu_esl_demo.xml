@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_refresh_esl_tags"
+        android:icon="@drawable/ic_refresh"
+        android:title="@string/menu_refresh_esl_tags"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_scan_qr_code"
+        android:icon="@drawable/ic_qr_code_scanner"
+        android:title="@string/menu_scan_qr_code"
+        app:showAsAction="ifRoom" />
+</menu>

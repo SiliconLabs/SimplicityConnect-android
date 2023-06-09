@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
+import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
@@ -20,12 +21,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.home_screen.adapters.ScannedDevicesAdapter
 import com.siliconlabs.bledemo.base.activities.BaseActivity
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
+import com.siliconlabs.bledemo.home_screen.viewmodels.SelectDeviceViewModel
 import com.siliconlabs.bledemo.bluetooth.ble.*
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService.GattConnectType
-import com.siliconlabs.bledemo.databinding.DialogSelectDeviceBinding
 import com.siliconlabs.bledemo.features.demo.blinky.activities.BlinkyActivity
 import com.siliconlabs.bledemo.features.demo.connected_lighting.activities.ConnectedLightingActivity
 import com.siliconlabs.bledemo.features.demo.health_thermometer.activities.HealthThermometerActivity
@@ -33,14 +35,14 @@ import com.siliconlabs.bledemo.features.demo.throughput.activities.ThroughputAct
 import com.siliconlabs.bledemo.features.demo.throughput.utils.PeripheralManager
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models.ThunderBoardDevice
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.activities.BlinkyThunderboardActivity
+import com.siliconlabs.bledemo.databinding.DialogSelectDeviceBinding
+import com.siliconlabs.bledemo.features.demo.esl_demo.activities.EslDemoActivity
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.activities.EnvironmentActivity
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.activities.MotionActivity
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.activities.WifiCommissioningActivity
 import com.siliconlabs.bledemo.features.iop_test.activities.IOPTestActivity
 import com.siliconlabs.bledemo.features.iop_test.models.IOPTest
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity
-import com.siliconlabs.bledemo.home_screen.adapters.ScannedDevicesAdapter
-import com.siliconlabs.bledemo.home_screen.viewmodels.SelectDeviceViewModel
 import timber.log.Timber
 
 @SuppressLint("MissingPermission")
@@ -288,8 +290,10 @@ class SelectDeviceDialog(
                 GattConnectType.IOP_TEST -> getString(R.string.soc_must_be_connected,
                         getString(R.string.demo_firmware_name_iop))
                 GattConnectType.WIFI_COMMISSIONING -> {
-                    getText(R.string.soc_wifi_commissioning_must_be_connected)
+                    Html.fromHtml(getString(R.string.soc_wifi_commissioning_must_be_connected), Html.FROM_HTML_MODE_LEGACY)
                 }
+                GattConnectType.ESL_DEMO -> getString(R.string.soc_must_be_connected,
+                        getString(R.string.demo_firmware_name_esl))
                 else -> getString(R.string.empty_description)
             }
 
@@ -402,6 +406,9 @@ class SelectDeviceDialog(
             GattConnectType.ENVIRONMENT -> {
                 add(buildFilter(manufacturerDataFilter))
             }
+            GattConnectType.ESL_DEMO -> {
+                add(buildFilter(GattService.EslDemoService))
+            }
             else -> Unit
         }
     }
@@ -452,7 +459,8 @@ class SelectDeviceDialog(
             GattConnectType.WIFI_COMMISSIONING -> WifiCommissioningActivity::class.java
             GattConnectType.IOP_TEST -> IOPTestActivity::class.java
             GattConnectType.MOTION -> MotionActivity::class.java
-            GattConnectType.ENVIRONMENT ->EnvironmentActivity::class.java
+            GattConnectType.ENVIRONMENT -> EnvironmentActivity::class.java
+            GattConnectType.ESL_DEMO -> EslDemoActivity::class.java
             else -> null
         }
 

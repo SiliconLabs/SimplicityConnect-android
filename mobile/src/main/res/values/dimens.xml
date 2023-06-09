@@ -37,6 +37,9 @@
     <!-- Scanning state help message-->
     <dimen name="scanning_animation_bar_height">64dp</dimen>
 
+    <!--- QR code scanner fragment -->
+    <dimen name="scanner_buttons_padding">40dp</dimen>
+
     <!-- Programmatically generated views -->
     <dimen name="characteristic_list_item_value_text_size">14sp</dimen>
     <dimen name="characteristic_list_item_value_label_text_size">12sp</dimen>
@@ -202,6 +205,7 @@
 
     <dimen name="dialog_title_size">20sp</dimen>
     <dimen name="dialog_text_info_size">14sp</dimen>
+    <dimen name="dialog_text_note_size">12dp</dimen>
     <dimen name="dialog_button_text_size">12sp</dimen>
 
     <dimen name="dialog_title_margin_bottom">@dimen/space_S</dimen>
@@ -279,4 +283,6 @@
     <dimen name="settings_link_button_width">160dp</dimen>
 
 
+    <dimen name="rv_loaded_images_horizontal_margin">12dp</dimen>
+    <dimen name="rv_loaded_images_stroke_width">2dp</dimen>
 </resources>

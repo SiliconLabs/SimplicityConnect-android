@@ -5,5 +5,5 @@ data class ConnectionParameters(
         val pdu: Int,
         val interval: Double,
         val slaveLatency: Int,
-        val supervisionTimeout: Int
+        val supervisionTimeout: Int,
 )

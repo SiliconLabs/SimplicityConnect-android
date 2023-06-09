@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    style="@style/list_item_card_view_box">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            style="@style/list_item_card_view_container_margins"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <ImageView
+                    android:id="@+id/tag_info_icon"
+                    android:layout_width="@dimen/card_view_main_icon_dimension"
+                    android:layout_height="@dimen/card_view_main_icon_dimension"
+                    android:contentDescription="@string/content_desc_tag_info_icon"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/redesign_ic_demo_esl" />
+
+                <TextView
+                    android:id="@+id/ble_address"
+                    style="@style/list_item_card_view_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    app:layout_constraintStart_toEndOf="@id/tag_info_icon"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="AA:BB:C:DD:EE:FF" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ping_tag_button"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    app:icon="@drawable/ic_refresh"
+                    app:iconPadding="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toEndOf="@+id/ble_address"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/esl_tag_id"
+                    style="@style/list_item_card_view_text_info_ellipsized"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toEndOf="@id/tag_info_icon"
+                    app:layout_constraintTop_toBottomOf="@id/ble_address"
+                    android:layout_marginStart="8dp"
+                    tools:text="ESL Tag ID: 2" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/card_view_first_horizontal_separator_margin_top"
+                android:layout_marginBottom="@dimen/space_S"
+                android:background="?android:attr/listDivider" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_S" >
+
+                <ImageButton
+                    android:id="@+id/ib_esl_light"
+                    style="@style/card_view_action_icon"
+                    android:layout_width="@dimen/card_view_action_icon_container_width"
+                    android:layout_height="@dimen/card_view_action_icon_container_height"
+                    android:layout_marginEnd="@dimen/space_S"
+                    android:contentDescription="@string/content_desc_toggle_led"
+                    app:srcCompat="@drawable/ic_esl_light" />
+
+                <ImageButton
+                    android:id="@+id/ib_esl_upload_image"
+                    style="@style/card_view_action_icon"
+                    android:layout_width="@dimen/card_view_action_icon_container_width"
+                    android:layout_height="@dimen/card_view_action_icon_container_height"
+                    android:layout_marginEnd="@dimen/space_S"
+                    android:layout_toEndOf="@id/ib_esl_light"
+                    android:contentDescription="@string/content_desc_upload_image"
+                    android:src="@drawable/ic_upload_new_image" />
+
+                <ImageButton
+                    android:id="@+id/ib_esl_display_image"
+                    style="@style/card_view_action_icon"
+                    android:layout_width="@dimen/card_view_action_icon_container_width"
+                    android:layout_height="@dimen/card_view_action_icon_container_height"
+                    android:layout_toEndOf="@id/ib_esl_upload_image"
+                    android:contentDescription="@string/content_desc_display_image"
+                    android:src="@drawable/ic_display_image" />
+
+                <com.siliconlabs.bledemo.common.views.ExpandArrow
+                    android:id="@+id/expand_arrow"
+                    style="@style/expand_arrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arrow_down_on"
+                    android:contentDescription="@string/content_desc_dropdown_arrow"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/esl_tag_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

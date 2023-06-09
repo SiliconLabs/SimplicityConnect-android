@@ -51,8 +51,8 @@ android {
         create("blueGecko") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 40
-            versionName = "2.6.4"
+            versionCode = 41
+            versionName = "2.7.0"
         }
     }
 
@@ -79,6 +79,8 @@ dependencies {
     implementation("androidx.fragment:fragment:1.5.6")
     implementation("androidx.core:core-splashscreen:1.0.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("androidx.activity:activity-ktx:1.6.0")
+    implementation("com.google.android.material:material:1.9.0")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
@@ -89,6 +91,8 @@ dependencies {
     implementation("androidx.gridlayout:gridlayout:1.0.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    implementation("com.github.yuriy-budiyev:code-scanner:2.3.2")
 
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.0.3")
@@ -114,6 +118,9 @@ dependencies {
 
     // Only used for Int.pow() method in a couple of places
     implementation("com.google.guava:guava:29.0-android")
+
+    //glide
+    implementation("com.github.bumptech.glide:glide:4.15.1")
 
     // instrumented tests
     testImplementation("junit:junit:4.13.2")

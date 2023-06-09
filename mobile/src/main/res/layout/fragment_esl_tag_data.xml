@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <include
+        android:id="@+id/container_no_tags_configured"
+        layout="@layout/full_screen_info"
+        tools:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/container_tags_configured"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            style="@style/TitleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/esl_label_control_group" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/ib_esl_group_led"
+                style="@style/card_view_action_icon"
+                android:layout_width="@dimen/card_view_action_icon_container_width"
+                android:layout_height="@dimen/card_view_action_icon_container_height"
+                android:layout_marginEnd="@dimen/space_S"
+                app:srcCompat="@drawable/ic_esl_light"
+                android:contentDescription="@string/content_desc_toggle_led"/>
+
+            <ImageButton
+                android:id="@+id/ib_esl_upload_image"
+                style="@style/card_view_action_icon"
+                android:enabled="false"
+                android:visibility="gone"
+                android:layout_width="@dimen/card_view_action_icon_container_width"
+                android:layout_height="@dimen/card_view_action_icon_container_height"
+                android:layout_marginEnd="@dimen/space_S"
+                app:srcCompat="@drawable/ic_upload_new_image"
+                android:contentDescription="@string/content_desc_upload_image"/>
+
+            <ImageButton
+                android:id="@+id/ib_esl_display_image"
+                style="@style/card_view_action_icon"
+                android:layout_width="@dimen/card_view_action_icon_container_width"
+                android:layout_height="@dimen/card_view_action_icon_container_height"
+                app:srcCompat="@drawable/ic_display_image"
+                android:contentDescription="@string/content_desc_display_image"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="16dp"
+            android:background="@color/silabs_click_grey"/>
+
+        <TextView
+            style="@style/TitleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:text="@string/esl_label_configured_tags" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_tag_info_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+</LinearLayout>

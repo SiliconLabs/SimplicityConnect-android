@@ -119,6 +119,10 @@ enum class GattService {
             GattCharacteristic.WifiCommissioningWrite,
             GattCharacteristic.WifiCommissioningRead,
             GattCharacteristic.WifiCommissioningNotify
+    ),
+    EslDemoService("35100001-4b1d-b16b-00b1-35018badf00d", "custom.type",
+        GattCharacteristic.EslControlPoint,
+        GattCharacteristic.EslTransferImage
     );
 
     /**

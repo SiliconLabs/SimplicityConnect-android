@@ -11,10 +11,15 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false"/>
 
     <application
         android:name=".application.SiliconLabsDemoApplication"
@@ -87,6 +92,11 @@
         <activity
             android:name="com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.activities.BlinkyThunderboardActivity"
             android:label="@string/title_Blinky"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".features.demo.esl_demo.activities.EslDemoActivity"
+            android:label="@string/esl_demo_bar_title"
             android:screenOrientation="portrait" />
 
         <provider

@@ -88,6 +88,7 @@
 
     <dimen name="dialog_title_size">24sp</dimen>
     <dimen name="dialog_text_info_size">16sp</dimen>
+    <dimen name="dialog_text_note_size">14sp</dimen>
     <dimen name="dialog_button_text_size">14sp</dimen>
 
     <dimen name="dialog_button_margin_top">24dp</dimen>
@@ -135,4 +136,7 @@
     <dimen name="settings_version_margin">12dp</dimen>
     <dimen name="settings_subtitle_size">20sp</dimen>
 
+
+    <dimen name="rv_loaded_images_horizontal_margin">16dp</dimen>
+    <dimen name="rv_loaded_images_stroke_width">3dp</dimen>
 </resources>

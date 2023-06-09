@@ -330,6 +330,11 @@
         <item name="android:textColor">@color/silabs_primary_text</item>
     </style>
 
+    <style name="dialog_text_note">
+        <item name="android:textSize">@dimen/dialog_text_note_size</item>
+        <item name="android:textColor">@color/silabs_dark_gray_text</item>
+    </style>
+
     <style name="dialog_button_positive_action" parent="@style/Widget.MaterialComponents.Button.TextButton">
         <item name="android:backgroundTint">@color/dialog_positive_button_selector</item>
         <item name="android:textColor">@color/silabs_white</item>
