@@ -61,6 +61,28 @@ EFR Connect helps developers create and troubleshoot Bluetooth applications runn
 - Export results log
 
 
+## Building EFR Connect from the source code
+
+- Clone the project repository
+
+- Open the project directory in [Android Studio](https://developer.android.com/studio)
+
+- Wait for Gradle sync to finish
+
+- In the Build Variants tool window, select the desired variant: release (`blueGeckoRelease`) or debug (`blueGeckoDebug`)
+
+- Build the project with `Build > Build Project` and run it on a connected mobile device with `Run > Run 'mobile'` or `Run > Debug 'mobile'`
+
+- You can also build an APK installation package with `Build > Build Bundle(s) / APK(s) > Build APK(s)...` - the APK will be built, and a link to its location on the disk displayed in a notification in Studio.
+
+## Development
+
+The main application code lies in the `<project_directory>\mobile\src\main\java\com\siliconlabs\bledemo` directory. 
+The main application screen's code can be found there in the `home_screen` directory, while the application features (scanner, IOP test, advertiser/server configuration, all the demos) 
+are separated into corresponding directories in the the `features` directory. 
+The application architecture mostly follows the MVVM (Model-View-Viewmodel) pattern, and the feature/demo directories contain their own views, model and viewmodels.
+Handling the Bluetooth operations is covered mainly by the code in the `bluetooth` directory, most importantly the `BluetoothService` class.
+GATT service/characteristic/descriptor definitions are contained in `<project_directory>\mobile\src\main\java\assets`.
 
 ## Additional information
 The app can be found on the [Google PlayStore](https://play.google.com/store/apps/details?id=com.siliconlabs.bledemo&hl=en) and [Apple App Store](https://apps.apple.com/us/app/blue-gecko/id1030932759).
