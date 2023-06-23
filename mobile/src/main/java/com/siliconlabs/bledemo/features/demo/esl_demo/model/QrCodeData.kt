@@ -3,6 +3,7 @@ package com.siliconlabs.bledemo.features.demo.esl_demo.model
 import android.bluetooth.BluetoothAdapter
 
 data class QrCodeData(
+    val fullCommand: String,
     val command: String,
     val address: String,
     val addressType: String? = null, /* Present only some in some versions of QR codes */
@@ -13,11 +14,11 @@ data class QrCodeData(
         fun decode(qrCodeText: String) : QrCodeData {
             val data = qrCodeText.split(" ")
 
-            if (data.size == 1) return QrCodeData(data[0], "unknown")
-            if (data.size == 2) return QrCodeData(data[0], data[1])
-            if (data.size == 3) return QrCodeData(data[0], data[1], data[2])
+            if (data.size == 1) return QrCodeData(qrCodeText, data[0], "unknown")
+            if (data.size == 2) return QrCodeData(qrCodeText, data[0], data[1])
+            if (data.size == 3) return QrCodeData(qrCodeText, data[0], data[1], data[2])
 
-            return QrCodeData(data[0], data[1], data[2], data[3].toInt())
+            return QrCodeData(qrCodeText, data[0], data[1], data[2], data[3].toInt())
         }
     }
 

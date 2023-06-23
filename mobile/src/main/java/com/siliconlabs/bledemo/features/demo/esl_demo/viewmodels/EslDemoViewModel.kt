@@ -16,8 +16,14 @@ import com.siliconlabs.bledemo.features.demo.esl_demo.model.QrCodeData
 import com.siliconlabs.bledemo.features.demo.esl_demo.model.TagInfo
 import com.siliconlabs.bledemo.features.demo.esl_demo.model.TagListItem
 import com.siliconlabs.bledemo.utils.SingleLiveEvent
+import kotlinx.coroutines.CoroutineStart
+import com.siliconlabs.bledemo.utils.indexOrNull
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -25,7 +31,9 @@ import kotlin.time.Duration.Companion.seconds
 
 class EslDemoViewModel : ViewModel() {
 
-    private val tagsInfo: MutableList<TagViewInfo> = mutableListOf()
+    private var oldTagsInfo = listOf<TagViewInfo>()
+    private val _tagsInfo = MutableStateFlow<List<TagViewInfo>>(emptyList())
+    val tagsInfo get() = _tagsInfo.asStateFlow()
 
     private val _viewState: MutableLiveData<ViewState> = MutableLiveData()
     val viewState: LiveData<ViewState> = _viewState
@@ -33,7 +41,11 @@ class EslDemoViewModel : ViewModel() {
     val actionState: SingleLiveEvent<ActionState> = _actionState
     val imageUploadData: MutableLiveData<ImageUploadData?> = MutableLiveData()
 
-    private var pendingConnectionData: QrCodeData? = null
+    private val _groupLedBtnToggled = MutableStateFlow(false)
+
+    private val removedEslIdChannel = Channel<Int>(CONFLATED)
+
+    private var pendingConnectionAddress: String? = null
 
     private var eslCommandManager: EslCommandManager? = null
     private var timeoutJob: Job = createTimeoutJob()
@@ -51,27 +63,29 @@ class EslDemoViewModel : ViewModel() {
     }
 
     fun toggleIsViewExpanded(tagInfoIndex: Int, isViewExpanded: Boolean) {
-        tagsInfo[tagInfoIndex].isViewExpanded = isViewExpanded
+        _tagsInfo.value[tagInfoIndex].isViewExpanded = isViewExpanded
     }
 
-    fun getImageArray(tagIndex: Int) : Array<Uri?> {
-        return tagsInfo[tagIndex].slotImages
+    fun getImageArray(tagIndex: Int): Array<Uri?> {
+        return _tagsInfo.value[tagIndex].slotImages
     }
+
+    fun getTagIndex(tag: TagViewInfo): Int? = tagsInfo.value.indexOrNull(tag)
 
     fun connectTag(qrCodeData: QrCodeData) {
-        if (tagsInfo.find { it.connectionData.address == qrCodeData.address } != null) {
+        if (_tagsInfo.value.find { it.tagInfo.bleAddress.uppercase() == qrCodeData.address.uppercase() } != null) {
             _actionState.postValue(ActionState.TagAlreadyExists)
         } else {
-            pendingConnectionData = qrCodeData
-            eslCommandManager?.connectTag(qrCodeData)
+            pendingConnectionAddress = qrCodeData.address
+            eslCommandManager?.connectTagByQr(qrCodeData)
             _viewState.postValue(ViewState.LoadingState(EslCommand.CONNECT))
         }
     }
 
     fun connectExistingTag(tagIndex: Int) {
-        tagsInfo[tagIndex].connectionData.let {
-            pendingConnectionData = it
-            eslCommandManager?.connectTag(it)
+        _tagsInfo.value[tagIndex].let {
+            pendingConnectionAddress = it.tagInfo.bleAddress
+            eslCommandManager?.connectTagById(it.tagInfo.eslId)
             _viewState.postValue(ViewState.LoadingState(EslCommand.CONNECT))
         }
     }
@@ -83,31 +97,41 @@ class EslDemoViewModel : ViewModel() {
 
     fun disconnectTag() {
         eslCommandManager?.disconnectTag()
-        pendingConnectionData = null
+        pendingConnectionAddress = null
         _viewState.postValue(ViewState.LoadingState(EslCommand.DISCONNECT))
     }
 
     fun loadTagsInfo() {
+        clearList()
+
         eslCommandManager?.loadTagsInfo()
         _viewState.postValue(ViewState.LoadingState(EslCommand.LOAD_INFO))
     }
 
-    fun deleteTag(address: String) {
-        eslCommandManager?.deleteTag(address)
+    fun removeTag(index: Int) {
+        viewModelScope.launch {
+            val eslId = _tagsInfo.value[index].tagInfo.eslId
+            eslCommandManager?.removeTag(eslId)
+            removedEslIdChannel.send(eslId)
+            _viewState.postValue(ViewState.LoadingState(EslCommand.REMOVE))
+        }
     }
 
     fun pingTag(index: Int) {
-        val eslId = tagsInfo[index].tagInfo.eslId
+        val eslId = _tagsInfo.value[index].tagInfo.eslId
         eslCommandManager?.pingTag(eslId)
         _viewState.postValue(ViewState.LoadingState(EslCommand.PING))
     }
 
     fun toggleLed(tagIndex: Int) {
-        eslCommandManager?.toggleLed(!tagsInfo[tagIndex].tagInfo.isLedOn, tagsInfo[tagIndex].tagInfo.eslId)
+        eslCommandManager?.toggleLed(
+            shouldSubmitStateOn = !_tagsInfo.value[tagIndex].tagInfo.isLedOn,
+            eslId = _tagsInfo.value[tagIndex].tagInfo.eslId,
+        )
     }
 
     fun toggleAllLeds() {
-        eslCommandManager?.toggleAllLeds(!getGroupLedState())
+        eslCommandManager?.toggleAllLeds(!_groupLedBtnToggled.value)
     }
 
     fun updateTagLedImage(imageIndex: Int, imageFilepath: String) {
@@ -115,14 +139,16 @@ class EslDemoViewModel : ViewModel() {
     }
 
     fun displayTagLedImage(tagIndex: Int, imageIndex: Int) {
-        eslCommandManager?.displayTagLedImage(tagsInfo[tagIndex].tagInfo.eslId, imageIndex, displayIndex = 0)
+        eslCommandManager?.displayTagLedImage(
+            _tagsInfo.value[tagIndex].tagInfo.eslId,
+            imageIndex,
+            displayIndex = 0,
+        )
     }
 
     fun displayAllTagsImage(imageIndex: Int) {
         eslCommandManager?.displayAllTagsImage(imageIndex, displayIndex = 0)
     }
-
-    fun clearTagsInfo() = tagsInfo.clear()
 
     private fun cleanupImageUpload() {
         imageUploadData.postValue(null)
@@ -132,7 +158,7 @@ class EslDemoViewModel : ViewModel() {
         clearTimeouts()
 
         char?.let {
-            if(it.uuid == GattCharacteristic.EslControlPoint.uuid) {
+            if (it.uuid == GattCharacteristic.EslControlPoint.uuid) {
                 handleControlCharacteristicChanged(it)
             } else if (it.uuid == GattCharacteristic.EslTransferImage.uuid) {
                 handleImageTransferCharacteristicChanged(it)
@@ -140,19 +166,24 @@ class EslDemoViewModel : ViewModel() {
         }
     }
 
+    private fun clearList() {
+        oldTagsInfo = _tagsInfo.value
+        _tagsInfo.value = emptyList()
+    }
+
     private fun handleControlCharacteristicChanged(char: BluetoothGattCharacteristic) {
         val executedCommand = EslCommand.fromCode(char.value[0].toInt())
         val commandStatus = char.value[1].toInt()
 
         if (commandStatus == ESL_COMMAND_STATUS_FAILURE) {
-            _viewState.postValue(ViewState.IdleState(isTagListEmpty(), null))
+            _viewState.postValue(ViewState.IdleState(null))
             _actionState.postValue(ActionState.CommandError(executedCommand))
             cleanupImageUpload()
         } else if (commandStatus == ESL_COMMAND_STATUS_SUCCESS) { when (executedCommand) {
             EslCommand.CONNECT -> {
-                if (tagsInfo.find { it.connectionData == pendingConnectionData } == null ) {
+                if (_tagsInfo.value.find { it.tagInfo.bleAddress.uppercase() == pendingConnectionAddress?.uppercase() } == null ) {
                     // new tag, proceed to configure
-                    _viewState.postValue(ViewState.IdleState(isTagListEmpty(), DialogQuery.CONFIGURE_TAG))
+                    _viewState.postValue(ViewState.IdleState(DialogQuery.CONFIGURE_TAG))
                 } else {
                     // connecting to existing tag, to upload image
                     imageUploadData.value?.let {
@@ -161,7 +192,7 @@ class EslDemoViewModel : ViewModel() {
                 }
             }
             EslCommand.DISCONNECT -> {
-                _viewState.postValue(ViewState.IdleState(isTagListEmpty(), null))
+                _viewState.postValue(ViewState.IdleState(null))
                 _actionState.postValue(ActionState.CommandSuccess(executedCommand))
                 imageUploadData.value?.let {
                     if(it.displayAfterUpload) {
@@ -171,58 +202,85 @@ class EslDemoViewModel : ViewModel() {
                 }
             }
             EslCommand.CONFIGURE -> {
-                pendingConnectionData?.let {
+                pendingConnectionAddress?.let {
                     val tagInfo = TagInfo.parse(char.value.copyOfRange(2, char.value.size))
-                    val tagViewInfo = TagViewInfo(tagInfo, arrayOfNulls(tagInfo.maxImageIndex + 1), it)
-                    tagsInfo.add(tagViewInfo)
+                    val tagViewInfo = TagViewInfo(tagInfo, arrayOfNulls(tagInfo.maxImageIndex + 1))
+
+                    _tagsInfo.value = _tagsInfo.value + tagViewInfo
                     _actionState.postValue(ActionState.TagConfigured(tagViewInfo))
                 }
 
-                pendingConnectionData = null
-                _viewState.postValue(ViewState.IdleState(isTagListEmpty(), null))
-                disconnectTag()
+                pendingConnectionAddress = null
+                _viewState.postValue(ViewState.IdleState(null))
             }
             EslCommand.TOGGLE_LED -> {
                 val eslId = char.value[2].toInt()
 
                 if (isGroupEslId(eslId)) {
-                    val groupLedState = getGroupLedState()
-                    tagsInfo.forEach { info -> info.tagInfo.isLedOn = !groupLedState }
-                    _actionState.postValue(ActionState.GroupLedStateToggled(!groupLedState))
+                    _groupLedBtnToggled.apply { value = !value }
+
+                    _tagsInfo.value = _tagsInfo.value.map {
+                        val newTagInfo = it.tagInfo.copy(isLedOn = _groupLedBtnToggled.value)
+                        it.copy(tagInfo = newTagInfo)
+                    }
+
+                    _actionState.postValue(ActionState.GroupLedStateToggled(_groupLedBtnToggled.value))
                 } else findTagIndexById(eslId)?.let { tagIndex ->
-                    val changedTag = tagsInfo[tagIndex]
-                    changedTag.tagInfo.isLedOn = !changedTag.tagInfo.isLedOn
-                    _actionState.postValue(ActionState.LedStateToggled
-                        (tagIndex, changedTag.tagInfo.isLedOn, getGroupLedState()))
+                    val updatedList = _tagsInfo.value.mapIndexed { index, tagViewInfo ->
+                        val newTagInfo = if (index == tagIndex) {
+                            val isLedOn = tagViewInfo.tagInfo.isLedOn
+                            tagViewInfo.tagInfo.copy(isLedOn = !isLedOn)
+                        } else tagViewInfo.tagInfo
+
+                        tagViewInfo.copy(tagInfo = newTagInfo)
+                    }
+
+                    _tagsInfo.value = updatedList
                 }
             }
             EslCommand.LOAD_INFO -> {
                 val tagListItem = TagListItem.parse(char.value.copyOfRange(2, char.value.size))
                 tagListItem.tagInfo?.let { info ->
-                    val connectionData = QrCodeData(EslCommand.CONNECT.message, info.bleAddress)
-                    val tagViewInfo = TagViewInfo(info, arrayOfNulls(info.maxImageIndex + 1), connectionData)
-                    tagsInfo.add(tagViewInfo)
-                    _actionState.postValue(ActionState.TagConfigured(tagViewInfo))
+                    var tagViewInfo = TagViewInfo(info, arrayOfNulls(info.maxImageIndex + 1))
+
+                    oldTagsInfo.find { it.tagInfo.eslId == tagViewInfo.tagInfo.eslId }?.let {
+                        tagViewInfo = tagViewInfo.copy(
+                            tagInfo = it.tagInfo,
+                            slotImages = it.slotImages,
+                            isViewExpanded = it.isViewExpanded,
+                        )
+                    }
+
+                    _tagsInfo.value = _tagsInfo.value + tagViewInfo
                 }
 
                 if (tagListItem.isLast) {
-                    _viewState.postValue(ViewState.IdleState(isTagListEmpty(), null))
+                    oldTagsInfo = emptyList()
+                    _viewState.postValue(ViewState.IdleState(null))
                 }
             }
             EslCommand.UPDATE_IMAGE -> {
                 //apparently there's no additional info here besides command type and success msg
                 imageUploadData.value?.let {
-                    tagsInfo[it.tagIndex].slotImages[it.slotIndex] = it.uri
+                    val updatedList = _tagsInfo.value.toList().apply {
+                        this[it.tagIndex].slotImages[it.slotIndex] = it.uri
+                    }
+
+                    _tagsInfo.value = updatedList
                 }
                 _actionState.postValue(ActionState.CommandSuccess(executedCommand))
-                _viewState.postValue(ViewState.IdleState(isTagListEmpty(), null))
+                _viewState.postValue(ViewState.IdleState(null))
                 disconnectTag()
                 if(imageUploadData.value?.displayAfterUpload == false) {
                     cleanupImageUpload()
                 }
             }
             EslCommand.DISPLAY_IMAGE -> {
-                _actionState.postValue(ActionState.CommandSuccess(executedCommand))
+                if (char.value.last().toInt() == IMAGE_UPLOAD_NO_IMAGE_ERROR) {
+                    _actionState.postValue(ActionState.ImageNotAvailable)
+                } else {
+                    _actionState.postValue(ActionState.CommandSuccess(executedCommand))
+                }
             }
             EslCommand.PING -> {
                 val pingInfo = PingInfo.parse(char.value.copyOfRange(2, char.value.size))
@@ -232,36 +290,63 @@ class EslDemoViewModel : ViewModel() {
                     else -> ActionState.CommandError(executedCommand)
                 }
 
+                if (pingInfo.tlvResponseBasicState == CORRECT_TLV_RESP_BASIC_STATE) {
+                    val ledState = pingInfo.activeLed
+                    val pingedTagIndex = tagsInfo.value.indexOrNull { it.tagInfo.eslId == pingInfo.eslId }
+
+                    pingedTagIndex?.let {
+                        val newTagsInfo = _tagsInfo.value.toMutableList()
+                        val pingedTag = newTagsInfo[it]
+                        val pingedTagInfo = pingedTag.tagInfo
+
+                        newTagsInfo[it] = pingedTag.copy(tagInfo = pingedTagInfo.copy(isLedOn = ledState))
+                        _tagsInfo.value = newTagsInfo
+                    }
+                }
+
                 _actionState.postValue(actionStateValue)
-                _viewState.postValue(ViewState.IdleState(isTagListEmpty(), null))
+                _viewState.postValue(ViewState.IdleState(null))
             }
-            EslCommand.DELETE -> { }
+
+            EslCommand.REMOVE -> viewModelScope.launch {
+                val eslId = removedEslIdChannel.receive()
+                _tagsInfo.value.indexOrNull { it.tagInfo.eslId == eslId }?.let {
+                    val updatedList = _tagsInfo.value.toMutableList().apply { removeAt(it) }
+                    _tagsInfo.value = updatedList
+                }
+
+                _actionState.postValue(ActionState.TagRemoved(eslId))
+                _viewState.postValue(ViewState.IdleState(null))
+            }
+
             else -> Unit
-        } }
+        }
+        }
     }
 
     private fun handleImageTransferCharacteristicChanged(char: BluetoothGattCharacteristic) {
         val header = char.value.firstOrNull()
         val expectedHeaderValue = 0xef.toByte()
         if (header == expectedHeaderValue) {
-            val rawOffset = char.value.sliceArray(IntRange(1,4))
+            val rawOffset = char.value.sliceArray(IntRange(1, 4))
             val offset = ByteBuffer.wrap(rawOffset).order(ByteOrder.LITTLE_ENDIAN).int
 
             startTimeoutCount()
             imageUploadData.value?.let {
                 val chunkLength = it.packetSize - 1
+                val dataRange =
+                    IntRange(offset, it.data.size.coerceAtMost(offset + chunkLength) - 1)
                 eslCommandManager?.sendImageWrite(
-                        data = it.data.sliceArray(IntRange(offset, it.data.size.coerceAtMost(offset + chunkLength) - 1)),
-                        lastChunk = (it.data.size - offset <= chunkLength)
+                    data = it.data.sliceArray(dataRange),
+                    lastChunk = (it.data.size - offset <= chunkLength)
                 )
 
                 val percentage = (offset * 100) / it.data.size
-                _viewState.postValue(ViewState.LoadingState(
-                        EslCommand.UPDATE_IMAGE, "Transferring image to the tag: $percentage% done"))
+                _viewState.postValue(ViewState.LoadingState(EslCommand.UPDATE_IMAGE, percentage))
                 // TODO improvement: proper progress dialog
             }
         } else {
-            _viewState.postValue(ViewState.IdleState(isTagListEmpty(), null))
+            _viewState.postValue(ViewState.IdleState(null))
             _actionState.postValue(ActionState.CommandError(EslCommand.UPDATE_IMAGE))
             cleanupImageUpload()
             disconnectTag()
@@ -271,29 +356,22 @@ class EslDemoViewModel : ViewModel() {
 
     private fun isGroupEslId(rawValue: Int) = rawValue == -1
 
-    private fun getGroupLedState() : Boolean {
-        /* If there's at least on led 'on', group led will be presented as 'on' */
-        return tagsInfo.any { it.tagInfo.isLedOn }
-    }
-
-    private fun findTagIndexById(eslId: Int) : Int? {
-        val index = tagsInfo.indexOfFirst { it.tagInfo.eslId == eslId }
-        return if (index != -1) index else null
-    }
+    private fun findTagIndexById(eslId: Int) : Int? =
+        _tagsInfo.value.indexOrNull { it.tagInfo.eslId == eslId }
 
     fun startTimeoutCount() {
         if (!timeoutJob.isActive) {
             timeoutJob = createTimeoutJob()
         }
-        timeoutJob.start()
 
+        timeoutJob.start()
     }
 
     private fun clearTimeouts() {
         timeoutJob.cancel()
     }
 
-    private fun createTimeoutJob(): Job = viewModelScope.launch {
+    private fun createTimeoutJob(): Job = viewModelScope.launch(start = CoroutineStart.LAZY) {
         delay(TIMEOUT)
         _actionState.postValue(ActionState.Timeout)
     }
@@ -301,15 +379,32 @@ class EslDemoViewModel : ViewModel() {
     data class TagViewInfo(
         val tagInfo: TagInfo,
         val slotImages: Array<Uri?>,
-        var connectionData: QrCodeData,
         var isViewExpanded: Boolean = false
-    )
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
 
-    private fun isTagListEmpty() = tagsInfo.isEmpty()
+            other as TagViewInfo
+
+            if (tagInfo != other.tagInfo) return false
+            if (!slotImages.contentEquals(other.slotImages)) return false
+            if (isViewExpanded != other.isViewExpanded) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = tagInfo.hashCode()
+            result = 31 * result + slotImages.contentHashCode()
+            result = 31 * result + isViewExpanded.hashCode()
+            return result
+        }
+    }
 
     sealed class ViewState {
-        data class IdleState(val isTagListEmpty: Boolean, val dialogQuery: DialogQuery?) : ViewState()
-        data class LoadingState(val commandBeingExecuted: EslCommand, val customText: String? = null) : ViewState()
+        data class IdleState(val dialogQuery: DialogQuery?) : ViewState()
+        data class LoadingState(val commandBeingExecuted: EslCommand, val arg: Int? = null) : ViewState()
     }
 
     sealed class ActionState {
@@ -317,24 +412,23 @@ class EslDemoViewModel : ViewModel() {
         data class CommandError(val failedCommand: EslCommand?) : ActionState()
         data class TagConfigured(val configuredTag: TagViewInfo) : ActionState()
         object TagAlreadyExists : ActionState()
-        data class TagPinged(val pingInfo: PingInfo) : ActionState()
-        data class LedStateToggled(
-            val tagIndex: Int,
-            val isLedOn: Boolean,
-            val isGroupLedOn: Boolean
-        ) : ActionState()
         data class GroupLedStateToggled(val isGroupLedOn: Boolean) : ActionState()
+        data class TagPinged(val pingInfo: PingInfo) : ActionState()
+        data class TagRemoved(val eslId: Int) : ActionState()
+        object ImageNotAvailable : ActionState()
         object Timeout : ActionState()
     }
 
     enum class DialogQuery {
-        CONFIGURE_TAG
+        CONFIGURE_TAG,
     }
 
 
     companion object {
         private const val ESL_COMMAND_STATUS_SUCCESS = 0x00
         private const val ESL_COMMAND_STATUS_FAILURE = 0x01
+
+        private const val IMAGE_UPLOAD_NO_IMAGE_ERROR = 0x05
 
         private val TIMEOUT = 10.seconds
     }

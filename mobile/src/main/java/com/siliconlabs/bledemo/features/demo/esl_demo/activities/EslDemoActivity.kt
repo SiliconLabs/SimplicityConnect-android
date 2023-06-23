@@ -3,30 +3,38 @@ package com.siliconlabs.bledemo.features.demo.esl_demo.activities
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
-import android.view.WindowManager
-import androidx.activity.OnBackPressedCallback
+import android.widget.Toast
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
 import com.siliconlabs.bledemo.databinding.ActivityEslDemoBinding
-import com.siliconlabs.bledemo.features.demo.esl_demo.fragments.QrCodeScannerFragment
 import com.siliconlabs.bledemo.features.demo.esl_demo.fragments.TagDataFragment
 import com.siliconlabs.bledemo.features.demo.esl_demo.model.QrCodeData
+import io.github.g00fy2.quickie.QRResult
+import io.github.g00fy2.quickie.ScanCustomCode
+import io.github.g00fy2.quickie.config.BarcodeFormat
+import io.github.g00fy2.quickie.config.ScannerConfig
 
 class EslDemoActivity : BaseDemoActivity() {
 
     private lateinit var binding: ActivityEslDemoBinding
     private lateinit var tagDataFragment: TagDataFragment
 
+    private val scanCustomCode = registerForActivityResult(ScanCustomCode(), ::handleScanResult)
+    private val scannerConfig = ScannerConfig.build {
+        setBarcodeFormats(listOf(BarcodeFormat.FORMAT_QR_CODE))
+        setOverlayStringRes(R.string.scan_qr_code)
+        setShowCloseButton(true)
+        setShowTorchToggle(true)
+        setUseFrontCamera(false)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEslDemoBinding.inflate(layoutInflater).also {
             setContentView(it.root)
         }
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         initDefaultFragment()
     }
 
@@ -42,7 +50,6 @@ class EslDemoActivity : BaseDemoActivity() {
                 true
             }
             R.id.menu_refresh_esl_tags -> {
-                tagDataFragment.clearAdapterData()
                 tagDataFragment.loadTags()
                 true
             }
@@ -50,26 +57,11 @@ class EslDemoActivity : BaseDemoActivity() {
         }
     }
 
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            with(supportFragmentManager) {
-                if (backStackEntryCount > 0 && getBackStackEntryAt(
-                        backStackEntryCount - 1).name == QR_CODE_SCANNER_FRAGMENT) {
-                    popBackStack()
-                    toggleFullscreen(toggleOn = false)
-                }
-                else {
-                    finish()
-                }
-            }
-        }
-    }
-
     fun handleOnDeviceDisconnected() {
         onDeviceDisconnected()
     }
 
-    fun handleScannedQrCode(qrCodeData: QrCodeData) {
+    private fun handleScannedQrCode(qrCodeData: QrCodeData) {
         tagDataFragment.connectTag(qrCodeData)
     }
 
@@ -78,19 +70,6 @@ class EslDemoActivity : BaseDemoActivity() {
             showScannerFragment()
         } else {
             requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST_CODE)
-        }
-    }
-
-    fun toggleFullscreen(toggleOn: Boolean) {
-        supportActionBar?.let {
-            if (toggleOn) it.hide()
-            else it.show()
-        }
-
-        val flag = WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-        with(window) {
-            if (toggleOn) addFlags(flag)
-            else clearFlags(flag)
         }
     }
 
@@ -103,14 +82,32 @@ class EslDemoActivity : BaseDemoActivity() {
     }
 
     private fun showScannerFragment() {
-        toggleFullscreen(toggleOn = true)
-        Handler(Looper.getMainLooper()).postDelayed({
-            supportFragmentManager.beginTransaction().apply {
-                hide(tagDataFragment)
-                add(binding.eslDemoFragmentContainer.id, QrCodeScannerFragment())
-                addToBackStack(QR_CODE_SCANNER_FRAGMENT)
-            }.commit()
-        }, SCANNER_FRAGMENT_LAUNCH_DELAY)
+        scanCustomCode.launch(scannerConfig)
+    }
+
+    private fun handleScanResult(result: QRResult) {
+        when (result) {
+            is QRResult.QRSuccess -> handleScanSuccess(result)
+            is QRResult.QRError -> handleScanError(result)
+            else -> Unit
+        }
+    }
+
+    private fun handleScanSuccess(result: QRResult.QRSuccess) {
+        val qrCodeData = QrCodeData.decode(result.content.rawValue)
+        if (qrCodeData.isValid()) {
+            handleScannedQrCode(qrCodeData)
+        } else {
+            showLongToast(getString(R.string.qr_code_unrecognized))
+        }
+    }
+
+    private fun handleScanError(result: QRResult.QRError) {
+        showLongToast(getString(R.string.qr_scan_error,result.exception.message ?: "unknown"))
+    }
+
+    private fun showLongToast(message: String) {
+        runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_LONG).show() }
     }
 
     override fun onRequestPermissionsResult(
@@ -135,7 +132,5 @@ class EslDemoActivity : BaseDemoActivity() {
 
     companion object {
         private const val CAMERA_PERMISSION_REQUEST_CODE = 201
-        private const val QR_CODE_SCANNER_FRAGMENT = "qr_code_scanner_fragment"
-        private const val SCANNER_FRAGMENT_LAUNCH_DELAY = 200L // to smooth out the transition
     }
 }

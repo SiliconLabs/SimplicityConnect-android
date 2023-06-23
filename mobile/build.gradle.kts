@@ -51,22 +51,23 @@ android {
         create("blueGecko") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 41
-            versionName = "2.7.0"
+            versionCode = 42
+            versionName = "2.7.1"
         }
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -74,16 +75,16 @@ dependencies {
     implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
 
     // androidx
-    implementation("androidx.core:core-ktx:1.10.0")
+    implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.fragment:fragment:1.5.6")
-    implementation("androidx.core:core-splashscreen:1.0.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-    implementation("androidx.activity:activity-ktx:1.6.0")
+    implementation("androidx.fragment:fragment:1.6.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.activity:activity-ktx:1.7.2")
     implementation("com.google.android.material:material:1.9.0")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
 
     // UI components
     implementation("androidx.cardview:cardview:1.0.0")
@@ -92,35 +93,37 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
-    implementation("com.github.yuriy-budiyev:code-scanner:2.3.2")
+    implementation("io.github.g00fy2.quickie:quickie-bundled:1.7.0")
 
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.0.3")
 
     // Navigation
-    implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
-    implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
-    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.5.3")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.6.0")
+    implementation("androidx.navigation:navigation-ui-ktx:2.6.0")
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.6.0")
 
     // Dependency injection
-    implementation("com.google.dagger:hilt-android:2.45")
-    kapt("com.google.dagger:hilt-android-compiler:2.45")
+    implementation("com.google.dagger:hilt-android:2.46.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.46.1")
 
     // View binding
     implementation("com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9")
 
     // Logging
-    implementation("com.jakewharton.timber:timber:4.7.1")
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
     // Parsing
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.opencsv:opencsv:5.6")
+    implementation("com.opencsv:opencsv:5.7.1")
 
     // Only used for Int.pow() method in a couple of places
-    implementation("com.google.guava:guava:29.0-android")
+    implementation("com.google.guava:guava:32.0.1-jre")
 
-    //glide
-    implementation("com.github.bumptech.glide:glide:4.15.1")
+    // Coil
+    implementation("io.coil-kt:coil:2.4.0")
+    implementation("io.coil-kt:coil-gif:2.4.0")
+    implementation("io.coil-kt:coil-svg:2.4.0")
 
     // instrumented tests
     testImplementation("junit:junit:4.13.2")

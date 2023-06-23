@@ -3,8 +3,12 @@ package com.siliconlabs.bledemo.features.demo.esl_demo.adapters
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import coil.dispose
+import coil.load
+import coil.size.Scale
+import coil.transform.RoundedCornersTransformation
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.AdapterEslLoadedImageBinding
 import com.siliconlabs.bledemo.utils.RecyclerViewUtils
@@ -42,8 +46,8 @@ class LoadedImagesAdapter(
 
         fun setupOnClickListener() {
             _binding.root.setOnClickListener { RecyclerViewUtils.withProperAdapterPosition(this) {
-                showBorder()
-                callback.onSlotClicked(adapterPosition)
+                showBorder(it)
+                callback.onSlotClicked(it)
             } }
         }
 
@@ -52,11 +56,14 @@ class LoadedImagesAdapter(
 
             _binding.apply {
                 imageInfo?.let {
-                    Glide
-                        .with(itemView.context)
-                        .load(it)
-                        .centerCrop()
-                        .into(eslImageLoaded)
+                    eslImageLoaded.load(it) {
+                        scale(Scale.FILL)
+                        transformations(RoundedCornersTransformation())
+                    }
+                } ?: run {
+                    eslImageLoaded.dispose()
+                    eslImageLoaded.load(R.color.silabs_click_grey)
+                    eslImageLoaded.setBackgroundColor(ContextCompat.getColor(eslImageLoading.context, R.color.silabs_click_grey))
                 }
 
                 root.strokeWidth =
@@ -66,9 +73,9 @@ class LoadedImagesAdapter(
             }
         }
 
-        private fun showBorder() {
-            val oldChosenSlot = chosenSlot ?: adapterPosition
-            chosenSlot = adapterPosition
+        private fun showBorder(position: Int) {
+            val oldChosenSlot = chosenSlot ?: position
+            chosenSlot = position
 
             notifyItemChanged(oldChosenSlot)
             notifyItemChanged(chosenSlot!!)

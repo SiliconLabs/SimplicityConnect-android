@@ -49,7 +49,9 @@ abstract class EslLoadedImagesDialog(
 
     private fun setupUiListeners() {
         binding.apply {
-            btnCancel.setOnClickListener { dismiss() }
+            btnCancel.setOnClickListener {
+                onNegativeButtonClicked()
+            }
             btnPositiveAction.setOnClickListener {
                 onPositiveButtonClicked()
             }
@@ -78,6 +80,11 @@ abstract class EslLoadedImagesDialog(
         dismiss()
     }
 
+    protected open fun onNegativeButtonClicked() {
+        dismiss()
+        callback.onCancelButtonClicked()
+    }
+
     private val adapterCallback = object : LoadedImagesAdapter.Callback {
         override fun onSlotClicked(index: Int) {
             this@EslLoadedImagesDialog.onSlotClicked(index)
@@ -87,6 +94,7 @@ abstract class EslLoadedImagesDialog(
     interface Callback {
         fun onUploadButtonClicked(slotIndex: Int, uri: Uri, displayAfterUpload: Boolean)
         fun onDisplayButtonClicked(slotIndex: Int)
+        fun onCancelButtonClicked()
     }
 
 }

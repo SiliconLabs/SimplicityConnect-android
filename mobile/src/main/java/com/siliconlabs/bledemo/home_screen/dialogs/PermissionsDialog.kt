@@ -7,6 +7,7 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.databinding.DialogPermissionsBinding
@@ -19,17 +20,17 @@ class PermissionsDialog(
         isCanceledOnTouchOutside = false
 ) {
 
-    private lateinit var _binding: DialogPermissionsBinding
+    private val binding by viewBinding(DialogPermissionsBinding::bind)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
-        _binding = DialogPermissionsBinding.inflate(inflater)
-        return _binding.root
-    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View? = inflater.inflate(R.layout.dialog_permissions, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding.apply {
+        binding.apply {
             rationaleText.text = Html.fromHtml(getString(R.string.permissions_rationale_html,
                 generateRationalesMessage()), Html.FROM_HTML_MODE_LEGACY)
             btnUnderstood.setOnClickListener {

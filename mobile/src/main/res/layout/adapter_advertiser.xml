@@ -25,8 +25,8 @@
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:layout_width="@dimen/card_view_main_icon_dimension"
-                    android:layout_height="@dimen/card_view_main_icon_dimension"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:src="@drawable/redesign_ic_bluetooth_with_background"
                     android:contentDescription="@string/content_desc_gatt_server_icon" />
 
@@ -67,8 +67,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="@dimen/card_view_first_horizontal_separator_margin_top"
-                android:layout_marginBottom="@dimen/space_S"
+                android:layout_marginVertical="@dimen/space_XS"
                 android:background="?android:attr/listDivider" />
 
             <LinearLayout
@@ -83,8 +82,8 @@
                     tools:ignore="UseCompoundDrawables">
 
                     <ImageView
-                        android:layout_width="@dimen/card_view_feature_icon_dimension"
-                        android:layout_height="@dimen/card_view_feature_icon_dimension"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_marginBottom="@dimen/space_XXS"
                         android:contentDescription="@string/advertiser_label_tx_power"
                         android:src="@drawable/redesign_ic_wifi"
@@ -181,8 +180,8 @@
                     tools:ignore="UseCompoundDrawables">
 
                     <ImageView
-                        android:layout_width="@dimen/card_view_feature_icon_dimension"
-                        android:layout_height="@dimen/card_view_feature_icon_dimension"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginBottom="@dimen/space_XXS"
                         android:contentDescription="@string/advertiser_label_interval"
@@ -204,57 +203,58 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="@dimen/space_S"
+                android:layout_marginVertical="@dimen/space_XS"
                 android:background="?android:attr/listDivider" />
 
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/space_S" >
+                android:layout_marginBottom="@dimen/card_view_margin_vertical">
 
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ib_edit"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" >
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/label_edit"
+                    app:icon="@drawable/redesign_ic_card_view_action_icon_edit"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <ImageButton
-                        android:id="@+id/ib_edit"
-                        style="@style/card_view_action_icon"
-                        android:layout_width="@dimen/card_view_action_icon_container_width"
-                        android:layout_height="@dimen/card_view_action_icon_container_height"
-                        android:layout_marginEnd="@dimen/space_S"
-                        android:contentDescription="@string/label_edit"
-                        android:src="@drawable/redesign_ic_card_view_action_icon_edit" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ib_copy"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_XS"
+                    android:contentDescription="@string/label_copy"
+                    app:icon="@drawable/redesign_ic_card_view_action_icon_copy"
+                    app:layout_constraintStart_toEndOf="@id/ib_edit"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <ImageButton
-                        android:id="@+id/ib_copy"
-                        style="@style/card_view_action_icon"
-                        android:layout_width="@dimen/card_view_action_icon_container_width"
-                        android:layout_height="@dimen/card_view_action_icon_container_height"
-                        android:layout_marginEnd="@dimen/space_S"
-                        android:contentDescription="@string/label_copy"
-                        android:src="@drawable/redesign_ic_card_view_action_icon_copy" />
-
-                    <ImageButton
-                        android:id="@+id/ib_remove"
-                        style="@style/card_view_action_icon"
-                        android:layout_width="@dimen/card_view_action_icon_container_width"
-                        android:layout_height="@dimen/card_view_action_icon_container_height"
-                        android:contentDescription="@string/label_remove"
-                        android:src="@drawable/redesign_ic_card_view_action_icon_delete" />
-
-                </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ib_remove"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_XS"
+                    android:contentDescription="@string/label_remove"
+                    app:icon="@drawable/redesign_ic_card_view_action_icon_delete"
+                    app:layout_constraintStart_toEndOf="@id/ib_copy"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.siliconlabs.bledemo.common.views.ExpandArrow
                     android:id="@+id/expand_arrow"
-                    style="@style/expand_arrow"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_arrow_down_on"
                     android:contentDescription="@string/content_desc_dropdown_arrow"
                     android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true" />
+                    android:layout_centerVertical="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            </RelativeLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
 

@@ -982,6 +982,8 @@
     <string name="content_desc_upload_image">Upload a new image</string>
     <string name="content_desc_display_image">Display image on WSTK LCD screen</string>
     <string name="content_desc_tag_info_icon">Tag info icon</string>
+    <string name="content_desc_ping_tag_icon">Ping tag</string>
+    <string name="content_desc_remove_tag_icon">Remove tag</string>
 
     <string name="unknown_state">Unknown state</string>
     <string name="connect_tag_error">Error trying to connect ESL Tag</string>
@@ -989,6 +991,9 @@
     <string name="ping_error">Error trying to ping the ESL Tag</string>
     <string name="disconnect_tag_success">ESL Tag disconnected successfully</string>
     <string name="disconnect_tag_error">Error trying to disconnect ESL Tag</string>
+    <string name="remove_tag_success">ESL Tag removed successfully</string>
+    <string name="remove_tag_error">Error trying to remove ESL Tag</string>
+    <string name="image_update_progress">"Transferring image to the tag: %1$d%% done"</string>
     <string name="image_update_success">Finished sending an image to the ESL Tag</string>
     <string name="image_update_error">Image transfer failed</string>
     <string name="image_display_error">Display image failed</string>
@@ -1003,11 +1008,16 @@
     <string name="ping_dialog_pending_display_update">The ESL has a timed display update pending</string>
     <string name="ping_dialog_reserved_for_future_use">Reserved for future use</string>
 
+    <string name="remove_dialog_title">Remove the ESL tag</string>
+    <string name="remove_dialog_message">Would you like to remove the ESL tag?</string>
+    <string name="remove_dialog_confirm">Remove</string>
+
     <string name="loading_dialog_connect">Connecting the ESL Tag…</string>
     <string name="loading_dialog_configure">Configuring the ESL Tag…</string>
     <string name="loading_dialog_disconnect">Disconnecting the ESL Tag…</string>
     <string name="loading_dialog_load_tags_info">Loading tags info…</string>
     <string name="loading_dialog_ping_tag">Pinging the ESL Tag…</string>
+    <string name="loading_dialog_remove_tag">Removing the ESL Tag…</string>
 
     <string name="dialog_configure_tag_title">ESL Tag connected</string>
     <string name="dialog_configure_tag_message">Do you wish to configure the connected ESL

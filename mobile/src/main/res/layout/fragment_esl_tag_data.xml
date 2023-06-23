@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="4dp"
             android:text="@string/esl_label_control_group" />
 
         <LinearLayout
@@ -33,39 +33,43 @@
             android:layout_marginHorizontal="16dp"
             android:orientation="horizontal">
 
-            <ImageButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/ib_esl_group_led"
-                style="@style/card_view_action_icon"
-                android:layout_width="@dimen/card_view_action_icon_container_width"
-                android:layout_height="@dimen/card_view_action_icon_container_height"
-                android:layout_marginEnd="@dimen/space_S"
-                app:srcCompat="@drawable/ic_esl_light"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/space_XS"
+                app:icon="@drawable/ic_esl_light"
+                app:iconTint="@color/silabs_dark_gray_icon"
                 android:contentDescription="@string/content_desc_toggle_led"/>
 
-            <ImageButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/ib_esl_upload_image"
-                style="@style/card_view_action_icon"
+                style="@style/Widget.Material3.Button.IconButton"
                 android:enabled="false"
                 android:visibility="gone"
-                android:layout_width="@dimen/card_view_action_icon_container_width"
-                android:layout_height="@dimen/card_view_action_icon_container_height"
-                android:layout_marginEnd="@dimen/space_S"
-                app:srcCompat="@drawable/ic_upload_new_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/space_XS"
+                app:icon="@drawable/ic_upload_new_image"
+                app:iconTint="@color/silabs_dark_gray_icon"
                 android:contentDescription="@string/content_desc_upload_image"/>
 
-            <ImageButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/ib_esl_display_image"
-                style="@style/card_view_action_icon"
-                android:layout_width="@dimen/card_view_action_icon_container_width"
-                android:layout_height="@dimen/card_view_action_icon_container_height"
-                app:srcCompat="@drawable/ic_display_image"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_display_image"
+                app:iconTint="@color/silabs_dark_gray_icon"
                 android:contentDescription="@string/content_desc_display_image"/>
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginVertical="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
             android:background="@color/silabs_click_grey"/>
 
         <TextView

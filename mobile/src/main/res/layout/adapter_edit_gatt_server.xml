@@ -59,53 +59,41 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_service_type" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ib_copy"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="8dp"
-            android:gravity="center_vertical"
-            android:id="@+id/ll_service_icons"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/btn_grey_ripple_effect"
+            android:contentDescription="@string/label_copy"
+            app:icon="@drawable/redesign_ic_card_view_action_icon_copy"
+            app:tint="@color/silabs_primary_icon"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/sp_service_name"
-            android:orientation="horizontal">
+            app:layout_constraintTop_toBottomOf="@id/sp_service_name" />
 
-            <ImageButton
-                android:id="@+id/ib_copy"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="@drawable/btn_grey_ripple_effect"
-                android:contentDescription="@string/label_copy"
-                android:tint="@color/silabs_primary_icon"
-                android:src="@drawable/redesign_ic_card_view_action_icon_copy"
-                app:layout_constraintEnd_toStartOf="@id/ib_remove"
-                app:layout_constraintTop_toTopOf="parent" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ib_remove"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_XS"
+            android:background="@drawable/btn_grey_ripple_effect"
+            android:contentDescription="@string/label_remove"
+            app:icon="@drawable/redesign_ic_card_view_action_icon_delete"
+            app:tint="@color/silabs_primary_icon"
+            app:layout_constraintStart_toEndOf="@id/ib_copy"
+            app:layout_constraintTop_toBottomOf="@id/sp_service_name" />
 
-            <ImageButton
-                android:id="@+id/ib_remove"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="@drawable/btn_grey_ripple_effect"
-                android:contentDescription="@string/label_remove"
-                android:tint="@color/silabs_primary_icon"
-                android:src="@drawable/redesign_ic_card_view_action_icon_delete"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"/>
-
-
-
-            <com.siliconlabs.bledemo.common.views.ExpandArrow
-                android:id="@+id/expand_arrow"
-                style="@style/expand_arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_arrow_down_on"
-                android:contentDescription="@string/content_desc_dropdown_arrow" />
-        </LinearLayout>
+        <com.siliconlabs.bledemo.common.views.ExpandArrow
+            android:id="@+id/expand_arrow"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@string/content_desc_dropdown_arrow"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sp_service_name" />
 
         <include
             android:id="@+id/sp_service_icons_collapsed"
@@ -114,17 +102,18 @@
             android:layout_height="1dp"
             android:layout_marginHorizontal="16dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ll_service_icons" />
+            app:layout_constraintTop_toBottomOf="@id/expand_arrow" />
 
 
         <LinearLayout
             android:id="@+id/ll_characteristics_outer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
             android:clickable="true"
             android:focusable="true"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ll_service_icons"
+            app:layout_constraintTop_toBottomOf="@id/expand_arrow"
             android:orientation="vertical"
             tools:visibility="visible"
             android:visibility="gone">
@@ -140,8 +129,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-<!--                <include tools:layout="@layout/view_gatt_characteristic"/>-->
-<!--                <include tools:layout="@layout/view_gatt_characteristic"/>-->
             </LinearLayout>
         </LinearLayout>
 

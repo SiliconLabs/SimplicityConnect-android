@@ -3,13 +3,13 @@ package com.siliconlabs.bledemo.features.configure.gatt_configurator.viewholders
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
-import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.GattServer
-import com.siliconlabs.bledemo.features.configure.gatt_configurator.adapters.GattServerAdapter.OnClickListener
+import com.google.android.material.button.MaterialButton
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.common.views.DetailsRow
 import com.siliconlabs.bledemo.databinding.AdapterGattServerBinding
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.adapters.GattServerAdapter.OnClickListener
+import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.GattServer
 
 class GattServerViewHolder(
         private val viewBinding: AdapterGattServerBinding,
@@ -118,10 +118,10 @@ class GattServerViewHolder(
         viewBinding.expandArrow.setState(shouldShowDetails = isExpanded)
     }
 
-    private fun toggleImageButton(ib: ImageButton, isEnabled: Boolean) {
+    private fun toggleImageButton(ib: MaterialButton, isEnabled: Boolean) {
         ib.let {
             it.isEnabled = isEnabled
-            it.imageAlpha = if (isEnabled) 0xFF else 0x3F
+            it.icon.alpha = if (isEnabled) 0xFF else 0x3F
         }
     }
 

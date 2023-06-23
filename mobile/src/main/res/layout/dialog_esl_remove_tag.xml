@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/dialog_card"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/space_S" >
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/esl_remove_dialog_title"
+            style="@style/dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dialog_loading_margin"
+            android:layout_marginTop="@dimen/dialog_loading_margin"
+            android:text="@string/remove_dialog_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/esl_remove_dialog_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dialog_loading_margin"
+            android:layout_marginEnd="@dimen/dialog_loading_margin"
+            android:layout_marginTop="@dimen/space_XXS"
+            android:text="@string/remove_dialog_message"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/esl_remove_dialog_title" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/esl_remove_confirm"
+            style="@style/dialog_button_positive_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_S"
+            android:layout_marginEnd="@dimen/space_XS"
+            android:text="@string/remove_dialog_confirm"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/esl_remove_dialog_message" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/esl_remove_cancel"
+            style="@style/dialog_button_negative_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/space_S"
+            android:layout_marginTop="@dimen/space_S"
+            android:text="@string/button_cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/esl_remove_confirm"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/esl_remove_dialog_message" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -36,6 +36,7 @@ class EslLoadingDialog(private val command: EslCommand, private val customText: 
         EslCommand.DISCONNECT -> R.string.loading_dialog_disconnect
         EslCommand.LOAD_INFO -> R.string.loading_dialog_load_tags_info
         EslCommand.PING -> R.string.loading_dialog_ping_tag
+        EslCommand.REMOVE -> R.string.loading_dialog_remove_tag
         else -> R.string.unknown_state
     }.let { getString(it) }
 

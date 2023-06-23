@@ -20,6 +20,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.home_screen.adapters.ScannedDevicesAdapter
 import com.siliconlabs.bledemo.base.activities.BaseActivity
@@ -47,15 +48,13 @@ import timber.log.Timber
 
 @SuppressLint("MissingPermission")
 class SelectDeviceDialog(
-        private var bluetoothService: BluetoothService?
+    private var bluetoothService: BluetoothService?
 ) : BaseDialogFragment(
-        hasCustomWidth = true,
-        isCanceledOnTouchOutside = true
-),
-    ScannedDevicesAdapter.DemoDeviceCallback,
-    BluetoothService.ScanListener {
+    hasCustomWidth = true,
+    isCanceledOnTouchOutside = true,
+), ScannedDevicesAdapter.DemoDeviceCallback, BluetoothService.ScanListener {
 
-    private lateinit var viewBinding: DialogSelectDeviceBinding
+    private val binding by viewBinding(DialogSelectDeviceBinding::bind)
     private lateinit var viewModel: SelectDeviceViewModel
 
     private lateinit var adapter: ScannedDevicesAdapter
@@ -86,6 +85,7 @@ class SelectDeviceDialog(
                 BluetoothGatt.STATE_CONNECTED -> {
                     if (status == BluetoothGatt.GATT_SUCCESS) handleSuccessfulConnection(gatt)
                 }
+
                 BluetoothGatt.STATE_DISCONNECTED -> {
                     when (status) {
                         133 -> showReconnectionMessage()
@@ -100,9 +100,11 @@ class SelectDeviceDialog(
             gatt?.readCharacteristic(getModelNumberCharacteristic(gatt))
         }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt?,
-                                          characteristic: BluetoothGattCharacteristic?,
-                                          status: Int) {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
             super.onCharacteristicRead(gatt, characteristic, status)
             if (characteristic?.uuid == GattCharacteristic.ModelNumberString.uuid) {
                 when (connectType) {
@@ -116,27 +118,37 @@ class SelectDeviceDialog(
                                 cachedBoardType = characteristic.getStringValue(0)
                                 gatt?.readCharacteristic(getPowerSourceCharacteristic(gatt))
                             }
+
                             ThunderBoardDevice.THUNDERBOARD_MODEL_BLUE_V1,
                             ThunderBoardDevice.THUNDERBOARD_MODEL_BLUE_V2 -> {
                                 launchDemo(characteristic.getStringValue(0))
                             }
-                            else -> { Timber.d("Unknown model")}
+
+                            else -> {
+                                Timber.d("Unknown model")
+                            }
                         }
                     }
+
                     else -> Unit
                 }
             } else if (characteristic?.uuid == GattCharacteristic.PowerSource.uuid) {
-                launchDemo(cachedBoardType, characteristic.getIntValue(GattCharacteristic.PowerSource.format, 0))
+                launchDemo(
+                    cachedBoardType,
+                    characteristic.getIntValue(GattCharacteristic.PowerSource.format, 0)
+                )
             }
         }
     }
 
     private fun getModelNumberCharacteristic(gatt: BluetoothGatt?): BluetoothGattCharacteristic? {
-        return gatt?.getService(GattService.DeviceInformation.number)?.getCharacteristic(GattCharacteristic.ModelNumberString.uuid)
+        return gatt?.getService(GattService.DeviceInformation.number)
+            ?.getCharacteristic(GattCharacteristic.ModelNumberString.uuid)
     }
 
     private fun getPowerSourceCharacteristic(gatt: BluetoothGatt?): BluetoothGattCharacteristic? {
-        return gatt?.getService(GattService.PowerSource.number)?.getCharacteristic(GattCharacteristic.PowerSource.uuid)
+        return gatt?.getService(GattService.PowerSource.number)
+            ?.getCharacteristic(GattCharacteristic.PowerSource.uuid)
     }
 
     private fun handleSuccessfulConnection(gatt: BluetoothGatt) {
@@ -146,6 +158,7 @@ class SelectDeviceDialog(
                 if (gatt.device.name == getString(R.string.blinky_service_name)) launchDemo()
                 else setReadingDialogMsgAndDiscoverServices(gatt)
             }
+
             else -> launchDemo()
         }
         bluetoothService?.isNotificationEnabled = true
@@ -188,8 +201,9 @@ class SelectDeviceDialog(
         super.onAttach(context)
 
         viewModel = ViewModelProvider(this)[SelectDeviceViewModel::class.java]
-        adapter = ScannedDevicesAdapter(mutableListOf(),
-                this
+        adapter = ScannedDevicesAdapter(
+            mutableListOf(),
+            this
         ).also { it.setHasStableIds(true) }
 
         if (bluetoothService == null) {
@@ -203,6 +217,7 @@ class SelectDeviceDialog(
                 dismiss()
                 rangeTestCallback?.getBluetoothDeviceInfo(deviceInfo)
             }
+
             GattConnectType.IOP_TEST -> {
                 dismiss()
                 IOPTest.createDataTest(deviceInfo.name)
@@ -210,6 +225,7 @@ class SelectDeviceDialog(
                     activity?.startActivity(it)
                 }
             }
+
             else -> connect(deviceInfo)
         }
     }
@@ -234,7 +250,7 @@ class SelectDeviceDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewBinding.buttonCancel.setOnClickListener {
+        binding.buttonCancel.setOnClickListener {
             dialog?.dismiss()
             rangeTestCallback?.onCancel()
         }
@@ -249,7 +265,7 @@ class SelectDeviceDialog(
     }
 
     private fun initializeRecyclerView() {
-        viewBinding.list.apply {
+        binding.list.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = this@SelectDeviceDialog.adapter
         }
@@ -265,7 +281,7 @@ class SelectDeviceDialog(
                 toggleListView(it)
             }
             numberOfDevices.observe(viewLifecycleOwner) {
-                viewBinding.devicesNumber.text = getString(R.string.DEVICE_LIST, it)
+                binding.devicesNumber.text = getString(R.string.DEVICE_LIST, it)
             }
             deviceToInsert.observe(viewLifecycleOwner) {
                 adapter.addNewDevice(it)
@@ -274,26 +290,48 @@ class SelectDeviceDialog(
     }
 
     private fun initDemoDescription() {
-        viewBinding.dialogTextInfo.apply {
+        binding.dialogTextInfo.apply {
             text = when (connectType) {
-                GattConnectType.THERMOMETER -> getString(R.string.soc_must_be_connected,
-                        getString(R.string.demo_firmware_name_health_thermometer))
-                GattConnectType.LIGHT -> getString(R.string.soc_must_be_connected,
-                        getString(R.string.demo_firmware_name_connected_lighting))
-                GattConnectType.RANGE_TEST -> getString(R.string.soc_must_be_connected,
-                        getString(R.string.demo_firmware_name_range_test))
+                GattConnectType.THERMOMETER -> getString(
+                    R.string.soc_must_be_connected,
+                    getString(R.string.demo_firmware_name_health_thermometer)
+                )
+
+                GattConnectType.LIGHT -> getString(
+                    R.string.soc_must_be_connected,
+                    getString(R.string.demo_firmware_name_connected_lighting)
+                )
+
+                GattConnectType.RANGE_TEST -> getString(
+                    R.string.soc_must_be_connected,
+                    getString(R.string.demo_firmware_name_range_test)
+                )
+
                 GattConnectType.BLINKY -> getString(R.string.soc_blinky_must_be_connected)
-                GattConnectType.THROUGHPUT_TEST -> getString(R.string.soc_must_be_connected,
-                        getString(R.string.demo_firmware_name_throughput))
+                GattConnectType.THROUGHPUT_TEST -> getString(
+                    R.string.soc_must_be_connected,
+                    getString(R.string.demo_firmware_name_throughput)
+                )
+
                 GattConnectType.MOTION -> getString(R.string.soc_thunderboard_must_be_connected)
                 GattConnectType.ENVIRONMENT -> getString(R.string.soc_thunderboard_must_be_connected)
-                GattConnectType.IOP_TEST -> getString(R.string.soc_must_be_connected,
-                        getString(R.string.demo_firmware_name_iop))
+                GattConnectType.IOP_TEST -> getString(
+                    R.string.soc_must_be_connected,
+                    getString(R.string.demo_firmware_name_iop)
+                )
+
                 GattConnectType.WIFI_COMMISSIONING -> {
-                    Html.fromHtml(getString(R.string.soc_wifi_commissioning_must_be_connected), Html.FROM_HTML_MODE_LEGACY)
+                    Html.fromHtml(
+                        getString(R.string.soc_wifi_commissioning_must_be_connected),
+                        Html.FROM_HTML_MODE_LEGACY
+                    )
                 }
-                GattConnectType.ESL_DEMO -> getString(R.string.soc_must_be_connected,
-                        getString(R.string.demo_firmware_name_esl))
+
+                GattConnectType.ESL_DEMO -> getString(
+                    R.string.soc_must_be_connected,
+                    getString(R.string.demo_firmware_name_esl)
+                )
+
                 else -> getString(R.string.empty_description)
             }
 
@@ -328,7 +366,7 @@ class SelectDeviceDialog(
     }
 
     private fun toggleListView(isAnyDeviceDiscovered: Boolean) {
-        viewBinding.apply {
+        binding.apply {
             if (isAnyDeviceDiscovered) {
                 list.visibility = View.VISIBLE
                 noDevicesFound.visibility = View.GONE
@@ -355,10 +393,11 @@ class SelectDeviceDialog(
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        viewBinding = DialogSelectDeviceBinding.inflate(inflater)
-        return viewBinding.root
-    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View? = inflater.inflate(R.layout.dialog_select_device, container, false)
 
     override fun onResume() {
         super.onResume()
@@ -377,38 +416,47 @@ class SelectDeviceDialog(
             GattConnectType.THERMOMETER -> {
                 add(buildFilter(GattService.HealthThermometer))
             }
+
             GattConnectType.LIGHT -> {
                 add(buildFilter(GattService.ProprietaryLightService))
                 add(buildFilter(GattService.ZigbeeLightService))
                 add(buildFilter(GattService.ConnectLightService))
                 add(buildFilter(GattService.ThreadLightService))
             }
+
             GattConnectType.RANGE_TEST -> {
                 add(buildFilter(GattService.RangeTestService))
             }
+
             GattConnectType.BLINKY -> {
                 add(buildFilter(BuildFilterName.BLINKY))
                 add(buildFilter(manufacturerDataFilter))
             }
+
             GattConnectType.THROUGHPUT_TEST -> {
                 add(buildFilter(BuildFilterName.THROUGHPUT_TEST))
             }
+
             GattConnectType.WIFI_COMMISSIONING -> {
                 add(buildFilter(BuildFilterName.BLE_CONFIGURATOR))
             }
+
             GattConnectType.IOP_TEST -> {
                 add(buildFilter(BuildFilterName.IOP_TEST))
                 add(buildFilter(BuildFilterName.IOP_TEST_UPDATE))
                 add(buildFilter(BuildFilterName.IOP_TEST_NO_1))
                 add(buildFilter(BuildFilterName.IOP_TEST_NO_2))
             }
+
             GattConnectType.MOTION,
             GattConnectType.ENVIRONMENT -> {
                 add(buildFilter(manufacturerDataFilter))
             }
+
             GattConnectType.ESL_DEMO -> {
                 add(buildFilter(GattService.EslDemoService))
             }
+
             else -> Unit
         }
     }
@@ -499,7 +547,10 @@ class SelectDeviceDialog(
         const val DEVICE_ADDRESS_EXTRA = "device_address"
         private const val SCAN_UPDATE_PERIOD = 2000L //ms
 
-        fun newDialog(connectType: GattConnectType?, service: BluetoothService? = null) : SelectDeviceDialog {
+        fun newDialog(
+            connectType: GattConnectType?,
+            service: BluetoothService? = null
+        ): SelectDeviceDialog {
             return SelectDeviceDialog(service).apply {
                 arguments = Bundle().apply {
                     connectType?.let { putInt(CONN_TYPE_INFO, connectType.ordinal) }

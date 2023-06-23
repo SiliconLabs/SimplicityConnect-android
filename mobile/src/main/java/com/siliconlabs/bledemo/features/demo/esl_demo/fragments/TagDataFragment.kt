@@ -8,11 +8,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.webkit.MimeTypeMap
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseActivity
@@ -27,6 +29,7 @@ import com.siliconlabs.bledemo.features.demo.esl_demo.dialogs.EslLoadedImagesDia
 import com.siliconlabs.bledemo.features.demo.esl_demo.dialogs.EslLoadingDialog
 import com.siliconlabs.bledemo.features.demo.esl_demo.dialogs.EslPingInfoDialog
 import com.siliconlabs.bledemo.features.demo.esl_demo.dialogs.EslPromptDialog
+import com.siliconlabs.bledemo.features.demo.esl_demo.dialogs.EslRemoveTagDialog
 import com.siliconlabs.bledemo.features.demo.esl_demo.dialogs.EslUploadImageDialog
 import com.siliconlabs.bledemo.features.demo.esl_demo.model.EslCommand
 import com.siliconlabs.bledemo.features.demo.esl_demo.model.EslCommandManager
@@ -35,6 +38,7 @@ import com.siliconlabs.bledemo.features.demo.esl_demo.model.PingInfo
 import com.siliconlabs.bledemo.features.demo.esl_demo.model.QrCodeData
 import com.siliconlabs.bledemo.features.demo.esl_demo.viewmodels.EslDemoViewModel
 import com.siliconlabs.bledemo.utils.Constants
+import com.siliconlabs.bledemo.utils.showOnce
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -53,8 +57,8 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
 
         initNoTagsContainer()
         setupUiListeners()
-        setupDataObservers()
         setupRecyclerView()
+        setupDataObservers()
     }
 
     private fun setupUiListeners() {
@@ -63,12 +67,16 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
                 viewModel.toggleAllLeds()
             }
             ibEslUploadImage.setOnClickListener {
-                EslUploadImageDialog(arrayOfNulls(GROUP_DISPLAY_SLOTS_COUNT), loadedImagesDialogCallback)
-                    .show(childFragmentManager, "loaded_images_dialog")
+                showImageUploadDialog(
+                    arrayOfNulls(GROUP_DISPLAY_SLOTS_COUNT),
+                    loadedImagesDialogGroupCallback,
+                )
             }
             ibEslDisplayImage.setOnClickListener {
-                EslDisplayImageDialog(arrayOfNulls(GROUP_DISPLAY_SLOTS_COUNT), loadedImagesDialogCallback)
-                    .show(childFragmentManager, "loaded_images_dialog")
+                showImageDisplayDialog(
+                    arrayOfNulls(GROUP_DISPLAY_SLOTS_COUNT),
+                    loadedImagesDialogGroupCallback,
+                )
             }
         }
     }
@@ -80,6 +88,9 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
             adapter = tagInfoAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             addItemDecoration(CardViewListDecoration())
+
+            val itemAnimator = itemAnimator as SimpleItemAnimator
+            itemAnimator.supportsChangeAnimations = false
         }
     }
 
@@ -89,44 +100,54 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
                 is EslDemoViewModel.ViewState.IdleState -> {
                     dismissLoadingDialog()
                     state.dialogQuery?.let {
-                        EslPromptDialog(it, eslPromptDialogCallback).show(childFragmentManager, "esl_prompt_dialog")
+                        EslPromptDialog(it, eslPromptDialogCallback).showOnce(childFragmentManager, ESL_DIALOG_TAG)
                     }
                 }
                 is EslDemoViewModel.ViewState.LoadingState -> {
-                    showLoadingDialog(state.commandBeingExecuted, state.customText)
+                    showLoadingDialog(state.commandBeingExecuted, state.arg)
                 }
             }
         }
+
         viewModel.actionState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is EslDemoViewModel.ActionState.CommandSuccess -> {
-                    (activity as? BaseActivity)?.showMessage(getSuccessMessage(state.commandExecuted))
+                    (requireActivity() as BaseActivity).showMessage(getSuccessMessage(state.commandExecuted))
                 }
                 is EslDemoViewModel.ActionState.CommandError -> {
-                    (activity as? BaseActivity)?.showMessage(getErrorMessage(state.failedCommand))
+                    (requireActivity() as BaseActivity).showMessage(getErrorMessage(state.failedCommand))
                 }
                 is EslDemoViewModel.ActionState.TagAlreadyExists -> {
                     (requireActivity() as BaseActivity).showMessage(getString(R.string.tag_already_provisioned_message))
                 }
                 is EslDemoViewModel.ActionState.TagConfigured -> {
-                    tagInfoAdapter.showNewTag(state.configuredTag)
                     toggleMainContainer(isAnyTagConfigured = true)
-                }
-                is EslDemoViewModel.ActionState.TagPinged -> {
-                    showPingInfoDialog(state.pingInfo)
-                }
-                is EslDemoViewModel.ActionState.LedStateToggled -> {
-                    tagInfoAdapter.toggleLedImage(state.tagIndex, state.isLedOn)
-                    toggleGroupLedImage(state.isGroupLedOn)
+
+                    viewModel.getTagIndex(state.configuredTag)?.let {
+                        showImageUploadDialog(
+                            viewModel.getImageArray(it),
+                            uploadImageAfterTagConfigureCallback(it)
+                        )
+                    }
                 }
                 is EslDemoViewModel.ActionState.GroupLedStateToggled -> {
-                    tagInfoAdapter.toggleAllLedImages(state.isGroupLedOn)
                     toggleGroupLedImage(state.isGroupLedOn)
+                }
+                is EslDemoViewModel.ActionState.TagPinged -> showPingDialog(state.pingInfo)
+                is EslDemoViewModel.ActionState.TagRemoved -> handleTagRemove()
+                is EslDemoViewModel.ActionState.ImageNotAvailable -> {
+                    (requireActivity() as BaseActivity).showMessage(getString(R.string.no_image_to_display))
                 }
                 is EslDemoViewModel.ActionState.Timeout -> handleTimeout()
                 else -> Unit
             }
+        }
 
+        lifecycleScope.launch {
+            viewModel.tagsInfo.collect {
+                toggleMainContainer(it.isNotEmpty())
+                tagInfoAdapter.submitList(it)
+            }
         }
     }
 
@@ -140,11 +161,6 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
     }
 
     fun loadTags() = viewModel.loadTagsInfo()
-
-    fun clearAdapterData() {
-        tagInfoAdapter.clear()
-        viewModel.clearTagsInfo()
-    }
 
     private fun initNoTagsContainer() {
         binding.containerNoTagsConfigured.apply {
@@ -163,28 +179,36 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
 
     private fun toggleGroupLedImage(isGroupLedOn: Boolean) {
         context?.let {
-            binding.ibEslGroupLed.imageTintList = ColorStateList.valueOf(it.getColor(
+            binding.ibEslGroupLed.iconTint = ColorStateList.valueOf(it.getColor(
                 if (isGroupLedOn) R.color.esl_led_on
                 else R.color.esl_led_off
             ))
         }
     }
 
-    private fun showLoadingDialog(command: EslCommand, customText: String? = null) {
+    private fun showLoadingDialog(command: EslCommand, customTextData: Int? = null) {
+        val customText = customTextData?.let { getCustomText(command, it) }
+
         eslLoadingDialog?.setText(command, customText) ?: run {
             eslLoadingDialog = EslLoadingDialog(command, customText).also {
-                it.show(childFragmentManager, EslLoadingDialog.FRAGMENT_NAME)
+                it.showOnce(childFragmentManager, EslLoadingDialog.FRAGMENT_NAME)
             }
         }
     }
+
+    private fun getCustomText(command: EslCommand, arg: Int): String? = when(command) {
+        EslCommand.UPDATE_IMAGE -> R.string.image_update_progress
+        else -> null
+    }?.let { getString(it, arg) }
 
     private fun dismissLoadingDialog() {
         eslLoadingDialog?.dismiss()
         eslLoadingDialog = null
     }
 
-    private fun showPingInfoDialog(pingInfo: PingInfo) =
-        EslPingInfoDialog(pingInfo).show(childFragmentManager, "ping_info_dialog")
+    private fun handleTagRemove() {
+        (requireActivity() as BaseActivity).showMessage(getSuccessMessage(EslCommand.REMOVE))
+    }
 
     private fun handleTimeout() {
         dismissLoadingDialog()
@@ -206,6 +230,7 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
             EslCommand.DISCONNECT -> R.string.disconnect_tag_success
             EslCommand.UPDATE_IMAGE -> R.string.image_update_success
             EslCommand.DISPLAY_IMAGE -> R.string.image_display_success
+            EslCommand.REMOVE -> R.string.remove_tag_success
             else -> R.string.unknown_state
         })
     }
@@ -216,13 +241,14 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
             EslCommand.CONFIGURE -> R.string.configure_tag_error
             EslCommand.PING -> R.string.ping_error
             EslCommand.DISCONNECT -> R.string.disconnect_tag_error
+            EslCommand.REMOVE -> R.string.remove_tag_error
             EslCommand.UPDATE_IMAGE -> R.string.image_update_error
             EslCommand.DISPLAY_IMAGE -> R.string.image_display_error
             else -> R.string.unknown_state
         })
     }
 
-    private val loadedImagesDialogCallback = object : EslLoadedImagesDialog.Callback {
+    private val loadedImagesDialogGroupCallback = object : EslLoadedImagesDialog.Callback {
         override fun onUploadButtonClicked(slotIndex: Int, uri: Uri, displayAfterUpload: Boolean) {
             Timber.d("HERE; upload clicked")
             //TODO: handle if group upload becomes possible
@@ -231,17 +257,33 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
         override fun onDisplayButtonClicked(slotIndex: Int) {
             viewModel.displayAllTagsImage(slotIndex)
         }
+
+        override fun onCancelButtonClicked() = Unit
     }
 
-    private fun getTagLoadedImagesDialogCallback(tagIndex: Int): EslLoadedImagesDialog.Callback {
-        return object : EslLoadedImagesDialog.Callback {
-            override fun onUploadButtonClicked(slotIndex: Int, uri: Uri, displayAfterUpload: Boolean) {
-                startFileUpload(uri, slotIndex, tagIndex, displayAfterUpload)
-            }
+    private fun getTagLoadedImagesDialogCallback(tagIndex: Int) = object : EslLoadedImagesDialog.Callback {
+        override fun onUploadButtonClicked(slotIndex: Int, uri: Uri, displayAfterUpload: Boolean) {
+            startFileUpload(uri, slotIndex, tagIndex, displayAfterUpload)
+        }
 
-            override fun onDisplayButtonClicked(slotIndex: Int) {
-                viewModel.displayTagLedImage(tagIndex, slotIndex)
-            }
+        override fun onDisplayButtonClicked(slotIndex: Int) {
+            viewModel.displayTagLedImage(tagIndex, slotIndex)
+        }
+
+        override fun onCancelButtonClicked() = Unit
+    }
+
+    private fun uploadImageAfterTagConfigureCallback(tagIndex: Int) = object : EslLoadedImagesDialog.Callback {
+        override fun onUploadButtonClicked(slotIndex: Int, uri: Uri, displayAfterUpload: Boolean) {
+            startFileUploadAfterConfigure(uri, slotIndex, tagIndex, displayAfterUpload)
+        }
+
+        override fun onDisplayButtonClicked(slotIndex: Int) {
+            viewModel.displayTagLedImage(tagIndex, slotIndex)
+        }
+
+        override fun onCancelButtonClicked() {
+            viewModel.disconnectTag()
         }
     }
 
@@ -249,11 +291,7 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
         val imageFileData = readImage(uri)
 
         imageFileData?.let {
-            val mimetype = requireContext().contentResolver.getType(uri)
-            val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimetype)
-            val filename = if(extension != null) "image.$extension" else "image"
-
-            val imageUploadData = ImageUploadData(uri, filename, it, slotIndex, tagIndex, displayAfterUpload, chunkSize)
+            val imageUploadData = prepareImageUploadData(uri, it, slotIndex, tagIndex, displayAfterUpload)
             viewModel.imageUploadData.value = imageUploadData
 
             lifecycleScope.launch {
@@ -262,6 +300,42 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
             }
         }
     }
+
+    private fun startFileUploadAfterConfigure(uri: Uri, slotIndex: Int, tagIndex: Int, displayAfterUpload: Boolean) {
+        val imageFileData = readImage(uri)
+
+        imageFileData?.let {
+            val imageUploadData = prepareImageUploadData(uri, it, slotIndex, tagIndex, displayAfterUpload)
+            viewModel.imageUploadData.value = imageUploadData
+
+            lifecycleScope.launch {
+                viewModel.updateTagLedImage(imageUploadData.slotIndex, imageUploadData.filename)
+            }
+        }
+    }
+
+    private fun prepareImageUploadData(
+        uri: Uri,
+        imageFileData: ByteArray,
+        slotIndex: Int,
+        tagIndex: Int,
+        displayAfterUpload: Boolean,
+    ): ImageUploadData {
+        val mimetype = requireContext().contentResolver.getType(uri)
+        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimetype)
+        val filename = if (extension != null) "image.$extension" else "image"
+
+        return ImageUploadData(
+            uri,
+            filename,
+            imageFileData,
+            slotIndex,
+            tagIndex,
+            displayAfterUpload,
+            chunkSize,
+        )
+    }
+
     private fun readImage(uri: Uri) : ByteArray? {
         return try {
             val imageInputStream = this.requireContext().contentResolver.openInputStream(uri)
@@ -276,6 +350,48 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
             Timber.d(e, "Couldn't open image")
             null
         }
+    }
+
+    private fun showImageDisplayDialog(
+        imageArray: Array<Uri?>,
+        callback: EslLoadedImagesDialog.Callback,
+    ) {
+        val dialog = EslDisplayImageDialog(
+            imageArray,
+            callback,
+        )
+
+        showDialogFragment(dialog)
+    }
+
+    private fun showImageUploadDialog(
+        imageArray: Array<Uri?>,
+        callback: EslLoadedImagesDialog.Callback,
+    ) {
+        val dialog = EslUploadImageDialog(
+            imageArray,
+            callback,
+        )
+
+        showDialogFragment(dialog)
+    }
+
+    private fun showPingDialog(
+        pingInfo: PingInfo,
+    ) {
+        val dialog = EslPingInfoDialog(pingInfo)
+        showDialogFragment(dialog)
+    }
+
+    private fun showRemoveDialog(index: Int) {
+        val dialog = EslRemoveTagDialog {
+            viewModel.removeTag(index)
+        }
+        showDialogFragment(dialog)
+    }
+
+    private fun showDialogFragment(dialog: DialogFragment, tag: String = ESL_DIALOG_TAG) {
+        dialog.showOnce(childFragmentManager, tag)
     }
 
     private val eslPromptDialogCallback = object : EslPromptDialog.EslDialogCallback {
@@ -302,21 +418,25 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
         }
 
         override fun onUploadImageClicked(index: Int) {
-            EslUploadImageDialog(
+            showImageUploadDialog(
                 viewModel.getImageArray(index),
-                getTagLoadedImagesDialogCallback(index)
-            ).show(childFragmentManager, "loaded_images_dialog")
+                getTagLoadedImagesDialogCallback(index),
+            )
         }
 
         override fun onDisplayImageClicked(index: Int) {
-            EslDisplayImageDialog(
+            showImageDisplayDialog(
                 viewModel.getImageArray(index),
-                getTagLoadedImagesDialogCallback(index)
-            ).show(childFragmentManager, "loaded_images_dialog")
+                getTagLoadedImagesDialogCallback(index),
+            )
         }
 
         override fun onPingButtonClicked(index: Int) {
             viewModel.pingTag(index)
+        }
+
+        override fun onRemoveButtonClicked(index: Int) {
+            showRemoveDialog(index)
         }
     }
 
@@ -385,5 +505,6 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
     }
     companion object {
         private const val GROUP_DISPLAY_SLOTS_COUNT = 2
+        private const val ESL_DIALOG_TAG = "esl_dialog_tag"
     }
 }

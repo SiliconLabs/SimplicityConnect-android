@@ -45,7 +45,7 @@ enum class EslCommand(val code: Int, val message: String) {
     /**
      * Delete ESL Tag from the list of tags maintained by ESL Access Point
      */
-    DELETE(9, "unassociate");
+    REMOVE(9, "unassociate");
 
 
     companion object {

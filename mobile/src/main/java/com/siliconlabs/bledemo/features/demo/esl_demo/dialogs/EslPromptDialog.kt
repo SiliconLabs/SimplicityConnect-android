@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.databinding.DialogEslPromptBinding
@@ -16,16 +17,13 @@ class EslPromptDialog(
     hasCustomWidth = true,
     isCanceledOnTouchOutside = false
 ) {
-    private lateinit var _binding: DialogEslPromptBinding
+    private val binding by viewBinding(DialogEslPromptBinding::bind)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        _binding = DialogEslPromptBinding.inflate(inflater)
-        return _binding.root
-    }
+    ): View? = inflater.inflate(R.layout.dialog_esl_prompt, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -34,7 +32,7 @@ class EslPromptDialog(
     }
 
     private fun initDialogTexts() {
-        _binding.apply {
+        binding.apply {
             eslPromptTitle.text = getDialogTitle()
             eslPromptMessage.text = getDialogMessage()
             btnCancel.text = getNegativeButtonText()
@@ -43,7 +41,7 @@ class EslPromptDialog(
     }
 
     private fun setupUiListeners() {
-        _binding.apply {
+        binding.apply {
             btnCancel.setOnClickListener {
                 callback.handleNegativeDialogAction(dialogQuery)
                 dismiss()

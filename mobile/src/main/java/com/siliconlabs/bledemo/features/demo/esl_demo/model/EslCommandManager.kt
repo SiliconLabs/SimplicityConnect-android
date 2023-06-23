@@ -24,18 +24,12 @@ class EslCommandManager(
         gattQueue.handleCommandProcessed()
     }
 
-    fun connectTag(qrCodeData: QrCodeData) {
-        val message = buildString {
-            append(qrCodeData.command).append(SPACE_SEPARATOR)
-            append(qrCodeData.address)
+    fun connectTagByQr(qrCodeData: QrCodeData) {
+        sendWriteCommand(qrCodeData.fullCommand)
+    }
 
-            qrCodeData.addressType?.let {
-                append(SPACE_SEPARATOR).append(it)
-            }
-            qrCodeData.passcode?.let {
-                append(SPACE_SEPARATOR).append(it)
-            }
-        }
+    fun connectTagById(eslId: Int) {
+        val message = listOf(EslCommand.CONNECT.message, eslId).joinToString(SPACE_SEPARATOR)
         sendWriteCommand(message)
     }
 
@@ -67,11 +61,11 @@ class EslCommandManager(
         sendWriteCommand(message)
     }
 
-    fun deleteTag(address: String) {
-        val message = buildString {
-            append(EslCommand.DELETE.message).append(SPACE_SEPARATOR)
-            append(address)
-        }
+    fun removeTag(eslId: Int) {
+        val message = listOf(
+            EslCommand.REMOVE.message,
+            eslId,
+        ).joinToString(SPACE_SEPARATOR)
         sendWriteCommand(message)
     }
 

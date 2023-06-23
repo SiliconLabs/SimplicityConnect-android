@@ -4,6 +4,8 @@ import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.common.views.DetailsRow
@@ -12,10 +14,9 @@ import com.siliconlabs.bledemo.features.demo.esl_demo.model.TagInfo
 import com.siliconlabs.bledemo.features.demo.esl_demo.viewmodels.EslDemoViewModel
 import com.siliconlabs.bledemo.utils.RecyclerViewUtils
 
-class TagInfoAdapter(val listener: Listener) : RecyclerView.Adapter<TagInfoAdapter.TagInfoViewHolder>() {
-
-    private val tagInfoList: MutableList<EslDemoViewModel.TagViewInfo> = mutableListOf()
-
+class TagInfoAdapter(val listener: Listener)
+    : ListAdapter<EslDemoViewModel.TagViewInfo, TagInfoAdapter.TagInfoViewHolder>
+    (TagViewInfoDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TagInfoViewHolder {
         val binding = AdapterEslTagInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -24,33 +25,8 @@ class TagInfoAdapter(val listener: Listener) : RecyclerView.Adapter<TagInfoAdapt
         }
     }
 
-    override fun getItemCount(): Int {
-        return tagInfoList.size
-    }
-
     override fun onBindViewHolder(holder: TagInfoViewHolder, position: Int) {
-        holder.bind(tagInfoList[position])
-    }
-
-    fun showNewTag(tagViewInfo: EslDemoViewModel.TagViewInfo) {
-        tagInfoList.add(tagViewInfo)
-        notifyItemInserted(itemCount - 1)
-    }
-
-    fun toggleLedImage(index: Int, isLedOn: Boolean) {
-        tagInfoList[index].tagInfo.isLedOn = isLedOn
-        notifyItemChanged(index, Unit)
-    }
-
-    fun toggleAllLedImages(isGroupLedOn: Boolean) {
-        tagInfoList.forEach { it.tagInfo.isLedOn = isGroupLedOn }
-        notifyDataSetChanged()
-    }
-
-    fun clear() {
-        val itemCount = tagInfoList.size
-        tagInfoList.clear()
-        notifyItemRangeRemoved(0, itemCount)
+        holder.bind(getItem(position))
     }
 
     interface Listener {
@@ -59,6 +35,19 @@ class TagInfoAdapter(val listener: Listener) : RecyclerView.Adapter<TagInfoAdapt
         fun onUploadImageClicked(index: Int)
         fun onDisplayImageClicked(index: Int)
         fun onPingButtonClicked(index: Int)
+        fun onRemoveButtonClicked(index: Int)
+    }
+
+    private class TagViewInfoDiffCallback: DiffUtil.ItemCallback<EslDemoViewModel.TagViewInfo>() {
+        override fun areContentsTheSame(
+            oldItem: EslDemoViewModel.TagViewInfo,
+            newItem: EslDemoViewModel.TagViewInfo,
+        ): Boolean = oldItem == newItem
+
+        override fun areItemsTheSame(
+            oldItem: EslDemoViewModel.TagViewInfo,
+            newItem: EslDemoViewModel.TagViewInfo,
+        ): Boolean = oldItem.tagInfo.eslId == newItem.tagInfo.eslId
     }
 
 
@@ -70,22 +59,25 @@ class TagInfoAdapter(val listener: Listener) : RecyclerView.Adapter<TagInfoAdapt
         fun setupUiListeners() {
             _binding.apply {
                 expandArrow.setOnClickListener { RecyclerViewUtils.withProperAdapterPosition(this@TagInfoViewHolder) {
-                    val newState = !tagInfoList[it].isViewExpanded
-                    tagInfoList[it].isViewExpanded = newState
+                    val newState = !getItem(it).isViewExpanded
+                    getItem(it).isViewExpanded = newState
                     toggleDetailsVisibility(newState)
                     listener.onExpandArrowClicked(it, newState)
                 } }
-                ibEslLight.setOnClickListener { RecyclerViewUtils.withProperAdapterPosition(this@TagInfoViewHolder) {
+                eslLightButton.setOnClickListener { RecyclerViewUtils.withProperAdapterPosition(this@TagInfoViewHolder) {
                     listener.onLedButtonClicked(it)
                 } }
-                ibEslUploadImage.setOnClickListener { RecyclerViewUtils.withProperAdapterPosition(this@TagInfoViewHolder) {
+                eslUploadImageButton.setOnClickListener { RecyclerViewUtils.withProperAdapterPosition(this@TagInfoViewHolder) {
                     listener.onUploadImageClicked(it)
                 } }
-                ibEslDisplayImage.setOnClickListener { RecyclerViewUtils.withProperAdapterPosition(this@TagInfoViewHolder) {
+                eslDisplayImageButton.setOnClickListener { RecyclerViewUtils.withProperAdapterPosition(this@TagInfoViewHolder) {
                     listener.onDisplayImageClicked(it)
                 } }
-                pingTagButton.setOnClickListener { RecyclerViewUtils.withProperAdapterPosition(this@TagInfoViewHolder) {
+                eslPingTagButton.setOnClickListener { RecyclerViewUtils.withProperAdapterPosition(this@TagInfoViewHolder) {
                     listener.onPingButtonClicked(it)
+                } }
+                ibEslRemove.setOnClickListener { RecyclerViewUtils.withProperAdapterPosition(this@TagInfoViewHolder) {
+                    listener.onRemoveButtonClicked(it)
                 } }
             }
 
@@ -98,10 +90,11 @@ class TagInfoAdapter(val listener: Listener) : RecyclerView.Adapter<TagInfoAdapt
             _binding.apply {
                 bleAddress.text = tagInfo.bleAddress
                 eslTagId.text = context.getString(R.string.esl_tag_id, tagInfo.eslId)
-                ibEslLight.imageTintList = ColorStateList.valueOf(context.getColor(
+                eslLightButton.iconTint = ColorStateList.valueOf(context.getColor(
                     if (tagInfo.isLedOn) R.color.esl_led_on
                     else R.color.esl_led_off
                 ))
+                eslLightButton.isCheckable = false
 
                 prepareDetailRows(tagInfo)
                 toggleDetailsVisibility(tagViewInfo.isViewExpanded)

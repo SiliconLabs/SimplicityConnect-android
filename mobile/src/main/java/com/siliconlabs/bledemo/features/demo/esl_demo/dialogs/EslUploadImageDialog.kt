@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import com.bumptech.glide.Glide
+import coil.load
+import coil.size.Scale
+import coil.transform.RoundedCornersTransformation
 import com.siliconlabs.bledemo.R
 
 class EslUploadImageDialog(
@@ -29,10 +31,11 @@ class EslUploadImageDialog(
     private fun updateSelectedImage(uri: Uri) {
         imageToUpload = uri
         this.context?.let {
-            Glide.with(it)
-                .load(uri)
-                .centerCrop()
-                .into(binding.eslImageSelected)
+            binding.eslImageSelected.load(uri) {
+                scale(Scale.FILL)
+                transformations(RoundedCornersTransformation())
+            }
+
             binding.eslSelectedImageMessage.visibility = View.VISIBLE
             binding.eslImageSelected.visibility = View.VISIBLE
             binding.btnPositiveAction.isEnabled = true
