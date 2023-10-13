@@ -33,7 +33,7 @@
                 <Bit index="4" size="1" name="RR-Interval bit">
                     <Enumerations>
                         <Enumeration key="0" value="RR-Interval values are not present." />
-                        <Enumeration key="1" value="One or more RR-Interval values are present." requires="C4"/>
+                        <Enumeration key="1" value="One or more RR-Interval values are present. Units: 1/1024 seconds" requires="C4"/>
                         </Enumerations>
                 </Bit>
                 <ReservedForFutureUse index="5" size="3"></ReservedForFutureUse>
@@ -68,29 +68,27 @@
         </Field>
         <Field name="RR-Interval">
             <InformativeText>
-               <!-- The presence of the RR-Interval field is dependent upon bit 4 of the Flags field. 
-                <p>The RR-Interval value represents the time between two R-Wave detections.</p> 
+                The presence of the RR-Interval field is dependent upon bit 4 of the Flags field. 
+                The RR-Interval value represents the time between two R-Wave detections.
                 
-                <p>Because several RR-Intervals may be measured between transmissions of the HEART RATE MEASUREMENT characteristic, 
+                Because several RR-Intervals may be measured between transmissions of the HEART RATE MEASUREMENT characteristic, 
                 multiple RR-Interval sub-fields may be present in the characteristic. The number of RR-Interval sub-fields present 
                 is determined by a combination of the overall length of the characteristic and whether or not the characteristic contains 
-                the Energy Expended field.</p>
+                the Energy Expended field.
                 
-                <p>Where there are multiple RR-Interval values transmitted in the HEART RATE MEASUREMENT characteristic, the field uses the following format:</p>
-                <p>RR-Interval Value 0 (LSO...MSO), RR-Interval Value 1 (LSO...MSO), RR-Interval Value 2 (LSO...MSO), RR-Interval Value n (LSO...MSO).</p>
-                <p>Where the RR-Interval Value 0 is older than the RR-Interval Value 1.</p>
-                <p>RR-Interval Value 0 is transmitted first followed by the newer measurements.</p>-->
+                Where there are multiple RR-Interval values transmitted in the HEART RATE MEASUREMENT characteristic, the field uses the following format:
+                RR-Interval Value 0 (LSO...MSO), RR-Interval Value 1 (LSO...MSO), RR-Interval Value 2 (LSO...MSO), RR-Interval Value n (LSO...MSO).
+                Where the RR-Interval Value 0 is older than the RR-Interval Value 1.
+                RR-Interval Value 0 is transmitted first followed by the newer measurements.
 
 			</InformativeText>
             <Requirement>C4</Requirement>
             <Format>uint16</Format>
             <Unit>org.bluetooth.unit.time.second</Unit>
-            <Description>Resolution of 1/1024 second</Description>
-		
-            
             
         </Field>
     </Value>
-   <Note> <p>The fields in the above table are in the order of LSO to MSO. Where LSO = Least Significant Octet and MSO = Most Significant Octet.</p>
+   <Note>
+    The fields in the above table are in the order of LSO to MSO. Where LSO = Least Significant Octet and MSO = Most Significant Octet.
    </Note>
 </Characteristic>
