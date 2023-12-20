@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.esl_demo.fragments
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
@@ -151,6 +152,7 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
         }
     }
 
+    @SuppressLint("MissingPermission")
     fun prepareGatt(service: BluetoothService, gatt: BluetoothGatt?) {
         service.registerGattCallback(false, eslGattCallback)
         gatt?.discoverServices()
@@ -472,6 +474,7 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
             }
         }
 
+        @SuppressLint("MissingPermission")
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             super.onServicesDiscovered(gatt, status)
             gatt?.requestMtu(Constants.MAX_ALLOWED_MTU)

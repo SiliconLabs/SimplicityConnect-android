@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/sl_light_grey"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="top|center_vertical"
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
+
+        <TextView
+            android:id="@+id/txt_cluster_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="@dimen/matter_5dp"
+            android:gravity="center"
+            android:text="@string/matter_on_off_cluster_title"
+            android:textSize="@dimen/text_size_XL"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/btn_matter_device_state"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/matter_light_height"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/matter_25dp"
+            android:layout_marginBottom="@dimen/matter_18dp"
+            android:adjustViewBounds="true"
+            android:background="@color/silabs_transparent"
+            android:scaleType="fitCenter" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_on"
+                style="@style/MatterButtonBlue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/matter_20dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/btn_off"
+                style="@style/MatterButtonBlue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/matter_20dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/btn_toggle"
+                style="@style/MatterButtonBlue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/matter_20dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

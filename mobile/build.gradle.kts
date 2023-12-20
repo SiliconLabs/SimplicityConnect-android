@@ -51,8 +51,8 @@ android {
         create("blueGecko") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 44
-            versionName = "2.7.2"
+            versionCode = 46
+            versionName = "2.8.0"
         }
     }
 
@@ -71,7 +71,7 @@ android {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
+    implementation(fileTree(mapOf("include" to listOf("*.jar", "*.so"), "dir" to "libs")))
 
     // androidx
     implementation("androidx.core:core-ktx:1.10.0")
@@ -130,4 +130,12 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("androidx.test:rules:1.5.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
+
+    //Matter
+    implementation("androidx.camera:camera-core:1.1.0")
+    implementation("androidx.camera:camera-camera2:1.1.0")
+    implementation("androidx.camera:camera-lifecycle:1.1.0")
+    implementation("androidx.camera:camera-view:1.1.0")
+    implementation("com.google.mlkit:barcode-scanning:17.0.2")
+    implementation ("com.daimajia.swipelayout:library:1.2.0@aar")
 }

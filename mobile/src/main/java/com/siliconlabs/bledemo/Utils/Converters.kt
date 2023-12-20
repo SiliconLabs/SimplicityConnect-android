@@ -19,12 +19,13 @@ package com.siliconlabs.bledemo.utils
 import android.text.TextUtils
 import androidx.core.util.Pair
 import com.google.common.math.IntMath.pow
-import timber.log.Timber
 import java.math.BigInteger
+import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.pow
+
 
 // TODO: Rewrite to extension functions
 object Converters {
@@ -87,6 +88,12 @@ object Converters {
             tmpNewVal = tmpNewVal shr 8
         }
         return tmpVal
+    }
+
+    fun longToBytes(x: Long): ByteArray? {
+        val buffer = ByteBuffer.allocate(java.lang.Long.BYTES)
+        buffer.putLong(x)
+        return buffer.array()
     }
 
     fun isZeroed(bytes: ByteArray): Boolean {

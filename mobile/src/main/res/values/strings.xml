@@ -263,7 +263,7 @@
     <string name="unknown_descriptor_label">Unknown descriptor</string>
     <string name="default_uuid_of_service">uuid</string>
     <string name="characteristic_default_name">Characteristic Name</string>
-    <string name="no_devices_found_title_copy">No devices found</string>
+    <string name="no_devices_found_title_copy">cNo devices found</string>
     <string name="device_scanning_background_message">Looking for nearby devices…</string>
     <string name="characteristic_dialog_default_service_name">Service Name</string>
     <string name="characteristic_dialog_default_charac_name">Characteristic Name</string>
@@ -727,7 +727,7 @@
 
     <!--<string name="app_name">Smart Home Automation</string>-->
     <string name="app_name">Silabs Connect</string>
-    <string name="empty_description"></string>
+    <string name="empty_description"> </string>
 
     <!--WifiCommissioningActivity-->
     <string name="hint_password">password</string>
@@ -837,8 +837,7 @@
     <string name="demo_firmware_name_throughput">Bluetooth - SoC Throughput</string>
     <string name="demo_firmware_name_esl">Bluetooth - NCP ESL Access Point</string>
     <string name="soc_wifi_commissioning_must_be_connected">A circuit board (SoC) and the
-        evaluation board (EVK) must be connected and running proper firmwares. See <a
-        href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-pc/update-evk-firmware">here</a>,
+        evaluation board (EVK) must be connected and running proper firmwares. See <a href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-pc/update-evk-firmware">here</a>,
         <a href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-efx32/">here</a> and
         <a href="https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk/tree/master/examples/snippets/wlan_ble/wlan_station_ble_provisioning">here</a> for more information.
     </string>
@@ -1053,4 +1052,109 @@
     <string name="battery_sensor_present">Present input voltage</string>
     <string name="temperature_sensor_present">Present device operating temperature</string>
 
+    <!--    Matter-->
+    <string name="matter_demo_title">Matter Demo</string>
+    <string name="matter_light_demo_toggle_instructions">Press the bulb icon to toggle light</string>
+    <string name="matter_demo_description">Add/commission Matter tags by scanning its QR code and control them from the UI</string>
+    <string name="matter_scanner_adapter_empty_list_title">No Device Found</string>
+    <string name="matter_scanner_adapter_empty_list_message_idle">Scan your matter device to add.</string>
+    <string name="matter_scanner_adapter_empty_list_message_scanning">Scanning for Bluetooth Matter devices…</string>
+    <string name="matter_camera_permission_missing_alert_title">Camera permission missing</string>
+    <string name="matter_camera_permission_missing_alert_subtitle">Camera permission required to be able to scan the QR code.</string>
+    <string name="matter_camera_permission_missing_alert_try_again">Try again</string>
+    <string name="matter_camera_unavailable_alert_title">Camera unavailable</string>
+    <string name="matter_camera_unavailable_alert_subtitle">Error launching camera to scan the QR code.</string>
+    <string name="matter_camera_unavailable_alert_exit">Exit</string>
+    <string name="matter_location_unavailable_alert_title">Location unavailable</string>
+    <string name="matter_location_unavailable_alert_subtitle">Error location to scan the QR code.</string>
+    <string name="matter_invalid_manual_qr_code">Manual QR code payload ID is invalid! Please enter a valid QR code payload ID.</string>
+
+    <!--    <string name="extPanID">19:19:11:11:22:22:42:22</string>-->
+    <!--    <string name="matMasterKey">00:FF:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:AF</string>-->
+    <string name="matter_quick_starter_guide_link">A circuit board (SoC) must be connected and running "matter" firmware and a Matter hub. See Quick-Start Guide for more information</string>
+    <string name="enter_thread_channel_text">15</string>
+    <string name="enter_thread_panid_text">1234</string>
+    <string name="extPanID">11:11:11:11:22:22:22:22</string>
+    <string name="matMasterKey">00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF</string>
+
+    <string name="rendezvous_over_ble_pairing_failure_text">Pairing failed</string>
+    <string name="matter_device_offline_text">Device is offline, Please check the device connectivity.</string>
+    <string name="rendezvous_over_ble_scanning_text">Scanning for BLE device %1$s</string>
+    <string name="rendezvous_over_ble_scanning_failed_text">Device not found</string>
+    <string name="rendezvous_over_ble_connecting_text">Connecting to %1$s</string>
+    <string name="device_commissioning_in_progress">Commissioning is in-progress for </string>
+    <string name="open_window_in_progress">Opening window cover is in-progress for </string>
+    <string name="plug_on_in_progress">Plug on is in-progress for </string>
+    <string name="plug_off_in_progress">Plug off is in-progress for </string>
+    <string name="closing_window_in_progress">Closing window cover is in-progress for </string>
+    <string name="matter_commissioning_completed">Commissioning completed with result: %1$d</string>
+    <string name="matter_commissioning_device">Commissioning Device</string>
+    <string name="mater_scan_qr_code">Scan QR Code</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="matter_light_on_status">ON</string>
+    <string name="matter_light_off_status">OFF</string>
+    <string name="matter_locked_status">Lock</string>
+    <string name="matter_unlock_status">Unlock</string>
+    <string name="matter_switch_on">Switch On</string>
+    <string name="matter_switch_off">Switch Off</string>
+    <string name="matter_device_unpair">Matter Device Unpair</string>
+    <string name="matter_temp_refresh">Refresh</string>
+    <string name="matter_switch_on_off_cluster">Switch On Off</string>
+    <string name="matter_window_open">Open</string>
+    <string name="matter_window_close">Close</string>
+    <string name="matter_window_open_close_cluster">Curtain Open Close</string>
+    <string name="matter_thermostat_cluster">Thermostat</string>
+    <string name="matter_occupancy_cluster">Occupancy Sensor</string>
+    <string name="matter_temp_sensor_cluster">Temperature Sensor</string>
+    <string name="matter_contact_sensor_cluster">Contact Sensor</string>
+    <string name="matter_init_value">00.00 ℃</string>
+    <string name="matter_init_thermostat_value">00 ℃</string>
+    <string name="matter_ok">Send</string>
+    <string name="matter_cancel">Cancel</string>
+    <string name="matter_alert_title">Thread Configuration</string>
+    <string name="matter_network_selection_alert_title">Commissioning</string>
+    <string name="matter_wifi_configuration_alert_title">WiFi Configuration</string>
+    <string name="matter_wifi_configuration_input_alert_title">Input network SSID and password that your phone is connected to</string>
+    <string name="matter_alert_message">Enter OTBR dataset to control</string>
+    <string name="matter_select_network_mode_alert_message">Select Network Mode</string>
+    <string name="matter_on_off_cluster_title">Light On Off</string>
+    <string name="matter_wifi">Wi-Fi</string>
+    <string name="matter_thread">Thread</string>
+    <string name="matter_network_ssid">Network SSID</string>
+    <string name="matter_network_password">WIFI Password</string>
+    <string name="matter_light_toggle_status">Toggle</string>
+    <string name="matter_manual_qr_code">QR code payload ID</string>
+    <string name="matter_submit">Pair</string>
+    <string name="matter_door_title">"Door Lock Unlock"</string>
+    <string name="matter_plug_title">Plug on off</string>
+    <string name="matter_plug_list">Plug</string>
+    <string name="matter_lock_list">Door Lock</string>
+    <string name="matter_occupancy_sensor_list">Occupancy Sensor</string>
+    <string name="matter_temperature_sensor_list">Temperature Sensor</string>
+    <string name="matter_contact_sensor_list">Contact Sensor</string>
+    <string name="matter_device_status">Connecting to commissioned device…</string>
+    <string name="matter_scanner_instruction">Please position the camera to point at the QR code</string>
+    <string name="matter_contact_sensor_action">Press and Hold to detect the contact and release the button to undetect the contact</string>
+    <string name="matter_refresh_button">Refresh</string>
+    <string name="matter_thermostat_list">Thermostat</string>
+    <string name="matter_light_list">Light</string>
+    <string name="matter_window_list">Window Cover</string>
+    <string name="please_wait">Please wait while the work is in progress..</string>
+    <string name="temp_note_message">Please press BTN1 button to change sensor value on the Baseboard to test the Temprature Sensor</string>
+    <string name="matter_tile">Matter Devices</string>
+    <string name="matter_alert_ok">Ok</string>
+    <string name="matter_delete_alert_title">Alert</string>
+    <string name="matter_delete_message">Do you want to delete Device?</string>
+    <string name="matter_validation_manual_qrcode">Enter valid QR Code</string>
+    <string name="matter_occupancy_sensor_action">Press and Hold to detect the occupancy” and release the button to undetect the occupancy</string>
+    <string name="ssid_and_password_required">SSID and password required.</string>
+    <string name="password_must_be_between_8_to_12_characters">Password must be between 8 to 12 characters.</string>
+    <string name="add_device_subtitle">Add the device name. This is the name that will be used to reference this device.</string>
+    <string name="add_device_name">Add Device Name</string>
+    <string name="matter_scanner_info">Manual QR code payload ID:</string>
+    <string name="matter_example_mt_yk">For example : MT:YK9042C00KA068G0</string>
+    <string name="matter_custom_alert_add">Add</string>
+    <string name="matter_custom_alert_enter_text">Enter text</string>
+    <string name="please_enter_device_name">Please enter device name</string>
+    <string name="please_enter_valid_device_name">Please enter valid device name</string>
 </resources>

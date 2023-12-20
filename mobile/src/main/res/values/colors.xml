@@ -3,11 +3,14 @@
 
     <color name="primary">@color/silabs_red</color>
 
+    <color name="silabs_dark_blue">#0F62FE</color>
     <color name="silabs_blue">#0086D9</color>
     <color name="silabs_red">#D91E2A</color>
     <color name="silabs_white">#FFFFFF</color>
     <color name="silabs_black">#000000</color>
     <color name="silabs_transparent">#00000000</color>
+    <color name="silabs_yellow">#F9C80E</color>
+    <color name="silabs_grey">#7A7878</color>
 
     <color name="silabs_ripple_blue">#400086D9</color>
 
@@ -49,6 +52,7 @@
     <color name="sl_white">#ffffffff</color>
     <color name="silicon_grey">#ff797777</color>
     <color name="divider_line">@color/silicon_grey</color>
+    <color name="sl_light_greys">#ffefefef</color>
 
     <!--RESKINNING-->
 
@@ -106,4 +110,8 @@
     <!-- ESL Demo -->
     <color name="esl_led_on">#FBE106</color>
     <color name="esl_led_off">@color/action_icon</color>
+
+    <!--    Matter Demo-->
+    <color name="adapter_item_title_color">#000000</color>
+    <color name="matter_tint_color">#000000</color>
 </resources>

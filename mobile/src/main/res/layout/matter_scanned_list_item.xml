@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:swipe="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipe"
+    android:paddingStart="@dimen/matter_5dp"
+    android:paddingTop="@dimen/matter_15dp"
+    android:paddingBottom="@dimen/matter_15dp"
+    android:background="@drawable/matter_scanned_result_item_shape"
+    android:layout_width="match_parent"
+
+    android:layout_height="wrap_content"
+    swipe:leftEdgeSwipeOffset="0dp"
+    swipe:rightEdgeSwipeOffset="0dp">
+
+    <LinearLayout
+        android:id="@+id/bottom_wrapper"
+        android:layout_width="80dp"
+
+        android:layout_marginStart="-8dp"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/img_delete"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_horizontal"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:padding="0dp"
+            android:adjustViewBounds="true"
+            android:layout_marginStart="-2dp"
+            android:src="@drawable/baseline_delete_24"
+            android:visibility="visible" />
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+
+            android:id="@+id/itemViewHolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="@dimen/matter_5dp">
+
+            <ImageView
+                android:id="@+id/imageview"
+                android:layout_gravity="center"
+                android:layout_width="@dimen/matter_40dp"
+                android:layout_height="@dimen/matter_40dp"
+                android:scaleType="fitCenter" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/matter_5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/matter_10dp"
+                    android:layout_weight="2"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textViewHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/matter_10dp"
+                        android:layout_marginEnd="@dimen/matter_15dp"
+                        android:textSize="@dimen/text_size_L"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+
+                <ImageView
+                    android:id="@+id/matterArrow"
+                    android:layout_width="24dp"
+                    android:layout_height="23dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/matter_arrow" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+</com.daimajia.swipe.SwipeLayout>

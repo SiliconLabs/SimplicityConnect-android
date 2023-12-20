@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@drawable/matter_popup_background"
+    android:gravity="center"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="7dp"
+        android:text="@string/matter_network_selection_alert_title"
+        android:textSize="@dimen/text_size_ML"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/matter_select_network_mode_alert_message"
+        android:textSize="@dimen/text_size_M" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/matter_18dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/matter_1dp"
+            android:background="@color/seekbar_progress" />
+
+        <LinearLayout
+            android:id="@+id/ll_wifi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/matter_5dp"
+            android:background="@drawable/rounded_background"
+            android:gravity="center"
+            android:padding="@dimen/matter_10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/matter_wifi"
+                android:textColor="@color/silabs_blue"
+                android:textSize="@dimen/text_size_ML" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/matter_1dp"
+            android:background="@color/seekbar_progress" />
+
+        <LinearLayout
+            android:id="@+id/ll_thread"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/matter_5dp"
+            android:background="@drawable/rounded_background"
+            android:gravity="center"
+            android:padding="@dimen/matter_10dp">
+
+            <TextView
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/matter_thread"
+                android:textColor="@color/silabs_blue"
+                android:textSize="@dimen/text_size_ML" />
+
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/matter_1dp"
+            android:background="@color/seekbar_progress" />
+
+        <LinearLayout
+            android:id="@+id/ll_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/matter_5dp"
+            android:background="@drawable/rounded_background"
+            android:gravity="center"
+            android:padding="@dimen/matter_10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/matter_cancel"
+                android:textColor="@color/silabs_red"
+                android:textSize="@dimen/text_size_ML" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

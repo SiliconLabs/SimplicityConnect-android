@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@drawable/matter_popup_background"
+    android:gravity="center"
+    android:padding="@dimen/matter_2dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/matter_wifi_configuration_alert_title"
+        android:textSize="@dimen/text_size_M"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/matter_wifi_configuration_input_alert_title"
+        android:textSize="@dimen/text_size_SM" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/matter_15dp"
+        android:layout_marginTop="@dimen/matter_5dp"
+        android:layout_marginEnd="@dimen/matter_15dp"
+        android:background="@drawable/stroke_box"
+        android:padding="@dimen/matter_0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/ll_wifi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|left"
+                android:layout_margin="@dimen/matter_5dp"
+                android:gravity="left"
+                android:padding="@dimen/matter_10dp">
+
+                <EditText
+                    android:id="@+id/editNetworkSSID"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center|left"
+                    android:autofillHints=""
+                    android:background="@drawable/rounded_background"
+                    android:gravity="center|left"
+                    android:hint="@string/matter_network_ssid"
+                    android:lines="1"
+                    android:textSize="@dimen/text_size_SM" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey" />
+
+            <LinearLayout
+                android:id="@+id/ll_thread"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/matter_5dp"
+                android:background="@drawable/rounded_background"
+                android:gravity="center"
+                android:orientation="horizontal"
+
+                android:padding="@dimen/matter_10dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/passwordTextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:hintEnabled="false"
+                    android:gravity="right|center"
+                    app:passwordToggleContentDescription="@string/password_toggle_content_description"
+                    app:passwordToggleDrawable="@drawable/baseline_remove_red_eye_24"
+                    app:passwordToggleEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editWiFiPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="34dp"
+                        android:layout_gravity="center"
+                        android:autofillHints=""
+                        android:background="@drawable/rounded_background"
+                        android:gravity="center|left"
+                        android:hint="@string/matter_network_password"
+                        android:inputType="textPassword"
+                        android:textSize="@dimen/text_size_SM"
+                        android:lines="1" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/negativeBtn"
+            style="@style/MatterButtonBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/matter_10dp"
+            android:text="@string/matter_cancel" />
+
+        <Button
+            android:id="@+id/positiveBtn"
+            style="@style/MatterButtonBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/matter_10dp"
+            android:text="@string/button_send" />
+
+
+    </LinearLayout>
+</LinearLayout>

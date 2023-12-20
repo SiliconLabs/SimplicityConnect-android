@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
+import android.view.MenuItem
 import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
@@ -53,7 +54,8 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
     private var txUpdateTimer: TxUpdateTimer? = null
 
 
-    inner class TxUpdateTimer(private val deviceAddress: String) : CountDownTimer(Long.MAX_VALUE, TRANSMISSION_INTERVAL) {
+    inner class TxUpdateTimer(private val deviceAddress: String) :
+        CountDownTimer(Long.MAX_VALUE, TRANSMISSION_INTERVAL) {
         override fun onTick(millisUntilFinished: Long) {
             /* Update sent packets when no onCharacteristicChanged callback invoked. */
             presenter.getDeviceByAddress(deviceAddress)?.let {
@@ -71,7 +73,11 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
         retryAttempts++
         runOnUiThread {
             Handler(Looper.getMainLooper()).postDelayed({
-                service?.connectGatt(presenter.getDeviceInfo()?.device!!, false, timeoutGattCallback)
+                service?.connectGatt(
+                    presenter.getDeviceInfo()?.device!!,
+                    false,
+                    timeoutGattCallback
+                )
             }, 1000)
         }
     }
@@ -101,7 +107,12 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                 retryConnectionAttempt()
             } else {
                 runOnUiThread {
-                    showMessage(ErrorCodes.getFailedConnectingToDeviceMessage(presenter.getDeviceInfo()?.name, status))
+                    showMessage(
+                        ErrorCodes.getFailedConnectingToDeviceMessage(
+                            presenter.getDeviceInfo()?.name,
+                            status
+                        )
+                    )
                     dismissModalDialog()
                     handleConnectionError()
                 }
@@ -133,11 +144,11 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
 
     private fun switchCurrentDevice() {
         activeDeviceId =
-                if (activeDeviceId == 1) 2
-                else 1
+            if (activeDeviceId == 1) 2
+            else 1
         presenter.switchCurrentDevice()
     }
-    
+
 
     private fun changeDevice(tvTab: TextView, which: Int) {
         removeRangeTestFragment()
@@ -146,32 +157,37 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
         runOnUiThread { selectTab(tvTab) }
 
         if (presenter.getDeviceInfo() == null) {
-            SelectDeviceDialog.newDialog(BluetoothService.GattConnectType.RANGE_TEST, service).apply {
-                setCallback(object : SelectDeviceDialog.RangeTestCallback {
-                    override fun getBluetoothDeviceInfo(info: BluetoothDeviceInfo?) {
-                        runOnUiThread {
-                            showModalDialog(ConnectionStatus.CONNECTING) {
-                                presenter.getDeviceInfo()?.address?.let {
-                                    service?.clearConnectedGatt()
-                                    presenter.resetDeviceAt(which)
+            SelectDeviceDialog.newDialog(BluetoothService.GattConnectType.RANGE_TEST, service)
+                .apply {
+                    setCallback(object : SelectDeviceDialog.RangeTestCallback {
+                        override fun getBluetoothDeviceInfo(info: BluetoothDeviceInfo?) {
+                            runOnUiThread {
+                                showModalDialog(ConnectionStatus.CONNECTING) {
+                                    presenter.getDeviceInfo()?.address?.let {
+                                        service?.clearConnectedGatt()
+                                        presenter.resetDeviceAt(which)
+                                    }
+                                    tvTab.text = getString(R.string.range_test_no_device)
                                 }
-                                tvTab.text = getString(R.string.range_test_no_device)
+                                tvTab.text = info?.device?.name
                             }
-                            tvTab.text = info?.device?.name
+
+                            presenter.setDeviceInfo(info)
+                            service?.let {
+                                it.isNotificationEnabled = false
+                                it.connectGatt(
+                                    presenter.getDeviceInfo()?.device!!,
+                                    false,
+                                    timeoutGattCallback
+                                )
+                            }
                         }
 
-                        presenter.setDeviceInfo(info)
-                        service?.let {
-                            it.isNotificationEnabled = false
-                            it.connectGatt(presenter.getDeviceInfo()?.device!!, false, timeoutGattCallback)
+                        override fun onCancel() {
+                            switchCurrentDevice()
                         }
-                    }
-
-                    override fun onCancel() {
-                        switchCurrentDevice()
-                    }
-                })
-            }.also {
+                    })
+                }.also {
                 it.show(supportFragmentManager, "select_device_dialog")
             }
         } else {
@@ -241,7 +257,12 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
     }
 
     override fun toggleRunningState() {
-        withGatt(SetValueGattAction(GattCharacteristic.RangeTestIsRunning, !presenter.getTestRunning()))
+        withGatt(
+            SetValueGattAction(
+                GattCharacteristic.RangeTestIsRunning,
+                !presenter.getTestRunning()
+            )
+        )
     }
 
     override fun updatePhyConfig(id: Int) {
@@ -295,8 +316,10 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
 
     private fun initAdvertisementHandler(address: String) {
         advertisementHandler = object : RangeTestAdvertisementHandler(this, address) {
-            override fun handleAdvertisementRecord(manufacturerData: Int, companyId: Int, structureType: Int,
-                                                   rssi: Int, packetCount: Int, packetReceived: Int) {
+            override fun handleAdvertisementRecord(
+                manufacturerData: Int, companyId: Int, structureType: Int,
+                rssi: Int, packetCount: Int, packetReceived: Int
+            ) {
                 if (structureType == 0) {
                     presenter.onTestDataReceived(address, rssi, packetCount, packetReceived)
                 }
@@ -306,7 +329,11 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
 
     private fun handleConnectionError() {
         runOnUiThread {
-            Toast.makeText(this@RangeTestActivity, R.string.demo_range_toast_error, Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this@RangeTestActivity,
+                R.string.demo_range_toast_error,
+                Toast.LENGTH_SHORT
+            ).show()
             finish()
         }
     }
@@ -320,9 +347,9 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
         val fragment = supportFragmentManager.findFragmentByTag("tag_show_range_test_fragment")
         fragment?.let {
             supportFragmentManager
-                    .beginTransaction()
-                    .remove(fragment)
-                    .commit()
+                .beginTransaction()
+                .remove(fragment)
+                .commit()
         }
     }
 
@@ -334,8 +361,8 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
         fragment.arguments = arguments
 
         supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment, fragment, "tag_show_range_test_fragment")
-                .commit()
+            .replace(R.id.fragment, fragment, "tag_show_range_test_fragment")
+            .commit()
     }
 
     private fun getGenericAccessCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
@@ -381,13 +408,22 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
         val characteristic: BluetoothGattCharacteristic?
         var descriptor: BluetoothGattDescriptor? = null
 
-        constructor(type: Type, gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
+        constructor(
+            type: Type,
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?
+        ) {
             this.type = type
             this.gatt = gatt
             this.characteristic = characteristic
         }
 
-        constructor(type: Type, gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, descriptor: BluetoothGattDescriptor) {
+        constructor(
+            type: Type,
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            descriptor: BluetoothGattDescriptor
+        ) {
             this.type = type
             this.gatt = gatt
             this.characteristic = characteristic
@@ -404,7 +440,11 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             queue(GattCommand(GattCommand.Type.Read, gatt, characteristic))
         }
 
-        private fun queueReadDescriptor(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, descriptor: BluetoothGattDescriptor) {
+        private fun queueReadDescriptor(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            descriptor: BluetoothGattDescriptor
+        ) {
             queue(GattCommand(GattCommand.Type.ReadDescriptor, gatt, characteristic, descriptor))
         }
 
@@ -412,7 +452,10 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             queue(GattCommand(GattCommand.Type.Write, gatt, characteristic))
         }
 
-        private fun queueSubscribe(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic?) {
+        private fun queueSubscribe(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic?
+        ) {
             queue(GattCommand(GattCommand.Type.Subscribe, gatt, characteristic))
         }
 
@@ -446,8 +489,14 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                     GattCommand.Type.Subscribe -> {
                         val gattCharacteristic = GattCharacteristic.fromUuid(characteristic.uuid)
                         val gattService = GattService.fromUuid(characteristic.service.uuid)
-                        setNotificationForCharacteristic(gatt, gattService, gattCharacteristic, Notifications.INDICATE)
+                        setNotificationForCharacteristic(
+                            gatt,
+                            gattService,
+                            gattCharacteristic,
+                            Notifications.INDICATE
+                        )
                     }
+
                     GattCommand.Type.ReadDescriptor -> gatt.readDescriptor(command.descriptor)
                 }
             }
@@ -503,16 +552,21 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                         }
 
                         val resetDeviceId =
-                                if (it === presenter.deviceState1) 1
-                                else 2
-                        showMessage(ErrorCodes.getDeviceDisconnectedMessage(presenter.getDeviceInfoAt(resetDeviceId)?.name, status))
+                            if (it === presenter.deviceState1) 1
+                            else 2
+                        showMessage(
+                            ErrorCodes.getDeviceDisconnectedMessage(
+                                presenter.getDeviceInfoAt(
+                                    resetDeviceId
+                                )?.name, status
+                            )
+                        )
                         presenter.resetDeviceAt(resetDeviceId)
 
                         if (resetDeviceId == 1) {
                             tv_device1_tab.text = getString(R.string.range_test_no_device)
                             changeDevice(tv_device1_tab, 1)
-                        }
-                        else {
+                        } else {
                             tv_device2_tab.text = getString(R.string.range_test_no_device)
                             changeDevice(tv_device2_tab, 2)
                         }
@@ -529,35 +583,191 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                 return
             }
 
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestIsRunning)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestRadioMode)))
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestIsRunning)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestRadioMode)
+                )
+            )
 
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getGenericAccessCharacteristic(GattCharacteristic.DeviceName)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getDeviceInformationCharacteristic(GattCharacteristic.ModelNumberString)))
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getGenericAccessCharacteristic(GattCharacteristic.DeviceName)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getDeviceInformationCharacteristic(GattCharacteristic.ModelNumberString)
+                )
+            )
 
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangePhyList)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangePhyConfig)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestTxPower)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestPacketsSend)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestDestinationId)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestSourceId)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestPacketsRequired)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestChannel)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestPayload)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestMaSize)))
-            addToQueue(GattCommand(GattCommand.Type.Read, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestLog)))
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangePhyList)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangePhyConfig)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestTxPower)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestPacketsSend)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestDestinationId)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestSourceId)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestPacketsRequired)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestChannel)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestPayload)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestMaSize)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Read,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestLog)
+                )
+            )
 
-            addToQueue(GattCommand(GattCommand.Type.Subscribe, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestIsRunning)))
-            addToQueue(GattCommand(GattCommand.Type.Subscribe, gatt, getRangeTestCharacteristic(GattCharacteristic.RangePhyConfig)))
-            addToQueue(GattCommand(GattCommand.Type.Subscribe, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestTxPower)))
-            addToQueue(GattCommand(GattCommand.Type.Subscribe, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestPacketsSend)))
-            addToQueue(GattCommand(GattCommand.Type.Subscribe, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestDestinationId)))
-            addToQueue(GattCommand(GattCommand.Type.Subscribe, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestSourceId)))
-            addToQueue(GattCommand(GattCommand.Type.Subscribe, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestPacketsRequired)))
-            addToQueue(GattCommand(GattCommand.Type.Subscribe, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestChannel)))
-            addToQueue(GattCommand(GattCommand.Type.Subscribe, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestRadioMode)))
-            addToQueue(GattCommand(GattCommand.Type.Subscribe, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestPayload)))
-            addToQueue(GattCommand(GattCommand.Type.Subscribe, gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestMaSize)))
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Subscribe,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestIsRunning)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Subscribe,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangePhyConfig)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Subscribe,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestTxPower)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Subscribe,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestPacketsSend)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Subscribe,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestDestinationId)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Subscribe,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestSourceId)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Subscribe,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestPacketsRequired)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Subscribe,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestChannel)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Subscribe,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestRadioMode)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Subscribe,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestPayload)
+                )
+            )
+            addToQueue(
+                GattCommand(
+                    GattCommand.Type.Subscribe,
+                    gatt,
+                    getRangeTestCharacteristic(GattCharacteristic.RangeTestMaSize)
+                )
+            )
 
             // Add to queue and start executing
             queueSubscribe(gatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestLog))
@@ -565,7 +775,11 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             if (setupData) runOnUiThread { showModalDialog(ConnectionStatus.READING_DEVICE_STATE) }
         }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             super.onCharacteristicRead(gatt, characteristic, status)
 
             if (status != BluetoothGatt.GATT_SUCCESS) {
@@ -589,7 +803,11 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             }
         }
 
-        override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+        override fun onDescriptorRead(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
             super.onDescriptorRead(gatt, descriptor, status)
 
             if (status != BluetoothGatt.GATT_SUCCESS) {
@@ -606,7 +824,11 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             }
         }
 
-        override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
 
             if (status != BluetoothGatt.GATT_SUCCESS) {
@@ -622,20 +844,29 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                 when (gattCharacteristic) {
                     GattCharacteristic.RangeTestIsRunning -> {
                         presenter.setTestRunning(
-                                gatt.device.address,
-                                characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) != 0)
+                            gatt.device.address,
+                            characteristic.getIntValue(
+                                BluetoothGattCharacteristic.FORMAT_UINT8,
+                                0
+                            ) != 0
+                        )
                         setKeepScreenOn(presenter.getTestRunning())
                         handleTxTimer(gatt.device.address, presenter.getTestRunning())
-                        presenter.onRunningStateUpdated(gatt.device.address, presenter.getTestRunning())
+                        presenter.onRunningStateUpdated(
+                            gatt.device.address,
+                            presenter.getTestRunning()
+                        )
                     }
+
                     GattCharacteristic.RangeTestPacketsRequired -> {
-                        val packetsRequired = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)
+                        val packetsRequired =
+                            characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)
                         val repeat = packetsRequired == RangeTestValues.PACKET_COUNT_REPEAT
                         presenter.onPacketRequiredUpdated(gatt.device.address, packetsRequired)
                         presenter.onPacketCountRepeatUpdated(gatt.device.address, repeat)
                     }
 
-                    else -> { }
+                    else -> {}
                 }
             }
 
@@ -653,12 +884,21 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                 GattCharacteristic.RangeTestMaSize,
                 GattCharacteristic.RangeTestLog,
                 GattCharacteristic.RangePhyConfig,
-                GattCharacteristic.RangePhyList -> updatePresenter(gatt, characteristic, gattCharacteristic)
-                else -> { }
+                GattCharacteristic.RangePhyList -> updatePresenter(
+                    gatt,
+                    characteristic,
+                    gattCharacteristic
+                )
+
+                else -> {}
             }
         }
 
-        override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
             super.onDescriptorWrite(gatt, descriptor, status)
 
             if (status != BluetoothGatt.GATT_SUCCESS) {
@@ -669,7 +909,10 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             handleCommandProcessed()
         }
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic
+        ) {
             super.onCharacteristicChanged(gatt, characteristic)
 
             val gattCharacteristic = GattCharacteristic.fromUuid(characteristic.uuid)
@@ -679,13 +922,18 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             }
         }
 
-        private fun updatePresenter(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, gattCharacteristic: GattCharacteristic) {
+        private fun updatePresenter(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            gattCharacteristic: GattCharacteristic
+        ) {
 
             when (gattCharacteristic) {
                 GattCharacteristic.DeviceName -> {
                     val deviceName = characteristic.getStringValue(0)
                     presenter.onDeviceNameUpdated(gatt.device.address, deviceName)
                 }
+
                 GattCharacteristic.ModelNumberString -> {
                     var modelNumber = characteristic.getStringValue(0)
 
@@ -694,17 +942,23 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
 
                     presenter.onModelNumberUpdated(gatt.device.address, modelNumber)
                 }
+
                 GattCharacteristic.RangeTestDestinationId -> {
-                    val remoteId = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
+                    val remoteId =
+                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
                     presenter.onRemoteIdUpdated(gatt.device.address, remoteId)
                 }
+
                 GattCharacteristic.RangeTestSourceId -> {
-                    val selfId = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
+                    val selfId =
+                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
                     presenter.onSelfIdUpdated(gatt.device.address, selfId)
                 }
+
                 GattCharacteristic.RangeTestPacketsSend -> {
                     val deviceResponding = presenter.getDeviceByAddress(gatt.device.address)
-                    val packetsSent = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)
+                    val packetsSent =
+                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)
                     if (deviceResponding?.testRunning == true) {
                         if (!timerStarted && packetsSent > 0) {
                             handleTxTimer(gatt.device.address, true)
@@ -712,25 +966,34 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                         presenter.onPacketSentUpdated(gatt.device.address, packetsSent)
                     }
                 }
+
                 GattCharacteristic.RangeTestPacketsRequired -> {
-                    val packetsRequired = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)
+                    val packetsRequired =
+                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)
                     val repeat = packetsRequired == RangeTestValues.PACKET_COUNT_REPEAT
 
                     presenter.onPacketRequiredUpdated(gatt.device.address, packetsRequired)
                     presenter.onPacketCountRepeatUpdated(gatt.device.address, repeat)
                 }
+
                 GattCharacteristic.RangeTestChannel -> {
-                    val channel = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)
+                    val channel =
+                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT16, 0)
                     presenter.onChannelNumberUpdated(gatt.device.address, channel)
                 }
+
                 GattCharacteristic.RangeTestRadioMode -> {
-                    val radioMode = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
+                    val radioMode =
+                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
                     val rangeTestMode = RangeTestMode.fromCode(radioMode)
 
                     if (service?.connectedGatt == gatt) {
                         if (presenter.getMode() == null && presenter.getTestRunning()) {
                             initTestView(rangeTestMode, false)
-                            presenter.onRunningStateUpdated(gatt.device.address, presenter.getTestRunning())
+                            presenter.onRunningStateUpdated(
+                                gatt.device.address,
+                                presenter.getTestRunning()
+                            )
                         } else if (presenter.getMode() != null) {
                             initTestView(rangeTestMode, false)
                         }
@@ -738,47 +1001,66 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                         presenter.setModeAt(if (activeDeviceId == 1) 2 else 1, rangeTestMode)
                     }
                 }
+
                 GattCharacteristic.RangeTestTxPower -> {
-                    val txPower = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, 0)
+                    val txPower =
+                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_SINT16, 0)
                     presenter.onTxPowerUpdated(gatt.device.address, txPower)
                 }
+
                 GattCharacteristic.RangeTestPayload -> {
-                    val payloadLength = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
+                    val payloadLength =
+                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
                     presenter.onPayloadLengthUpdated(gatt.device.address, payloadLength)
                 }
+
                 GattCharacteristic.RangeTestMaSize -> {
-                    val maWindowSize = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
+                    val maWindowSize =
+                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
                     presenter.onMaWindowSizeUpdated(gatt.device.address, maWindowSize)
                 }
+
                 GattCharacteristic.RangeTestLog -> {
-                    val log = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
+                    val log =
+                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
                     presenter.onUartLogEnabledUpdated(gatt.device.address, log != 0)
                 }
+
                 GattCharacteristic.RangeTestIsRunning -> {
                     presenter.getDeviceByAddress(gatt.device.address)?.let {
                         when (it.mode) {
                             null -> showModeSelectionDialog()
                             RangeTestMode.Tx -> {
                                 presenter.setTestRunning(
-                                        gatt.device.address,
-                                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0) != 0
+                                    gatt.device.address,
+                                    characteristic.getIntValue(
+                                        BluetoothGattCharacteristic.FORMAT_UINT8,
+                                        0
+                                    ) != 0
                                 )
                                 handleTxTimer(gatt.device.address, it.testRunning)
                                 presenter.onRunningStateUpdated(gatt.device.address, it.testRunning)
                             }
-                            else -> { }
+
+                            else -> {}
                         }
                     }
                 }
+
                 GattCharacteristic.RangePhyConfig -> {
-                    val phyConfig = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
+                    val phyConfig =
+                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
                     presenter.onPhyConfigUpdated(gatt.device.address, phyConfig)
 
                     val connectedGatt = service?.connectedGatt
                     if (connectedGatt != null) {
-                        queueRead(connectedGatt, getRangeTestCharacteristic(GattCharacteristic.RangeTestPayload))
+                        queueRead(
+                            connectedGatt,
+                            getRangeTestCharacteristic(GattCharacteristic.RangeTestPayload)
+                        )
                     }
                 }
+
                 GattCharacteristic.RangePhyList -> {
                     val phyConfigs = LinkedHashMap<Int, String>()
 
@@ -796,11 +1078,16 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
 
                     presenter.onPhyMapUpdated(gatt.device.address, phyConfigs)
                 }
-                else -> { }
+
+                else -> {}
             }
         }
 
-        private fun updatePresenter(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, gattCharacteristic: GattCharacteristic) {
+        private fun updatePresenter(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            gattCharacteristic: GattCharacteristic
+        ) {
 
             val descriptorValues = descriptor.value
 
@@ -809,9 +1096,14 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             }
 
             val firstValueArray = Arrays.copyOfRange(descriptorValues, 0, descriptorValues.size / 2)
-            val secondValueArray = Arrays.copyOfRange(descriptorValues, descriptorValues.size / 2, descriptorValues.size)
+            val secondValueArray = Arrays.copyOfRange(
+                descriptorValues,
+                descriptorValues.size / 2,
+                descriptorValues.size
+            )
             val wrappedFirstValue = ByteBuffer.wrap(firstValueArray).order(ByteOrder.LITTLE_ENDIAN)
-            val wrappedSecondValue = ByteBuffer.wrap(secondValueArray).order(ByteOrder.LITTLE_ENDIAN)
+            val wrappedSecondValue =
+                ByteBuffer.wrap(secondValueArray).order(ByteOrder.LITTLE_ENDIAN)
             val rangeFrom: Int
             val rangeTo: Int
 
@@ -821,16 +1113,19 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                     rangeTo = wrappedSecondValue.short.toInt()
                     presenter.onTxPowerRangeUpdated(gatt.device.address, rangeFrom, rangeTo)
                 }
+
                 GattCharacteristic.RangeTestPayload -> {
                     rangeFrom = firstValueArray[0].toInt()
                     rangeTo = secondValueArray[0].toInt()
                     presenter.onPayloadLengthRangeUpdated(gatt.device.address, rangeFrom, rangeTo)
                 }
+
                 GattCharacteristic.RangeTestMaSize -> {
                     rangeFrom = abs(firstValueArray[0].toInt())
                     rangeTo = abs(secondValueArray[0].toInt())
                     presenter.onMaWindowSizeRangeUpdated(gatt.device.address, rangeFrom, rangeTo)
                 }
+
                 else -> {
                 }
             }
@@ -885,7 +1180,10 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             } else characteristic.getIntValue(this.characteristic.format, 0)
         }
 
-        private fun writeValueFor(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic) {
+        private fun writeValueFor(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic
+        ) {
             characteristic.setValue(value, this.characteristic.format, 0)
             processor.queueWrite(gatt, characteristic)
         }
@@ -907,6 +1205,20 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
         textView?.background = ContextCompat.getDrawable(this, R.drawable.btn_rounded_red_dark)
         textView?.setTextColor(ContextCompat.getColor(this, R.color.silabs_white))
         textView?.typeface = Typeface.create("sans-serif", Typeface.NORMAL)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                service?.disconnectAllGatts()
+                gatt?.disconnect()
+                Handler(Looper.getMainLooper()).postDelayed({ onBackPressed() },500)
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     companion object {

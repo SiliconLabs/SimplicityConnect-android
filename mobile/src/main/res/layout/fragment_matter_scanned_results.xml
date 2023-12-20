@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_scanned_devices"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top"
+            android:layout_marginStart="@dimen/matter_2dp"
+            android:layout_marginEnd="@dimen/matter_2dp"
+            android:dividerHeight="@dimen/matter_2dp"
+            android:fadeScrollbars="false"
+            android:scrollbars="vertical"
+            android:scrollbarThumbVertical="@drawable/matter_scroller_bar"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbarFadeDuration="0"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <LinearLayout
+            android:id="@+id/placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="@dimen/adapter_item_padding"
+                    android:text="@string/matter_scanner_adapter_empty_list_title"
+                    android:textColor="@color/adapter_item_title_color"
+                    android:textSize="@dimen/text_size_XL"
+                     />
+
+                <TextView
+                    android:id="@+id/tv_empty_scan_action_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/matter_scanner_adapter_empty_list_message_idle"
+                    android:textColor="@color/adapter_item_title_color"
+                    android:textSize="@dimen/text_size_ML" />
+
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_quick_start_hyperlink"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|start"
+                android:layout_marginTop ="@dimen/matter_50dp"
+                android:padding="@dimen/matter_30dp"
+                android:textColor="@color/adapter_item_title_color"
+                android:textSize="@dimen/text_size_ML" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

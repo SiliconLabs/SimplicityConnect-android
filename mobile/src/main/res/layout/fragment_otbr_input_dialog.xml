@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@drawable/matter_popup_background"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/matter_10dp"
+        android:gravity="center"
+        android:text="@string/matter_alert_title"
+        android:textSize="@dimen/text_size_ML"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/matter_alert_message"
+        android:textSize="@dimen/text_size_M" />
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:layout_marginTop="@dimen/matter_5dp"
+        android:layout_marginStart="@dimen/matter_10dp"
+        android:layout_marginEnd="@dimen/matter_10dp"
+        android:background="@drawable/stroke_box"
+        android:gravity="top|start"
+        android:inputType="textMultiLine"
+        android:lines="10"
+        android:minLines="4"
+        android:padding="@dimen/matter_10dp"
+        android:scrollbars="vertical"
+        android:textSize="@dimen/text_size_SM" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/matter_5dp"
+        android:layout_marginBottom="@dimen/matter_10dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/negativeBtn"
+            style="@style/MatterButtonBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/matter_cancel" />
+
+        <Button
+            android:id="@+id/positiveBtn"
+            style="@style/MatterButtonBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/matter_10dp"
+            android:text="@string/matter_ok" />
+    </LinearLayout>
+</LinearLayout>

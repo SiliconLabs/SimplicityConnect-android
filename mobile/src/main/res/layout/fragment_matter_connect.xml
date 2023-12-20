@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:visibility="gone"
+        android:id="@+id/otbrEntry"
+        android:layout_width="match_parent"
+        android:layout_height="108dp"
+        android:layout_marginLeft="@dimen/matter_10dp"
+        android:layout_marginTop="@dimen/matter_25dp"
+        android:layout_marginRight="@dimen/matter_10dp"
+        android:background="@color/silabs_click_grey"
+        android:hint="Enter OTBR Info"
+        android:inputType="text" />
+
+        <Button
+            android:visibility="gone"
+            style="@style/ButtonBlue"
+            android:layout_marginTop="@dimen/matter_10dp"
+            android:id="@+id/submit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit"/>
+
+</LinearLayout>

@@ -78,7 +78,8 @@ class BluetoothService : LocalService<BluetoothService>() {
         MOTION,
         ENVIRONMENT,
         IOP_TEST,
-        ESL_DEMO
+        ESL_DEMO,
+        MATTER_DEMO
     }
 
     interface ScanListener {

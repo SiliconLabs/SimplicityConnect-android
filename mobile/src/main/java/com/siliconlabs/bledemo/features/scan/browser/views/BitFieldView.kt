@@ -1,10 +1,12 @@
 package com.siliconlabs.bledemo.features.scan.browser.views
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.data_types.Field
 import com.siliconlabs.bledemo.databinding.CharacteristicFieldBitfieldWriteModeBinding
@@ -17,9 +19,7 @@ class BitFieldView(
 ) : FieldView(context, field, fieldValue) {
     private val BUTTON_0 = 1
     private val BUTTON_1 = 2
-    private val BUTTON_1_PRESSED = 2
-    private val BUTTON_2_PRESSED = 4
-    private val BUTTON_0_AND_1_PRESSED = 6
+    private val BOTH_BUTTON_0_AND_BUTTON_1 = 3
     private val FIELDLENG = 4
 
     private val STATUS_ON = "ON"
@@ -29,94 +29,59 @@ class BitFieldView(
     private val bitfieldBuilder = fillStringBuilderWithZeros(field.getSizeInBytes() * 8)
     private var inputInfo: Int = 0
 
+    @SuppressLint("SetTextI18n")
     override fun createViewForRead(isParsedSuccessfully: Boolean, viewHandler: ViewHandler) {
         val fieldBits = getFieldValueAsLsoMsoBitsString()
-        inputInfo = getFirst4BitsAsInt(fieldBits)
 
-        val bitInfo = field.bitfield?.bits!!
-
-        if (inputInfo == BUTTON_1_PRESSED || inputInfo == BUTTON_0_AND_1_PRESSED) {
-
-            if (fieldBits.length >= FIELDLENG) {
-
-                var nibble = toggleFirstFourBits(fieldBits).toString()
-
-                nibble = getReverseBit(nibble)
-
-                val enumerations = ArrayList<String>()
-                val bits = field.bitfield?.bits!!
-                for (bit in bitInfo.indices) {
-                    var data: String = ""
-                    if (nibble[bit] == '0') {
-                        data =
-                            bitInfo[bit]?.enumerations!![nibble[bit].digitToInt()].value.toString()
-                    } else if (nibble[bit] == '1') {
-                        data =
-                            bitInfo[bit]?.enumerations!![nibble[bit].digitToInt()].value.toString()
-                    }
-                    enumerations.add(data)
-
-                    CharacteristicFieldReadModeBinding.inflate(LayoutInflater.from(context))
-                        .apply {
-                            characteristicFieldName.text = FLAGS + bits[bit].name
-                            if (isParsedSuccessfully) {
-                                characteristicFieldValue.text = enumerations[bit]
-                                if (bit == 1) {
-                                    characteristicFieldStatus.text = STATUS_ON
-                                } else {
-                                    characteristicFieldStatus.text = STATUS_OFF
-                                }
-                            }
-
-                            characteristicFieldStatus.visibility = View.VISIBLE
-                            viewHandler.handleFieldView(root, characteristicFieldValue)
-                        }
-                }
+        for (bit in field.bitfield?.bits!!) {
+            val enumerations = ArrayList<String>()
+            for (enumeration in bit.enumerations!!) {
+                enumerations.add(enumeration.value!!)
             }
+            // println("1613 enumerations $enumerations")
+            val chosenOption = getValueInStringBitsRange(
+                bit.index,
+                bit.index + bit.size,
+                fieldBits
+            )
+            println("1613 enumerations $chosenOption")
+            val bitFlagView = LayoutInflater.from(context).inflate(
+                R.layout.characteristic_field_read_mode, null, false
+            )
+            val bitFlagValueText = bitFlagView.findViewById<TextView>(
+                R.id.characteristic_field_value
+            )
+            val bitFlagNameText = bitFlagView.findViewById<TextView>(
+                R.id.characteristic_field_name
+            )
+            val bitFlagStatusText = bitFlagView.findViewById<TextView>(
+                R.id.characteristic_field_status
+            )
 
-        } else {
-
-            for (bit in field.bitfield?.bits!!) {
-                val enumerations = ArrayList<String>()
-                for (enumeration in bit.enumerations!!) {
-                    enumerations.add(enumeration.value!!)
+            val res = chosenOption.toBinary(2)
+            println("1613 res $res")
+            bitFlagNameText.text = FLAGS + bit.name
+            if (isParsedSuccessfully) {
+                var str = enumerations[chosenOption]
+                if (chosenOption == BUTTON_0) {
+                    str = enumerations[chosenOption]
+                } else if (chosenOption == BUTTON_1) {
+                    str = enumerations[chosenOption]
+                } else if (chosenOption == BOTH_BUTTON_0_AND_BUTTON_1) {
+                    str = enumerations[chosenOption]
                 }
-
-                val chosenOption = getValueInStringBitsRange(
-                    bit.index,
-                    bit.index + bit.size,
-                    fieldBits
-                )
-                val inputInfo = getFirst4BitsAsInt(fieldBits)
-                CharacteristicFieldReadModeBinding.inflate(LayoutInflater.from(context)).apply {
-                    characteristicFieldName.text = FLAGS + bit.name
-                    if (isParsedSuccessfully) {
-                        when (chosenOption) {
-                            BUTTON_0 -> {
-                                characteristicFieldValue.text = enumerations[inputInfo]
-                                characteristicFieldStatus.text = STATUS_OFF
-                                characteristicFieldStatus.visibility = View.VISIBLE
-                            }
-
-                            else -> {
-                                characteristicFieldValue.text = enumerations[chosenOption]
-                                characteristicFieldStatus.text = STATUS_OFF
-                                characteristicFieldStatus.visibility = View.VISIBLE
-                            }
-                        }
-
-                    }
-
-                    viewHandler.handleFieldView(root, characteristicFieldValue)
-                }
+                bitFlagValueText.text = str
+                bitFlagStatusText.text = STATUS_OFF
+                bitFlagStatusText.visibility = View.VISIBLE
             }
+            viewHandler.handleFieldView(bitFlagView, bitFlagValueText)
         }
     }
 
 
     override fun createViewForWrite(fieldOffset: Int, valueListener: ValueListener) {
         val fieldValueInBits = getFieldValueAsLsoMsoBitsString()
-
+        println("fieldValueInBits value $fieldValueInBits")
         for (bit in field.bitfield?.bits!!) {
             val enumerations = ArrayList<String>()
             for (enumeration in bit.enumerations!!) {
@@ -217,6 +182,7 @@ class BitFieldView(
         }
     }
 
+
     private fun setStringBuilderBitsInRange(
         builder: StringBuilder,
         startBit: Int,
@@ -254,36 +220,8 @@ class BitFieldView(
         return arr
     }
 
-    fun Int.toBinary(len: Int): String {
+    private fun Int.toBinary(len: Int): String {
         return String.format("%" + len + "s", this.toString(2)).replace(" ".toRegex(), "0")
     }
 
-    private fun getReverseBit(x: String): String {
-        return x.reversed()
-    }
-
-    private fun getFirst4BitsAsInt(binaryString: String): Int {
-        val trimmedBinaryString = binaryString.trim()
-        val substring = trimmedBinaryString.take(4)
-        return Integer.parseInt(substring, 2)
-    }
-
-    private fun toggleFirstFourBits(bitInput: String): String {
-        var res: String = ""
-        val toggledBits = StringBuilder(bitInput)
-        for (i in 0 until 4) {
-            if (bitInput[i] == '0') {
-                toggledBits.setCharAt(i, '1')
-            } else {
-                toggledBits.setCharAt(i, '0')
-            }
-        }
-        if (inputInfo == 6) {
-            toggledBits.setCharAt(1,'1')
-        }
-        if (toggledBits.length >= FIELDLENG) {
-            res = toggledBits.substring(0, FIELDLENG)
-        }
-        return res
-    }
 }

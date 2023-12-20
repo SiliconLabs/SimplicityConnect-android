@@ -150,6 +150,9 @@
     <dimen name="text_size_M">16sp</dimen>
     <dimen name="text_size_ML">18sp</dimen>
     <dimen name="text_size_L">20sp</dimen>
+    <dimen name="text_size_XL">25sp</dimen>
+    <dimen name="text_size_XXL">30sp</dimen>
+    <dimen name="text_size_XXXL">60sp</dimen>
 
     <!-- Material Dimensions -->
     <dimen name="material_listitem_height">72dp</dimen>
@@ -238,7 +241,7 @@
 
 
     <!-- Action Buttons -->
-    <dimen name="btn_disabled_alpha" type="integer" format="float" >0.7</dimen>
+    <dimen name="btn_disabled_alpha" format="float" type="integer">0.7</dimen>
 
     <!-- Icons -->
     <dimen name="main_view_icon_width">96dp</dimen>
@@ -285,4 +288,37 @@
 
     <dimen name="rv_loaded_images_horizontal_margin">12dp</dimen>
     <dimen name="rv_loaded_images_stroke_width">2dp</dimen>
+
+    <!-- ADAPTER ITEM -->
+    <dimen name="adapter_layout_padding">10dp</dimen>
+    <dimen name="adapter_item_padding">5dp</dimen>
+    <dimen name="adapter_item_title">18dp</dimen>
+    <dimen name="adapter_label_big_size">15sp</dimen>
+    <dimen name="adapter_label_medium_size">14sp</dimen>
+    <dimen name="adapter_label_small_size">12sp</dimen>
+    <dimen name="adapter_label_ultra_small_size">10sp</dimen>
+    <dimen name="adapter_bottom_layout_padding">20dp</dimen>
+
+    <!--    Matter -->
+    <dimen name="matter_0dp">0dp</dimen>
+    <dimen name="matter_1dp">1dp</dimen>
+    <dimen name="matter_2dp">2dp</dimen>
+    <dimen name="matter_5dp">5dp</dimen>
+    <dimen name="matter_8dp">8dp</dimen>
+    <dimen name="matter_10dp">10dp</dimen>
+    <dimen name="matter_15dp">15dp</dimen>
+    <dimen name="matter_18dp">18dp</dimen>
+    <dimen name="matter_20dp">20dp</dimen>
+    <dimen name="matter_25dp">25dp</dimen>
+    <dimen name="matter_30dp">30dp</dimen>
+    <dimen name="matter_36dp">36dp</dimen>
+    <dimen name="matter_38dp">38dp</dimen>
+    <dimen name="matter_40dp">40dp</dimen>
+    <dimen name="matter_50dp">50dp</dimen>
+    <dimen name="matter_90dp">90dp</dimen>
+    <dimen name="matter_200dp">200dp</dimen>
+
+    <dimen name="matter_preview_height">380dp</dimen>
+    <dimen name="matter_light_height">200dp</dimen>
+    <dimen name="matter_margin">10dp</dimen>
 </resources>

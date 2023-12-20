@@ -39,4 +39,7 @@ object Constants {
      * Maximum expected Tx power (in dBm) in UID and URL frames.
      */
     const val MAX_EXPECTED_TX_POWER = 20
+
+    /*delay timer for scanning status of matter device*/
+    const val SCAN_TIMER:Long = 5
 }

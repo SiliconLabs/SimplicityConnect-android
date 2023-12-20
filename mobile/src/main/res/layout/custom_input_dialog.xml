@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/matter_progress_shape"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/matter_15dp">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/matter_5dp"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_ML"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_sub_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/matter_5dp"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_SM"/>
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/matter_8dp"
+        android:background="@drawable/edit_text_border"
+        android:hint="@string/matter_custom_alert_enter_text"
+        android:inputType="text"
+        android:padding="@dimen/matter_10dp" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/matter_8dp"
+        android:background="@color/silabs_blue"
+        android:onClick="onOkButtonClick"
+        android:text="@string/matter_custom_alert_add"
+        android:textColor="@color/white" />
+
+</LinearLayout>
