@@ -28,6 +28,7 @@ EFR Connect includes many demos to test sample apps in the Silicon Labs GSDK qui
 - **Environment**: Read and display the data from the on-board sensors on a Silicon Labs Thunderboard or Dev Kit.
 - **Wi-Fi Commissioning**: Commission a Wi-Fi device over BLE.
 - **Bluetooth Electronic Shelf Labels (ESL)**: Adds and commissions ESL tags to the system network by scanning the tag's QR code with the mobile device's camera and provides the user a UI to view the list commissioned tags and control them.
+- **Matter**: Commission and control of the Matter devices over Thread and Wi-Fi.
 
 ## Development Features
 EFR Connect helps developers create and troubleshoot Bluetooth applications running on Silicon Labs’ BLE hardware. Here’s a rundown of some example functionalities.
