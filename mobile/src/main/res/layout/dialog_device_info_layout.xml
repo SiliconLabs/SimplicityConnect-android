@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/rounded_dialog_background"
+    android:paddingBottom="@dimen/matter_10dp"
+    android:paddingTop="@dimen/matter_10dp">
+
+    <!-- Title TextView -->
+    <TextView
+        android:textSize="17dp"
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textStyle="bold"
+        android:gravity="left"
+        android:paddingBottom="@dimen/matter_5dp"
+        android:textColor="@color/black"
+        android:paddingStart="@dimen/matter_10dp"
+        android:text="QR Code Info" />
+
+    <!-- Message TextView -->
+    <LinearLayout
+        android:background="@color/dialog_loading_spinner_start"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <TextView
+            android:textSize="15sp"
+            android:textStyle="normal"
+            android:textColor="@color/black"
+            android:id="@+id/dialog_message"
+            android:layout_width="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:text="Message" />
+    </LinearLayout>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/matter_10dp"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:textSize="12dp"
+            style="@style/MatterButtonBlue"
+            android:id="@+id/btn_negative"
+            android:background="@color/silabs_white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/matter_5dp"
+            android:layout_weight="3"
+            android:textColor="@color/silabs_dark_blue"
+            android:textAllCaps="false"
+            android:text="Cancle" />
+        <Button
+            android:textSize="12dp"
+            android:id="@+id/btn_positive"
+            style="@style/MatterButtonBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/matter_5dp"
+            android:layout_weight="1"
+            android:text="@string/start_commissioning"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+
+</LinearLayout>

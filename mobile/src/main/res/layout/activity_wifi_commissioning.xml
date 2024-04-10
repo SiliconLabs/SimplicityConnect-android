@@ -19,7 +19,7 @@
             android:id="@+id/firmware_label_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
+            android:layout_weight="3"
             android:text="@string/firmware_version"
             android:textSize="@dimen/firmware_txt_size"
             android:textStyle="bold"
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/firmware_txt_size"
             android:textColor="@color/black"
-            android:layout_weight="0.5"
+            android:layout_weight="2"
             android:gravity="end" />
     </LinearLayout>
 

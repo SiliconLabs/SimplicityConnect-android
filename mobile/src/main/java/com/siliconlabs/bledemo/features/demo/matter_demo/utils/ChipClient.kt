@@ -60,10 +60,9 @@ object ChipClient {
     }
 
     private fun showMessage(msg: String, context: Context) {
-
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
+
     suspend fun getConnectedDevicePointer(context: Context, nodeId: Long): Long {
         // TODO (#21539) This is a memory leak because we currently never call releaseConnectedDevicePointer
         // once we are done with the returned device pointer. Memory leak was introduced since the refactor
@@ -79,7 +78,7 @@ object ChipClient {
                     }
 
                     override fun onConnectionFailure(nodeId: Long, error: Exception) {
-                      //  showMessage("Device is offline",context)
+                        //  showMessage("Device is offline",context)
                         val errorMessage = "Unable to get connected device with nodeId $nodeId"
                         Log.e(TAG, errorMessage, error)
                         continuation.resumeWithException(IllegalStateException(errorMessage))

@@ -50,7 +50,7 @@
                     android:padding="@dimen/adapter_item_padding"
                     android:text="@string/matter_scanner_adapter_empty_list_title"
                     android:textColor="@color/adapter_item_title_color"
-                    android:textSize="@dimen/text_size_XL"
+                    android:textSize="@dimen/text_size_L"
                      />
 
                 <TextView
@@ -58,9 +58,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:layout_gravity="center"
                     android:text="@string/matter_scanner_adapter_empty_list_message_idle"
                     android:textColor="@color/adapter_item_title_color"
-                    android:textSize="@dimen/text_size_ML" />
+                    android:textSize="@dimen/text_size_SM" />
 
 
             </LinearLayout>
@@ -70,10 +71,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center|start"
+                android:layout_gravity="center"
                 android:layout_marginTop ="@dimen/matter_50dp"
                 android:padding="@dimen/matter_30dp"
                 android:textColor="@color/adapter_item_title_color"
-                android:textSize="@dimen/text_size_ML" />
+                android:textSize="@dimen/text_size_SM" />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

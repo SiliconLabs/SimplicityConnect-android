@@ -432,14 +432,14 @@ class MatterConnectFragment : Fragment() {
 
         override fun onStatusUpdate(status: Int) {
             super.onStatusUpdate(status)
-            Timber.tag(TAG).e("onStatusUpdate :" + status.toString())
+            Timber.tag(TAG).e("onStatusUpdate : $status.toString()")
         }
 
 
         @SuppressLint("MissingPermission")
         override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
             super.onCommissioningComplete(nodeId, errorCode)
-            Timber.tag(TAG).e("onCommissioningComplete : NodeID: " + nodeId.toString())
+            Timber.tag(TAG).e("onCommissioningComplete : NodeID:  $nodeId.toString()")
             Timber.tag(TAG).e("onCommissioningComplete : errorCode: " + errorCode.toString())
             removeAlert()
             if (errorCode == STATUS_PAIRING_SUCCESS) {
@@ -455,7 +455,7 @@ class MatterConnectFragment : Fragment() {
                         override fun onSuccess(valueList: MutableList<ChipStructs.DescriptorClusterDeviceTypeStruct>?) {
 
                             Timber.tag(TAG)
-                                .e("deviceType " + valueList?.get(0)?.deviceType?.toInt()!!)
+                                .e("deviceType  $ valueList?.get(0)?.deviceType?.toInt()!!")
                             val deviceType = valueList?.get(0)?.deviceType?.toInt()!!
                             println("device Type: $deviceType}")
                             println("device Info: ${matterScanDevice.name}  DeviceId: ${deviceId}")

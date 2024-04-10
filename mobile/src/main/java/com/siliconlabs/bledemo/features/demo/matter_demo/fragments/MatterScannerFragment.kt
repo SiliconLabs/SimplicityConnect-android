@@ -38,6 +38,7 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.model.CHIPDeviceInfo
 import com.siliconlabs.bledemo.features.demo.matter_demo.model.ProvisionNetworkType
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.FragmentUtils
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.MessageDialogFragment
+import com.siliconlabs.bledemo.features.iop_test.utils.DialogDeviceInfoFragment
 import timber.log.Timber
 import java.util.concurrent.Executors
 import kotlin.math.abs
@@ -55,6 +56,8 @@ class MatterScannerFragment : Fragment() {
     private lateinit var payload: SetupPayload
     private var isShortDiscriminator = false
     private lateinit var qrCodeManualInput: String
+    private var deviceDialog: DialogDeviceInfoFragment? = null
+    private var deviceInfodialogShown = false
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -173,13 +176,27 @@ class MatterScannerFragment : Fragment() {
                         ALERT_NTW_MODE_DIALOG_TAG
                     )
                 if (prev == null) {
-                    networkSelectionDialog = MatterNetworkSelectionInputDialogFragment.newInstance()
+                    val chipDeviceInfo = """
+    Version: ${payload.version ?: "N/A"}
+    
+    Vendor ID: ${payload.vendorId ?: "N/A"}
+    
+    Product ID: ${payload.productId ?: "N/A"}
+    
+    Discriminator: ${payload.discriminator ?: "N/A"}
+    
+    Setup PIN Code: ${payload.setupPinCode ?: "N/A"}
+    
+    Discovery Capabilities: ${
+                        payload.discoveryCapabilities?.joinToString(", ") ?: "N/A"
+                    }
+    
+    Commissioning Flow: ${payload.commissioningFlow ?: "N/A"}
+""".trimIndent()
+                    showDeviceInfoDialog(chipDeviceInfo)
 
-                    networkSelectionDialog!!.setTargetFragment(this, DIALOG_NTW_MODE_FRAGMENT)
-                    networkSelectionDialog!!.show(
-                        requireActivity().supportFragmentManager,
-                        ALERT_NTW_MODE_DIALOG_TAG
-                    )
+
+
                 }
             }
 
@@ -217,14 +234,26 @@ class MatterScannerFragment : Fragment() {
                             ALERT_NTW_MODE_DIALOG_TAG
                         )
                     if (prev == null) {
-                        networkSelectionDialog =
-                            MatterNetworkSelectionInputDialogFragment.newInstance()
+                        val chipDeviceInfo = """
+    Version: ${payload.version ?: "N/A"}
+    
+    Vendor ID: ${payload.vendorId ?: "N/A"}
+    
+    Product ID: ${payload.productId ?: "N/A"}
+    
+    Discriminator: ${payload.discriminator ?: "N/A"}
+    
+    Setup PIN Code: ${payload.setupPinCode ?: "N/A"}
+    
+    Discovery Capabilities: ${
+                            payload.discoveryCapabilities?.joinToString(", ") ?: "N/A"
+                        }
+    
+    Commissioning Flow: ${payload.commissioningFlow ?: "N/A"}
+""".trimIndent()
+                        showDeviceInfoDialog(chipDeviceInfo)
 
-                        networkSelectionDialog!!.setTargetFragment(this, DIALOG_NTW_MODE_FRAGMENT)
-                        networkSelectionDialog!!.show(
-                            requireActivity().supportFragmentManager,
-                            ALERT_NTW_MODE_DIALOG_TAG
-                        )
+
                     }
                 }
 
@@ -427,6 +456,45 @@ class MatterScannerFragment : Fragment() {
         }
     }
 
+    private fun showDeviceInfoDialog(message: String) {
+        try {
+            if (isAdded && requireActivity() != null && !requireActivity().isFinishing) {
+                requireActivity().runOnUiThread {
+                    if (!deviceInfodialogShown && (deviceDialog == null || !deviceDialog!!.isShowing())) {
+                        deviceInfodialogShown=true
+                        deviceDialog = DialogDeviceInfoFragment.Builder()
+                            .setTitle(getString(R.string.qr_code_info))
+                            .setMessage(message)
+                            .setPositiveButton(getString(R.string.start_commissioning)) { dialog, which ->
+                                // Positive button click logic
+                                networkSelectionDialog =
+                                    MatterNetworkSelectionInputDialogFragment.newInstance()
+
+                                networkSelectionDialog!!.setTargetFragment(this, DIALOG_NTW_MODE_FRAGMENT)
+                                networkSelectionDialog!!.show(
+                                    requireActivity().supportFragmentManager, ALERT_NTW_MODE_DIALOG_TAG
+                                )
+                                deviceDialog?.isShowing()==false
+                                deviceInfodialogShown=false
+                            }
+                            .setNegativeButton("Cancel") { dialog, which ->
+                                deviceDialog?.dismiss()
+                                deviceDialog?.isShowing()==false
+                                deviceInfodialogShown=false
+                            }
+                            .build()
+
+                        deviceDialog?.show(parentFragmentManager, "DialogDeviceInfoFragment")
+                    }
+                }
+            } else {
+                Timber.e("Fail to read device detail")
+            }
+        } catch (e: Exception) {
+            Timber.e("Fail to read device detail $e")
+        }
+    }
+
     interface CallBack {
         fun onChipDeviceInfoReceived(deviceInfo: CHIPDeviceInfo, ntwInputType: String)
 
@@ -437,10 +505,10 @@ class MatterScannerFragment : Fragment() {
     companion object {
         private val TAG = MatterScannerFragment::class.java.classes.toString()
         private const val REQUEST_CODE_LOCATION_PERMISSION = 101
-        private const val REQUEST_CODE_CAMERA_PERMISSION = 100;
+        private const val REQUEST_CODE_CAMERA_PERMISSION = 100
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
-        private const val DIALOG_NTW_MODE_FRAGMENT = 998;
+        private const val DIALOG_NTW_MODE_FRAGMENT = 998
         const val CANCEL_REQ_CODE = 5000
         const val WIFI_REQ_CODE = 5001
         const val THREAD_REQ_CODE = 5002

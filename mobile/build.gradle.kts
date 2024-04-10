@@ -16,6 +16,7 @@ android {
     compileSdk = 33
     namespace = "com.siliconlabs.bledemo"
 
+
     defaultConfig {
         minSdk = 29
         targetSdk = 33
@@ -28,6 +29,11 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("debug")
+
+            ndk {
+                abiFilters.add("armeabi-v7a")
+                abiFilters.add("arm64-v8a")
+            }
         }
         debug {
             isDebuggable = true
@@ -51,8 +57,8 @@ android {
         create("blueGecko") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 46
-            versionName = "2.8.0"
+            versionCode = 47
+            versionName = "2.8.1"
         }
     }
 
@@ -67,7 +73,14 @@ android {
 
     buildFeatures {
         viewBinding = true
+
     }
+
+//    packagingOptions {
+//        jniLibs {
+//            useLegacyPackaging = true
+//        }
+//    }
 }
 
 dependencies {
@@ -95,7 +108,7 @@ dependencies {
     implementation("io.github.g00fy2.quickie:quickie-bundled:1.7.0")
 
     implementation("com.google.android.flexbox:flexbox:3.0.0")
-    implementation("com.github.PhilJay:MPAndroidChart:v3.0.3")
+   // implementation("com.github.PhilJay:MPAndroidChart:v3.0.3")
 
     // Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.3")
@@ -104,6 +117,7 @@ dependencies {
 
     // Dependency injection
     implementation("com.google.dagger:hilt-android:2.45")
+    implementation(files("libs/MPAndroidChart-v3.0.1.jar"))
     kapt("com.google.dagger:hilt-android-compiler:2.45")
 
     // View binding
@@ -115,6 +129,7 @@ dependencies {
     // Parsing
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.opencsv:opencsv:5.6")
+    implementation ("androidx.activity:activity:1.6.0-alpha05")
 
     // Only used for Int.pow() method in a couple of places
     implementation("com.google.guava:guava:29.0-android")

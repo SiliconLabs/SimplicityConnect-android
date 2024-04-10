@@ -263,7 +263,7 @@
     <string name="unknown_descriptor_label">Unknown descriptor</string>
     <string name="default_uuid_of_service">uuid</string>
     <string name="characteristic_default_name">Characteristic Name</string>
-    <string name="no_devices_found_title_copy">cNo devices found</string>
+    <string name="no_devices_found_title_copy">No devices found</string>
     <string name="device_scanning_background_message">Looking for nearby devices…</string>
     <string name="characteristic_dialog_default_service_name">Service Name</string>
     <string name="characteristic_dialog_default_charac_name">Characteristic Name</string>
@@ -1157,4 +1157,6 @@
     <string name="matter_custom_alert_enter_text">Enter text</string>
     <string name="please_enter_device_name">Please enter device name</string>
     <string name="please_enter_valid_device_name">Please enter valid device name</string>
+    <string name="start_commissioning">Start Commissioning</string>
+    <string name="qr_code_info">QR Code info</string>
 </resources>

@@ -1,0 +1,6 @@
+<!-- rounded_dialog_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="@dimen/matter_10dp" /> <!-- Adjust radius as needed -->
+    <solid android:color="@android:color/white" /> <!-- Background color -->
+</shape>
