@@ -57,8 +57,8 @@ android {
         create("blueGecko") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 47
-            versionName = "2.8.1"
+            versionCode = 48
+            versionName = "2.8.2"
         }
     }
 

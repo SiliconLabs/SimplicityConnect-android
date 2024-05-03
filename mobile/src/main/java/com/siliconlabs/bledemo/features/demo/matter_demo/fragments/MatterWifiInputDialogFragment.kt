@@ -73,7 +73,7 @@ class MatterWifiInputDialogFragment : DialogFragment() {
             }
             if (!FragmentUtils.isPasswordValid(wifiPassword)) {
                 Toast.makeText(requireContext(),
-                    getString(R.string.password_must_be_between_8_to_12_characters), Toast.LENGTH_SHORT)
+                    getString(R.string.password_must_be_min_8_characters), Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
             }

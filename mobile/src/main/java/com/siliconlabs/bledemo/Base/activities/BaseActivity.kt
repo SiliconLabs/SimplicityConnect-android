@@ -8,6 +8,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.dialogs.ProgressDialogWithSpinner
+import timber.log.Timber
 
 abstract class BaseActivity : AppCompatActivity() {
     enum class ConnectionStatus {
@@ -15,6 +16,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private var connectionStatusModalDialog: ProgressDialogWithSpinner? = null
+    private var isDialogVisible = false // Custom flag for dialog visibility
 
     @JvmOverloads
     fun showModalDialog(
@@ -39,6 +41,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
             if (!this@BaseActivity.isFinishing) {
                 connectionStatusModalDialog?.show(supportFragmentManager, null)
+                isDialogVisible = true
             }
         }
     }
@@ -49,9 +52,13 @@ abstract class BaseActivity : AppCompatActivity() {
 
     fun dismissModalDialog() {
         runOnUiThread {
-            if (connectionStatusModalDialog != null && connectionStatusModalDialog?.isVisible!!) {
+            if (isDialogVisible) {
+                Timber.e("Attempting to dismiss the dialog")
                 connectionStatusModalDialog?.dismiss()
                 connectionStatusModalDialog = null
+                isDialogVisible = false // Update the visibility flag after dismissing
+            } else {
+                Timber.e("Dialog is not visible, cannot dismiss")
             }
         }
     }

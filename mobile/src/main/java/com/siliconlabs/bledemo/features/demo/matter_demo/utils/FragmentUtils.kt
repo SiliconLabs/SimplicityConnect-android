@@ -28,7 +28,7 @@ object FragmentUtils {
     }
     fun isPasswordValid(password: String?): Boolean {
         val minLength = 8
-        val maxLength = 12
+        val maxLength = 100
 
         return password != null && password.length >= minLength && password.length <= maxLength
     }

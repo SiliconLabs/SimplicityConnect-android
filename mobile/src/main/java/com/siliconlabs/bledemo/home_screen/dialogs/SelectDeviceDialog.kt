@@ -166,7 +166,12 @@ class SelectDeviceDialog(
 
     private fun setReadingDialogMsgAndDiscoverServices(gatt: BluetoothGatt) {
         (activity as MainActivity).setModalDialogMessage(R.string.reading_board_type)
-        gatt.discoverServices()
+        val success = gatt.discoverServices()
+        if (!success) {
+            // Handle unsuccessful service discovery
+            showMessage(R.string.failed_to_discover_services)
+            (activity as MainActivity).dismissModalDialog()
+        }
     }
 
     private fun launchDemo(boardType: String? = null, powerSource: Int? = null) {

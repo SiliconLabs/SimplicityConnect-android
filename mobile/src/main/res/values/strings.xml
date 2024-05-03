@@ -1148,7 +1148,7 @@
     <string name="matter_validation_manual_qrcode">Enter valid QR Code</string>
     <string name="matter_occupancy_sensor_action">Press and Hold to detect the occupancy” and release the button to undetect the occupancy</string>
     <string name="ssid_and_password_required">SSID and password required.</string>
-    <string name="password_must_be_between_8_to_12_characters">Password must be between 8 to 12 characters.</string>
+    <string name="password_must_be_min_8_characters">Password must be minimum 8 characters.</string>
     <string name="add_device_subtitle">Add the device name. This is the name that will be used to reference this device.</string>
     <string name="add_device_name">Add Device Name</string>
     <string name="matter_scanner_info">Manual QR code payload ID:</string>
@@ -1159,4 +1159,5 @@
     <string name="please_enter_valid_device_name">Please enter valid device name</string>
     <string name="start_commissioning">Start Commissioning</string>
     <string name="qr_code_info">QR Code info</string>
+    <string name="failed_to_discover_services">Failed to discover services</string>
 </resources>
