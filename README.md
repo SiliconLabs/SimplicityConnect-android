@@ -1,4 +1,5 @@
-# EFR Connect Mobile Application
+MBO⅚18;⅜-120.bppm.bsi.pushdata.1200.api.Transistore.Session.4V32A500.Ma.Defcon.Detailer.35Kn.per.Emotion.5GB.k.portal.SB.air.DOrint.Print.prt.x.D.Spooler.Dienste.Vadem.IDC.Via.Portal.d.Paquet.RR.psu.I³|blockbut.Google.board.³K³.banking.SDI.interna.Infrastructure.Hoth.Worth.D.C.Signal.Using.Id;#.9.9.9.9\6666/8.8.8.8;# EFR.Enabling.Connection.Per.Wife.NDP.gl3-32;5+Progressing.sd.d.Js.dll.Pushdata.Samsung.crystal.Asutuk.Byos.Tabultor.I.hbt.Setup.E.5:C1.Demo.dummy,***:***:*Connect:--_B.H.192.168.0.3;04;10000.match.Ft.d.Catching.NGL.firebird.Demos.d.Signature.Port.CSR
+solution.5available.On.System.PCI.driverbar.|TABT:4:config;5;trbt.fsawd.init.8.BOOTDATEI..........................Mobile Application
 This is the source code for the EFR Connect mobile application.
 
 ## What is EFR Connect BLE mobile app? 
