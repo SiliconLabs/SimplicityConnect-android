@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/dialog_card" >
+
+    <LinearLayout
+        style="@style/dialog_margins"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
+        android:orientation="vertical" >
+
+        <TextView
+            style="@style/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dialog_margin_between_buttons"
+            android:layout_marginTop="@dimen/dialog_margin_between_buttons"
+            android:text="@string/configure_wi_fi_ota_server" />
+
+        <TextView
+            android:id="@+id/dialog_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dialog_margin_between_buttons"
+            android:text="@string/ota_demo_desc" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:gravity="center_vertical"
+                android:fontFamily="sans-serif"
+                android:text="@string/ip" />
+
+            <TextView
+                android:id="@+id/wifi_ip_address"
+                style="@style/button_external_link"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:layout_weight="0.7"
+                android:textSize="16sp"
+                android:text="190.202.20.101"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:gravity="center_vertical"
+                android:fontFamily="sans-serif"
+                android:text="@string/port" />
+
+            <EditText
+                android:id="@+id/port_id"
+                android:background="@drawable/background_grey_box"
+                android:paddingLeft="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:layout_width="0dp"
+                android:maxLength="4"
+                android:inputType="number"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:layout_weight="0.7"
+                android:textSize="16sp"
+                android:textColor="@color/blue_primary"
+                android:text="8080"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
+            android:layout_marginTop="@dimen/dialog_margin_between_buttons"
+            android:textSize="16sp"
+            android:text="@string/heading_ota_choose_file" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.3"
+                    android:gravity="center_vertical"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/select_file" />
+
+                <Button
+                    android:id="@+id/select_app_file_btn"
+                    style="@style/button_external_link"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center|left"
+                    android:layout_weight="0.7"
+                    android:text="@string/select_rps_file"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/space_S"
+            android:layout_marginHorizontal="@dimen/dialog_button_margin_end"
+            android:gravity="end">
+
+            <Button android:id="@+id/ota_cancel"
+                style="@style/dialog_button_negative_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginEnd="@dimen/dialog_margin_between_buttons"
+                android:text="@string/button_cancel" />
+
+            <Button android:id="@+id/ota_proceed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:fontFamily="sans-serif-medium"
+                style="@style/dialog_button_positive_action"
+                android:text="@string/btn_update" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

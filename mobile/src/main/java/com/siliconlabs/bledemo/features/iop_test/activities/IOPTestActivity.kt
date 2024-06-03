@@ -94,14 +94,18 @@ class IOPTestActivity : AppCompatActivity() {
     private var mIndexRunning = -1
     private var countReTest = 0
     private var iopPhase3IndexStartChildrenTest = -1
-
+    private var iopPhase3BondingStep = 2
+    private var iopPhase3ExtraDescriptor: BluetoothGattDescriptor? = null
+    private var read_CCCD_value = ByteArray(1)
+    var isCCCDPass = true
     private var testParametersService: BluetoothGattService? = null
     private var characteristicIOPPhase3Control: BluetoothGattCharacteristic? = null
     private var characteristicIOPPhase3Throughput: BluetoothGattCharacteristic? = null
     private var characteristicIOPPhase3ClientSupportedFeatures: BluetoothGattCharacteristic? = null
     private var characteristicIOPPhase3DatabaseHash: BluetoothGattCharacteristic? = null
     private var characteristicIOPPhase3IOPTestCaching: BluetoothGattCharacteristic? = null
-    private var characteristicIOPPhase3IOPTestServiceChangedIndication: BluetoothGattCharacteristic? = null
+    private var characteristicIOPPhase3IOPTestServiceChangedIndication: BluetoothGattCharacteristic? =
+        null
     private var characteristicIOPPhase3ServiceChanged: BluetoothGattCharacteristic? = null
     private var characteristicIOPPhase3DeviceName: BluetoothGattCharacteristic? = null
 
@@ -113,7 +117,8 @@ class IOPTestActivity : AppCompatActivity() {
     private var mBluetoothEnableDialog: Dialog? = null
 
     private val mListCharacteristics: MutableList<BluetoothGattCharacteristic> = ArrayList()
-    private val characteristicsPhase3Security: MutableList<BluetoothGattCharacteristic> = ArrayList()
+    private val characteristicsPhase3Security: MutableList<BluetoothGattCharacteristic> =
+        ArrayList()
 
     private var isDisabled = false
     private val mtuValue = 255
@@ -166,13 +171,17 @@ class IOPTestActivity : AppCompatActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             val state = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1)
             val prevState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1)
-            val msg = "Bond state change: state " + printBondState(state) + ", previous state " + printBondState(prevState)
+            val msg =
+                "Bond state change: state " + printBondState(state) + ", previous state " + printBondState(
+                    prevState
+                )
             Log.d(TAG, msg)
             if (state == BluetoothDevice.BOND_BONDED && prevState == BluetoothDevice.BOND_BONDING) {
                 handler?.postDelayed({
                     if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_SECURITY].getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING
-                          /*  || getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING]
-                                    .getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING*/) {
+                        || getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_LE_PRIVACY].getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING
+                    /*  || getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING]
+                              .getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING*/) {
                         if (mBluetoothGatt != null) {
                             mListCharacteristics.clear()
                             characteristicsPhase3Security.clear()
@@ -188,7 +197,11 @@ class IOPTestActivity : AppCompatActivity() {
                     }
                 }, 1600)
             } else if (state == BluetoothDevice.BOND_BONDING) {
-                Toast.makeText(this@IOPTestActivity, R.string.iop_test_toast_bonding, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@IOPTestActivity,
+                    R.string.iop_test_toast_bonding,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
 
@@ -210,28 +223,36 @@ class IOPTestActivity : AppCompatActivity() {
 
         private fun printVariant(variant: Int): String {
             if (variant == BluetoothDevice.PAIRING_VARIANT_PIN) {
-                Toast.makeText(this@IOPTestActivity, R.string.iop_test_toast_press_passkey, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@IOPTestActivity,
+                    R.string.iop_test_toast_press_passkey,
+                    Toast.LENGTH_LONG
+                ).show()
                 return "PAIRING_VARIANT_PIN"
             }
             return variant.toString()
         }
     }
-    private val bluetoothAdapterStateChangeListener: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val action = intent.action
-            val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
-            if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
-                Log.d(TAG, "BluetoothAdapter.ACTION_STATE_CHANGED mIndexRunning: $mIndexRunning,state: $state")
-                when (state) {
-                    BluetoothAdapter.STATE_OFF -> {
-                        disconnectGatt(mBluetoothGatt)
-                        handler?.removeCallbacksAndMessages(null)
-                        finish()
+    private val bluetoothAdapterStateChangeListener: BroadcastReceiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val action = intent.action
+                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
+                if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
+                    Log.d(
+                        TAG,
+                        "BluetoothAdapter.ACTION_STATE_CHANGED mIndexRunning: $mIndexRunning,state: $state"
+                    )
+                    when (state) {
+                        BluetoothAdapter.STATE_OFF -> {
+                            disconnectGatt(mBluetoothGatt)
+                            handler?.removeCallbacksAndMessages(null)
+                            finish()
+                        }
                     }
                 }
             }
         }
-    }
 
     /**
      * Update data test failed by item
@@ -243,13 +264,20 @@ class IOPTestActivity : AppCompatActivity() {
                 scanLeDevice(false)
                 getSiliconLabsTestInfo().listItemTest[index].setStatusTest(Common.IOP3_TC_STATUS_FAILED)
             }
-            POSITION_TEST_CONNECTION, POSITION_TEST_DISCOVER_SERVICE, POSITION_TEST_SERVICE -> disconnectGatt(mBluetoothGatt)
+
+            POSITION_TEST_CONNECTION, POSITION_TEST_DISCOVER_SERVICE, POSITION_TEST_SERVICE -> disconnectGatt(
+                mBluetoothGatt
+            )
+
             else -> {
             }
         }
+        Log.d(TAG, "listItemTest.size " + getSiliconLabsTestInfo().listItemTest.size)
+
         for (i in index until getSiliconLabsTestInfo().listItemTest.size) {
             getSiliconLabsTestInfo().listItemTest[i].setStatusTest(Common.IOP3_TC_STATUS_FAILED)
         }
+        Log.d(TAG, "POSITION_TEST_SCANNER " + POSITION_TEST_SCANNER)
         if (index >= POSITION_TEST_SCANNER) {
             isTestRunning = false
             isTestFinished = true
@@ -281,6 +309,7 @@ class IOPTestActivity : AppCompatActivity() {
                     Log.d(TAG, "scanLeDevice at POSITION_TEST_SCANNER")
                     scanLeDevice(true)
                 }
+
                 POSITION_TEST_CONNECTION -> connectToDevice(mBluetoothDevice)
                 POSITION_TEST_DISCOVER_SERVICE -> mBluetoothGatt?.requestMtu(247)
                 POSITION_TEST_SERVICE -> runChildrenTestCase(mIndexStartChildrenTest)
@@ -288,11 +317,19 @@ class IOPTestActivity : AppCompatActivity() {
                     Log.d(TAG, "POSITION_TEST_IOP3_THROUGHPUT")
                     iopPhase3RunTestCaseThroughput(1)
                 }
+
+                POSITION_TEST_IOP3_LE_PRIVACY -> {
+                    Log.d(TAG, "POSITION_TEST_IOP3_LE_PRIVACY")
+                    iopPhase3RunTestCaseLEPrivacy(1)
+                }
+
                 POSITION_TEST_IOP3_SECURITY -> {
                     Log.d(TAG, "POSITION_TEST_IOP3_SECURITY")
                     iopPhase3IndexStartChildrenTest = 0
                     iopPhase3RunTestCaseSecurity(iopPhase3IndexStartChildrenTest, 1)
                 }
+
+
                 /*
                 POSITION_TEST_IOP3_CACHING -> {
                     isServiceChangedIndication = 1
@@ -303,10 +340,12 @@ class IOPTestActivity : AppCompatActivity() {
                     iopPhase3IndexStartChildrenTest = 0
                     startOtaTestCase(iopPhase3IndexStartChildrenTest)
                 }
+
                 POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
                     iopPhase3IndexStartChildrenTest = 1
                     startOtaTestCase(iopPhase3IndexStartChildrenTest)
                 }
+
                 else -> {
                 }
             }
@@ -325,10 +364,13 @@ class IOPTestActivity : AppCompatActivity() {
             POSITION_TEST_SCANNER -> {
                 itemTestCaseInfo.timeStart = mStartTimeScanner
                 itemTestCaseInfo.setTimeEnd(System.currentTimeMillis())
-                Log.d(TAG, "finishItemTest: scanLeDevice startTime: " + itemTestCaseInfo.getTimeEnd())
+                Log.d(
+                    TAG,
+                    "finishItemTest: scanLeDevice startTime: " + itemTestCaseInfo.getTimeEnd()
+                )
                 if (itemTestCaseInfo.getStatusTest() == Common.IOP3_TC_STATUS_FAILED) {
                     countReTest++
-                    if (countReTest < 6) {
+                    if (countReTest < 7) {
                         itemTestCaseInfo.setStatusTest(-1)
                         startItemTest(item)
                         return
@@ -337,13 +379,17 @@ class IOPTestActivity : AppCompatActivity() {
                     countReTest = 0
                 }
             }
+
             POSITION_TEST_CONNECTION -> {
                 itemTestCaseInfo.timeStart = mStartTimeConnection
                 itemTestCaseInfo.setTimeEnd(System.currentTimeMillis())
-                Log.d(TAG, "finishItemTest: POSITION_TEST_CONNECTION time " + (System.currentTimeMillis() - mStartTimeConnection))
+                Log.d(
+                    TAG,
+                    "finishItemTest: POSITION_TEST_CONNECTION time " + (System.currentTimeMillis() - mStartTimeConnection)
+                )
                 if (itemTestCaseInfo.getStatusTest() == Common.IOP3_TC_STATUS_FAILED) {
                     countReTest++
-                    if (countReTest < 6) {
+                    if (countReTest < 7) {
                         if (isConnected) {
                             isConnected = false
                             mBluetoothGatt?.disconnect()
@@ -357,31 +403,51 @@ class IOPTestActivity : AppCompatActivity() {
                     countReTest = 0
                 }
             }
+
             POSITION_TEST_DISCOVER_SERVICE -> {
                 itemTestCaseInfo.timeStart = mStartTimeDiscover
                 itemTestCaseInfo.setTimeEnd(mEndTimeDiscover)
-                Log.d(TAG, "finishItemTest: POSITION_TEST_DISCOVER_SERVICE " + (mEndTimeDiscover - mStartTimeDiscover) + "ms")
+                Log.d(
+                    TAG,
+                    "finishItemTest: POSITION_TEST_DISCOVER_SERVICE " + (mEndTimeDiscover - mStartTimeDiscover) + "ms"
+                )
                 countReTest = 0
             }
+
             POSITION_TEST_SERVICE -> {
                 getItemTestCaseInfo(POSITION_TEST_SERVICE).checkStatusItemService()
                 Log.d(TAG, "finishItemTest: POSITION_TEST_SERVICE")
                 countReTest = 0
             }
+
             POSITION_TEST_IOP3_THROUGHPUT -> {
                 val throughputAcceptable = calculateAcceptableThroughput()
                 itemTestCaseInfo.setThroughputBytePerSec(mByteSpeed, throughputAcceptable)
-                Log.d(TAG, "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT mByteSpeed $mByteSpeed throughputAcceptable $throughputAcceptable")
+                Log.d(
+                    TAG,
+                    "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT mByteSpeed $mByteSpeed throughputAcceptable $throughputAcceptable"
+                )
                 countReTest = 0
             }
+
+            POSITION_TEST_IOP3_LE_PRIVACY -> {
+                getItemTestCaseInfo(POSITION_TEST_IOP3_LE_PRIVACY).checkStatusItemService()
+                Log.d(TAG, "finishItemTest: POSITION_TEST_IOP3_LE_PRIVACY")
+                countReTest = 0
+                isTestRunning = false
+                isTestFinished = true
+            }
+
             POSITION_TEST_IOP3_SECURITY -> {
                 getItemTestCaseInfo(POSITION_TEST_IOP3_SECURITY).checkStatusItemService()
                 Log.d(TAG, "finishItemTest: POSITION_TEST_IOP3_SECURITY")
                 countReTest = 0
-                isTestRunning = false
-                isTestFinished = true
+                //  isTestRunning = false
+                //  isTestFinished = true
                 mBluetoothService?.isNotificationEnabled = true
             }
+
+
             /*
             POSITION_TEST_IOP3_CACHING -> {
                 isTestRunning = false
@@ -392,39 +458,62 @@ class IOPTestActivity : AppCompatActivity() {
             else -> {
             }
         }
-        if (item != POSITION_TEST_IOP3_SECURITY && countReTest == 0) {
+        if (item != POSITION_TEST_IOP3_LE_PRIVACY && countReTest == 0) {
             startItemTest(item + 1)
         }
+        /*if (item != POSITION_TEST_IOP3_SECURITY && countReTest == 0) {
+          startItemTest(item + 1)
+      }*/
+
+
+
         runOnUiThread { updateUIFooter(isTestRunning) }
         mListener?.updateUi()
     }
 
     private fun calculateAcceptableThroughput(): Int {
-        val notLegacyFw = getSiliconLabsTestInfo().firmwareVersion.split('.')[0].let { it != "" && it.toInt() >= 6 }
+        val notLegacyFw =
+            getSiliconLabsTestInfo().firmwareVersion.split('.')[0].let { it != "" && it.toInt() >= 6 }
         val knownPhy = currentRxPhy in arrayOf(BluetoothDevice.PHY_LE_1M, BluetoothDevice.PHY_LE_2M)
-        return if(notLegacyFw && knownPhy) {
+
+
+        return if (notLegacyFw && knownPhy) {
             try {
-                Log.d(TAG, "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT calculating acceptable throughput (new method)")
+                Log.d(
+                    TAG,
+                    "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT calculating acceptable throughput (new method)"
+                )
                 val connectionParameters = getSiliconLabsTestInfo().connectionParameters!!
                 val pdu = connectionParameters.pdu
-                val tPacketMicroseconds: Int = when(currentRxPhy){
+                Log.d(TAG, "pdu : " + pdu)
+                val tPacketMicroseconds: Int = when (currentRxPhy) {
                     BluetoothDevice.PHY_LE_1M -> (8 * pdu) + 492
                     else -> (4 * pdu) + 396
                 }
-                val connectionIntervalMs: Double = getSiliconLabsTestInfo().connectionParameters!!.interval
+                val connectionIntervalMs: Double =
+                    getSiliconLabsTestInfo().connectionParameters!!.interval
                 val connectionIntervalMicroseconds = connectionIntervalMs * 1000
                 val connectionIntervalSeconds = connectionIntervalMs / 1000
+                Log.d(TAG, "connectionIntervalMs " + connectionIntervalMs)
                 val numPacket = floor(connectionIntervalMicroseconds / tPacketMicroseconds)
                 val sizeEffective = mtu - 3
                 val fragmentationCount = ceil(mtu.toFloat() / (pdu - 4))
-                val velExpected = numPacket * sizeEffective / fragmentationCount / connectionIntervalSeconds
+                val velExpected =
+                    numPacket * sizeEffective / fragmentationCount / connectionIntervalSeconds
                 (0.5 * velExpected).toInt()
             } catch (e: NullPointerException) {
-                Log.d(TAG, "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT Failed to calculate acceptable throughput")
+                Log.d(
+                    TAG,
+                    "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT Failed to calculate acceptable throughput"
+                )
                 0
             }
         } else {
-            Log.d(TAG, "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT calculating acceptable throughput (legacy method)")
+
+            Log.d(
+                TAG,
+                "finishItemTest: POSITION_TEST_IOP3_THROUGHPUT calculating acceptable throughput (legacy method)"
+            )
             (mPDULength) * 4 * 1000 * 65 / 1500
         }
     }
@@ -438,9 +527,15 @@ class IOPTestActivity : AppCompatActivity() {
     /**
      * Update data test after listening bluetooth gatt callback
      */
-    private fun updateDataTest(characteristic: BluetoothGattCharacteristic?, type: Int, status: Int) {
+    private fun updateDataTest(
+        characteristic: BluetoothGattCharacteristic?,
+        type: Int,
+        status: Int
+    ) {
         if (characteristic != null) {
-            for (itemChildrenTest: ChildrenItemTestInfo in getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!) {
+            for (itemChildrenTest: ChildrenItemTestInfo in getListChildrenItemTestCase(
+                POSITION_TEST_SERVICE
+            )!!) {
                 if (itemChildrenTest.characteristic?.uuid.toString() == characteristic.uuid.toString()) {
                     itemChildrenTest.statusRunTest = 1 // 0 running, 1 finish test
                     itemChildrenTest.valueMtu = mtu
@@ -456,7 +551,9 @@ class IOPTestActivity : AppCompatActivity() {
                     itemChildrenTest.setDataAndCompareResult(characteristic)
                 }
             }
-            for (itemChildrenTest: ChildrenItemTestInfo in getListChildrenItemTestCase(POSITION_TEST_IOP3_SECURITY)!!) {
+            for (itemChildrenTest: ChildrenItemTestInfo in getListChildrenItemTestCase(
+                POSITION_TEST_IOP3_SECURITY
+            )!!) {
                 if (itemChildrenTest.characteristic?.uuid.toString() == characteristic.uuid.toString()) {
                     itemChildrenTest.statusRunTest = 1 // 0 running, 1 finish test
                     when (type) {
@@ -468,6 +565,9 @@ class IOPTestActivity : AppCompatActivity() {
                     itemChildrenTest.setDataAndCompareResult(characteristic)
                 }
             }
+
+
+
             if (mIndexRunning == POSITION_TEST_IOP3_OTA_ACK || mIndexRunning == POSITION_TEST_IOP3_OTA_WITHOUT_ACK) {
                 if (!otaProcess) {
                     testParametersService?.let { readCharacteristic(it.characteristics[0]) }
@@ -477,15 +577,27 @@ class IOPTestActivity : AppCompatActivity() {
                         } else {
                             checkIOP3OTA(mIndexRunning, Common.IOP3_TC_STATUS_FAILED)
                         }
-                        handler?.postDelayed( {
-                            finishItemTest(mIndexRunning, getSiliconLabsTestInfo().listItemTest[mIndexRunning])
-                        }, 100) /* Read testParametersService characteristic before starting next test case. */
+                        handler?.postDelayed(
+                            {
+                                finishItemTest(
+                                    mIndexRunning,
+                                    getSiliconLabsTestInfo().listItemTest[mIndexRunning]
+                                )
+                            },
+                            100
+                        ) /* Read testParametersService characteristic before starting next test case. */
                     }
                 }
             } else if (characteristicIOPPhase3Control?.uuid.toString() == characteristic.uuid.toString()) {
                 if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_THROUGHPUT].getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING) {
                     iopPhase3RunTestCaseThroughput(0)
-                } /* else if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING]
+                } /*else if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_LE_PRIVACY].getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING) {
+                    iopPhase3RunTestCaseLEPrivacy(0)
+                    finishItemTest(
+                        POSITION_TEST_IOP3_LE_PRIVACY,
+                        getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_LE_PRIVACY]
+                    )
+                }*/ /* else if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING]
                                 .getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING) {
                     if (isServiceChangedIndication == 0) {
                         handler?.postDelayed({
@@ -501,7 +613,8 @@ class IOPTestActivity : AppCompatActivity() {
                 if (isServiceChangedIndication == 1) {
                     if (characteristicIOPPhase3IOPTestServiceChangedIndication != null) {
                         if (characteristicIOPPhase3IOPTestServiceChangedIndication?.uuid.toString() == characteristic.uuid.toString()) {
-                            val itemChildrenTest = getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![isServiceChangedIndication]
+                            val itemChildrenTest =
+                                getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![isServiceChangedIndication]
                             itemChildrenTest.statusRead = status
                             itemChildrenTest.statusRunTest = 1
                             itemChildrenTest.setDataAndCompareResult((itemChildrenTest.characteristic)!!)
@@ -510,15 +623,23 @@ class IOPTestActivity : AppCompatActivity() {
                 } else {
                     if (characteristicIOPPhase3DatabaseHash?.uuid.toString() == characteristic.uuid.toString()) {
                         if (iopPhase3DatabaseHash != null) {
-                            val itemTestInfo = getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![0]
-                            if (!itemTestInfo.compareValueCharacteristic(iopPhase3DatabaseHash!!, Converters.getHexValue(characteristic.value))) {
+                            val itemTestInfo =
+                                getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![0]
+                            if (!itemTestInfo.compareValueCharacteristic(
+                                    iopPhase3DatabaseHash!!,
+                                    Converters.getHexValue(characteristic.value)
+                                )
+                            ) {
                                 Log.d(TAG, "iopPhase3DatabaseHash has changed")
                                 mListCharacteristics.clear()
                                 characteristicsPhase3Security.clear()
                                 refreshServices()
                             }
                         } else {
-                            setNotificationForCharacteristic(characteristicIOPPhase3ServiceChanged, Notifications.DISABLED)
+                            setNotificationForCharacteristic(
+                                characteristicIOPPhase3ServiceChanged,
+                                Notifications.DISABLED
+                            )
                         }
                         iopPhase3DatabaseHash = Converters.getHexValue(characteristic.value)
                         Log.d(TAG, "characteristicIOPPhase3DatabaseHash: $iopPhase3DatabaseHash")
@@ -526,7 +647,8 @@ class IOPTestActivity : AppCompatActivity() {
                         readCharacteristic(characteristicIOPPhase3DatabaseHash)
                     } else if (characteristicIOPPhase3IOPTestCaching != null) {
                         if (characteristicIOPPhase3IOPTestCaching?.uuid.toString() == characteristic.uuid.toString()) {
-                            val itemChildrenTest = getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![isServiceChangedIndication]
+                            val itemChildrenTest =
+                                getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![isServiceChangedIndication]
                             itemChildrenTest.statusRead = status
                             itemChildrenTest.statusRunTest = 1
                             itemChildrenTest.setDataAndCompareResult((itemChildrenTest.characteristic)!!)
@@ -534,11 +656,15 @@ class IOPTestActivity : AppCompatActivity() {
                             if (itemChildrenTest.statusChildrenTest) {
                                 getItemTestCaseInfo(POSITION_TEST_IOP3_CACHING).setStatusTest(Common.IOP3_TC_STATUS_PASS)
                             }
-                            finishItemTest(POSITION_TEST_IOP3_CACHING, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING])
+                            finishItemTest(
+                                POSITION_TEST_IOP3_CACHING,
+                                getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING]
+                            )
                         }
                     }
                 }
             }
+
         }
     }
 
@@ -565,7 +691,12 @@ class IOPTestActivity : AppCompatActivity() {
                 mBluetoothBinding = object : BluetoothService.Binding(applicationContext) {
                     override fun onBound(service: BluetoothService?) {
                         service?.isNotificationEnabled = false
-                        mBluetoothGatt = mBluetoothDevice?.connectGatt(applicationContext, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
+                        mBluetoothGatt = mBluetoothDevice?.connectGatt(
+                            applicationContext,
+                            false,
+                            gattCallback,
+                            BluetoothDevice.TRANSPORT_LE
+                        )
                     }
                 }
                 mBluetoothBinding?.bind()
@@ -623,6 +754,38 @@ class IOPTestActivity : AppCompatActivity() {
         }, 1000)
     }
 
+    private var onConnectionSuccess: (() -> Unit)? = null
+    private var onConnectionFailure: (() -> Unit)? = null
+
+
+    private fun connectToDevice(
+        bluetoothDevice: BluetoothDevice?,
+        onConnectionSuccess: (() -> Unit)? = null,
+        onConnectionFailure: (() -> Unit)? = null
+    ) {
+        Log.d(TAG, "connectToDevice() with param called with: bluetoothDevice = $bluetoothDevice")
+        mStartTimeConnection = System.currentTimeMillis()
+
+        // Save the callback functions
+        this.onConnectionSuccess = onConnectionSuccess
+        this.onConnectionFailure = onConnectionFailure
+
+        Log.d(TAG, "connectToDevice() with param, postDelayed connectionRunnable")
+        handler?.postDelayed({
+            // Execute the connection logic after the delay
+            mBluetoothBinding = object : BluetoothService.Binding(applicationContext) {
+                override fun onBound(service: BluetoothService?) {
+                    mBluetoothService = service
+                    service?.isNotificationEnabled = false
+                    service?.connectGatt(bluetoothDevice!!, false, gattCallback)
+                    mBluetoothGatt = service?.connectedGatt!!
+                }
+            }
+            mBluetoothBinding?.bind()
+        }, 15000) // 15 seconds delay
+    }
+
+
     private fun connectToDevice(bluetoothDevice: BluetoothDevice?) {
         Log.d(TAG, "connectToDevice() called with: bluetoothDevice = $bluetoothDevice")
         mStartTimeConnection = System.currentTimeMillis()
@@ -667,20 +830,40 @@ class IOPTestActivity : AppCompatActivity() {
             btn_start_and_stop_test.apply {
                 text = getString(R.string.button_run_test)
                 isEnabled = true
-                backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@IOPTestActivity, R.color.silabs_blue))
+                backgroundTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        this@IOPTestActivity,
+                        R.color.silabs_blue
+                    )
+                )
             }
             if (isTestFinished) {
                 shareMenuItem?.isVisible = true
+                mBluetoothDevice?.let { removeBond(it) }
             }
         } else {
             btn_start_and_stop_test?.apply {
                 text = getString(R.string.button_waiting)
-                backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this@IOPTestActivity, R.color.silabs_inactive_light))
+                backgroundTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        this@IOPTestActivity,
+                        R.color.silabs_inactive_light
+                    )
+                )
                 isEnabled = false
             }
             shareMenuItem?.isVisible = false
         }
     }
+
+    private fun removeBond(device: BluetoothDevice): Boolean {
+        return try {
+            return device::class.java.getMethod("removeBond").invoke(device) as Boolean
+        } catch (e: Exception) {
+            false
+        }
+    }
+
 
     /**
      * Show information device test and progress test item
@@ -689,15 +872,21 @@ class IOPTestActivity : AppCompatActivity() {
         val siliconlabsTestInfo = getSiliconLabsTestInfo()
         runOnUiThread {
             if (isInformation || item == POSITION_TEST_CONNECTION) {
-                tv_fw_name.text = getString(R.string.iop_test_label_fw_name, siliconlabsTestInfo.fwName)
-                tv_device_name.text = getString(R.string.iop_test_label_device_name, siliconlabsTestInfo.phoneName)
+                tv_fw_name.text =
+                    getString(R.string.iop_test_label_fw_name, siliconlabsTestInfo.fwName)
+                tv_device_name.text =
+                    getString(R.string.iop_test_label_device_name, siliconlabsTestInfo.phoneName)
             }
             val total = siliconlabsTestInfo.totalTestCase.toString()
             if (item == POSITION_TEST_SERVICE) {
                 testCaseCount = item + mIndexStartChildrenTest + 1
             }
             Log.d(TAG, "The number of test case $testCaseCount")
-            tv_progress.text = getString(R.string.iop_test_label_progress_count_test, testCaseCount.toString(), total)
+            tv_progress.text = getString(
+                R.string.iop_test_label_progress_count_test,
+                testCaseCount.toString(),
+                total
+            )
         }
     }
 
@@ -783,7 +972,11 @@ class IOPTestActivity : AppCompatActivity() {
 
     private fun checkIfBluetoothIsSupported() {
         if (BluetoothAdapter.getDefaultAdapter() == null) {
-            Toast.makeText(this, R.string.iop_test_toast_bluetooth_not_supported, Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                R.string.iop_test_toast_bluetooth_not_supported,
+                Toast.LENGTH_SHORT
+            ).show()
             finish()
         }
     }
@@ -802,10 +995,12 @@ class IOPTestActivity : AppCompatActivity() {
                 saveLogFile()
                 true
             }
+
             android.R.id.home -> {
                 onBackPressed()
                 true
             }
+
             else -> false
         }
     }
@@ -822,9 +1017,19 @@ class IOPTestActivity : AppCompatActivity() {
     }
 
     private fun registerBroadcastReceivers() {
-        registerReceiver(mBondStateReceiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
-        registerReceiver(mPairRequestReceiver, IntentFilter(BluetoothDevice.ACTION_PAIRING_REQUEST))
-        registerReceiver(bluetoothAdapterStateChangeListener, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
+        registerReceiver(
+            mBondStateReceiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED),
+            RECEIVER_EXPORTED
+        )
+        registerReceiver(
+            mPairRequestReceiver, IntentFilter(BluetoothDevice.ACTION_PAIRING_REQUEST),
+            RECEIVER_EXPORTED
+        )
+        registerReceiver(
+            bluetoothAdapterStateChangeListener,
+            IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED),
+            RECEIVER_EXPORTED
+        )
     }
 
     private fun handleClickEvents() {
@@ -887,15 +1092,15 @@ class IOPTestActivity : AppCompatActivity() {
      */
     private fun showDialogConfirmStopTest() {
         AlertDialog.Builder(this)
-                .setMessage(getString(R.string.iop_test_message_stop_test))
-                .setPositiveButton(getString(R.string.button_ok)) { dialog, _ ->
-                    dialog.dismiss()
-                    mBluetoothService?.isNotificationEnabled = true
-                    disconnectGatt(mBluetoothGatt)
-                    finish()
-                }.setNegativeButton(getString(R.string.button_cancel)) { dialog, _ ->
-                    dialog.dismiss()
-                }.show()
+            .setMessage(getString(R.string.iop_test_message_stop_test))
+            .setPositiveButton(getString(R.string.button_ok)) { dialog, _ ->
+                dialog.dismiss()
+                mBluetoothService?.isNotificationEnabled = true
+                disconnectGatt(mBluetoothGatt)
+                finish()
+            }.setNegativeButton(getString(R.string.button_cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }.show()
     }
 
     /**
@@ -916,6 +1121,7 @@ class IOPTestActivity : AppCompatActivity() {
                     mBluetoothEnableDialog?.show()
                 }
             }
+
             GBL_FILE_CHOICE_REQUEST_CODE -> {
                 intent?.data?.let {
                     otaFileManager?.readFilename(it)
@@ -924,9 +1130,14 @@ class IOPTestActivity : AppCompatActivity() {
                         otaFileManager?.readFile(it)
                         otaFileSelectionDialog?.enableUploadButton()
                     } else {
-                        Toast.makeText(this, getString(R.string.incorrect_file), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, getString(R.string.incorrect_file), Toast.LENGTH_SHORT)
+                            .show()
                     }
-                } ?: Toast.makeText(this, getString(R.string.chosen_file_not_found), Toast.LENGTH_SHORT).show()
+                } ?: Toast.makeText(
+                    this,
+                    getString(R.string.chosen_file_not_found),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -934,7 +1145,10 @@ class IOPTestActivity : AppCompatActivity() {
     /**
      * Enable indicate by characteristics
      */
-    private fun setIndicationProperty(characteristic: BluetoothGattCharacteristic?, indicate: Notifications) {
+    private fun setIndicationProperty(
+        characteristic: BluetoothGattCharacteristic?,
+        indicate: Notifications
+    ) {
         setNotificationForCharacteristic(
             mBluetoothGatt!!,
             characteristic,
@@ -946,7 +1160,10 @@ class IOPTestActivity : AppCompatActivity() {
     /**
      * Enable notification by characteristics
      */
-    private fun setNotificationForCharacteristic(characteristic: BluetoothGattCharacteristic?, notifications: Notifications) {
+    private fun setNotificationForCharacteristic(
+        characteristic: BluetoothGattCharacteristic?,
+        notifications: Notifications
+    ) {
         setNotificationForCharacteristic(
             mBluetoothGatt!!,
             characteristic,
@@ -955,10 +1172,16 @@ class IOPTestActivity : AppCompatActivity() {
         )
     }
 
+
     /**
-     * Write down the value in characteristics
+     * Write down the value in characteristics and wait for response
      */
-    private fun writeValueToCharacteristic(characteristic: BluetoothGattCharacteristic?, value: String?, byteValues: ByteArray?) {
+    private fun writeValueToCharacteristic(
+        characteristic: BluetoothGattCharacteristic?,
+        value: String?,
+        byteValues: ByteArray?,
+        callback: (Boolean) -> Unit // Callback parameter
+    ) {
         var newValue: ByteArray? = null
         if (byteValues != null) {
             newValue = byteValues
@@ -967,13 +1190,56 @@ class IOPTestActivity : AppCompatActivity() {
         }
         if (isSetProperty(Common.PropertyType.WRITE, characteristic!!.properties)) {
             characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-        } else if (isSetProperty(Common.PropertyType.WRITE_NO_RESPONSE, characteristic.properties)) {
+        } else if (isSetProperty(
+                Common.PropertyType.WRITE_NO_RESPONSE,
+                characteristic.properties
+            )
+        ) {
+            characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+        }
+        characteristic.value = newValue
+        Log.d(TAG, "writeValueToCharacteristic " + characteristic.uuid.toString())
+
+        // Perform the write operation asynchronously
+        val success = mBluetoothGatt?.writeCharacteristic(characteristic) ?: false
+
+        // Invoke the callback with the write operation result
+        callback(success)
+    }
+
+    /**
+     * Write down the value in characteristics
+     */
+    private fun writeValueToCharacteristic(
+        characteristic: BluetoothGattCharacteristic?,
+        value: String?,
+        byteValues: ByteArray?
+    ) {
+        var newValue: ByteArray? = null
+        if (byteValues != null) {
+            newValue = byteValues
+        } else if (!TextUtils.isEmpty(value)) {
+            newValue = Converters.hexToByteArray(value!!)
+        }
+        if (isSetProperty(Common.PropertyType.WRITE, characteristic!!.properties)) {
+            characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        } else if (isSetProperty(
+                Common.PropertyType.WRITE_NO_RESPONSE,
+                characteristic.properties
+            )
+        ) {
             characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
         }
         characteristic.value = newValue
         Log.d(TAG, "writeValueToCharacteristic " + characteristic.uuid.toString())
         if (!mBluetoothGatt!!.writeCharacteristic(characteristic)) {
-            Log.e(TAG, String.format("ERROR: writeCharacteristic failed for characteristic: %s", characteristic.uuid))
+            Log.e(
+                TAG,
+                String.format(
+                    "ERROR: writeCharacteristic failed for characteristic: %s",
+                    characteristic.uuid
+                )
+            )
         }
     }
 
@@ -1016,15 +1282,18 @@ class IOPTestActivity : AppCompatActivity() {
                             CommonUUID.Characteristic.IOP_TEST_PHASE3_SERVICE_CHANGED.toString() == item.uuid.toString() -> {
                                 characteristicIOPPhase3ServiceChanged = item
                             }
+
                             CommonUUID.Characteristic.IOP_TEST_PHASE3_CLIENT_SUPPORT_FEATURES.toString() == item.uuid.toString() -> {
                                 characteristicIOPPhase3ClientSupportedFeatures = item
                             }
+
                             CommonUUID.Characteristic.IOP_TEST_PHASE3_DATABASE_HASH.toString() == item.uuid.toString() -> {
                                 characteristicIOPPhase3DatabaseHash = item
                             }
                         }
                     }
                 }
+
                 CommonUUID.Service.UUID_GENERIC_ACCESS.toString() -> {
                     val gattCharacteristics = gattService.characteristics
                     for (item: BluetoothGattCharacteristic in gattCharacteristics) {
@@ -1034,10 +1303,12 @@ class IOPTestActivity : AppCompatActivity() {
                         }
                     }
                 }
+
                 CommonUUID.Service.TEST_PARAMETERS.toString() -> {
                     count++
                     testParametersService = gattService
                 }
+
                 CommonUUID.Service.UUID_PROPERTIES_SERVICE.toString(),
                 CommonUUID.Service.UUID_CHARACTERISTICS_SERVICE.toString() -> {
                     count++
@@ -1046,6 +1317,7 @@ class IOPTestActivity : AppCompatActivity() {
                         mListCharacteristics.add(item)
                     }
                 }
+
                 CommonUUID.Service.UUID_PHASE3_SERVICE.toString() -> {
                     Log.d(TAG, "mBluetoothGattServicePhase3 " + gattService.uuid.toString())
                     val gattCharacteristicsIOPPhase3 = gattService.characteristics
@@ -1055,17 +1327,27 @@ class IOPTestActivity : AppCompatActivity() {
                             CommonUUID.Characteristic.IOP_TEST_PHASE3_CONTROL.toString() -> {
                                 characteristicIOPPhase3Control = item
                             }
+
                             CommonUUID.Characteristic.IOP_TEST_THROUGHPUT.toString() -> {
                                 characteristicIOPPhase3Throughput = item
                             }
+
                             CommonUUID.Characteristic.IOP_TEST_GATT_CATCHING.toString() -> {
                                 characteristicIOPPhase3IOPTestCaching = item
-                                Log.d(TAG, "characteristicIOPPhase3IOPTestCaching " + characteristicIOPPhase3IOPTestCaching?.uuid.toString())
+                                Log.d(
+                                    TAG,
+                                    "characteristicIOPPhase3IOPTestCaching " + characteristicIOPPhase3IOPTestCaching?.uuid.toString()
+                                )
                             }
+
                             CommonUUID.Characteristic.IOP_TEST_SERVICE_CHANGED_INDICATION.toString() -> {
                                 characteristicIOPPhase3IOPTestServiceChangedIndication = item
-                                Log.d(TAG, "characteristicIOPPhase3IOPTestServiceChangedIndication " + characteristicIOPPhase3IOPTestServiceChangedIndication?.uuid.toString())
+                                Log.d(
+                                    TAG,
+                                    "characteristicIOPPhase3IOPTestServiceChangedIndication " + characteristicIOPPhase3IOPTestServiceChangedIndication?.uuid.toString()
+                                )
                             }
+
                             CommonUUID.Characteristic.IOP_TEST_SECURITY_PAIRING.toString(),
                             CommonUUID.Characteristic.IOP_TEST_SECURITY_AUTHENTICATION.toString(),
                             CommonUUID.Characteristic.IOP_TEST_SECURITY_BONDING.toString() -> {
@@ -1075,14 +1357,27 @@ class IOPTestActivity : AppCompatActivity() {
                         }
                     }
                 }
+
                 CommonUUID.Service.UUID_BLE_OTA.toString() -> {
                     val gattCharacteristics = gattService.characteristics
                     for (gattCharacteristic: BluetoothGattCharacteristic in gattCharacteristics) {
                         val characteristicUUID = gattCharacteristic.uuid.toString()
-                        Log.i(TAG, "onServicesDiscovered Characteristic UUID " + characteristicUUID + " - Properties: " + gattCharacteristic.properties)
+                        Log.i(
+                            TAG,
+                            "onServicesDiscovered Characteristic UUID " + characteristicUUID + " - Properties: " + gattCharacteristic.properties
+                        )
                         if (gattCharacteristic.uuid.toString() == ota_control.toString()) {
-                            if (gattCharacteristics.contains(mBluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data))) {
-                                if (!gattServices.contains(mBluetoothGatt?.getService(homekit_service))) {
+                            if (gattCharacteristics.contains(
+                                    mBluetoothGatt?.getService(ota_service)
+                                        ?.getCharacteristic(ota_data)
+                                )
+                            ) {
+                                if (!gattServices.contains(
+                                        mBluetoothGatt?.getService(
+                                            homekit_service
+                                        )
+                                    )
+                                ) {
                                     Log.i(TAG, "onServicesDiscovered Device in DFU Mode")
                                     mBluetoothGatt?.requestMtu(247)
                                 } else {
@@ -1107,16 +1402,20 @@ class IOPTestActivity : AppCompatActivity() {
         }
         for (i in getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indices) {
             for (j in i until mListCharacteristics.size) {
-                getListChildrenItemTestCase(POSITION_TEST_SERVICE)!![i].characteristic = mListCharacteristics[j]
+                getListChildrenItemTestCase(POSITION_TEST_SERVICE)!![i].characteristic =
+                    mListCharacteristics[j]
                 break
             }
         }
         for (i in getListChildrenItemTestCase(POSITION_TEST_IOP3_SECURITY)!!.indices) {
             for (j in i until characteristicsPhase3Security.size) {
-                getListChildrenItemTestCase(POSITION_TEST_IOP3_SECURITY)!![i].characteristic = characteristicsPhase3Security[j]
+                getListChildrenItemTestCase(POSITION_TEST_IOP3_SECURITY)!![i].characteristic =
+                    characteristicsPhase3Security[j]
                 break
             }
         }
+
+
 
         when (mIndexRunning) {
             POSITION_TEST_DISCOVER_SERVICE -> {
@@ -1124,6 +1423,7 @@ class IOPTestActivity : AppCompatActivity() {
                     handler?.postDelayed({ readCharacteristic(it.characteristics[0]) }, 5000)
                 }
             }
+
             POSITION_TEST_IOP3_OTA_WITHOUT_ACK,
             POSITION_TEST_IOP3_OTA_ACK -> {
                 if (!otaProcess) {
@@ -1133,19 +1433,40 @@ class IOPTestActivity : AppCompatActivity() {
                     }, 5000)
                 }
             }
+
             POSITION_TEST_IOP3_THROUGHPUT -> {
                 mEndThroughputNotification = false
-                finishItemTest(POSITION_TEST_IOP3_THROUGHPUT, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_THROUGHPUT])
+                finishItemTest(
+                    POSITION_TEST_IOP3_THROUGHPUT,
+                    getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_THROUGHPUT]
+                )
             }
+
+            POSITION_TEST_IOP3_LE_PRIVACY -> {
+                return
+                /* finishItemTest(
+                     POSITION_TEST_IOP3_LE_PRIVACY,
+                     getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_LE_PRIVACY]
+                 )*/
+            }
+
             POSITION_TEST_IOP3_SECURITY -> {
-                iopPhase3RunTestCaseSecurity(iopPhase3IndexStartChildrenTest, 0)
+                if (iopPhase3BondingStep == 2) {
+                    iopPhase3RunTestCaseSecurity(iopPhase3IndexStartChildrenTest, 0)
+                } else {
+                    iopPhase3RunTestCaseBonding(6)
+                }
+                // iopPhase3RunTestCaseSecurity(iopPhase3IndexStartChildrenTest, 0)
             }
+
             POSITION_TEST_IOP3_CACHING -> {
                 if (characteristicIOPPhase3IOPTestCaching != null) {
-                    getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![0].characteristic = characteristicIOPPhase3IOPTestCaching
+                    getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![0].characteristic =
+                        characteristicIOPPhase3IOPTestCaching
                     readCharacteristic(characteristicIOPPhase3IOPTestCaching)
                 } else if (characteristicIOPPhase3IOPTestServiceChangedIndication != null) {
-                    getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![1].characteristic = characteristicIOPPhase3IOPTestServiceChangedIndication
+                    getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![1].characteristic =
+                        characteristicIOPPhase3IOPTestServiceChangedIndication
                     readCharacteristic(characteristicIOPPhase3IOPTestServiceChangedIndication)
                 }
             }
@@ -1162,20 +1483,28 @@ class IOPTestActivity : AppCompatActivity() {
             POSITION_TEST_DISCOVER_SERVICE -> {
                 getSiliconLabsTestInfo().firmwareVersion = parseFirmwareVersion(payload)
             }
+
             POSITION_TEST_IOP3_OTA_ACK -> {
                 getSiliconLabsTestInfo().firmwareAckVersion = parseFirmwareVersion(payload)
             }
+
             POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
                 getSiliconLabsTestInfo().firmwareUnackVersion = parseFirmwareVersion(payload)
             }
-            else -> { }
+
+            else -> {}
         }
         readCharacteristic(testParametersService?.characteristics?.get(1))
     }
 
     private fun getFirmwareVersion(): String {
-        for (fwString in listOf(getSiliconLabsTestInfo().firmwareUnackVersion, getSiliconLabsTestInfo().firmwareAckVersion)) {
-            if (fwString != "") { return fwString }
+        for (fwString in listOf(
+            getSiliconLabsTestInfo().firmwareUnackVersion,
+            getSiliconLabsTestInfo().firmwareAckVersion
+        )) {
+            if (fwString != "") {
+                return fwString
+            }
         }
         return getSiliconLabsTestInfo().firmwareVersion
     }
@@ -1187,31 +1516,40 @@ class IOPTestActivity : AppCompatActivity() {
                 getSiliconLabsTestInfo().iopBoard = IopBoard.fromBoardCode(payload[0])
                 payloadIndex = 2
             }
+
             else -> readCharacteristic(getModelNumberStringCharacteristic())
         }
 
         getSiliconLabsTestInfo().connectionParameters = ConnectionParameters(
-                mtu = Converters.calculateDecimalValue(
-                        payload.copyOfRange(payloadIndex, payloadIndex+2), isBigEndian = false),
-                pdu = Converters.calculateDecimalValue(
-                        payload.copyOfRange(payloadIndex+2, payloadIndex+4), isBigEndian = false),
-                interval = Converters.calculateDecimalValue(
-                        payload.copyOfRange(payloadIndex+4, payloadIndex+6), isBigEndian = false).
-                        toDouble().times(1.25), // Conversion of sent int representation to actual double value in ms
-                slaveLatency = Converters.calculateDecimalValue(
-                        payload.copyOfRange(payloadIndex+6, payloadIndex+8), isBigEndian = false),
-                supervisionTimeout = Converters.calculateDecimalValue(
-                        payload.copyOfRange(payloadIndex+8, payloadIndex+10), isBigEndian = false)
-                        .times(10), // Conversion of sent int representation to actual value in ms
+            mtu = Converters.calculateDecimalValue(
+                payload.copyOfRange(payloadIndex, payloadIndex + 2), isBigEndian = false
+            ),
+            pdu = Converters.calculateDecimalValue(
+                payload.copyOfRange(payloadIndex + 2, payloadIndex + 4), isBigEndian = false
+            ),
+            interval = Converters.calculateDecimalValue(
+                payload.copyOfRange(payloadIndex + 4, payloadIndex + 6), isBigEndian = false
+            ).toDouble()
+                .times(1.25), // Conversion of sent int representation to actual double value in ms
+            slaveLatency = Converters.calculateDecimalValue(
+                payload.copyOfRange(payloadIndex + 6, payloadIndex + 8), isBigEndian = false
+            ),
+            supervisionTimeout = Converters.calculateDecimalValue(
+                payload.copyOfRange(payloadIndex + 8, payloadIndex + 10), isBigEndian = false
+            )
+                .times(10), // Conversion of sent int representation to actual value in ms
         )
-        if(mIndexRunning == POSITION_TEST_DISCOVER_SERVICE) {
+        if (mIndexRunning == POSITION_TEST_DISCOVER_SERVICE) {
             mIndexStartChildrenTest = 0
-            finishItemTest(POSITION_TEST_DISCOVER_SERVICE, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_DISCOVER_SERVICE])
+            finishItemTest(
+                POSITION_TEST_DISCOVER_SERVICE,
+                getSiliconLabsTestInfo().listItemTest[POSITION_TEST_DISCOVER_SERVICE]
+            )
             Log.d(TAG, "convertValuesParameters(), finishItemTest(POSITION_TEST_DISCOVER_SERVICE)")
         }
     }
 
-    private fun parseFirmwareVersion(payload: ByteArray) : String {
+    private fun parseFirmwareVersion(payload: ByteArray): String {
         return if (payload.size < 8) "3.2.1" /* Old, incompatible method for numbering versions. */
         else StringBuilder().apply {
             append(Converters.calculateDecimalValue(payload.copyOfRange(0, 2), isBigEndian = false))
@@ -1273,7 +1611,10 @@ class IOPTestActivity : AppCompatActivity() {
                     myOutWriter = OutputStreamWriter(fOut)
                     myOutWriter.write(getDataLog())
                 } catch (e: Exception) {
-                    Log.e(TAG, e.localizedMessage ?: "saveDataTestToFile(), OutputStreamWriter exception")
+                    Log.e(
+                        TAG,
+                        e.localizedMessage ?: "saveDataTestToFile(), OutputStreamWriter exception"
+                    )
                 } finally {
                     myOutWriter?.close()
                 }
@@ -1305,7 +1646,11 @@ class IOPTestActivity : AppCompatActivity() {
 
     private fun shareLogDataTestByEmail(fileLocation: String) {
         try {
-            val uri = FileProvider.getUriForFile(this, applicationContext.packageName + ".provider", File(fileLocation))
+            val uri = FileProvider.getUriForFile(
+                this,
+                applicationContext.packageName + ".provider",
+                File(fileLocation)
+            )
             val message = "Please check the attachment to get the log file."
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
@@ -1343,56 +1688,107 @@ class IOPTestActivity : AppCompatActivity() {
         for (i in uuids.indices) {
             if (cUuid.equals(uuids[i].toString(), ignoreCase = true)) {
                 matchChar = uuids[i].id
-                Log.d(TAG, "Run TestCase [" + (matchChar + 3) + "] at characteristic " + uuids[i].toString())
+                Log.d(
+                    TAG,
+                    "Run TestCase [" + (matchChar + 3) + "] at characteristic " + uuids[i].toString()
+                )
                 break
             }
         }
         when (matchChar) {
-            CommonUUID.ID_READ_ONLY_LENGTH_1, CommonUUID.ID_READ_ONLY_LENGTH_255 -> readCharacteristic(childrenItem.characteristic)
-            CommonUUID.ID_WRITE_ONLY_LENGTH_1, CommonUUID.ID_WRITE_WITHOUT_RESPONSE_LENGTH_1 -> writeValueToCharacteristic(childrenItem.characteristic, writeHexForMaxLengthByte(Common.WRITE_VALUE_0, Common.WRITE_LENGTH_1), null)
-            CommonUUID.ID_WRITE_ONLY_LENGTH_255, CommonUUID.ID_WRITE_WITHOUT_RESPONSE_LENGTH_255 -> writeValueToCharacteristic(childrenItem.characteristic, writeHexForMaxLengthByte(Common.WRITE_VALUE_0, Common.WRITE_LENGTH_255), null)
+            CommonUUID.ID_READ_ONLY_LENGTH_1, CommonUUID.ID_READ_ONLY_LENGTH_255 -> readCharacteristic(
+                childrenItem.characteristic
+            )
+
+            CommonUUID.ID_WRITE_ONLY_LENGTH_1, CommonUUID.ID_WRITE_WITHOUT_RESPONSE_LENGTH_1 -> writeValueToCharacteristic(
+                childrenItem.characteristic,
+                writeHexForMaxLengthByte(Common.WRITE_VALUE_0, Common.WRITE_LENGTH_1),
+                null
+            )
+
+            CommonUUID.ID_WRITE_ONLY_LENGTH_255, CommonUUID.ID_WRITE_WITHOUT_RESPONSE_LENGTH_255 -> writeValueToCharacteristic(
+                childrenItem.characteristic,
+                writeHexForMaxLengthByte(Common.WRITE_VALUE_0, Common.WRITE_LENGTH_255),
+                null
+            )
+
             CommonUUID.ID_NOTIFICATION_LENGTH_1, CommonUUID.ID_NOTIFICATION_LENGTH_MTU_3 -> {
                 setTimeStart(childrenItem.characteristic)
                 setNotificationForCharacteristic(childrenItem.characteristic, Notifications.NOTIFY)
             }
+
             CommonUUID.ID_INDICATE_LENGTH_1, CommonUUID.ID_INDICATE_LENGTH_MTU_3 -> {
                 setTimeStart(childrenItem.characteristic)
                 setIndicationProperty(childrenItem.characteristic, Notifications.INDICATE)
             }
+
             CommonUUID.ID_IOP_TEST_LENGTH_1, CommonUUID.ID_IOP_TEST_USER_LEN_1 -> if (!childrenItem.isWriteCharacteristic) {
-                writeValueToCharacteristic(childrenItem.characteristic, writeHexForMaxLengthByte(Common.WRITE_VALUE_55, Common.WRITE_LENGTH_1), null)
+                writeValueToCharacteristic(
+                    childrenItem.characteristic,
+                    writeHexForMaxLengthByte(Common.WRITE_VALUE_55, Common.WRITE_LENGTH_1),
+                    null
+                )
             } else {
                 readCharacteristic(childrenItem.characteristic)
             }
+
             CommonUUID.ID_IOP_TEST_LENGTH_255, CommonUUID.ID_IOP_TEST_USER_LEN_255 -> if (!childrenItem.isWriteCharacteristic) {
-                writeValueToCharacteristic(childrenItem.characteristic, null, Converters.decToByteArray(createDataTestCaseLength255(mtuValue)))
+                writeValueToCharacteristic(
+                    childrenItem.characteristic,
+                    null,
+                    Converters.decToByteArray(createDataTestCaseLength255(mtuValue))
+                )
             } else {
                 readCharacteristic(childrenItem.characteristic)
             }
+
             CommonUUID.ID_IOP_TEST_LENGTH_VARIABLE_4, CommonUUID.ID_IOP_TEST_USER_LEN_VARIABLE_4 ->                 // write length 1
-                if (childrenItem.getLstValueItemTest().isEmpty() && !childrenItem.isWriteCharacteristic) {
-                    writeValueToCharacteristic(childrenItem.characteristic, writeHexForMaxLengthByte(Common.WRITE_VALUE_55, Common.WRITE_LENGTH_1), null)
-                } else if (childrenItem.getLstValueItemTest().isEmpty() && childrenItem.isWriteCharacteristic) {
+                if (childrenItem.getLstValueItemTest()
+                        .isEmpty() && !childrenItem.isWriteCharacteristic
+                ) {
+                    writeValueToCharacteristic(
+                        childrenItem.characteristic,
+                        writeHexForMaxLengthByte(Common.WRITE_VALUE_55, Common.WRITE_LENGTH_1),
+                        null
+                    )
+                } else if (childrenItem.getLstValueItemTest()
+                        .isEmpty() && childrenItem.isWriteCharacteristic
+                ) {
                     childrenItem.isWriteCharacteristic = false
                     childrenItem.statusWrite = -1
                     readCharacteristic(childrenItem.characteristic)
                 } else if (childrenItem.getLstValueItemTest().size == 1 && !childrenItem.isWriteCharacteristic) {
                     childrenItem.statusRead = -1
                     childrenItem.isReadCharacteristic = false
-                    writeValueToCharacteristic(childrenItem.characteristic, writeHexForMaxLengthByte(Common.WRITE_VALUE_66, Common.WRITE_LENGTH_4), null)
+                    writeValueToCharacteristic(
+                        childrenItem.characteristic,
+                        writeHexForMaxLengthByte(Common.WRITE_VALUE_66, Common.WRITE_LENGTH_4),
+                        null
+                    )
                 } else if (childrenItem.getLstValueItemTest().size == 1 && childrenItem.isWriteCharacteristic) {
                     readCharacteristic(childrenItem.characteristic)
                 }
+
             CommonUUID.ID_IOP_TEST_CONST_LENGTH_1 -> if (!childrenItem.isReadCharacteristic) {
                 readCharacteristic(childrenItem.characteristic)
             } else {
-                writeValueToCharacteristic(childrenItem.characteristic, writeHexForMaxLengthByte(Common.WRITE_VALUE_55, Common.WRITE_LENGTH_1), null)
+                writeValueToCharacteristic(
+                    childrenItem.characteristic,
+                    writeHexForMaxLengthByte(Common.WRITE_VALUE_55, Common.WRITE_LENGTH_1),
+                    null
+                )
             }
+
             CommonUUID.ID_IOP_TEST_CONST_LENGTH_255 -> if (!childrenItem.isReadCharacteristic) {
                 readCharacteristic(childrenItem.characteristic)
             } else {
-                writeValueToCharacteristic(childrenItem.characteristic, null, Converters.decToByteArray(createDataTestCaseLength255(mtuValue)))
+                writeValueToCharacteristic(
+                    childrenItem.characteristic,
+                    null,
+                    Converters.decToByteArray(createDataTestCaseLength255(mtuValue))
+                )
             }
+
             else -> {
             }
         }
@@ -1414,7 +1810,9 @@ class IOPTestActivity : AppCompatActivity() {
      */
     private fun checkNextTestCase(characteristic: BluetoothGattCharacteristic?, type: Int) {
         if (characteristic != null) {
-            for (itemChildrenTest: ChildrenItemTestInfo in getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!) {
+            for (itemChildrenTest: ChildrenItemTestInfo in getListChildrenItemTestCase(
+                POSITION_TEST_SERVICE
+            )!!) {
                 if (itemChildrenTest.characteristic?.uuid.toString() == characteristic.uuid.toString()) {
                     if (type == 1) {
                         itemChildrenTest.isReadCharacteristic = true
@@ -1422,47 +1820,73 @@ class IOPTestActivity : AppCompatActivity() {
                         itemChildrenTest.isWriteCharacteristic = true
                     }
                     if (CommonUUID.Characteristic.IOP_TEST_LENGTH_1.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_LENGTH_255.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_CONST_LENGTH_1.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_CONST_LENGTH_255.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_USER_LEN_1.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_USER_LEN_255.toString() == characteristic.uuid.toString()) {
-                        mIndexStartChildrenTest = if (itemChildrenTest.isReadCharacteristic && itemChildrenTest.isWriteCharacteristic) {
-                            getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest) + 1
-                        } else {
-                            getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest)
-                        }
+                        mIndexStartChildrenTest =
+                            if (itemChildrenTest.isReadCharacteristic && itemChildrenTest.isWriteCharacteristic) {
+                                getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(
+                                    itemChildrenTest
+                                ) + 1
+                            } else {
+                                getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(
+                                    itemChildrenTest
+                                )
+                            }
                     } else if (CommonUUID.Characteristic.NOTIFICATION_LENGTH_1.toString() == characteristic.uuid.toString()) {
                         if (isDisabled) {
-                            mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest)
+                            mIndexStartChildrenTest =
+                                getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(
+                                    itemChildrenTest
+                                )
                             isDisabled = false
                         } else {
                             if (itemChildrenTest.statusChildrenTest) {
                                 countReTest = 0
-                                mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest) + 1
+                                mIndexStartChildrenTest =
+                                    getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(
+                                        itemChildrenTest
+                                    ) + 1
                                 isDisabled = false
                             } else {
                                 countReTest++
                                 if (countReTest > 5) {
-                                    mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest) + 1
+                                    mIndexStartChildrenTest =
+                                        getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(
+                                            itemChildrenTest
+                                        ) + 1
                                     isDisabled = false
                                     countReTest = 0
                                 } else {
                                     isDisabled = true
-                                    setNotificationForCharacteristic(characteristic, Notifications.DISABLED)
+                                    setNotificationForCharacteristic(
+                                        characteristic,
+                                        Notifications.DISABLED
+                                    )
                                     return
                                 }
                             }
                         }
                     } else if (CommonUUID.Characteristic.INDICATE_LENGTH_1.toString() == characteristic.uuid.toString()) {
                         if (isDisabled) {
-                            mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest)
+                            mIndexStartChildrenTest =
+                                getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(
+                                    itemChildrenTest
+                                )
                             isDisabled = false
                         } else {
                             if (itemChildrenTest.statusChildrenTest) {
                                 countReTest = 0
-                                mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest) + 1
+                                mIndexStartChildrenTest =
+                                    getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(
+                                        itemChildrenTest
+                                    ) + 1
                                 isDisabled = false
                             } else {
                                 countReTest++
                                 if (countReTest > 5) {
                                     countReTest = 0
-                                    mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest) + 1
+                                    mIndexStartChildrenTest =
+                                        getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(
+                                            itemChildrenTest
+                                        ) + 1
                                     isDisabled = false
                                 } else {
                                     isDisabled = true
@@ -1473,21 +1897,35 @@ class IOPTestActivity : AppCompatActivity() {
                         }
                     } else if (CommonUUID.Characteristic.IOP_TEST_LENGTH_VARIABLE_4.toString() == characteristic.uuid.toString() || CommonUUID.Characteristic.IOP_TEST_USER_LEN_VARIABLE_4.toString() == characteristic.uuid.toString()) {
                         if (itemChildrenTest.getLstValueItemTest().size > 1 && itemChildrenTest.isReadCharacteristic) {
-                            mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest) + 1
+                            mIndexStartChildrenTest =
+                                getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(
+                                    itemChildrenTest
+                                ) + 1
                             if ((CommonUUID.Characteristic.IOP_TEST_USER_LEN_VARIABLE_4.toString() == characteristic.uuid.toString())) {
-                                finishItemTest(POSITION_TEST_SERVICE, getItemTestCaseInfo(POSITION_TEST_SERVICE))
+                                finishItemTest(
+                                    POSITION_TEST_SERVICE,
+                                    getItemTestCaseInfo(POSITION_TEST_SERVICE)
+                                )
                             }
                         } else {
-                            mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest)
+                            mIndexStartChildrenTest =
+                                getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(
+                                    itemChildrenTest
+                                )
                         }
                     } else {
-                        mIndexStartChildrenTest = getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(itemChildrenTest) + 1
+                        mIndexStartChildrenTest =
+                            getListChildrenItemTestCase(POSITION_TEST_SERVICE)!!.indexOf(
+                                itemChildrenTest
+                            ) + 1
                     }
                     break
                 }
             }
             if (mIndexRunning == POSITION_TEST_IOP3_SECURITY) {
-                for (itemChildrenTest: ChildrenItemTestInfo in getListChildrenItemTestCase(POSITION_TEST_IOP3_SECURITY)!!) {
+                for (itemChildrenTest: ChildrenItemTestInfo in getListChildrenItemTestCase(
+                    POSITION_TEST_IOP3_SECURITY
+                )!!) {
                     if (itemChildrenTest.characteristic?.uuid.toString() == characteristic.uuid.toString()) {
                         handler?.removeCallbacks(iopSecurityRunnable)
                         if (type == 1) {
@@ -1495,11 +1933,22 @@ class IOPTestActivity : AppCompatActivity() {
                         }
                         if (CommonUUID.Characteristic.IOP_TEST_SECURITY_BONDING.toString() != (characteristic.uuid.toString())) {
                             iopPhase3IndexStartChildrenTest++
-                            Log.d(TAG, "iopPhase3IndexStartChildrenTest $iopPhase3IndexStartChildrenTest")
+                            Log.d(
+                                TAG,
+                                "iopPhase3IndexStartChildrenTest $iopPhase3IndexStartChildrenTest"
+                            )
                             showDetailInformationTest(testCaseCount++, false)
                             iopPhase3RunTestCaseSecurity(iopPhase3IndexStartChildrenTest, 1)
-                        } else {
+                        } /*else {
                             finishItemTest(POSITION_TEST_IOP3_SECURITY, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_SECURITY])
+                        }*/
+                        else {
+                            Log.d("checkNextTestCase", "iopPhase3RunTestCaseBonding")
+                            if (iopPhase3BondingStep < 8) {
+                                iopPhase3RunTestCaseBonding(iopPhase3BondingStep + 1)
+                            }
+
+                            showDetailInformationTest(testCaseCount++, false)
                         }
                     }
                 }
@@ -1514,6 +1963,7 @@ class IOPTestActivity : AppCompatActivity() {
                     }
                 }
             }
+
         }
         if (mIndexStartChildrenTest <= 17) {
             runChildrenTestCase(mIndexStartChildrenTest)
@@ -1534,12 +1984,95 @@ class IOPTestActivity : AppCompatActivity() {
     /**
      * Create values for control characteristic
      */
-    private fun iopPhase3WriteControlBytes(throughput: Int, security: Int, caching: Int): ByteArray {
+    private fun iopPhase3WriteControlBytes(
+        throughput: Int,
+        security: Int,
+        caching: Int
+    ): ByteArray {
         val hex = ByteArray(3)
         hex[0] = throughput.toByte()
         hex[1] = security.toByte()
         hex[2] = caching.toByte()
         return hex
+    }
+
+    private fun iopPhase3RunTestCaseBonding(step: Int) {
+        Log.d("iopPhase3RunTestCaseBonding", "step $step")
+        iopPhase3BondingStep = step
+        val CCCD_value = ByteArray(1)
+        val securityItem = getListChildrenItemTestCase(POSITION_TEST_IOP3_SECURITY)!![2]
+        Log.d(
+            "iopPhase3RunTestCaseBonding",
+            "uuid " + UUID.fromString(securityItem.characteristic!!.uuid.toString())
+        )
+        iopPhase3ExtraDescriptor =
+            securityItem.characteristic!!.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"))
+        when (step) {
+            // write CCCD to different value from the default
+            3 -> {
+                CCCD_value[0] = 1
+                iopPhase3ExtraDescriptor?.setValue(CCCD_value)
+                mBluetoothGatt?.writeDescriptor(iopPhase3ExtraDescriptor)
+
+                mBluetoothGatt?.readDescriptor(iopPhase3ExtraDescriptor)
+                read_CCCD_value = iopPhase3ExtraDescriptor?.getValue()!!.copyOf()
+            }
+
+            // disconnect
+            4 -> {
+
+                disconnectGatt(mBluetoothGatt)
+                // reconnect(4000)
+                //connectToDevice(mBluetoothDevice)
+                /* writeValueToCharacteristic(
+                     characteristicIOPPhase3Control,
+                     null,
+                     iopPhase3WriteControlBytes(0, 4, 0))
+                 Log.d("iopPhase3RunTestCaseBonding", "Set Control Characteristic for Security")*/
+            }
+
+            6 -> {
+                mBluetoothGatt?.readDescriptor(iopPhase3ExtraDescriptor)
+                Log.d("CASE 6: iopPhase3RunTestCaseBonding", "read CCCD:" + read_CCCD_value[0])
+                // Mobile read CCCD. (Pass: if the CCCD value is the same as the value written before bond ).
+                if (read_CCCD_value[0].toInt() == 1) {
+                } else {
+                    updateDataTestFailed(POSITION_TEST_IOP3_SECURITY)
+                    isCCCDPass = false
+                    finishItemTest(
+                        POSITION_TEST_IOP3_SECURITY,
+                        getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_SECURITY]
+                    )
+                }
+            }
+
+            // Mobile write value 0xBB (0xBB or 0x00) to CCCD. (Pass: if the CCCD value was written in last step).
+            7 -> {
+                Log.d("CASE 7: iopPhase3RunTestCaseBonding", "Write value 0x00 to CCCD")
+                CCCD_value[0] = 0
+                iopPhase3ExtraDescriptor?.setValue(CCCD_value)
+                mBluetoothGatt?.writeDescriptor(iopPhase3ExtraDescriptor)
+            }
+
+            8 -> {
+                mBluetoothGatt?.readDescriptor(iopPhase3ExtraDescriptor)
+                read_CCCD_value = iopPhase3ExtraDescriptor?.getValue()!!.copyOf()
+                Log.d("CASE 8: iopPhase3RunTestCaseBonding", "read CCCD:" + read_CCCD_value[0])
+                // Mobile read CCCD. (Pass: if the CCCD value is the same as the value written before bond ).
+                if (read_CCCD_value[0].toInt() == 0) {
+                } else {
+                    isCCCDPass = false
+                    updateDataTestFailed(POSITION_TEST_IOP3_SECURITY)
+                }
+                finishItemTest(
+                    POSITION_TEST_IOP3_SECURITY,
+                    getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_SECURITY]
+                )
+            }
+
+            else -> {
+            }
+        }
     }
 
     private fun iopPhase3RunTestCaseSecurity(index: Int, isControl: Int) {
@@ -1552,7 +2085,10 @@ class IOPTestActivity : AppCompatActivity() {
         for (i in uuids.indices) {
             if (cUuid.equals(uuids[i].toString(), ignoreCase = true)) {
                 matchChar = uuids[i].id
-                Log.d(TAG, "Run TestCase [7." + (matchChar - CommonUUID.ID_IOP_TEST_PHASE3_THROUGHPUT) + "] at Characteristic " + uuids[i].toString())
+                Log.d(
+                    TAG,
+                    "Run TestCase [7." + (matchChar - CommonUUID.ID_IOP_TEST_PHASE3_THROUGHPUT) + "] at Characteristic " + uuids[i].toString()
+                )
                 break
             }
         }
@@ -1561,47 +2097,182 @@ class IOPTestActivity : AppCompatActivity() {
             CommonUUID.ID_IOP_TEST_PHASE3_SECURITY_AUTHENTICATION,
             CommonUUID.ID_IOP_TEST_PHASE3_SECURITY_BONDING ->
                 if (isControl == 1) {
-                    countReTest = 0
-                    handler?.postDelayed(iopSecurityRunnable, 60000)
-                    writeValueToCharacteristic(
+                    if (iopPhase3BondingStep == 2) {
+                        countReTest = 0
+                        handler?.postDelayed(iopSecurityRunnable, 60000)
+                        writeValueToCharacteristic(
                             characteristicIOPPhase3Control,
                             null,
-                            iopPhase3WriteControlBytes(0, matchChar - CommonUUID.ID_IOP_TEST_PHASE3_CONTROL - 1, 0))
-                    Log.d(TAG, "Set Control Characteristic for Security")
+                            iopPhase3WriteControlBytes(
+                                0,
+                                matchChar - CommonUUID.ID_IOP_TEST_PHASE3_CONTROL - 1,
+                                0
+                            )
+                        )
+                        Log.d(TAG, "Set Control Characteristic for Security")
+                    } else {
+                        //Mobile read CCCD
+                        iopPhase3RunTestCaseBonding(6)
+                    }
                 } else if (!securityItem.isReadCharacteristic) {
                     Log.d(TAG, "Read Security Characteristic $cUuid")
                     readCharacteristic(securityItem.characteristic)
                 }
-                else -> {
-                }
+
+            else -> {
+            }
         }
     }
 
+
     private fun iopPhase3RunTestCaseThroughput(isControl: Int) {
-        Log.d(TAG, "Run TestCase [6] at Characteristic " + characteristicIOPPhase3Throughput?.uuid.toString())
+        Log.d(
+            TAG,
+            "Run TestCase [6] at Characteristic " + characteristicIOPPhase3Throughput?.uuid.toString()
+        )
         if (isControl == 1) {
             writeValueToCharacteristic(
-                    characteristicIOPPhase3Control,
-                    null,
-                    iopPhase3WriteControlBytes(1, 0, 0))
+                characteristicIOPPhase3Control,
+                null,
+                iopPhase3WriteControlBytes(1, 0, 0)
+            )
             Log.d(TAG, "Set Control Characteristic for Throughput")
         } else {
             Log.d(TAG, "set Notification enable for Throughput")
             mEndThroughputNotification = false
-            setNotificationForCharacteristic(characteristicIOPPhase3Throughput, Notifications.NOTIFY)
+            setNotificationForCharacteristic(
+                characteristicIOPPhase3Throughput,
+                Notifications.NOTIFY
+            )
             mStartTimeThroughput = System.currentTimeMillis()
             handler?.postDelayed({
                 mEndTimeThroughput = System.currentTimeMillis()
-                mByteSpeed = ((mByteNumReceived * 1000) / (mEndTimeThroughput - mStartTimeThroughput)).toInt()
+                mByteSpeed =
+                    ((mByteNumReceived * 1000) / (mEndTimeThroughput - mStartTimeThroughput)).toInt()
                 Log.d(TAG, "set Notification disable for throughput")
                 Log.d(TAG, "Throughput is $mByteSpeed Bytes/sec")
                 try {
-                    setNotificationForCharacteristic(characteristicIOPPhase3Throughput, Notifications.DISABLED)
+                    setNotificationForCharacteristic(
+                        characteristicIOPPhase3Throughput,
+                        Notifications.DISABLED
+                    )
                 } catch (e: Exception) {
                     Log.e(TAG, "Error Notification disable for throughput")
                 }
                 mEndThroughputNotification = true
             }, 5000)
+        }
+    }
+
+    private fun iopPhase3RunTestCaseLEPrivacy(isControl: Int) {
+        Log.d(
+            TAG,
+            "Run TestCase [8] at Characteristic " + characteristicIOPPhase3Throughput?.uuid.toString()
+        )
+
+        if (isControl == 1) {
+            connectToDevice(mBluetoothDevice)
+
+            writeValueToCharacteristic(
+                characteristicIOPPhase3Control,
+                null,
+                iopPhase3WriteControlBytes(0, 4, 0)
+            ) { success ->
+                if (success) {
+                    handler?.postDelayed({
+                        Log.d(TAG, "Write operation successful")
+
+                        connectToDevice(mBluetoothDevice,
+                            onConnectionSuccess = {
+                                // Code to execute after successful connection
+                                handler?.postDelayed({
+                                    if (isConnected) {
+                                        Log.d(TAG, "Connection successful")
+                                        // Perform further actions here
+
+                                        Log.d(TAG, "Set Control Characteristic for LE Privacy")
+                                        if (isServiceChangedIndication == 1) {
+                                            try {
+                                                val connectionState = mBluetoothDevice?.bondState
+                                                Log.d(TAG, "" + connectionState)
+
+
+                                                when (connectionState) {
+                                                    BluetoothDevice.BOND_BONDED -> {
+                                                        // Device is bonded (connected)
+                                                        Log.d(TAG, "Device is bonded (connected)")
+                                                        setNotificationForCharacteristic(
+                                                            characteristicIOPPhase3ServiceChanged,
+                                                            Notifications.INDICATE
+                                                        )
+                                                        getItemTestCaseInfo(
+                                                            POSITION_TEST_IOP3_LE_PRIVACY
+                                                        ).setStatusTest(Common.IOP3_TC_STATUS_PASS)
+
+                                                    }
+
+                                                    BluetoothDevice.BOND_BONDING -> {
+                                                        // Device is in the process of bonding (connecting)
+                                                        // Handle this state if needed
+                                                        Log.d(
+                                                            TAG,
+                                                            "Device is in the process of bonding (connecting)"
+                                                        )
+                                                    }
+
+                                                    BluetoothDevice.BOND_NONE -> {
+                                                        // Device is not bonded (not connected)
+                                                        // Handle this state if needed
+                                                        Log.d(
+                                                            TAG,
+                                                            "Device is not bonded (not connected)"
+                                                        )
+                                                        Log.d(
+                                                            TAG,
+                                                            "Connection is not trusted, not bonded"
+                                                        )
+                                                        updateDataTestFailed(
+                                                            POSITION_TEST_IOP3_LE_PRIVACY
+                                                        )
+                                                        //  handler?.removeCallbacks(iopLEPrivacyRunnable)
+                                                    }
+                                                }
+
+                                            } catch (e: Exception) {
+                                                Log.d(TAG, "exception $e")
+                                                updateDataTestFailed(POSITION_TEST_IOP3_LE_PRIVACY)
+                                            }
+
+                                        } else {
+                                            Log.d(
+                                                TAG,
+                                                "isServiceChangedIndication $isServiceChangedIndication"
+                                            )
+                                            updateDataTestFailed(POSITION_TEST_IOP3_LE_PRIVACY)
+                                        }
+                                    }
+                                }, 15000)
+
+
+                            },
+                            onConnectionFailure = {
+                                // Code to handle connection failure
+                                Log.e(TAG, "Connection failed")
+                                updateDataTestFailed(POSITION_TEST_IOP3_LE_PRIVACY)
+                                // Perform actions to handle the failure
+                            }
+                        )
+                    }, CONNECTION_PERIOD)
+
+
+                } else {
+                    // Write operation failed, handle accordingly
+                    Log.e(TAG, "Write operation failed")
+                }
+            }
+
+        } else {
+            Log.d(TAG, "is control $isControl")
         }
     }
 
@@ -1612,19 +2283,22 @@ class IOPTestActivity : AppCompatActivity() {
         if (isControl == 1) {
             if (isServiceChangedIndication == 1) {
                 writeValueToCharacteristic(
-                        characteristicIOPPhase3Control,
-                        null,
-                        iopPhase3WriteControlBytes(0, 0, 1))
+                    characteristicIOPPhase3Control,
+                    null,
+                    iopPhase3WriteControlBytes(0, 0, 1)
+                )
                 Log.d(TAG, "Set Control Characteristic for Service Changed Indications")
             } else {
                 writeValueToCharacteristic(
-                        characteristicIOPPhase3Control,
-                        null,
-                        iopPhase3WriteControlBytes(0, 0, 2))
+                    characteristicIOPPhase3Control,
+                    null,
+                    iopPhase3WriteControlBytes(0, 0, 2)
+                )
                 Log.d(TAG, "Set Control Characteristic for GATT Caching")
             }
         } else {
-            itemChildrenTest = getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![isServiceChangedIndication]
+            itemChildrenTest =
+                getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![isServiceChangedIndication]
             itemChildrenTest.statusRunTest = 0
             itemChildrenTest.startTimeTest = System.currentTimeMillis()
             handler?.postDelayed(iopCachingRunnable, 90000)
@@ -1632,7 +2306,10 @@ class IOPTestActivity : AppCompatActivity() {
                 val bonded = mBluetoothGatt?.device?.bondState == BluetoothDevice.BOND_BONDED
                 if (bonded) {
                     Log.d(TAG, "Subscribe Indication for Service Changed")
-                    setNotificationForCharacteristic(characteristicIOPPhase3ServiceChanged, Notifications.INDICATE)
+                    setNotificationForCharacteristic(
+                        characteristicIOPPhase3ServiceChanged,
+                        Notifications.INDICATE
+                    )
                 } else {
                     Log.d(TAG, "Connection is not trusted, not bonded")
                     iopCachingFailed()
@@ -1640,10 +2317,15 @@ class IOPTestActivity : AppCompatActivity() {
                 }
             } else {
                 Log.d(TAG, "Set on Client Supported Features")
-                writeValueToCharacteristic(characteristicIOPPhase3ClientSupportedFeatures, "01", null)
+                writeValueToCharacteristic(
+                    characteristicIOPPhase3ClientSupportedFeatures,
+                    "01",
+                    null
+                )
             }
         }
     }
+
 
     private val iopCachingRunnable = Runnable {
         Log.d(TAG, "iopCachingRunnable")
@@ -1651,12 +2333,16 @@ class IOPTestActivity : AppCompatActivity() {
     }
 
     private fun iopCachingFailed() {
-        val itemChildrenTest = getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![isServiceChangedIndication]
+        val itemChildrenTest =
+            getListChildrenItemTestCase(POSITION_TEST_IOP3_CACHING)!![isServiceChangedIndication]
         itemChildrenTest.statusRunTest = 1
         itemChildrenTest.statusChildrenTest = false
         itemChildrenTest.endTimeTest = System.currentTimeMillis()
         getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING].setStatusTest(Common.IOP3_TC_STATUS_FAILED)
-        finishItemTest(POSITION_TEST_IOP3_CACHING, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING])
+        finishItemTest(
+            POSITION_TEST_IOP3_CACHING,
+            getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING]
+        )
     }
 
     private fun retryIOP3Failed(index: Int, mCountReTest: Int) {
@@ -1664,9 +2350,14 @@ class IOPTestActivity : AppCompatActivity() {
             updateDataTestFailed(index)
         } else if (index == POSITION_TEST_CONNECTION) {
             Log.d(TAG, "retryIOP3Failed index $index")
-            handler?.postDelayed({ finishItemTest(POSITION_TEST_CONNECTION, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_CONNECTION]) }, 1000)
+            handler?.postDelayed({
+                finishItemTest(
+                    POSITION_TEST_CONNECTION,
+                    getSiliconLabsTestInfo().listItemTest[POSITION_TEST_CONNECTION]
+                )
+            }, 1000)
         } else {
-            if (mCountReTest < 6) {
+            if (mCountReTest < 7) {
                 isConnecting = false
                 reconnect(2000)
             } else {
@@ -1688,9 +2379,13 @@ class IOPTestActivity : AppCompatActivity() {
 
     private val iopSecurityRunnable: Runnable = Runnable {
         Log.d(TAG, "iopSecurityRunnable $iopPhase3IndexStartChildrenTest")
-        val itemChildrenTest = getListChildrenItemTestCase(POSITION_TEST_IOP3_SECURITY)!![iopPhase3IndexStartChildrenTest]
+        val itemChildrenTest =
+            getListChildrenItemTestCase(POSITION_TEST_IOP3_SECURITY)!![iopPhase3IndexStartChildrenTest]
         itemChildrenTest.statusRunTest = 1 // 0 running, 1 finish test
-        Log.d(TAG, "iopSecurityRunnable $iopPhase3IndexStartChildrenTest, setStatusRunTest finish test")
+        Log.d(
+            TAG,
+            "iopSecurityRunnable $iopPhase3IndexStartChildrenTest, setStatusRunTest finish test"
+        )
         itemChildrenTest.statusChildrenTest = false
         Log.d(TAG, "setStatusChildrenTest false")
         val itemTestCaseInfo = getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_SECURITY]
@@ -1711,19 +2406,23 @@ class IOPTestActivity : AppCompatActivity() {
         when (getSiliconLabsTestInfo().firmwareVersion) {
             "3.2.1", "3.2.2", "3.2.3", "3.2.4" -> {
                 otaFileManager
-                        ?.apply { uploadMode = OtaFileManager.UploadMode.AUTO }
-                        ?.also { it.findGblFile(
-                                getSiliconLabsTestInfo().firmwareVersion,
-                                getSiliconLabsTestInfo().iopBoard,
-                                reliable
-                        ) }
+                    ?.apply { uploadMode = OtaFileManager.UploadMode.AUTO }
+                    ?.also {
+                        it.findGblFile(
+                            getSiliconLabsTestInfo().firmwareVersion,
+                            getSiliconLabsTestInfo().iopBoard,
+                            reliable
+                        )
+                    }
                 startOtaProcess()
             }
+
             else -> {
                 otaFileManager?.uploadMode = OtaFileManager.UploadMode.USER
-                otaFileSelectionDialog = OtaFileSelectionDialog(listener = fileSelectionListener).also {
-                    it.show(supportFragmentManager, "ota_file_selection_dialog")
-                }
+                otaFileSelectionDialog =
+                    OtaFileSelectionDialog(listener = fileSelectionListener).also {
+                        it.show(supportFragmentManager, "ota_file_selection_dialog")
+                    }
             }
         }
 
@@ -1733,8 +2432,14 @@ class IOPTestActivity : AppCompatActivity() {
         override fun onSelectFileButtonClicked() {
             Intent(Intent.ACTION_GET_CONTENT)
                 .apply { type = "*/*" }
-                .also { startActivityForResult(Intent.createChooser(it,
-                getString(R.string.ota_choose_file)), GBL_FILE_CHOICE_REQUEST_CODE) }
+                .also {
+                    startActivityForResult(
+                        Intent.createChooser(
+                            it,
+                            getString(R.string.ota_choose_file)
+                        ), GBL_FILE_CHOICE_REQUEST_CODE
+                    )
+                }
         }
 
         override fun onOtaButtonClicked() {
@@ -1742,9 +2447,17 @@ class IOPTestActivity : AppCompatActivity() {
                 otaFileSelectionDialog?.dismiss()
                 startOtaProcess()
             } ?: if (otaFileManager?.otaFilename != null) {
-                Toast.makeText(this@IOPTestActivity, getString(R.string.incorrect_file), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@IOPTestActivity,
+                    getString(R.string.incorrect_file),
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
-                Toast.makeText(this@IOPTestActivity, getString(R.string.no_file_chosen), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@IOPTestActivity,
+                    getString(R.string.no_file_chosen),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -1769,20 +2482,24 @@ class IOPTestActivity : AppCompatActivity() {
         }
     }
 
-    private fun isOtaNameCorrect(deviceName: String) : Boolean {
+    private fun isOtaNameCorrect(deviceName: String): Boolean {
         return when {
             otaFileManager?.uploadMode == OtaFileManager.UploadMode.AUTO && mIndexRunning == POSITION_TEST_IOP3_OTA_ACK -> {
                 deviceName.equals(OTA_DEVICE_NAME_AUTO_ACK, ignoreCase = true)
             }
+
             otaFileManager?.uploadMode == OtaFileManager.UploadMode.AUTO && mIndexRunning == POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
                 deviceName.equals(OTA_DEVICE_NAME_AUTO_UNACK, ignoreCase = true)
             }
+
             otaFileManager?.uploadMode == OtaFileManager.UploadMode.USER && mIndexRunning == POSITION_TEST_IOP3_OTA_ACK -> {
                 deviceName.equals(OTA_DEVICE_NAME_USER_ACK, ignoreCase = true)
             }
+
             otaFileManager?.uploadMode == OtaFileManager.UploadMode.USER && mIndexRunning == POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
                 deviceName.equals(OTA_DEVICE_NAME_USER_UNACK, ignoreCase = true)
             }
+
             else -> false
 
         }
@@ -1808,12 +2525,14 @@ class IOPTestActivity : AppCompatActivity() {
                     handler?.postDelayed(WRITE_OTA_CONTROL_ZERO, 200)
                 }
             }
+
             "OTAUPLOAD" -> {
                 Log.d(OTA_UPLOAD, "Called")
                 //Check Services
                 val mBluetoothGattService = mBluetoothGatt?.getService(ota_service)
                 if (mBluetoothGattService != null) {
-                    val charac = mBluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data)
+                    val charac =
+                        mBluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data)
                     if (charac != null) {
                         charac.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
                         Log.d("Instance ID", "" + charac.instanceId)
@@ -1822,7 +2541,10 @@ class IOPTestActivity : AppCompatActivity() {
 
                         //Set info into UI OTA Progress
                         runOnUiThread {
-                            otaProgressDialog?.setProgressInfo(otaFileManager?.otaFilename, otaFileManager?.otaFile?.size)
+                            otaProgressDialog?.setProgressInfo(
+                                otaFileManager?.otaFilename,
+                                otaFileManager?.otaFile?.size
+                            )
                             animateLoading()
                         }
                         //Start OTA_data Upload in another thread
@@ -1837,15 +2559,18 @@ class IOPTestActivity : AppCompatActivity() {
                     }
                 }
             }
+
             "OTAEND" -> {
                 Log.d(TAG, "OTAEND Called")
                 handler?.postDelayed({ writeOtaControl(0x03.toByte()) }, 1000)
             }
+
             "DISCONNECTION" -> {
                 otaProcess = false
                 boolOTAbegin = false
                 disconnectGatt(mBluetoothGatt)
             }
+
             else -> {
             }
         }
@@ -1999,7 +2724,10 @@ class IOPTestActivity : AppCompatActivity() {
                 j++
             }
             pgss = ((pack + last).toFloat() / (otaFileManager?.otaFile!!.size - 1)) * 100
-            Log.d("characte", "last: " + pack + " / " + (pack + last) + " : " + Converters.getHexValue(writearray))
+            Log.d(
+                "characte",
+                "last: " + pack + " / " + (pack + last) + " : " + Converters.getHexValue(writearray)
+            )
         } else {
             var j = 0
             writearray = ByteArray(mtuDivisible)
@@ -2008,7 +2736,12 @@ class IOPTestActivity : AppCompatActivity() {
                 j++
             }
             pgss = ((pack + mtuDivisible).toFloat() / (otaFileManager?.otaFile!!.size - 1)) * 100
-            Log.d("characte", "pack: " + pack + " / " + (pack + mtuDivisible) + " : " + Converters.getHexValue(writearray))
+            Log.d(
+                "characte",
+                "pack: " + pack + " / " + (pack + mtuDivisible) + " : " + Converters.getHexValue(
+                    writearray
+                )
+            )
         }
         val charac = mBluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data)
         charac?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
@@ -2022,7 +2755,8 @@ class IOPTestActivity : AppCompatActivity() {
                     otaProgressDialog?.progressBar?.progress = pgss.toInt()
                     val datarate = String.format(Locale.US, kBits, bitrate)
                     otaProgressDialog?.dataRate?.text = datarate
-                    otaProgressDialog?.dataSize?.text = getString(R.string.iop_test_n_percent, pgss.toInt())
+                    otaProgressDialog?.dataSize?.text =
+                        getString(R.string.iop_test_n_percent, pgss.toInt())
                 }
             }
         } else {
@@ -2044,24 +2778,46 @@ class IOPTestActivity : AppCompatActivity() {
                 j++
                 if (j >= mtu - 3 || i >= (dataThread.size - 1)) {
                     var wait = System.nanoTime()
-                    val charac = mBluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data)
+                    val charac =
+                        mBluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_data)
                     charac?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
                     val progress = ((i + 1).toFloat() / dataThread.size) * 100
-                    val bitrate = (((i + 1) * (8.0)).toFloat() / (((wait - start) / 1000000.0).toFloat()))
+                    val bitrate =
+                        (((i + 1) * (8.0)).toFloat() / (((wait - start) / 1000000.0).toFloat()))
                     if (j < mtu - 3) {
                         val end = ByteArray(j)
                         System.arraycopy(value, 0, end, 0, j)
-                        Log.d("Progress", "sent " + (i + 1) + " / " + dataThread.size + " - " + String.format("%.1f", progress) + " % - " + String.format(kBits, bitrate) + " - " + Converters.getHexValue(end))
+                        Log.d(
+                            "Progress",
+                            "sent " + (i + 1) + " / " + dataThread.size + " - " + String.format(
+                                "%.1f",
+                                progress
+                            ) + " % - " + String.format(
+                                kBits,
+                                bitrate
+                            ) + " - " + Converters.getHexValue(end)
+                        )
                         runOnUiThread {
-                            otaProgressDialog?.dataSize?.text = getString(R.string.iop_test_n_percent, progress.toInt())
+                            otaProgressDialog?.dataSize?.text =
+                                getString(R.string.iop_test_n_percent, progress.toInt())
                             otaProgressDialog?.progressBar?.progress = progress.toInt()
                         }
                         charac?.value = end
                     } else {
                         j = 0
-                        Log.d("Progress", "sent " + (i + 1) + " / " + dataThread.size + " - " + String.format("%.1f", progress) + " % - " + String.format(kBits, bitrate) + " - " + Converters.getHexValue(value))
+                        Log.d(
+                            "Progress",
+                            "sent " + (i + 1) + " / " + dataThread.size + " - " + String.format(
+                                "%.1f",
+                                progress
+                            ) + " % - " + String.format(
+                                kBits,
+                                bitrate
+                            ) + " - " + Converters.getHexValue(value)
+                        )
                         runOnUiThread {
-                            otaProgressDialog?.dataSize?.text = getString(R.string.iop_test_n_percent, progress.toInt())
+                            otaProgressDialog?.dataSize?.text =
+                                getString(R.string.iop_test_n_percent, progress.toInt())
                             otaProgressDialog?.progressBar?.progress = progress.toInt()
                         }
                         charac?.value = value
@@ -2107,7 +2863,18 @@ class IOPTestActivity : AppCompatActivity() {
      */
     private fun homeKitOTAControl(instanceID: ByteArray) {
         //WRITE CHARACTERISTIC FOR HOMEKIT
-        val value = byteArrayOf(0x00, 0x02, 0xee.toByte(), instanceID[0], instanceID[1], 0x03, 0x00, 0x01, 0x01, 0x01)
+        val value = byteArrayOf(
+            0x00,
+            0x02,
+            0xee.toByte(),
+            instanceID[0],
+            instanceID[1],
+            0x03,
+            0x00,
+            0x01,
+            0x01,
+            0x01
+        )
         writeGenericCharacteristic(ota_service, ota_control, value)
         Log.d(TAG, "characteristic writting: " + Converters.getHexValue(value))
     }
@@ -2115,13 +2882,19 @@ class IOPTestActivity : AppCompatActivity() {
     /**
      * WRITES BYTE ARRAY TO A GENERIC CHARACTERISTIC
      */
-    private fun writeGenericCharacteristic(service: UUID?, characteristic: UUID?, value: ByteArray?): Boolean {
+    private fun writeGenericCharacteristic(
+        service: UUID?,
+        characteristic: UUID?,
+        value: ByteArray?
+    ): Boolean {
         if (mBluetoothGatt != null) {
-            val bluetoothGattCharacteristic = mBluetoothGatt?.getService(service)?.getCharacteristic(characteristic)
+            val bluetoothGattCharacteristic =
+                mBluetoothGatt?.getService(service)?.getCharacteristic(characteristic)
             Log.d(TAG, "characteristic exists")
             if (bluetoothGattCharacteristic != null) {
                 bluetoothGattCharacteristic.value = value
-                bluetoothGattCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                bluetoothGattCharacteristic.writeType =
+                    BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
                 mBluetoothGatt?.writeCharacteristic(bluetoothGattCharacteristic)
                 Log.d(TAG, "characteristic written")
             } else {
@@ -2152,24 +2925,52 @@ class IOPTestActivity : AppCompatActivity() {
             Log.d(TAG, "onConnectionStateChange status $status - newState $newState")
             when (newState) {
                 BluetoothGatt.STATE_CONNECTED -> {
+                    Log.d(TAG, "onConnectionStateChange connected")
                     handler?.removeCallbacks(connectionRunnable)
                     isConnected = true
                     isTestFinished = false
                     if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_CONNECTION].getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING) {
                         Log.d(TAG, "onConnectionStateChange POSITION_TEST_CONNECTION")
-                        finishItemTest(POSITION_TEST_CONNECTION, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_CONNECTION])
+                        finishItemTest(
+                            POSITION_TEST_CONNECTION,
+                            getSiliconLabsTestInfo().listItemTest[POSITION_TEST_CONNECTION]
+                        )
                     } else {
                         if (!otaProcess) {
-                            Log.d(TAG, "onConnectionStateChange connected mIndexRunning $mIndexRunning")
+                            Log.d(
+                                TAG,
+                                "onConnectionStateChange connected mIndexRunning $mIndexRunning"
+                            )
                             mBluetoothGatt?.requestMtu(247)
+                            handler?.postDelayed({
+                                if (isConnected && mIndexRunning == 8) {
+                                    Log.d(
+                                        TAG,
+                                        "onConnectionStateChange connected mIndexRunningis 8"
+                                    )
+                                    isTestRunning = false
+                                    isTestFinished = true
+
+                                    getItemTestCaseInfo(POSITION_TEST_IOP3_LE_PRIVACY).setStatusTest(
+                                        Common.IOP3_TC_STATUS_PASS
+                                    )
+                                    runOnUiThread { updateUIFooter(isTestRunning) }
+                                    mListener?.updateUi()
+                                }
+                            }, CONNECTION_PERIOD)
+
                         } else { //After OTA process started
                             //get information
                             Log.d(TAG, "Device: " + gatt.device)
                             Log.d(TAG, "Device Name: " + gatt.device.name)
                             if (gatt.services.isEmpty()) {
                                 handler?.postDelayed({
-                                    mBluetoothGatt = null //It's going to be equal gatt in Discover Services Callback...
-                                    Log.d(TAG, "onConnected, start Services Discovery: " + gatt.discoverServices())
+                                    mBluetoothGatt =
+                                        null //It's going to be equal gatt in Discover Services Callback...
+                                    Log.d(
+                                        TAG,
+                                        "onConnected, start Services Discovery: " + gatt.discoverServices()
+                                    )
                                 }, 250)
 
                                 discoverTimeout = true
@@ -2178,7 +2979,11 @@ class IOPTestActivity : AppCompatActivity() {
                                         if (discoverTimeout) {
                                             disconnectGatt(gatt)
                                             runOnUiThread {
-                                                Toast.makeText(baseContext, "DISCOVER SERVICES TIMEOUT", Toast.LENGTH_LONG).show()
+                                                Toast.makeText(
+                                                    baseContext,
+                                                    "DISCOVER SERVICES TIMEOUT",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
                                             }
                                         }
                                     }, 25000)
@@ -2188,6 +2993,7 @@ class IOPTestActivity : AppCompatActivity() {
                         }
                     }
                 }
+
                 BluetoothGatt.STATE_DISCONNECTED -> {
                     Log.d(TAG, "Disconnected IOP Test device: " + System.currentTimeMillis())
                     isConnected = false
@@ -2203,7 +3009,10 @@ class IOPTestActivity : AppCompatActivity() {
                         }
                     } else {
                         if (!otaProcess && !isTestFinished) {
-                            Log.d(TAG, "onConnectionStateChange ota_process $otaProcess,isConnecting $isConnecting")
+                            Log.d(
+                                TAG,
+                                "onConnectionStateChange ota_process $otaProcess,isConnecting $isConnecting"
+                            )
                             if (mIndexRunning > POSITION_TEST_IOP3_OTA_WITHOUT_ACK || mIndexRunning < POSITION_TEST_IOP3_OTA_ACK) {
                                 if (!isConnecting) {
                                     isConnecting = true
@@ -2242,7 +3051,12 @@ class IOPTestActivity : AppCompatActivity() {
                         }
                     }
                 }
-                BluetoothGatt.STATE_CONNECTING -> Log.d(TAG, "onConnectionStateChange Connecting...")
+
+                BluetoothGatt.STATE_CONNECTING -> Log.d(
+                    TAG,
+                    "onConnectionStateChange Connecting..."
+                )
+
                 else -> {
                 }
             }
@@ -2261,7 +3075,11 @@ class IOPTestActivity : AppCompatActivity() {
                 discoverTimeout = false
                 if (status != 0) {
                     runOnUiThread {
-                        Toast.makeText(baseContext, ErrorCodes.getErrorName(status), Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            baseContext,
+                            ErrorCodes.getErrorName(status),
+                            Toast.LENGTH_LONG
+                        ).show()
                         updateDataTestFailed(mIndexRunning)
                     }
                     handler?.postDelayed({
@@ -2272,7 +3090,8 @@ class IOPTestActivity : AppCompatActivity() {
 
                     val otaServiceCheck = gatt.getService(ota_service) != null
                     if (otaServiceCheck) {
-                        val otaDataCheck = gatt.getService(ota_service).getCharacteristic(ota_data) != null
+                        val otaDataCheck =
+                            gatt.getService(ota_service).getCharacteristic(ota_data) != null
                         if (otaDataCheck) {
                             val homeKitCheck = gatt.getService(homekit_service) != null
                             if (!homeKitCheck) {
@@ -2299,12 +3118,20 @@ class IOPTestActivity : AppCompatActivity() {
             }
         }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             super.onCharacteristicRead(gatt, characteristic, status)
-            Log.d(TAG, "onCharacteristicRead: " + characteristic.uuid.toString() + " status " + status)
+            Log.d(
+                TAG,
+                "onCharacteristicRead: " + characteristic.uuid.toString() + " status " + status
+            )
 
             if (characteristic.uuid == GattCharacteristic.ModelNumberString.uuid) {
-                getSiliconLabsTestInfo().iopBoard = IopBoard.fromBoardString(characteristic.getStringValue(0))
+                getSiliconLabsTestInfo().iopBoard =
+                    IopBoard.fromBoardString(characteristic.getStringValue(0))
             }
 
             if (characteristic.service.uuid.toString() == CommonUUID.Service.TEST_PARAMETERS.toString()) {
@@ -2312,9 +3139,11 @@ class IOPTestActivity : AppCompatActivity() {
                     when (characteristic.uuid.toString()) {
                         CommonUUID.Characteristic.FIRMWARE_VERSION.toString() ->
                             readFirmwareVersion(characteristic.value)
+
                         CommonUUID.Characteristic.CONNECTION_PARAMETERS.toString() ->
                             readConnectionParameters(characteristic.value)
-                        else -> { }
+
+                        else -> {}
                     }
                 } else {
                     nrTries = 0
@@ -2333,12 +3162,18 @@ class IOPTestActivity : AppCompatActivity() {
                 checkNextTestCase(characteristic, 1)
                 // type 1: CharacteristicRead, 2:CharacteristicWrite
                 if (mBluetoothGatt?.getService(ota_service) != null) {
-                    if (characteristic === mBluetoothGatt?.getService(ota_service)?.getCharacteristic(ota_control)) {
+                    if (characteristic === mBluetoothGatt?.getService(ota_service)
+                            ?.getCharacteristic(ota_control)
+                    ) {
                         val value = characteristic.value
                         if (value[2] == 0x05.toByte()) {
                             Log.e("homekit_descriptor", "Insecure Connection")
                             runOnUiThread {
-                                Toast.makeText(this@IOPTestActivity, "Error: Not a Homekit Secure Connection", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    this@IOPTestActivity,
+                                    "Error: Not a Homekit Secure Connection",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         } else if (value[2] == 0x04.toByte()) {
                             Log.e("homekit_descriptor", "Wrong Address")
@@ -2360,7 +3195,11 @@ class IOPTestActivity : AppCompatActivity() {
             }
         }
 
-        override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
             Log.d(TAG, "onCharacteristicWrite: " + characteristic.uuid.toString())
             Log.d(TAG, "onCharacteristicWrite: $status")
@@ -2371,7 +3210,10 @@ class IOPTestActivity : AppCompatActivity() {
                 if (characteristic.uuid == ota_control) { //OTA Control Callback Handling
                     if (characteristic.value.size == 1) {
                         if (characteristic.value[0] == 0x00.toByte()) {
-                            Log.e("Callback", "Control " + Converters.getHexValue(characteristic.value) + "status: " + status)
+                            Log.e(
+                                "Callback",
+                                "Control " + Converters.getHexValue(characteristic.value) + "status: " + status
+                            )
                             if (ota_mode && otaProcess) {
                                 Log.e(OTA_UPLOAD, "Sent")
                                 runOnUiThread(checkBeginRunnable)
@@ -2386,13 +3228,19 @@ class IOPTestActivity : AppCompatActivity() {
                         }
                         if (characteristic.value[0] == 0x03.toByte()) {
                             if (otaProcess) {
-                                Log.e("Callback", "Control " + Converters.getHexValue(characteristic.value) + "status: " + status)
+                                Log.e(
+                                    "Callback",
+                                    "Control " + Converters.getHexValue(characteristic.value) + "status: " + status
+                                )
                                 runOnUiThread { otaProgressDialog?.btnOtaEnd?.isEnabled = true }
                                 boolOTAbegin = false
                             }
                         }
                     } else {
-                        Log.i("OTA_Control", "Received: " + Converters.getHexValue(characteristic.value))
+                        Log.i(
+                            "OTA_Control",
+                            "Received: " + Converters.getHexValue(characteristic.value)
+                        )
                         if (characteristic.value[0].toInt() == 0x00 && characteristic.value[1].toInt() == 0x02) {
                             Log.i("HomeKit", "Reading OTA_Control...")
                             mBluetoothGatt?.readCharacteristic(characteristic)
@@ -2421,15 +3269,25 @@ class IOPTestActivity : AppCompatActivity() {
             }
         }
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic
+        ) {
             super.onCharacteristicChanged(gatt, characteristic)
-            Log.d(TAG, "onCharacteristicChanged: " + characteristic.uuid.toString() + " len:" + characteristic.value.size)
+            Log.d(
+                TAG,
+                "onCharacteristicChanged: " + characteristic.uuid.toString() + " len:" + characteristic.value.size
+            )
             updateDataTest(characteristic, -1, -1)
             checkNextTestCase(characteristic, 0)
             // type 1: CharacteristicRead, 2:CharacteristicWrite, 0:Notify
         }
 
-        override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+        override fun onDescriptorRead(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
             super.onDescriptorRead(gatt, descriptor, status)
             Log.d(TAG, "onDescriptorRead mIndexStartChildrenTest: $mIndexStartChildrenTest")
             if (descriptor.uuid.toString() == homekit_descriptor.toString()) {
@@ -2440,9 +3298,24 @@ class IOPTestActivity : AppCompatActivity() {
                     Log.i("descriptor", "getValue " + Converters.getHexValue(descriptor.value))
                 }
             }
+            if (iopPhase3ExtraDescriptor != null) {
+                if (descriptor.uuid.toString() == iopPhase3ExtraDescriptor!!.uuid.toString()) {
+                    Log.d(
+                        "iopPhase3RunTestCaseBonding",
+                        "Descriptor getValue " + Converters.getHexValue(descriptor.value)
+                    )
+                    if (iopPhase3BondingStep < 8) {
+                        iopPhase3RunTestCaseBonding(iopPhase3BondingStep + 1)
+                    }
+                }
+            }
         }
 
-        override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
             super.onDescriptorWrite(gatt, descriptor, status)
             Log.d(TAG, "onDescriptorWrite status $status")
             if (mIndexStartChildrenTest <= 17 && isDisabled) {
@@ -2451,11 +3324,28 @@ class IOPTestActivity : AppCompatActivity() {
             } else if (mEndThroughputNotification) {
                 mEndThroughputNotification = false
                 if (status == 0) {
-                    finishItemTest(POSITION_TEST_IOP3_THROUGHPUT, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_THROUGHPUT])
+                    finishItemTest(
+                        POSITION_TEST_IOP3_THROUGHPUT,
+                        getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_THROUGHPUT]
+                    )
+                } else if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_LE_PRIVACY]
+                        .getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING
+                ) {
+                    iopPhase3RunTestCaseLEPrivacy(1)
                 }
-            /*} else if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING]
-            .getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING) {
-                iopPhase3RunTestCaseCaching(1) */
+                /*} else if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_CACHING]
+                .getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING) {
+                    iopPhase3RunTestCaseCaching(1) */
+            } else if (getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_LE_PRIVACY]
+                    .getStatusTest() == Common.IOP3_TC_STATUS_PROCESSING
+            ) {
+                iopPhase3RunTestCaseLEPrivacy(1)
+            } else if (iopPhase3ExtraDescriptor != null) {
+                if (descriptor.uuid.toString() == iopPhase3ExtraDescriptor!!.uuid.toString()) {
+                    if (iopPhase3BondingStep < 8) {
+                        iopPhase3RunTestCaseBonding(iopPhase3BondingStep + 1)
+                    }
+                }
             } else {
                 Log.d(TAG, "do nothing")
             }
@@ -2473,7 +3363,9 @@ class IOPTestActivity : AppCompatActivity() {
 
         override fun onPhyRead(gatt: BluetoothGatt?, txPhy: Int, rxPhy: Int, status: Int) {
             super.onPhyRead(gatt, txPhy, rxPhy, status) // TODO read PHY before starting throughput?
+            Log.d(TAG, "read PHY before starting throughput")
             currentRxPhy = rxPhy
+            Log.d(TAG, "phy : " + currentRxPhy.toString())
         }
 
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
@@ -2482,15 +3374,20 @@ class IOPTestActivity : AppCompatActivity() {
             this@IOPTestActivity.mtu = mtu
             mStartTimeDiscover = System.currentTimeMillis()
             Log.d(TAG, "setPreferredPhy 1M")
-            mBluetoothGatt?.setPreferredPhy(BluetoothDevice.PHY_LE_1M_MASK, BluetoothDevice.PHY_LE_1M_MASK, BluetoothDevice.PHY_OPTION_NO_PREFERRED)
-            if (mIndexRunning == POSITION_TEST_DISCOVER_SERVICE || mIndexRunning == POSITION_TEST_IOP3_THROUGHPUT) {
+            mBluetoothGatt?.setPreferredPhy(
+                BluetoothDevice.PHY_LE_1M_MASK,
+                BluetoothDevice.PHY_LE_1M_MASK,
+                BluetoothDevice.PHY_OPTION_NO_PREFERRED
+            )
+            if (mIndexRunning == POSITION_TEST_DISCOVER_SERVICE || mIndexRunning == POSITION_TEST_IOP3_THROUGHPUT || mIndexRunning == POSITION_TEST_IOP3_LE_PRIVACY || (mIndexRunning == POSITION_TEST_IOP3_SECURITY && iopPhase3BondingStep > 2)) {
                 mListCharacteristics.clear()
                 characteristicsPhase3Security.clear()
                 characteristicIOPPhase3Control = null
                 refreshServices()
             } else if ((mIndexRunning == POSITION_TEST_IOP3_OTA_WITHOUT_ACK
-                            || mIndexRunning == POSITION_TEST_IOP3_OTA_ACK)
-                    && !otaProcess) {
+                        || mIndexRunning == POSITION_TEST_IOP3_OTA_ACK)
+                && !otaProcess
+            ) {
                 Log.d(TAG, "rediscover OTA")
                 handler?.postDelayed({
                     mListCharacteristics.clear()
@@ -2523,13 +3420,17 @@ class IOPTestActivity : AppCompatActivity() {
 
             when (mIndexRunning) {
                 POSITION_TEST_SCANNER -> {
-                   if (device.name.equals(getSiliconLabsTestInfo().fwName, ignoreCase = true)) {
-                       mBluetoothDevice = device
-                       mDeviceAddress = device.address
-                       scanLeDevice(false)
-                       finishItemTest(POSITION_TEST_SCANNER, getSiliconLabsTestInfo().listItemTest[POSITION_TEST_SCANNER])
-                   } else return
+                    if (device.name.equals(getSiliconLabsTestInfo().fwName, ignoreCase = true)) {
+                        mBluetoothDevice = device
+                        mDeviceAddress = device.address
+                        scanLeDevice(false)
+                        finishItemTest(
+                            POSITION_TEST_SCANNER,
+                            getSiliconLabsTestInfo().listItemTest[POSITION_TEST_SCANNER]
+                        )
+                    } else return
                 }
+
                 POSITION_TEST_IOP3_OTA_ACK,
                 POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
                     if (device.address == mDeviceAddress) {
@@ -2540,6 +3441,8 @@ class IOPTestActivity : AppCompatActivity() {
                         }, 5000)
                     } else return
                 }
+
+                POSITION_TEST_IOP3_LE_PRIVACY,
                 POSITION_TEST_IOP3_SECURITY,
                 POSITION_TEST_IOP3_CACHING -> {
                     if (device.address == mDeviceAddress) {
@@ -2586,7 +3489,8 @@ class IOPTestActivity : AppCompatActivity() {
         /* Add IoP Test for P3 */
         private const val POSITION_TEST_IOP3_THROUGHPUT = 6
         private const val POSITION_TEST_IOP3_SECURITY = 7
-        private const val POSITION_TEST_IOP3_CACHING = 8
+        private const val POSITION_TEST_IOP3_CACHING = 9
+        private const val POSITION_TEST_IOP3_LE_PRIVACY = 8
         private const val POSITION_TEST_IOP3_OTA_ACK = 4
         private const val POSITION_TEST_IOP3_OTA_WITHOUT_ACK = 5
 

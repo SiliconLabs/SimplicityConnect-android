@@ -28,7 +28,7 @@ class ShareLogServices : Service() {
             sendIntent.action = Intent.ACTION_SEND
             sendIntent.putExtra(Intent.EXTRA_TEXT, logsText)
             sendIntent.type = "text/plain"
-            val shareIntent = Intent.createChooser(sendIntent, resources.getString(R.string.app_name_EFR_Connect) + " LOGS")
+            val shareIntent = Intent.createChooser(sendIntent, resources.getString(R.string.app_name_simplicity_Connect) + " LOGS")
             shareIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(shareIntent)
             stopSelf(msg.arg1)

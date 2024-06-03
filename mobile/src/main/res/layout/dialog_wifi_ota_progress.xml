@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/dialog_card">
+
+    <LinearLayout
+        style="@style/dialog_margins"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginBottom="@dimen/space_SM"
+            android:text="@string/update_firmware" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/space_XS">
+
+            <TextView
+                style="@style/dialog_text_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/ip" />
+
+            <TextView android:id="@+id/wifi_ip_address"
+                style="@style/dialog_text_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:text="100.102.252.14" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/space_XS">
+
+            <TextView
+                style="@style/dialog_text_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/port" />
+
+            <TextView android:id="@+id/wifi_port"
+                style="@style/dialog_text_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:text="8080" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/space_XS">
+
+            <TextView
+                style="@style/dialog_text_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/File_Name_colon" />
+
+            <TextView android:id="@+id/file_name"
+                style="@style/dialog_text_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:text="filename.gbl" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/space_XS">
+
+            <TextView
+                style="@style/dialog_text_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/File_Size_colon" />
+
+            <TextView android:id="@+id/file_size"
+                style="@style/dialog_text_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:ellipsize="end"
+                android:maxLines="1"
+                tools:text="102400 bytes" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/dialog_text_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:elegantTextHeight="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/Packet_Size_colon" />
+
+            <TextView android:id="@+id/packet_size"
+                style="@style/dialog_text_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:elegantTextHeight="true"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="1024 bytes" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/space_XS"
+            android:layout_marginBottom="@dimen/space_SM"
+            android:background="@color/divider_line"/>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/ota_number_of_steps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elegantTextHeight="true"
+                android:fontFamily="sans-serif"
+                android:layout_marginBottom="@dimen/space_XS"
+                tools:text="1 OF 1" />
+
+            <TextView
+                android:id="@+id/data_rate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/ota_progress_bar"
+                android:layout_toEndOf="@id/ota_number_of_steps"
+                android:elegantTextHeight="true"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="@dimen/space_XS"
+                android:visibility="invisible"
+                android:gravity="end"
+                android:maxLength="15"
+                tools:text="10.24 kbit/s"
+                android:textSize="@dimen/advertisement_details_device_name_text_size" />
+
+            <ProgressBar
+                android:id="@+id/connecting_spinner"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_above="@id/ota_progress_percent"
+                android:layout_alignStart="@id/ota_progress_percent"
+                android:layout_alignEnd="@id/ota_progress_percent"
+                android:layout_marginBottom="@dimen/space_XS"
+                android:indeterminate="true"
+                android:indeterminateDrawable="@drawable/spinner_connecting_ring"
+                android:visibility="invisible"
+                tools:visibility="visible" />
+
+
+            <ProgressBar
+                android:id="@+id/ota_progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ota_number_of_steps"
+                android:layout_alignParentStart="true"
+                android:layout_gravity="center_vertical"
+                android:layout_toStartOf="@id/ota_progress_percent"
+                android:elevation="5dp"
+                android:max="100"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:progressTint="@color/blue_primary"
+                android:scaleY="5" />
+
+            <TextView
+                android:id="@+id/ota_progress_percent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ota_number_of_steps"
+                android:layout_alignTop="@id/ota_progress_bar"
+                android:layout_alignBottom="@id/ota_progress_bar"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="center"
+                android:elegantTextHeight="true"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/space_SM"
+                android:text="@string/zero_percent" />
+        </RelativeLayout>
+
+        <Chronometer
+            android:id="@+id/ota_chronometer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elegantTextHeight="true"
+            android:visibility="gone"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="@dimen/space_S"
+            android:textSize="@dimen/advertisement_details_title_text_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_firmware_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="@dimen/space_S"
+            android:textColor="@color/silabs_blue"
+            android:text="@string/waiting_for_client_to_connect"
+            android:textSize="@dimen/advertisement_details_title_text_size" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/space_S"
+            android:layout_marginHorizontal="@dimen/dialog_button_margin_end"
+            android:gravity="center">
+
+            <Button android:id="@+id/cancel"
+                style="@style/dialog_button_negative_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginEnd="@dimen/dialog_margin_between_buttons"
+                android:text="@string/button_cancel" />
+
+            <Button android:id="@+id/otabutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                style="@style/dialog_button_positive_red"
+                android:text="@string/button_cancel" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

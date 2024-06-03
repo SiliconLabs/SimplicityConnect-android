@@ -104,12 +104,12 @@ class SettingsFragment : Fragment() {
     }
 
     companion object {
-        private const val LINK_REPORT_ISSUE = "github.com/SiliconLabs/EFRConnect-android/issues"
+        private const val LINK_REPORT_ISSUE = "github.com/SiliconLabs/SimplicityConnect-android/issues"
         private const val LINK_MORE_INFO = "silabs.com/products/wireless"
-        private const val LINK_SOURCECODE = "github.com/SiliconLabs/EFRConnect-android"
-        private const val LINK_USERS_GUIDE = "docs.silabs.com/bluetooth/latest/miscellaneous/mobile/efr-connect-mobile-app"
+        private const val LINK_SOURCECODE = "github.com/SiliconLabs/SimplicityConnect-android"
+        private const val LINK_USERS_GUIDE = "docs.silabs.com/mobile-apps/latest/mobile-apps-start/"
         private const val LINK_SUPPORT = "silabs.com/support"
-        private const val LINK_RELEASE_NOTES = "silabs.com/documents/public/release-notes/efr-connect-release-notes.pdf"
+        private const val LINK_RELEASE_NOTES = "docs.silabs.com/mobile-apps/latest/mobile-apps-release-notes/"
         private const val LINK_DOCUMENTATION = "docs.silabs.com/bluetooth/latest"
         private const val LINK_GOOGLE_PLAY_STORE = "play.google.com/store/apps/developer?id=Silicon+Laboratories"
     }

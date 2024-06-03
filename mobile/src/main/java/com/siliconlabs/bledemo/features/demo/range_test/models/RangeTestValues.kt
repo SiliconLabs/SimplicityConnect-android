@@ -13,8 +13,8 @@ class RangeTestValues {
         var PACKET_COUNT_LOOKUP: List<Int>
         var ID_LOOKUP: List<Int>
 
-        private const val CHANNELS_MIN = 0
-        private const val CHANNELS_MAX = 19
+        private var CHANNELS_MIN = 0
+        private var CHANNELS_MAX = 0
 
         private val PACKET_COUNTS = arrayOf(500, 1000, 2500, 5000, 10000, 25000, 50000)
 
@@ -38,6 +38,21 @@ class RangeTestValues {
             }
 
             ID_LOOKUP = Collections.unmodifiableList(idLookup)
+        }
+
+        fun setChannelsMinMax(min: Int, max: Int) {
+            CHANNELS_MIN = min
+            CHANNELS_MAX = max
+            updateChannelLookup()
+        }
+
+        private fun updateChannelLookup() {
+            val channelsLookupSize = CHANNELS_MAX - CHANNELS_MIN + 1
+            val channelsLookup: ArrayList<Int> = ArrayList(channelsLookupSize)
+            for (i in 0 until channelsLookupSize) {
+                channelsLookup.add(CHANNELS_MIN + i)
+            }
+            CHANNEL_LOOKUP = Collections.unmodifiableList(channelsLookup)
         }
     }
 }

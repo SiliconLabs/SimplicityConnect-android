@@ -79,7 +79,8 @@ class BluetoothService : LocalService<BluetoothService>() {
         ENVIRONMENT,
         IOP_TEST,
         ESL_DEMO,
-        MATTER_DEMO
+        MATTER_DEMO,
+        WIFI_OTA_UPDATE
     }
 
     interface ScanListener {
@@ -280,6 +281,7 @@ class BluetoothService : LocalService<BluetoothService>() {
             addAction(ACTION_GATT_SERVER_REMOVE_NOTIFICATION)
         }
         registerReceiver(gattServerBroadcastReceiver, filter)
+
     }
 
     override fun onDestroy() {
@@ -659,10 +661,13 @@ class BluetoothService : LocalService<BluetoothService>() {
 
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
             super.onMtuChanged(gatt, mtu, status)
-            Timber.d("onMtuChanged(): gatt device =${gatt.device.address}, mtu = $mtu")
-            addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.MTU_CHANGED,
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Timber.d("onMtuChanged(): gatt device =${gatt.device.address}, mtu = $mtu")
+                addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.MTU_CHANGED,
                     status, "mtu = $mtu"))
-            extraGattCallback?.onMtuChanged(gatt, mtu, status)
+                extraGattCallback?.onMtuChanged(gatt, mtu, status)
+            }
+
         }
 
         override fun onPhyUpdate(gatt: BluetoothGatt, txPhy: Int, rxPhy: Int, status: Int) {
@@ -843,7 +848,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         createNotificationChannel()
 
         val notification = Notification.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.efr_redesign_launcher)
+                .setSmallIcon(R.mipmap.si_launcher)
                 .setContentTitle(getString(R.string.notification_title_device_has_connected, deviceName))
                 .setContentText(getString(R.string.notification_note_debug_connection))
                 .addAction(buildAction(getString(R.string.button_yes), getYesPendingIntent(device)))
@@ -869,7 +874,7 @@ class BluetoothService : LocalService<BluetoothService>() {
 
     private fun buildAction(actionText: String, actionIntent: PendingIntent) : Notification.Action {
         return Notification.Action.Builder(
-            R.mipmap.efr_redesign_launcher,
+            R.mipmap.si_launcher,
             actionText,
             actionIntent
         ).build()

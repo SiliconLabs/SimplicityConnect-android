@@ -321,4 +321,9 @@
     <dimen name="matter_preview_height">380dp</dimen>
     <dimen name="matter_light_height">200dp</dimen>
     <dimen name="matter_margin">10dp</dimen>
+
+<!--    Splash screeen-->
+    <dimen name="splash_screen_dim">240dp</dimen>
+    <dimen name="splash_si_connect_logo">-40dp</dimen>
+    <dimen name="splash_si_labs_logo">40dp</dimen>
 </resources>

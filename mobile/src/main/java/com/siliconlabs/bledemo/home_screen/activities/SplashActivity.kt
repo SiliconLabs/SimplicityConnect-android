@@ -29,7 +29,7 @@ class SplashActivity : AppCompatActivity() {
         } else setTheme(R.style.CustomSplashTheme)
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.efr_splash_screen)
+        setContentView(R.layout.si_connect_splash_screen)
 
         Handler(Looper.getMainLooper()).postDelayed({
             Intent(this, MainActivity::class.java).apply {

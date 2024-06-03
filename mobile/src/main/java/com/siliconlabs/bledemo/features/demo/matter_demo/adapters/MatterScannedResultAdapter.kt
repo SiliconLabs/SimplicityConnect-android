@@ -1,7 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.matter_demo.adapters
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -65,7 +64,7 @@ class MatterScannedResultAdapter(
 
 
 
-        holder.itemView.setOnClickListener {
+        holder.binding.textViewHeader.setOnClickListener {
             runBlocking {
                 if (onClickListener != null) {
                     onClickListener!!.onClick(position, matterInfo)

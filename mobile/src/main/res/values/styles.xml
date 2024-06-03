@@ -14,7 +14,7 @@
     </style>
 
     <style name="CustomSplashTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="android:windowBackground">@drawable/splash_screen_gradient</item>
+       <item name="android:windowBackground">@drawable/si_connect_app_screen_background</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
@@ -29,7 +29,7 @@
 
     <!-- override system splash screen with just a matching color background -->
     <style name="SystemSplashTheme" parent="Theme.SplashScreen">
-        <item name="android:windowBackground">@drawable/splash_screen_gradient</item>
+        <item name="android:windowBackground">@drawable/si_connect_app_screen_background</item>
         <item name="postSplashScreenTheme">@style/CustomSplashTheme</item>
     </style>
 
@@ -348,6 +348,13 @@
 
     <style name="dialog_button_positive_action" parent="@style/Widget.MaterialComponents.Button.TextButton">
         <item name="android:backgroundTint">@color/dialog_positive_button_selector</item>
+        <item name="android:textColor">@color/silabs_white</item>
+        <item name="android:textSize">@dimen/dialog_button_text_size</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="dialog_button_positive_red" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:backgroundTint">@color/silabs_red</item>
         <item name="android:textColor">@color/silabs_white</item>
         <item name="android:textSize">@dimen/dialog_button_text_size</item>
         <item name="android:textAllCaps">false</item>

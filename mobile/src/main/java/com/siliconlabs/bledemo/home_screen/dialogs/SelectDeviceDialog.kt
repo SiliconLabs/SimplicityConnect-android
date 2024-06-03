@@ -113,7 +113,8 @@ class SelectDeviceDialog(
                         when (characteristic.getStringValue(0)) {
                             ThunderBoardDevice.THUNDERBOARD_MODEL_SENSE,
                             ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V1,
-                            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2 -> {
+                            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2,
+                            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V3 -> {
                                 connectType = GattConnectType.BLINKY_THUNDERBOARD
                                 cachedBoardType = characteristic.getStringValue(0)
                                 gatt?.readCharacteristic(getPowerSourceCharacteristic(gatt))
@@ -125,6 +126,8 @@ class SelectDeviceDialog(
                             }
 
                             else -> {
+                                showMessage(R.string.unknown_model)
+                                (activity as MainActivity).dismissModalDialog()
                                 Timber.d("Unknown model")
                             }
                         }

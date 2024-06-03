@@ -3,6 +3,7 @@ package com.siliconlabs.bledemo.utils
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
+import android.util.Log
 import java.util.*
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
@@ -62,12 +63,13 @@ class GattQueue(private val gatt: BluetoothGatt?) {
 
     private fun processNextCommand() {
         var success = false
+        Log.i("GattQueue","processNextCommand")
         val command = commands.poll()
 
         if (command?.gatt != null && command.characteristic != null) {
             val gatt = command.gatt
             val characteristic = command.characteristic
-
+            Log.i("GattQueue","command.type "+command.type)
             success = when (command.type) {
                 GattCommand.Type.READ -> gatt.readCharacteristic(characteristic)
                 GattCommand.Type.WRITE -> gatt.writeCharacteristic(characteristic)

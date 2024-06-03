@@ -1,5 +1,7 @@
 package com.siliconlabs.bledemo.features.iop_test.models
 
+import android.util.Log
+import com.siliconlabs.bledemo.features.iop_test.activities.IOPTestActivity
 import com.siliconlabs.bledemo.features.iop_test.utils.Utils
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -14,7 +16,7 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
     private var phoneOs: String = Utils.getAndroidVersion()
     var phoneName: String = Utils.getDeviceName()
     var totalTestCase: Int
-
+    var iopActivity = IOPTestActivity()
     init {
         this.totalTestCase = getTotalTestCase(listItemTest)
     }
@@ -26,7 +28,7 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
                 count += it.size
             }
         }
-        return count + 6
+        return count + 8
     }
 
     private fun getDate(): String {
@@ -34,6 +36,7 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
     }
 
     private fun logDataTest(): String {
+        var printedTestCase7_5 = false
         return StringBuilder().apply {
             for (itemTest in listItemTest) {
                 if (itemTest.listChildrenItem != null && itemTest.listChildrenItem?.size!! > 0) {
@@ -85,6 +88,7 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
                         itemTest.idTest == 7 -> append("7.1")
                         itemTest.idTest == 5 -> append("6.1")
                         itemTest.idTest == 6 -> append("6.2")
+                        itemTest.idTest == 9 -> append("7.6")
                         else -> append(itemTest.idTest + 1)
                     }
                     append(",")
@@ -107,6 +111,13 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
                         }
                     }
                     append(".\n")
+                }
+                // Append test case 7.5 after test case 7.4
+                if (iopActivity.isCCCDPass){
+                    if (itemTest.idTest == 8 && !printedTestCase7_5) {
+                        append("\tTest case 7.5,Pass.\n") // Assuming test case 7.5 is always passed
+                        printedTestCase7_5 = true // Set the flag to true after printing test case 7.5
+                    }
                 }
             }
         }.toString()

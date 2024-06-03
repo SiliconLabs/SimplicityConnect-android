@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Application -->
-    <string name="app_name_EFR_Connect">EFR Connect</string>
+    <string name="app_name_simplicity_Connect">Si Connect</string>
 
     <!-- Bluetooth bar -->
     <string name="bluetooth_adapter_bar_disabled">Bluetooth adapter disabled</string>
@@ -94,6 +94,7 @@
         running \"%s\" firmware."</string>
     <string name="please_connect_a_device">Please connect a device</string>
     <string name="reading_board_type">Reading board type…</string>
+    <string name="failed_to_discover_services">Failed to discover services</string>
 
     <!-- Main Menu -->
     <string name="main_menu_title">Menu title</string>
@@ -234,7 +235,7 @@
     <!-- Help -->
     <string name="help_text_moreinfo_label">For more information visit:</string>
     <string name="help_text_sourcecode_label">Source code:</string>
-    <string name="help_text_users_guide_label">EFR Connect User\'s Guide:</string>
+    <string name="help_text_users_guide_label">Simplicity Connect User\'s Guide:</string>
     <string name="help_text_support_label">Support:</string>
     <string name="help_text_release_notes_label">Release notes:</string>
     <string name="help_text_documentation_label">Additional documentation:</string>
@@ -336,6 +337,7 @@
 
     <!-- Other -->
     <string name="unknown">Unknown</string>
+    <string name="unknown_model">Unknown Model</string>
     <string name="hex">Hex</string>
     <string name="ascii">ASCII</string>
     <string name="decimal">Decimal</string>
@@ -1148,7 +1150,7 @@
     <string name="matter_validation_manual_qrcode">Enter valid QR Code</string>
     <string name="matter_occupancy_sensor_action">Press and Hold to detect the occupancy” and release the button to undetect the occupancy</string>
     <string name="ssid_and_password_required">SSID and password required.</string>
-    <string name="password_must_be_min_8_characters">Password must be minimum 8 characters.</string>
+    <string name="password_must_be_min_8_characters">Password must be minimum 8 characters.</string>BT
     <string name="add_device_subtitle">Add the device name. This is the name that will be used to reference this device.</string>
     <string name="add_device_name">Add Device Name</string>
     <string name="matter_scanner_info">Manual QR code payload ID:</string>
@@ -1159,5 +1161,26 @@
     <string name="please_enter_valid_device_name">Please enter valid device name</string>
     <string name="start_commissioning">Start Commissioning</string>
     <string name="qr_code_info">QR Code info</string>
-    <string name="failed_to_discover_services">Failed to discover services</string>
+
+    //Wi-Fi OTA Firmware Update Demo
+    <string name="ota_demo_title">Wi-Fi OTA Update</string>
+    <string name="ota_demo_desc">This is a demonstration how to update the SiWx91x firmware via Wi-Fi by downloading an image from a remote TCP server. Mobile App will act as a TCP server.</string>
+    <string name="ip">IP Address:</string>
+    <string name="port">Server Port:</string>
+    <string name="heading_ota_choose_file">Select firmware file for updating SiWx91x</string>
+    <string name="select_rps_file">Select *.rps file</string>
+    <string name="ota_count_test_label">%d OF %d</string>
+    <string name="configure_wi_fi_ota_server">Configure Wi-Fi OTA Server</string>
+    <string name="select_file">Select file:</string>
+    <string name="turn_on_wifi">Turn ON your Wi-Fi connection</string>
+    <string name="waiting_for_client_to_connect">Waiting for client to connect</string>
+    <string name="client_connected">Firmware update in progress.</string>
+    <string name="firmware_update_completed">Firmware updated successfully!</string>
+    <string name="server_timeout">Exceeded timeout! Please try again</string>
+    <string name="port_id_validation">Enter 4 digit valid Server PORT</string>
+    <string name="done">Done</string>
+    <string name="btn_update">Update</string>
+    <string name="update_firmware">Updating Firmware</string>
+    <string name="alert">Alert</string>
+    <string name="matter_qr_code_info">QR Code Info</string>
 </resources>
