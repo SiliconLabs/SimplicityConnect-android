@@ -1,11 +1,13 @@
 package com.siliconlabs.bledemo.base.viewmodels
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
 import com.siliconlabs.bledemo.bluetooth.ble.ScanResultCompat
 import com.siliconlabs.bledemo.bluetooth.parsing.ScanRecordParser
+import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 
 abstract class ScannerViewModel : ViewModel() {
 
@@ -16,7 +18,9 @@ abstract class ScannerViewModel : ViewModel() {
     val isScanningOn: LiveData<Boolean> = _isScanningOn
 
 
-    abstract fun handleScanResult(result: ScanResultCompat)
+    abstract fun handleScanResult(result: ScanResultCompat,
+                                  connectType: BluetoothService.GattConnectType?,
+                                  context: Context?)
 
 
     fun toggleScanningState() {

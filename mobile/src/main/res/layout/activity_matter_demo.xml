@@ -45,7 +45,6 @@
 
                 <ImageView
                     android:layout_gravity="center"
-
                     android:id="@+id/refresh"
                     android:layout_width="@dimen/matter_25dp"
                     android:layout_height="@dimen/matter_25dp"

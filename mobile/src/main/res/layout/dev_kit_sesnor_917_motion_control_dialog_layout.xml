@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/matter_25dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/header"
+        style="@style/settings_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        android:gravity="center" />
+
+    <RelativeLayout
+        android:id="@+id/parentOrientLay"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_margin="@dimen/matter_10dp"
+        android:layout_marginTop="@dimen/matter_10dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/tb_robo_medium_14dp"
+                android:layout_gravity="start"
+                android:textStyle="bold"
+                android:text="@string/motion_orientation" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_S"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/orient_x_label"
+                    style="@style/tb_robo_regular_12dp_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/motion_x"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/orient_x"
+                    style="@style/tb_robo_regular_12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_S"
+                    android:fontFamily="sans-serif-light" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_S">
+
+                <TextView
+                    android:id="@+id/orient_y_label"
+                    style="@style/tb_robo_regular_12dp_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/motion_y"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/orientation_y"
+                    style="@style/tb_robo_regular_12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_S"
+                    android:fontFamily="sans-serif-light" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_S">
+
+                <TextView
+                    android:id="@+id/orientation_z_label"
+                    style="@style/tb_robo_regular_12dp_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/motion_z"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/orientation_z"
+                    style="@style/tb_robo_regular_12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_S"
+                    android:fontFamily="sans-serif-light" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="2dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@color/main_background" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/divider"
+            android:layout_marginStart="@dimen/space_M"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/tb_robo_medium_14dp"
+                android:layout_gravity="start"
+                android:textStyle="bold"
+                android:text="@string/motion_acceleration" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_S"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/accelo_x_label"
+                    style="@style/tb_robo_regular_12dp_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/motion_x"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/accelo_x"
+                    style="@style/tb_robo_regular_12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_S"
+                    android:fontFamily="sans-serif-light" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_S">
+
+                <TextView
+                    android:id="@+id/accelo_y_label"
+                    style="@style/tb_robo_regular_12dp_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/motion_y"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/accelo_y"
+                    style="@style/tb_robo_regular_12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_S"
+                    android:fontFamily="sans-serif-light" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_S">
+
+                <TextView
+                    android:id="@+id/accelo_z_label"
+                    style="@style/tb_robo_regular_12dp_grey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/motion_z"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/accelo_z"
+                    style="@style/tb_robo_regular_12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_S"
+                    android:fontFamily="sans-serif-light" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/matter_10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/yes_opt"
+            style="@style/SensorText"
+            android:layout_alignParentEnd="true"
+            android:paddingRight="20dp"
+            android:text="@string/refresh"
+            android:textAllCaps="false" />
+
+
+        <TextView
+            android:id="@+id/no_opt"
+            style="@style/SensorText"
+            android:layout_alignParentStart="true"
+            android:text="@string/close"
+            android:textAllCaps="false" />
+    </RelativeLayout>
+</LinearLayout>

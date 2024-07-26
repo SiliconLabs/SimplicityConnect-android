@@ -73,8 +73,7 @@ class MatterWifiInputDialogFragment : DialogFragment() {
             }
             if (!FragmentUtils.isPasswordValid(wifiPassword)) {
                 Toast.makeText(requireContext(),
-                    getString(R.string.password_must_be_min_8_characters), Toast.LENGTH_SHORT)
-                    .show()
+                    getString(R.string.password_must_be_min_8_characters), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             val intent = Intent()

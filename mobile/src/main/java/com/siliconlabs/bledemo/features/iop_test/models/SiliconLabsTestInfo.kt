@@ -46,7 +46,6 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
                         when {
                             children.id >= 11 -> append(itemTest.idTest + 1)
                             itemTest.idTest == 8 -> append(7)
-                            itemTest.idTest == 9 -> append(7)
                             else -> append(itemTest.idTest)
                         }
                         append(".")
@@ -75,7 +74,7 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
                             if (children.statusChildrenTest) {
                                 append(".\n")
                             } else {
-                                append(children.getValueErrorLog() + ".\n")
+                                append("Fail" + ".\n")
                             }
                         }
 
@@ -93,8 +92,8 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
                     }
                     append(",")
 
-                    if (itemTest.idTest == 7) {
-                        append("N/A,")
+                    if (itemTest.idTest == 7 && itemTest.getValueStatusTest() == FAILED) {
+                        append("Fail,")
                     } else {
                         append(itemTest.getValueStatusTest())
                     }
@@ -113,12 +112,15 @@ class SiliconLabsTestInfo(var fwName: String, val listItemTest: ArrayList<ItemTe
                     append(".\n")
                 }
                 // Append test case 7.5 after test case 7.4
-                if (iopActivity.isCCCDPass){
-                    if (itemTest.idTest == 8 && !printedTestCase7_5) {
-                        append("\tTest case 7.5,Pass.\n") // Assuming test case 7.5 is always passed
-                        printedTestCase7_5 = true // Set the flag to true after printing test case 7.5
+                if (itemTest.idTest == 8 && !printedTestCase7_5) {
+                    if (iopActivity.isCCCDPass) {
+                        append("\tTest case 7.5,Pass.\n")
+                    } else {
+                        append("\tTest case 7.5,Fail.\n")
                     }
+                    printedTestCase7_5 = true // Set the flag to true after printing test case 7.5
                 }
+
             }
         }.toString()
     }

@@ -18,10 +18,12 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.NFC"></uses-permission>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.NFC"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
@@ -33,13 +35,14 @@
     <application
         android:name=".application.SiliconLabsDemoApplication"
         android:allowBackup="false"
-        android:icon="@mipmap/si_launcher_round"
-        android:requestLegacyExternalStorage="true"
-        android:label="@string/app_name_simplicity_Connect"
-        android:supportsRtl="true"
-        tools:replace="android:allowBackup"
         android:enableOnBackInvokedCallback="true"
-        android:theme="@style/MainAppTheme">
+        android:icon="@mipmap/si_launcher_round"
+        android:label="@string/app_name_simplicity_Connect"
+        android:requestLegacyExternalStorage="true"
+        android:supportsRtl="true"
+        android:theme="@style/MainAppTheme"
+        android:usesCleartextTraffic="true"
+        tools:replace="android:allowBackup">
 
         <activity
             android:name=".features.configure.gatt_configurator.activities.GattServerActivity"
@@ -80,6 +83,7 @@
             android:exported="true" />
         <service
             android:name=".features.configure.advertiser.services.AdvertiserService"
+            android:foregroundServiceType="connectedDevice"
             android:exported="true" />
         <service
             android:name=".features.scan.browser.services.ShareLogServices"
@@ -111,8 +115,13 @@
         <activity
             android:name=".features.demo.matter_demo.activities.MatterDemoActivity"
             android:label="@string/matter_demo_title"
-            android:theme="@style/matter_theme"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/matter_theme" />
+        <activity
+            android:name=".features.demo.devkitsensor917.activities.DevKitSensor917Activity"
+            android:label="Dev kitSensor 917"
+            android:screenOrientation="portrait"
+            android:theme="@style/matter_theme" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

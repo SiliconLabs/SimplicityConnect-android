@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.dialogs.ProgressDialogWithSpinner
 import timber.log.Timber
-
 abstract class BaseActivity : AppCompatActivity() {
     enum class ConnectionStatus {
         CONNECTING, READING_DEVICE_STATE
@@ -60,6 +59,7 @@ abstract class BaseActivity : AppCompatActivity() {
             } else {
                 Timber.e("Dialog is not visible, cannot dismiss")
             }
+
         }
     }
 

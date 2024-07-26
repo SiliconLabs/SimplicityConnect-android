@@ -126,6 +126,11 @@
                     android:id="@+id/help_text_playstore"
                     style="@style/settings_link_button"
                     android:text="@string/settings_link_other_silabs_apps" />
+                <Button
+                    android:id="@+id/log_text_share"
+                    style="@style/settings_link_button"
+                    android:text="@string/settings_link_export_logger"
+                    />
 
         </com.google.android.flexbox.FlexboxLayout>
 

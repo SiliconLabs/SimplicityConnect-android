@@ -7,11 +7,15 @@
     <color name="silabs_blue">#0086D9</color>
     <color name="silabs_red">#D91E2A</color>
     <color name="silabs_white">#FFFFFF</color>
+    <color name="silabs_led_white">#D0D0D0</color>
     <color name="silabs_black">#000000</color>
     <color name="silabs_transparent">#00000000</color>
     <color name="silabs_yellow">#F9C80E</color>
     <color name="silabs_grey">#7A7878</color>
     <color name="silabs_green">#14A359</color>
+    <color name="silabs_magenta">#FF00FF</color>
+    <color name="silabs_cyan_led">#00FFFF</color>
+    <color name="silabs_yellow_led">#FFFF00</color>
 
     <color name="silabs_ripple_blue">#400086D9</color>
 
@@ -69,10 +73,15 @@
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="silabs_soft_black">#414a4c</color>
+    <color name="silabs_soft_red">#ff9b9b</color>
+    <color name="silabs_soft_blue">#d1dff6</color>
+    <color name="silabs_soft_green">#6FC276</color>
 
 
     <!-- REDESIGN 07/22 -->
     <color name="blue_primary">#0f62f3</color>
+
     <color name="blue_dark">#A00f62f3</color>
     <color name="blue_teal">#bff3ff</color>
 
@@ -115,4 +124,9 @@
     <!--    Matter Demo-->
     <color name="adapter_item_title_color">#000000</color>
     <color name="matter_tint_color">#000000</color>
+
+    <!-- 917 Dev Kit Sensor Demo -->
+    <color name="button_red">#FF0000</color>
+    <color name="button_green">#00FF00</color>
+    <color name="button_blue">#0000FF</color>
 </resources>

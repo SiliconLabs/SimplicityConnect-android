@@ -98,6 +98,7 @@
 
     <dimen name="main_view_icon_width">120dp</dimen>
     <dimen name="main_view_icon_height">150dp</dimen>
+    <dimen name="led_light_icon_height">200dp</dimen>
     <dimen name="main_view_square_icon_dimension">120dp</dimen>
 
     <dimen name="recycler_view_card_view_horizontal_margin">24dp</dimen>

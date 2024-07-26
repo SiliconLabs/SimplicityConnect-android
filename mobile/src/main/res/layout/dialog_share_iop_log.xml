@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/dialog_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        style="@style/dialog_margins"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="@dimen/dialog_margin_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/matter_10dp"
+            android:layout_marginBottom="@dimen/matter_10dp"
+            android:gravity="center"
+            android:text="@string/iop_test_share_log_dialog_title"
+            android:textSize="@dimen/matter_15dp"
+            android:textStyle="normal" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/matter_1dp"
+
+            android:background="@color/tb_grey"></View>
+
+        <TextView
+            android:id="@+id/tv_test_log"
+            style="@style/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_margin_between_buttons"
+            android:layout_marginBottom="@dimen/dialog_margin_between_buttons"
+            android:gravity="center"
+            android:text="@string/iop_test_result_log"
+            android:textColor="@color/silabs_blue" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/matter_1dp"
+            android:background="@color/tb_grey"></View>
+
+        <TextView
+            android:id="@+id/tv_app_log"
+            style="@style/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_margin_between_buttons"
+            android:layout_marginBottom="@dimen/dialog_margin_between_buttons"
+            android:gravity="center"
+            android:text="@string/iop_test_app_log"
+            android:textColor="@color/silabs_blue" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/matter_1dp"
+            android:background="@color/tb_grey"></View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/dialog_button_margin_end"
+            android:layout_marginTop="@dimen/space_S"
+            android:gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/share_log_cancel"
+                style="@style/dialog_button_negative_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dialog_margin_between_buttons"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/button_cancel"
+                android:textColor="@color/silabs_red"
+                android:textSize="@dimen/matter_18dp" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

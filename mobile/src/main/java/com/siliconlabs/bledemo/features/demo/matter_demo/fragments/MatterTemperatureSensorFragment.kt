@@ -56,6 +56,7 @@ class MatterTemperatureSensorFragment : Fragment() {
     private var endpointId: Int = ON_OFF_CLUSTER_ENDPOINT
     private lateinit var model: MatterScannedResultModel
     private var customProgressDialog: CustomProgressDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPrefs = requireContext().getSharedPreferences(

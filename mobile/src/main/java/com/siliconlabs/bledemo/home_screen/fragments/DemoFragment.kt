@@ -19,6 +19,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.databinding.FragmentDemoBinding
+import com.siliconlabs.bledemo.features.demo.devkitsensor917.activities.DevKitSensor917Activity
 import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoActivity
 import com.siliconlabs.bledemo.features.demo.range_test.activities.RangeTestActivity
 import com.siliconlabs.bledemo.features.demo.wifi_ota_update.AlertErrorDialog
@@ -33,6 +34,7 @@ import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import com.siliconlabs.bledemo.home_screen.menu_items.Blinky
 import com.siliconlabs.bledemo.home_screen.menu_items.ConnectedLighting
 import com.siliconlabs.bledemo.home_screen.menu_items.DemoMenuItem
+import com.siliconlabs.bledemo.home_screen.menu_items.DevKitSensorDemo
 import com.siliconlabs.bledemo.home_screen.menu_items.Environment
 import com.siliconlabs.bledemo.home_screen.menu_items.EslDemo
 import com.siliconlabs.bledemo.home_screen.menu_items.HealthThermometer
@@ -70,8 +72,8 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
     private var otaFileSelectionDialog: WiFiOtaFileSelectionDialog? = null
     private var otaFileManager: WiFiOtaFileManager? = null
     private var otaFilePath: Uri? = null
-    private var socket : Socket? = null
-    private var serverSocket : ServerSocket? = null
+    private var socket: Socket? = null
+    private var serverSocket: ServerSocket? = null
     private var portId = 8080
     private var isClientConnected = false
     private val kBits = "%.2f Kbit/s"
@@ -158,7 +160,14 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                 OTADemo(
                     R.drawable.redesign_ic_demo_ota,
                     getString(R.string.ota_demo_title),
-                    getString(R.string.ota_demo_desc)
+                    getString(R.string.ota_demo_title_desc)
+                )
+            )
+            add(
+                DevKitSensorDemo(
+                    R.drawable.redesign_ic_demo_dks_917,
+                    getString(R.string.dev_kit_sensor_917_title),
+                    getString(R.string.dev_kit_sensor_917_desc)
                 )
             )
         }
@@ -230,28 +239,45 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
     }
 
     override fun onDemoItemClicked(demoItem: DemoMenuItem) {
-        if (demoItem.connectType == BluetoothService.GattConnectType.MATTER_DEMO) {
+        if (demoItem.connectType == BluetoothService.GattConnectType.DEV_KIT_SENSOR) {
+            if (isNetworkAvailable(context)) {
+                requireContext().startActivity(
+                    Intent(
+                        requireContext(),
+                        DevKitSensor917Activity::class.java
+                    )
+                )
+            }else{
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.turn_on_wifi),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } else if (demoItem.connectType == BluetoothService.GattConnectType.MATTER_DEMO) {
             requireContext().startActivity(Intent(requireContext(), MatterDemoActivity::class.java))
         } else if (demoItem.connectType == BluetoothService.GattConnectType.RANGE_TEST) {
             startActivity(Intent(requireContext(), RangeTestActivity::class.java))
         } else if (demoItem.connectType == BluetoothService.GattConnectType.WIFI_OTA_UPDATE) {
-                if (isNetworkAvailable(context)) {
-                    otaFileSelectionDialog = WiFiOtaFileSelectionDialog(object : WiFiOtaFileSelectionDialog.CancelCallback {
+            if (isNetworkAvailable(context)) {
+                otaFileSelectionDialog = WiFiOtaFileSelectionDialog(
+                    object : WiFiOtaFileSelectionDialog.CancelCallback {
                         override fun onDismiss() {
                             otaFileSelectionDialog?.dismiss()
-                        }},
-                        listener = fileSelectionListener,
-                        getLocalIpAddress()
-                    ).also {
-                        it.show(childFragmentManager, "ota_file_selection_dialog")
-                    }
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.turn_on_wifi),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        }
+                    },
+                    listener = fileSelectionListener,
+                    getLocalIpAddress()
+                ).also {
+                    it.show(childFragmentManager, "ota_file_selection_dialog")
                 }
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.turn_on_wifi),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         } else {
             selectDeviceDialog = SelectDeviceDialog.newDialog(demoItem.connectType)
             selectDeviceDialog?.show(childFragmentManager, "select_device_dialog")
@@ -275,9 +301,11 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
 
     private fun isNetworkAvailable(context: Context?): Boolean {
         if (context == null) return false
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
             if (capabilities != null) {
                 when {
                     capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
@@ -293,28 +321,46 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
         }
         return false
     }
+
     private val fileSelectionListener = object : WiFiOtaFileSelectionDialog.FileSelectionListener {
         override fun onSelectFileButtonClicked() {
             otaFileSelectionDialog?.disableUploadButton()
             Intent(Intent.ACTION_GET_CONTENT)
                 .apply { type = "*/*" }
-                .also { startActivityForResult(Intent.createChooser(it,
-                    getString(R.string.ota_choose_file)),
-                    RPS_FILE_CHOICE_REQUEST_CODE
-                ) }
+                .also {
+                    startActivityForResult(
+                        Intent.createChooser(
+                            it,
+                            getString(R.string.ota_choose_file)
+                        ),
+                        RPS_FILE_CHOICE_REQUEST_CODE
+                    )
+                }
         }
 
         override fun onOtaButtonClicked() {
-            if(otaFileSelectionDialog?.checkPortNumberValid() == true){
+            if (otaFileSelectionDialog?.checkPortNumberValid() == true) {
                 otaFileManager?.otaFile?.let {
                     startOtaProcess()
                 } ?: if (otaFileManager?.otaFilename != null) {
-                    Toast.makeText(requireContext(), getString(R.string.incorrect_file), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.incorrect_file),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
-                    Toast.makeText(requireContext(), getString(R.string.no_file_chosen), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.no_file_chosen),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
-                Toast.makeText(requireContext(), getString(R.string.port_id_validation), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.port_id_validation),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -349,10 +395,20 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
         otaProgressDialog?.steps?.visibility = View.INVISIBLE
         otaProgressDialog?.uploadImage?.visibility = View.VISIBLE
 //        otaProgressDialog?.btnOtaEnd?.isEnabled = false
-        otaProgressDialog?.btnOtaEnd?.setBackgroundColor(getColor(requireContext(),R.color.silabs_red))
+        otaProgressDialog?.btnOtaEnd?.setBackgroundColor(
+            getColor(
+                requireContext(),
+                R.color.silabs_red
+            )
+        )
         otaProgressDialog?.btnOtaEnd?.text = getString(R.string.button_cancel)
         otaProgressDialog?.firmwareStatus?.text = getString(R.string.waiting_for_client_to_connect)
-        otaProgressDialog?.firmwareStatus?.setTextColor(getColor(requireContext(),R.color.silabs_dark_blue))
+        otaProgressDialog?.firmwareStatus?.setTextColor(
+            getColor(
+                requireContext(),
+                R.color.silabs_dark_blue
+            )
+        )
     }
 
     private fun showOtaProgressDialog() {
@@ -362,8 +418,13 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
     private fun startOtaProcess() {
         activity?.runOnUiThread {
             showOtaProgressDialog()
-            portId =  Integer.parseInt(otaFileSelectionDialog?.getPortId())
-            otaProgressDialog?.setProgressInfo(otaFileManager?.otaFilename, otaFileManager?.otaFile?.size, getLocalIpAddress() ,portId.toString())
+            portId = Integer.parseInt(otaFileSelectionDialog?.getPortId())
+            otaProgressDialog?.setProgressInfo(
+                otaFileManager?.otaFilename,
+                otaFileManager?.otaFile?.size,
+                getLocalIpAddress(),
+                portId.toString()
+            )
             animateLoading()
 
         }
@@ -403,14 +464,14 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
 
     private fun showTimeOutAlertDialog() {
         activity?.runOnUiThread {
-            alertErrorDialog  = AlertErrorDialog( object : AlertErrorDialog.OtaErrorCallback {
-                    override fun onDismiss() {
-                        initializeToDefaultValues()
-                        otaProgressDialog?.dismiss()
-                        socket?.close()
-                        serverSocket?.close()
-                    }
-                })
+            alertErrorDialog = AlertErrorDialog(object : AlertErrorDialog.OtaErrorCallback {
+                override fun onDismiss() {
+                    initializeToDefaultValues()
+                    otaProgressDialog?.dismiss()
+                    socket?.close()
+                    serverSocket?.close()
+                }
+            })
 
             alertErrorDialog?.show(childFragmentManager, "error_dialog")
         }
@@ -468,7 +529,8 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
             var length = 0
             val outputStream = socket!!.getOutputStream()
             val inputStream = socket!!.getInputStream()
-            val totalPackets = Integer.parseInt(otaFileManager?.otaFile?.size?.div(1024).toString())+1
+            val totalPackets =
+                Integer.parseInt(otaFileManager?.otaFile?.size?.div(1024).toString()) + 1
             while (true) {
                 retLen = inputStream.read(data, 0, 3)
                 if (retLen > 0) {
@@ -513,7 +575,7 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                 //Update the Progress Dialog UI
                 updateProgressDialog(ctr++, totalPackets)
                 packetCount = ctr
-                if(ctr<totalPackets)
+                if (ctr < totalPackets)
                     checkTimeOut(ctr)
             }
         } catch (e: IOException) {
@@ -526,32 +588,50 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
     private fun checkTimeOut(ctr: Int) {
         Timer().schedule(object : TimerTask() {
             override fun run() {
-                if(packetCount == ctr)
+                if (packetCount == ctr)
                     showTimeOutAlertDialog()
             }
         }, 30000)
     }
 
-    private fun updateProgressDialog(packetCount:Int, totalPackets: Int) {
-        val percentageSent = (packetCount*100/totalPackets)
+    private fun updateProgressDialog(packetCount: Int, totalPackets: Int) {
+        val percentageSent = (packetCount * 100 / totalPackets)
         isClientConnected = true
         activity?.runOnUiThread {
             otaProgressDialog?.progressBar?.progress = percentageSent
-            otaProgressDialog?.dataRate?.visibility =  View.INVISIBLE
+            otaProgressDialog?.dataRate?.visibility = View.INVISIBLE
             val datarate = String.format(Locale.US, kBits, 1.024F)
             otaProgressDialog?.dataRate?.text = datarate
-            otaProgressDialog?.dataSize?.text = getString(R.string.iop_test_n_percent, percentageSent)
+            otaProgressDialog?.dataSize?.text =
+                getString(R.string.iop_test_n_percent, percentageSent)
             otaProgressDialog?.steps?.visibility = View.VISIBLE
-            otaProgressDialog?.steps?.text = getString(R.string.ota_count_test_label,packetCount,totalPackets)
+            otaProgressDialog?.steps?.text =
+                getString(R.string.ota_count_test_label, packetCount, totalPackets)
             otaProgressDialog?.firmwareStatus?.text = getString(R.string.client_connected)
-            otaProgressDialog?.firmwareStatus?.setTextColor(getColor(requireContext(),R.color.silabs_dark_blue))
+            otaProgressDialog?.firmwareStatus?.setTextColor(
+                getColor(
+                    requireContext(),
+                    R.color.silabs_dark_blue
+                )
+            )
 
-            if(packetCount == totalPackets){
+            if (packetCount == totalPackets) {
 //                otaProgressDialog?.btnOtaEnd?.isEnabled = true
                 otaProgressDialog?.btnOtaEnd?.text = getString(R.string.done)
-                otaProgressDialog?.btnOtaEnd?.setBackgroundColor(getColor(requireContext(),R.color.dialog_positive_button_selector))
-                otaProgressDialog?.firmwareStatus?.text = getString(R.string.firmware_update_completed)
-                otaProgressDialog?.firmwareStatus?.setTextColor(getColor(requireContext(),R.color.silabs_green))
+                otaProgressDialog?.btnOtaEnd?.setBackgroundColor(
+                    getColor(
+                        requireContext(),
+                        R.color.dialog_positive_button_selector
+                    )
+                )
+                otaProgressDialog?.firmwareStatus?.text =
+                    getString(R.string.firmware_update_completed)
+                otaProgressDialog?.firmwareStatus?.setTextColor(
+                    getColor(
+                        requireContext(),
+                        R.color.silabs_green
+                    )
+                )
                 otaProgressDialog?.uploadImage?.visibility = View.GONE
             }
         }
@@ -577,12 +657,20 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                     otaFileManager?.readFilename(it)
                     otaFileSelectionDialog?.changeFileName(otaFileManager?.otaFilename)
                     if (otaFileManager?.hasCorrectFileExtensionRPS() == true) {
-                       otaFileManager?.readFile(it).toString()
-                       otaFileSelectionDialog?.enableUploadButton()
+                        otaFileManager?.readFile(it).toString()
+                        otaFileSelectionDialog?.enableUploadButton()
                     } else {
-                        Toast.makeText(requireContext(), getString(R.string.incorrect_file), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.incorrect_file),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                } ?: Toast.makeText(requireContext(), getString(R.string.chosen_file_not_found), Toast.LENGTH_SHORT).show()
+                } ?: Toast.makeText(
+                    requireContext(),
+                    getString(R.string.chosen_file_not_found),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

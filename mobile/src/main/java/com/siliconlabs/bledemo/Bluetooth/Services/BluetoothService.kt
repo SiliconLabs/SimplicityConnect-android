@@ -80,7 +80,8 @@ class BluetoothService : LocalService<BluetoothService>() {
         IOP_TEST,
         ESL_DEMO,
         MATTER_DEMO,
-        WIFI_OTA_UPDATE
+        WIFI_OTA_UPDATE,
+        DEV_KIT_SENSOR
     }
 
     interface ScanListener {
@@ -280,7 +281,12 @@ class BluetoothService : LocalService<BluetoothService>() {
             addAction(ACTION_GATT_SERVER_DEBUG_CONNECTION)
             addAction(ACTION_GATT_SERVER_REMOVE_NOTIFICATION)
         }
-        registerReceiver(gattServerBroadcastReceiver, filter)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(gattServerBroadcastReceiver, filter, RECEIVER_EXPORTED)
+        }else {
+            registerReceiver(gattServerBroadcastReceiver, filter)
+        }
 
     }
 

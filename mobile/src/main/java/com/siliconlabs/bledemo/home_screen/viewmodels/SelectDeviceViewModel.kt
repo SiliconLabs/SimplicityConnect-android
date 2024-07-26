@@ -1,38 +1,72 @@
 package com.siliconlabs.bledemo.home_screen.viewmodels
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.viewmodels.ScannerViewModel
 import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.bluetooth.ble.ManufacturerDataFilter
 import com.siliconlabs.bledemo.bluetooth.ble.ScanResultCompat
+import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 
 
 class SelectDeviceViewModel : ScannerViewModel() {
 
-    private val _scannedDevices: MutableLiveData<MutableMap<String, BluetoothDeviceInfo>> = MutableLiveData(mutableMapOf())
+    private val _scannedDevices: MutableLiveData<MutableMap<String, BluetoothDeviceInfo>> =
+        MutableLiveData(mutableMapOf())
     val scannedDevices: LiveData<MutableMap<String, BluetoothDeviceInfo>> = _scannedDevices
     private val _deviceToInsert: MutableLiveData<BluetoothDeviceInfo> = MutableLiveData()
     val deviceToInsert: LiveData<BluetoothDeviceInfo> = _deviceToInsert
     private val _numberOfDevices: MutableLiveData<Int> = MutableLiveData(0)
     val numberOfDevices: LiveData<Int> = _numberOfDevices
 
-    override fun handleScanResult(result: ScanResultCompat) {
+    override fun handleScanResult(
+        result: ScanResultCompat,
+        connectType: BluetoothService.GattConnectType?,
+        context: Context?
+    ) {
+        val manufacturerDataFilter = ManufacturerDataFilter(
+            id = 71,
+            data = byteArrayOf(2, 0)
+        )
+
         synchronized(_scannedDevices) {
-            _scannedDevices.value?.apply {
-                val address = result.device?.address!!
-                val isNewDevice = !keys.contains(address)
+            val deviceName = result.device?.name
+            var shouldAddDevice = true
+            if (deviceName == null) {
+                shouldAddDevice = false
+            }
 
-                getOrPut(address, { BluetoothDeviceInfo(result.device!!)}).also {
-                    updateScanInfo(it, result)
+            if (connectType != null && connectType == BluetoothService.GattConnectType.BLINKY) {
+                if (deviceName != null) {
+                    if (context != null) {
+                        if (!deviceName.startsWith(context.getString(R.string.blinky_service_name),ignoreCase = true)
+                            &&  !matchesManufacturerData(result, manufacturerDataFilter)) {
+                            shouldAddDevice = false
+                        }
+                    }
                 }
+            }
+            if (shouldAddDevice) {
+                _scannedDevices.value?.apply {
+                    val address = result.device?.address!!
+                    val isNewDevice = !keys.contains(address)
 
-                if (isNewDevice) {
-                    _deviceToInsert.value = this[address]
-                    _numberOfDevices.value = size
+                    getOrPut(address, { BluetoothDeviceInfo(result.device!!) }).also {
+                        updateScanInfo(it, result)
+                    }
+
+                    if (isNewDevice) {
+                        _deviceToInsert.value = this[address]
+                        _numberOfDevices.value = size
+                    }
                 }
             }
             _isAnyDeviceDiscovered.value = _scannedDevices.value?.isNotEmpty() ?: false
         }
+
+
     }
 
     fun clearDevices() {
@@ -42,6 +76,11 @@ class SelectDeviceViewModel : ScannerViewModel() {
 
     fun getScannedDevicesList() : List<BluetoothDeviceInfo> {
         return _scannedDevices.value?.values?.toList() ?: listOf()
+    }
+
+    fun matchesManufacturerData(result: ScanResultCompat, filter: ManufacturerDataFilter): Boolean {
+        val manufacturerData = result.scanRecord?.getManufacturerSpecificData(filter.id)
+        return manufacturerData != null && manufacturerData.contentEquals(filter.data)
     }
 
 }

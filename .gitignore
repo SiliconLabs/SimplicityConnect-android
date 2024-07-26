@@ -9,4 +9,5 @@ Builds
 .idea/
 *.iml
 /local.properties
+*.apk
 *.DS_Store

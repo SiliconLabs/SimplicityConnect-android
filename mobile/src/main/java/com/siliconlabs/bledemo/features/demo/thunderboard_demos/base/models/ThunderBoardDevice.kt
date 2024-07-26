@@ -19,11 +19,9 @@ class ThunderBoardDevice(device: BluetoothDevice) {
             THUNDERBOARD_MODEL_SENSE -> Type.THUNDERBOARD_SENSE
             THUNDERBOARD_MODEL_BLUE_V1,
             THUNDERBOARD_MODEL_BLUE_V2 -> Type.THUNDERBOARD_BLUE
-
+            THUNDERBOARD_MODEL_DEV_KIT_V3,
             THUNDERBOARD_MODEL_DEV_KIT_V1,
-            THUNDERBOARD_MODEL_DEV_KIT_V2,
-            THUNDERBOARD_MODEL_DEV_KIT_V3 -> Type.THUNDERBOARD_DEV_KIT
-
+            THUNDERBOARD_MODEL_DEV_KIT_V2 -> Type.THUNDERBOARD_DEV_KIT
             else -> Type.UNKNOWN
         }
 
@@ -33,9 +31,9 @@ class ThunderBoardDevice(device: BluetoothDevice) {
         UNKNOWN(0);
 
         companion object {
-            fun fromInt(code: Int): PowerSource {
+            fun fromInt(code: Int) : PowerSource {
                 for (source in values()) {
-                    if (source.value == code) return source
+                    if (source.value == code ) return source
                 }
                 return UNKNOWN
             }

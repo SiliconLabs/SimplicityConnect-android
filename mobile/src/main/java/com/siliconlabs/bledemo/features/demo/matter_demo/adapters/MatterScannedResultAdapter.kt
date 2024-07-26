@@ -1,10 +1,12 @@
 package com.siliconlabs.bledemo.features.demo.matter_demo.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.daimajia.swipe.SimpleSwipeListener
 import com.daimajia.swipe.SwipeLayout
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.MatterScannedListItemBinding
@@ -18,8 +20,6 @@ class MatterScannedResultAdapter(
 ) : RecyclerView.Adapter<MatterItemViewModel>() {
     private lateinit var context: Context
     private var onClickListener: OnClickListener? = null
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MatterItemViewModel {
         val binding =
             MatterScannedListItemBinding.inflate(
@@ -61,10 +61,8 @@ class MatterScannedResultAdapter(
             holder.binding.swipe.findViewById(R.id.bottom_wrapper)
         )
         //viewHolder.swipeLayout.addDrag(SwipeLayout.DragEdge.Right, viewHolder.swipeLayout.findViewById(R.id.bottom_wrapper));
-
-
-
         holder.binding.textViewHeader.setOnClickListener {
+
             runBlocking {
                 if (onClickListener != null) {
                     onClickListener!!.onClick(position, matterInfo)
@@ -80,7 +78,6 @@ class MatterScannedResultAdapter(
             }
         }
     }
-
 
     override fun getItemCount(): Int {
         return matterList.size

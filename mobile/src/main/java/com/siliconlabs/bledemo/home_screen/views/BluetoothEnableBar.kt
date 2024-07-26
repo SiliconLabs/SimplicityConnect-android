@@ -1,14 +1,18 @@
 package com.siliconlabs.bledemo.home_screen.views
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
-import android.os.Looper
+import android.provider.Settings
 import android.util.AttributeSet
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.siliconlabs.bledemo.R
+import android.os.Handler
+import android.os.Looper
 
 class BluetoothEnableBar(context: Context, attrs: AttributeSet?) :
     NoServiceWarningBar(context, attrs) {
@@ -45,8 +49,7 @@ class BluetoothEnableBar(context: Context, attrs: AttributeSet?) :
             val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
             // Add a delay to check if Bluetooth is on after enabling
             Handler(Looper.getMainLooper()).postDelayed({
-                warningBarMessage.text =
-                    context.getString(R.string.bluetooth_adapter_bar_turning_on)
+                warningBarMessage.text = context.getString(R.string.bluetooth_adapter_bar_turning_on)
                 if (bluetoothAdapter.isEnabled) {
                     // Bluetooth is on
                     // Display message or perform actions here
@@ -58,8 +61,7 @@ class BluetoothEnableBar(context: Context, attrs: AttributeSet?) :
                     // Bluetooth is still off
                     // Display message or perform actions here
                     _binding.apply {
-                        warningBarMessage.text =
-                            context.getString(R.string.bluetooth_adapter_bar_disabled)
+                        warningBarMessage.text = context.getString(R.string.bluetooth_adapter_bar_disabled)
                         warningBarActionButton.visibility = View.VISIBLE
                     }
                 }
@@ -67,7 +69,8 @@ class BluetoothEnableBar(context: Context, attrs: AttributeSet?) :
         }
     }
 
-    companion object {
+    companion object{
         private const val DELAY_CHECK_BLUETOOTH = 5000L
     }
+
 }

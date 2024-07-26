@@ -15,6 +15,7 @@ import com.siliconlabs.bledemo.bluetooth.beacon_utils.BleFormat
 import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
 import com.siliconlabs.bledemo.bluetooth.ble.ConnectedDeviceInfo
 import com.siliconlabs.bledemo.bluetooth.ble.ScanResultCompat
+import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.features.scan.browser.models.GraphInfo
 import com.siliconlabs.bledemo.features.scan.browser.models.ScannedDeviceInfo
 import com.siliconlabs.bledemo.features.scan.browser.view_states.GraphFragmentViewState
@@ -132,7 +133,9 @@ class ScanFragmentViewModel(private val context: Context) : ScannerViewModel() {
         return if (index != -1) index else null
     }
 
-    override fun handleScanResult(result: ScanResultCompat) {
+    override fun handleScanResult(result: ScanResultCompat,
+                                  connectType: BluetoothService.GattConnectType?,
+                                  context: Context?) {
         val address = result.device?.address ?: return
         val dataColor = generateDataColor()
 

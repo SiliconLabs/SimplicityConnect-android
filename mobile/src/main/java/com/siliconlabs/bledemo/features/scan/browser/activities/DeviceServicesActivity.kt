@@ -511,8 +511,10 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     private fun registerReceivers() {
+
         registerReceiver(bluetoothReceiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
         registerReceiver(bondStateChangeListener, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
+
     }
 
     private fun displayBondState(newState: Int? = null) {

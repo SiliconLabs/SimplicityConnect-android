@@ -16,6 +16,7 @@ class DemoItemProvider {
                 add(ItemTestCaseInfo(7, "Throughput", "Throughput-GATT Notification.", null, Common.IOP3_TC_STATUS_WAITING))
                 add(ItemTestCaseInfo(8, "Security and Encryption", "Security and Encryption.", dataChildrenSecurity(), Common.IOP3_TC_STATUS_WAITING))
                 add(ItemTestCaseInfo(9, "LE Privacy", "LE Privacy.",null, Common.IOP3_TC_STATUS_WAITING))
+
                 /* This test should remain hidden for now due to investigation being underway. It may return later.
                 add(ItemTestCaseInfo(9, "GATT Caching", "GATT Caching.", dataChildrenCaching(), Common.IOP3_TC_STATUS_WAITING))
                  */

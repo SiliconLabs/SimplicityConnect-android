@@ -152,7 +152,7 @@ class ScanFragment : Fragment(), BluetoothService.ScanListener {
     }
 
     override fun handleScanResult(scanResult: ScanResultCompat) {
-        viewModel.handleScanResult(scanResult)
+        viewModel.handleScanResult(scanResult, null, context)
     }
 
     override fun onDiscoveryFailed() {

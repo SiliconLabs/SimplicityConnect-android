@@ -82,7 +82,6 @@ class MatterScannerFragment : Fragment() {
             println("Input MT : ${qrCodeManualInput}")
             handleManualInput(qrCodeManualInput)
         }
-
     }
 
     override fun onResume() {
@@ -293,7 +292,7 @@ class MatterScannerFragment : Fragment() {
                 Timber.e("Unrecognized QR Exception")
             }
         } catch (e: Exception) {
-            Timber.e("Unrecognized QR Exception " + e)
+            Timber.e("Unrecognized QR Exception $e" )
         }
 
     }
@@ -372,6 +371,7 @@ class MatterScannerFragment : Fragment() {
         return locationPermissionGranted && bleScanPermissionGranted
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

@@ -261,10 +261,10 @@ class GdxAdapter(private val backgroundColor: Int, modelType: String?) :
         when (modelType) {
             ThunderBoardDevice.THUNDERBOARD_MODEL_BLUE_V1,
             ThunderBoardDevice.THUNDERBOARD_MODEL_BLUE_V2 -> this.modelType = ModelType.BLUE
+            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V3,
             ThunderBoardDevice.THUNDERBOARD_MODEL_SENSE,
             ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V1,
-            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2,
-            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V3 -> this.modelType = ModelType.SENSE
+            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2 -> this.modelType = ModelType.SENSE
             else -> this.modelType = ModelType.SENSE
         }
     }

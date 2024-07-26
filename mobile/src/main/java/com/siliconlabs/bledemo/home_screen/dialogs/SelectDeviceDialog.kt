@@ -111,10 +111,10 @@ class SelectDeviceDialog(
                     GattConnectType.MOTION -> launchDemo(characteristic.getStringValue(0))
                     GattConnectType.BLINKY -> {
                         when (characteristic.getStringValue(0)) {
+                            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V3,
                             ThunderBoardDevice.THUNDERBOARD_MODEL_SENSE,
                             ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V1,
-                            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2,
-                            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V3 -> {
+                            ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V2 -> {
                                 connectType = GattConnectType.BLINKY_THUNDERBOARD
                                 cachedBoardType = characteristic.getStringValue(0)
                                 gatt?.readCharacteristic(getPowerSourceCharacteristic(gatt))
@@ -158,7 +158,7 @@ class SelectDeviceDialog(
         when (connectType) {
             GattConnectType.MOTION -> setReadingDialogMsgAndDiscoverServices(gatt)
             GattConnectType.BLINKY -> {
-                if (gatt.device.name == getString(R.string.blinky_service_name)) launchDemo()
+                if (gatt.device.name.startsWith(getString(R.string.blinky_service_name))) launchDemo()
                 else setReadingDialogMsgAndDiscoverServices(gatt)
             }
 
@@ -436,10 +436,10 @@ class SelectDeviceDialog(
                 add(buildFilter(GattService.RangeTestService))
             }
 
-            GattConnectType.BLINKY -> {
+            /*GattConnectType.BLINKY -> {
                 add(buildFilter(BuildFilterName.BLINKY))
                 add(buildFilter(manufacturerDataFilter))
-            }
+            }*/
 
             GattConnectType.THROUGHPUT_TEST -> {
                 add(buildFilter(BuildFilterName.THROUGHPUT_TEST))
@@ -535,7 +535,7 @@ class SelectDeviceDialog(
     }
 
     override fun handleScanResult(scanResult: ScanResultCompat) {
-        viewModel.handleScanResult(scanResult)
+        viewModel.handleScanResult(scanResult,connectType,context)
     }
 
     override fun onDiscoveryFailed() {

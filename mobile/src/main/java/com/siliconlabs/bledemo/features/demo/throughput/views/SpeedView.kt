@@ -135,7 +135,8 @@ class SpeedView(context: Context, attributeSet: AttributeSet? = null) : View(con
         this.unitsArray = array
     }
 
-    override fun onDraw(canvas: Canvas?) {
+
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         val startAngle = (135f + (progress / 100.0) * 270).toFloat()
@@ -157,6 +158,7 @@ class SpeedView(context: Context, attributeSet: AttributeSet? = null) : View(con
             drawUnits(this)
             drawSpeed(this)
         }
+
     }
 
     private fun drawUnits(canvas: Canvas) {

@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.os.Build
 import android.os.IBinder
 import androidx.core.content.ContextCompat
@@ -39,11 +40,16 @@ class AdvertiserService : Service() {
 
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         registerReceiver(receiver, filter)
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val notification = prepareNotification()
-        startForeground(1, notification)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(1, notification, FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
+        } else {
+            startForeground(1, notification)
+        }
 
         return START_STICKY
     }
@@ -67,9 +73,9 @@ class AdvertiserService : Service() {
                 this, ADVERTISER_NOTIFICATION_REQUEST_CODE, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
 
         return Notification.Builder(this, CHANNEL_ID).apply {
-            setContentTitle("EFR Connect")
+            setContentTitle("Si Connect")
             setContentText("Advertiser is running...")
-            setSmallIcon(R.mipmap.efr_redesign_launcher)
+            setSmallIcon(R.mipmap.si_launcher)
             setContentIntent(pendingIntent)
             setShowWhen(false)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

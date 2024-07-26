@@ -17,6 +17,7 @@
 package com.siliconlabs.bledemo.features.iop_test.activities
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.bluetooth.*
 import android.bluetooth.le.BluetoothLeScanner
@@ -27,6 +28,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.*
 import android.text.TextUtils
 import android.util.Log
@@ -40,12 +44,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.get
+import androidx.lifecycle.lifecycleScope
+import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
+import com.siliconlabs.bledemo.databinding.DialogShareIopLogBinding
 import com.siliconlabs.bledemo.features.scan.browser.dialogs.OtaLoadingDialog
-import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.features.iop_test.fragments.IOPTestFragment
 import com.siliconlabs.bledemo.features.iop_test.fragments.IOPTestFragment.Companion.newInstance
 import com.siliconlabs.bledemo.features.iop_test.models.*
@@ -63,6 +69,11 @@ import com.siliconlabs.bledemo.utils.Converters
 import com.siliconlabs.bledemo.utils.Notifications
 import com.siliconlabs.bledemo.utils.UuidConsts
 import kotlinx.android.synthetic.main.activity_iop_test.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.*
 import java.text.SimpleDateFormat
@@ -73,6 +84,10 @@ import kotlin.math.floor
 
 @SuppressLint("LogNotTimber", "MissingPermission")
 class IOPTestActivity : AppCompatActivity() {
+    private val SAVE_LOG_REQUEST_CODE = 123
+    private var isLogcatData: Boolean = false
+    private var logs: String = ""
+
     private var reconnectTimer: Timer? = Timer()
     private var handler: Handler? = null
 
@@ -803,14 +818,17 @@ class IOPTestActivity : AppCompatActivity() {
         mBluetoothBinding?.bind()
     }
 
-    private fun saveLogFile() {
-        Executors.newSingleThreadExecutor().execute {
-            val file = saveDataTestToFile(getPathOfLogFile())
-            handler?.post {
-                shareLogDataTestByEmail(file.absolutePath)
-            }
+
+    private fun saveLogcatFile() {
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "text/plain"  // MIME type of the file you want to save
+            putExtra(Intent.EXTRA_TITLE, getPathOfLogFile())
         }
+        startActivityForResult(intent, SAVE_LOG_REQUEST_CODE)
     }
+
+
 
     private fun startTest() {
         isTestRunning = true
@@ -855,7 +873,6 @@ class IOPTestActivity : AppCompatActivity() {
             shareMenuItem?.isVisible = false
         }
     }
-
     private fun removeBond(device: BluetoothDevice): Boolean {
         return try {
             return device::class.java.getMethod("removeBond").invoke(device) as Boolean
@@ -863,6 +880,7 @@ class IOPTestActivity : AppCompatActivity() {
             false
         }
     }
+
 
 
     /**
@@ -968,6 +986,29 @@ class IOPTestActivity : AppCompatActivity() {
         checkBluetoothExtendedSettings()
         registerBroadcastReceivers()
         handleClickEvents()
+        startLogCapture()
+    }
+
+    private fun startLogCapture() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            captureContinuousLogcat("IOPTest").collect { logLine ->
+                withContext(Dispatchers.Main) {
+                    logs += logLine + "\n"
+                }
+            }
+        }
+
+    }
+
+    fun captureContinuousLogcat(tag: String): Flow<String> = flow {
+        val process = Runtime.getRuntime().exec("logcat -s $tag")
+        val bufferedReader = BufferedReader(InputStreamReader(process.inputStream))
+
+        bufferedReader.useLines { lines ->
+            lines.forEach { line ->
+                emit(line)
+            }
+        }
     }
 
     private fun checkIfBluetoothIsSupported() {
@@ -988,11 +1029,36 @@ class IOPTestActivity : AppCompatActivity() {
         }
         return true
     }
+    private fun showCustomDialog() {
+        val dialog = Dialog(this)
+        val dialogBinding: DialogShareIopLogBinding = DialogShareIopLogBinding.inflate(layoutInflater)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCancelable(true)
+
+        dialogBinding.tvTestLog.setOnClickListener {
+            isLogcatData = false
+            //saveLogFile()
+            saveLogcatFile()
+            dialog.dismiss()
+        }
+
+        dialogBinding.tvAppLog.setOnClickListener {
+            isLogcatData = true
+            saveLogcatFile()
+            dialog.dismiss()
+        }
+
+        dialogBinding.shareLogCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.iop_share -> {
-                saveLogFile()
+                showCustomDialog()
                 true
             }
 
@@ -1139,7 +1205,44 @@ class IOPTestActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+
+            SAVE_LOG_REQUEST_CODE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    intent?.data?.let { uri ->
+                        Executors.newSingleThreadExecutor().execute {
+                            val file = saveDataLogcatDataToFile(uri)
+                            handler?.post {
+                                shareLogDataTestByEmail(uri)
+                            }
+                        }
+                    } ?: run {
+                        Toast.makeText(this, getString(R.string.chosen_file_not_found), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
+    }
+    /**
+     * Save log data into File
+     */
+    private fun saveDataLogcatDataToFile(uri: Uri): File {
+        val contentResolver = applicationContext.contentResolver
+        val outputStream = contentResolver.openOutputStream(uri)
+        outputStream?.use { fOut ->
+            OutputStreamWriter(fOut).use { myOutWriter ->
+                if (isLogcatData){
+                    myOutWriter.write(logs + "\n" + getDataLog())
+                }else{
+                    myOutWriter.write( getDataLog())
+                }
+
+
+            }
+        } ?: throw IOException("Failed to open output stream")
+
+        return File(uri.path ?: throw IOException("File path not available from URI"))
+
+
     }
 
     /**
@@ -1585,56 +1688,22 @@ class IOPTestActivity : AppCompatActivity() {
         val boardName = getSiliconLabsTestInfo().iopBoard.icName.text
         val pathFile = getSiliconLabsTestInfo().phoneName
         pathFile.replace(" ", "")
-        return pathFile + "_" + boardName + "_" + getDate() + ".txt"
+        if (isLogcatData) {
+            return "logcat"+"_" + getDate("EEE MMM dd HH_mm_ss z yyyy") + ".txt"
+
+        } else {
+            return pathFile + "_" + boardName + "_" + getDate("yyyy_MM_dd_HH_mm_ss") + ".txt"
+        }
     }
 
-    /**
-     * Save log data into File
-     */
-    private fun saveDataTestToFile(pathFileOfLog: String?): File {
-        val path = getExternalFilesDir(null)?.absolutePath + File.separator + FOLDER_NAME
-        val folder = File(path)
-        if (!folder.exists()) {
-            folder.mkdirs()
-        }
-        val file = File(folder, pathFileOfLog)
-        if (file.exists()) {
-            file.delete()
-        }
-        try {
-            file.createNewFile()
-            var fOut: FileOutputStream? = null
-            try {
-                fOut = FileOutputStream(file)
-                var myOutWriter: OutputStreamWriter? = null
-                try {
-                    myOutWriter = OutputStreamWriter(fOut)
-                    myOutWriter.write(getDataLog())
-                } catch (e: Exception) {
-                    Log.e(
-                        TAG,
-                        e.localizedMessage ?: "saveDataTestToFile(), OutputStreamWriter exception"
-                    )
-                } finally {
-                    myOutWriter?.close()
-                }
-                fOut.flush()
-            } catch (e: Exception) {
-                Log.e(TAG, e.localizedMessage ?: "saveDataTestToFile(), FileOutputStream exception")
-            } finally {
-                fOut?.close()
-            }
-        } catch (e: IOException) {
-            Log.e("Exception", "File write failed: $e")
-        }
-        return file
-    }
+
+
 
     /**
      * Get Date currently
      */
-    private fun getDate(): String {
-        return SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault()).format(Date())
+    private fun getDate(format: String): String {
+        return SimpleDateFormat(format, Locale.getDefault()).format(Date())
     }
 
     /**
@@ -1643,18 +1712,17 @@ class IOPTestActivity : AppCompatActivity() {
     private fun getDataLog(): String {
         return getSiliconLabsTestInfo().toString()
     }
-
-    private fun shareLogDataTestByEmail(fileLocation: String) {
+    private fun shareLogDataTestByEmail(uri: Uri) {
         try {
-            val uri = FileProvider.getUriForFile(
-                this,
-                applicationContext.packageName + ".provider",
-                File(fileLocation)
-            )
             val message = "Please check the attachment to get the log file."
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
-                putExtra(Intent.EXTRA_SUBJECT, "[Silabs] Test log")
+                if (isLogcatData){
+                    putExtra(Intent.EXTRA_SUBJECT, "[Silabs] Application Debug log")
+                }else{
+                    putExtra(Intent.EXTRA_SUBJECT, "[Silabs] Test log")
+                }
+
                 putExtra(Intent.EXTRA_STREAM, uri)
                 putExtra(Intent.EXTRA_TEXT, message)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -1665,6 +1733,8 @@ class IOPTestActivity : AppCompatActivity() {
             Log.e(TAG, "Exception in shareLogDataTestByEmail(): $e")
         }
     }
+
+
 
     /**
      * Perform the test by item test case
@@ -2010,6 +2080,7 @@ class IOPTestActivity : AppCompatActivity() {
         when (step) {
             // write CCCD to different value from the default
             3 -> {
+                Log.d(TAG,"CASE 3: iopPhase3RunTestCaseBonding"+ "Write value 0x00 to CCCD")
                 CCCD_value[0] = 1
                 iopPhase3ExtraDescriptor?.setValue(CCCD_value)
                 mBluetoothGatt?.writeDescriptor(iopPhase3ExtraDescriptor)
@@ -2020,25 +2091,21 @@ class IOPTestActivity : AppCompatActivity() {
 
             // disconnect
             4 -> {
+                Log.d(TAG,"CASE 4: iopPhase3RunTestCaseBonding"+ "disconnect")
 
                 disconnectGatt(mBluetoothGatt)
-                // reconnect(4000)
-                //connectToDevice(mBluetoothDevice)
-                /* writeValueToCharacteristic(
-                     characteristicIOPPhase3Control,
-                     null,
-                     iopPhase3WriteControlBytes(0, 4, 0))
-                 Log.d("iopPhase3RunTestCaseBonding", "Set Control Characteristic for Security")*/
-            }
+                }
 
             6 -> {
                 mBluetoothGatt?.readDescriptor(iopPhase3ExtraDescriptor)
-                Log.d("CASE 6: iopPhase3RunTestCaseBonding", "read CCCD:" + read_CCCD_value[0])
+                Log.d(TAG,"CASE 6: iopPhase3RunTestCaseBonding"+ "read CCCD:" + read_CCCD_value[0])
                 // Mobile read CCCD. (Pass: if the CCCD value is the same as the value written before bond ).
                 if (read_CCCD_value[0].toInt() == 1) {
+                    isCCCDPass=true
                 } else {
-                    updateDataTestFailed(POSITION_TEST_IOP3_SECURITY)
                     isCCCDPass = false
+                    updateDataTestFailed(POSITION_TEST_IOP3_SECURITY)
+
                     finishItemTest(
                         POSITION_TEST_IOP3_SECURITY,
                         getSiliconLabsTestInfo().listItemTest[POSITION_TEST_IOP3_SECURITY]
@@ -2048,7 +2115,7 @@ class IOPTestActivity : AppCompatActivity() {
 
             // Mobile write value 0xBB (0xBB or 0x00) to CCCD. (Pass: if the CCCD value was written in last step).
             7 -> {
-                Log.d("CASE 7: iopPhase3RunTestCaseBonding", "Write value 0x00 to CCCD")
+                Log.d(TAG,"CASE 7: iopPhase3RunTestCaseBonding"+ "Write value 0x00 to CCCD")
                 CCCD_value[0] = 0
                 iopPhase3ExtraDescriptor?.setValue(CCCD_value)
                 mBluetoothGatt?.writeDescriptor(iopPhase3ExtraDescriptor)
@@ -2057,9 +2124,10 @@ class IOPTestActivity : AppCompatActivity() {
             8 -> {
                 mBluetoothGatt?.readDescriptor(iopPhase3ExtraDescriptor)
                 read_CCCD_value = iopPhase3ExtraDescriptor?.getValue()!!.copyOf()
-                Log.d("CASE 8: iopPhase3RunTestCaseBonding", "read CCCD:" + read_CCCD_value[0])
+                Log.d(TAG,"CASE 8: iopPhase3RunTestCaseBonding"+ "read CCCD:" + read_CCCD_value[0])
                 // Mobile read CCCD. (Pass: if the CCCD value is the same as the value written before bond ).
                 if (read_CCCD_value[0].toInt() == 0) {
+                    isCCCDPass = true
                 } else {
                     isCCCDPass = false
                     updateDataTestFailed(POSITION_TEST_IOP3_SECURITY)
@@ -2325,6 +2393,8 @@ class IOPTestActivity : AppCompatActivity() {
             }
         }
     }
+
+
 
 
     private val iopCachingRunnable = Runnable {

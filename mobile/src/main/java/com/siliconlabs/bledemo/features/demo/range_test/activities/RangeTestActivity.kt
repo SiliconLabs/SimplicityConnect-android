@@ -39,10 +39,9 @@ import kotlin.math.abs
 @SuppressLint("MissingPermission")
 class RangeTestActivity : BaseDemoActivity(), Controller {
 
-    private var lowerLimit: Int = 0
+      private var lowerLimit: Int = 0
     private var upperLimit: Int = 0
     private var descriptor2906: BluetoothGattDescriptor? = null
-
     private var activeDeviceId = 1
 
     private var advertisementHandler: RangeTestAdvertisementHandler? = null
@@ -192,8 +191,8 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                         }
                     })
                 }.also {
-                    it.show(supportFragmentManager, "select_device_dialog")
-                }
+                it.show(supportFragmentManager, "select_device_dialog")
+            }
         } else {
             showRangeTestFragment(presenter.getMode())
         }
@@ -785,11 +784,11 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             status: Int
         ) {
             super.onCharacteristicRead(gatt, characteristic, status)
-            val descriptorUuid = UUID.fromString("00002906-0000-1000-8000-00805f9b34fb")
-            if (characteristic != null) {
-                descriptor2906 = characteristic.getDescriptor(descriptorUuid)
-            }
 
+            val descriptorUuid=UUID.fromString("00002906-0000-1000-8000-00805f9b34fb")
+            if(characteristic!=null){
+                descriptor2906=characteristic.getDescriptor(descriptorUuid)
+            }
             if (status != BluetoothGatt.GATT_SUCCESS) {
                 handleConnectionError()
                 return
@@ -802,16 +801,14 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             if (gattCharacteristic != null) {
                 updatePresenter(gatt, characteristic, gattCharacteristic)
 
-                if (gattCharacteristic === GattCharacteristic.RangeTestTxPower
-                    || gattCharacteristic === GattCharacteristic.RangeTestPayload
-                    || gattCharacteristic === GattCharacteristic.RangeTestMaSize
-                ) {
+                if (gattCharacteristic === GattCharacteristic.RangeTestTxPower || gattCharacteristic === GattCharacteristic.RangeTestPayload || gattCharacteristic === GattCharacteristic.RangeTestMaSize) {
                     val descriptors = characteristic.descriptors
                     if (descriptors.size > 1) {
                         queueReadDescriptor(gatt, characteristic, descriptors[descriptors.size - 1])
                     }
-                } else {
-                    if (gattCharacteristic === GattCharacteristic.RangeTestChannel) {
+                }
+                else{
+                    if (gattCharacteristic===GattCharacteristic.RangeTestChannel){
                         val descriptors = characteristic.descriptors
                         if (descriptors.size > 1) {
                             descriptor2906?.let { queueReadDescriptor(gatt, characteristic, it) }
@@ -1247,7 +1244,7 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             android.R.id.home -> {
                 service?.disconnectAllGatts()
                 gatt?.disconnect()
-                Handler(Looper.getMainLooper()).postDelayed({ onBackPressed() }, 500)
+                Handler(Looper.getMainLooper()).postDelayed({ onBackPressed() },500)
                 true
             }
 
@@ -1259,4 +1256,5 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
         private const val RECONNECTION_RETRIES = 3
         private const val TRANSMISSION_INTERVAL: Long = 1000 / 13
     }
+
 }

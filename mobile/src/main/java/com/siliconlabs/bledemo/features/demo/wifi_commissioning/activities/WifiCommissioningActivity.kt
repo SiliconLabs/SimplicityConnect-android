@@ -6,6 +6,7 @@ import android.app.ProgressDialog
 import android.bluetooth.*
 import android.content.*
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,6 +21,7 @@ import com.siliconlabs.bledemo.features.demo.wifi_commissioning.adapters.AccessP
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.AccessPoint
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.BoardCommand
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.SecurityMode
+import com.siliconlabs.bledemo.utils.Constants
 import timber.log.Timber
 import java.util.*
 
@@ -69,11 +71,12 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     }
 
     private fun setupRecyclerView() {
-        accessPointsAdapter = AccessPointsAdapter(accessPoints, object : AccessPointsAdapter.OnItemClickListener {
-            override fun onItemClick(itemView: View?, position: Int) {
-                onAccessPointClicked(position)
-            }
-        })
+        accessPointsAdapter =
+            AccessPointsAdapter(accessPoints, object : AccessPointsAdapter.OnItemClickListener {
+                override fun onItemClick(itemView: View?, position: Int) {
+                    onAccessPointClicked(position)
+                }
+            })
         _binding.wifiAccessPtsList.apply {
             adapter = accessPointsAdapter
             layoutManager = LinearLayoutManager(context)
@@ -87,7 +90,8 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     private fun showProgressDialog(message: String) {
         runOnUiThread {
             progressDialog?.dismiss()
-            progressDialog = ProgressDialog.show(this, getString(R.string.empty_description), message)
+            progressDialog =
+                ProgressDialog.show(this, getString(R.string.empty_description), message)
         }
     }
 
@@ -164,15 +168,17 @@ class WifiCommissioningActivity : BaseDemoActivity() {
 
     private fun toggleMainView(isAccessPointConnected: Boolean) {
         runOnUiThread {
-            _binding.apConnectedLayout.visibility = if (isAccessPointConnected) View.VISIBLE else View.GONE
-            _binding.wifiAccessPtsList.visibility = if (isAccessPointConnected) View.GONE else View.VISIBLE
+            _binding.apConnectedLayout.visibility =
+                if (isAccessPointConnected) View.VISIBLE else View.GONE
+            _binding.wifiAccessPtsList.visibility =
+                if (isAccessPointConnected) View.GONE else View.VISIBLE
         }
     }
 
     private fun showDisconnectionDialog() {
         val dialogMessage =
-                if (connectedAccessPoint?.name == clickedAccessPoint?.name) getString(R.string.disconnect_title)
-                else getString(R.string.another_ap_connected)
+            if (connectedAccessPoint?.name == clickedAccessPoint?.name) getString(R.string.disconnect_title)
+            else getString(R.string.another_ap_connected)
 
         AlertDialog.Builder(this).apply {
             setCancelable(false)
@@ -244,31 +250,40 @@ class WifiCommissioningActivity : BaseDemoActivity() {
             Timber.d("onServicesDiscovered; status = $status")
 
             gatt.getService(GattService.WifiCommissioningService.number)?.let {
-                characteristicWrite = it.getCharacteristic(GattCharacteristic.WifiCommissioningWrite.uuid)
-                characteristicRead = it.getCharacteristic(GattCharacteristic.WifiCommissioningRead.uuid)
-                characteristicNotification = it.getCharacteristic(GattCharacteristic.WifiCommissioningNotify.uuid)
+                characteristicWrite =
+                    it.getCharacteristic(GattCharacteristic.WifiCommissioningWrite.uuid)
+                characteristicRead =
+                    it.getCharacteristic(GattCharacteristic.WifiCommissioningRead.uuid)
+                characteristicNotification =
+                    it.getCharacteristic(GattCharacteristic.WifiCommissioningNotify.uuid)
             }
 
             if (gatt.setCharacteristicNotification(characteristicNotification, true)) {
                 Timber.d("Notifications enabled for ${characteristicNotification?.uuid}")
-                characteristicNotification?.getDescriptor(UUID.fromString(clientCharacteristicConfig))?.let {
-                    it.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                    gatt.writeDescriptor(it)
-                }
+                characteristicNotification?.getDescriptor(UUID.fromString(clientCharacteristicConfig))
+                    ?.let {
+                        it.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        gatt.writeDescriptor(it)
+                    }
             }
 
             writeCommand(BoardCommand.Send.GET_FIRMWARE_VERSION)
         }
 
-        override fun onCharacteristicWrite(gatt: BluetoothGatt,
-                                           characteristic: BluetoothGattCharacteristic,
-                                           status: Int) {
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             Timber.d("onCharacteristicWrite; characteristic = ${characteristic.uuid}, sendCommand = $sendCommand, status = $status")
             Timber.d("Raw data = ${Arrays.toString(characteristic.value)}")
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 when (sendCommand) {
                     BoardCommand.Send.SSID -> writeCommand(
-                            BoardCommand.Send.SECURITY_TYPE, clickedAccessPoint?.securityMode?.value?.toString()!!)
+                        BoardCommand.Send.SECURITY_TYPE,
+                        clickedAccessPoint?.securityMode?.value?.toString()!!
+                    )
+
                     BoardCommand.Send.DISCONNECTION -> readOperation()
                     BoardCommand.Send.SECURITY_TYPE -> {
                         if (clickedAccessPoint?.password!!.isNotEmpty()) {
@@ -278,33 +293,40 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                             readOperation()
                         }
                     }
+
                     BoardCommand.Send.PASSWORD -> {
                         sendCommand = BoardCommand.Send.SSID
                         readOperation()
                     }
+
                     BoardCommand.Send.CHECK_CONNECTION -> {
                         sendCommand = BoardCommand.Send.CHECK_CONNECTION
                         readOperation()
                     }
+
                     BoardCommand.Send.GET_FIRMWARE_VERSION -> {
                         sendCommand = BoardCommand.Send.GET_FIRMWARE_VERSION
                         readOperation()
                     }
-                    else -> { }
+
+                    else -> {}
                 }
             }
         }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt,
-                                          characteristic: BluetoothGattCharacteristic,
-                                          status: Int) {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             Timber.d("onCharacteristicRead; characteristic = ${characteristic.uuid}, readCommand = $readCommand, status = $status")
             Timber.d("Raw data = ${Arrays.toString(characteristic.value)}")
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 readCommand = BoardCommand.Response.fromInt(
-                        characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
+                    characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
                 )
-                val statusBit = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)
+                val statusBit =
+                    characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1)
 
                 if (readCommand.value != sendCommand.value) {
                     readOperation()
@@ -312,21 +334,49 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                     when (readCommand) {
                         BoardCommand.Response.CONNECTION -> {
                             if (statusBit == 1) {
-                                clickedAccessPoint?.macAddress = convertMacAddressToString(characteristic.value.copyOfRange(3, 9))
-                                clickedAccessPoint?.ipAddress = convertIpAddressToString(characteristic.value.copyOfRange(10, 14))
+                                clickedAccessPoint?.macAddress = convertMacAddressToString(
+                                    characteristic.value.copyOfRange(
+                                        3,
+                                        9
+                                    )
+                                )
+                                clickedAccessPoint?.ipAddress = convertIpAddressToString(
+                                    characteristic.value.copyOfRange(
+                                        10,
+                                        14
+                                    )
+                                )
                                 onAccessPointConnection(true)
                             } else {
                                 onAccessPointConnection(false)
                             }
                         }
+
                         BoardCommand.Response.DISCONNECTION -> onAccessPointDisconnection(statusBit == 1)
                         BoardCommand.Response.CHECK_CONNECTION -> isAccessPointConnected(statusBit == 1)
                         BoardCommand.Response.FIRMWARE_VERSION -> {
+
+                            val bytes: ByteArray = characteristic.value
                             if (statusBit > 0) {
-                                val rawString = characteristic.getStringValue(2)
-                                onFirmwareVersionReceived(rawString.replace(unprintableCharsRegex, ""))
+                                val firmareVersionString = buildString {
+                                    for ((index, byte) in bytes.sliceArray(FIRMWARE_BYTE_START_INDEX until FIRMWARE_BYTE_END_INDEX)
+                                        .withIndex()) {
+                                        if (index < 2) {
+                                            append(
+                                                byte.toUByte().toString(RADIX_HEX)
+                                                    .padStart(PADDING_LENGTH, '0')
+                                            ) // Convert byte to hexadecimal string
+                                        } else if (index != 7) {
+                                            append(".${byte.toUByte()}") // Append byte value with a dot separator
+                                        }
+                                    }
+                                }
+                                onFirmwareVersionReceived(firmareVersionString)
                             }
+
+
                         }
+
                         BoardCommand.Response.UNKNOWN -> {
                             if (sendCommand != BoardCommand.Send.SSID) readOperation()
                         }
@@ -335,20 +385,26 @@ class WifiCommissioningActivity : BaseDemoActivity() {
             }
         }
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic
+        ) {
             Timber.d("onCharacteristicChanged; characteristic = ${characteristic.uuid}")
             Timber.d("Raw data = ${Arrays.toString(characteristic.value)}")
 
             if (characteristic.uuid == GattCharacteristic.WifiCommissioningNotify.uuid) {
                 /* Scanned access point info. */
                 val rawName = characteristic.getStringValue(2)
-                val rawSecurityMode = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
+                val rawSecurityMode =
+                    characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)
                 Timber.d("Raw access point name = $rawName")
 
-                onAccessPointScanned(AccessPoint(
+                onAccessPointScanned(
+                    AccessPoint(
                         name = rawName.replace(unprintableCharsRegex, ""),
-                        securityMode =  SecurityMode.fromInt(rawSecurityMode)
-                ))
+                        securityMode = SecurityMode.fromInt(rawSecurityMode)
+                    )
+                )
             }
         }
     }
@@ -382,7 +438,11 @@ class WifiCommissioningActivity : BaseDemoActivity() {
         }.start()
     }
 
-    private fun writeToCharacteristic(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, data: String): Boolean {
+    private fun writeToCharacteristic(
+        gatt: BluetoothGatt?,
+        characteristic: BluetoothGattCharacteristic?,
+        data: String
+    ): Boolean {
         return if (gatt != null && characteristic != null) {
             Timber.d("Data to write = $data")
             if (data.length > 100) {
@@ -404,7 +464,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
         }.start()
     }
 
-    private fun convertMacAddressToString(rawData: ByteArray) : String {
+    private fun convertMacAddressToString(rawData: ByteArray): String {
         return StringBuilder().apply {
             rawData.forEachIndexed { index, byte ->
                 val hexValue = Integer.toHexString(Converters.getIntFromTwosComplement(byte))
@@ -416,13 +476,20 @@ class WifiCommissioningActivity : BaseDemoActivity() {
         }.toString()
     }
 
-    private fun convertIpAddressToString(rawData: ByteArray) : String {
+    private fun convertIpAddressToString(rawData: ByteArray): String {
         return StringBuilder().apply {
             rawData.forEachIndexed { index, byte ->
                 append(Converters.getIntFromTwosComplement(byte))
                 if (index != rawData.size - 1) append('.')
             }
         }.toString()
+    }
+    
+    companion object {
+        private const val RADIX_HEX = 16
+        private const val PADDING_LENGTH = 2
+        private const val FIRMWARE_BYTE_START_INDEX = 2
+        private const val FIRMWARE_BYTE_END_INDEX = 11
     }
 
 }
