@@ -57,11 +57,11 @@ android {
     flavorDimensions.add(versionDim)
 
     productFlavors {
-        create("blueGecko") {
+        create("Si-Connect") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 53
-            versionName = "2.9.1"
+            versionCode = 54
+            versionName = "2.9.2"
         }
     }
 

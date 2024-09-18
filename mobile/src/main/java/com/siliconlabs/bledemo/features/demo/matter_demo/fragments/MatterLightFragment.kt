@@ -33,6 +33,7 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -52,6 +53,8 @@ class MatterLightFragment : Fragment() {
     private lateinit var model: MatterScannedResultModel
     private lateinit var mPrefs: SharedPreferences
     private var currLightStatus: Boolean = false
+    private lateinit var matterLightFragmentJob: Job
+    private val matterLightFragmentScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -351,6 +354,37 @@ class MatterLightFragment : Fragment() {
 
     interface CallBackHandler {
         fun onBackHandler()
+    }
+
+    private fun startBackgroundTask() {
+        matterLightFragmentJob = matterLightFragmentScope.launch(Dispatchers.IO) {
+            while (true) {
+                delay(1000)
+                getOnOffClusterForDevice().readOnOffAttribute(object : ChipClusters.BooleanAttributeCallback{
+                    override fun onSuccess(value: Boolean) {
+                        if (value){
+                            imageForLightOn()
+                        }else{
+                            imageForLightOff()
+                        }
+                    }
+
+                    override fun onError(error: java.lang.Exception?) {
+                        println("error $error")
+                    }
+                })
+            }
+        }
+    }
+    private fun stopBackgroundTask() {
+        if (::matterLightFragmentJob.isInitialized && matterLightFragmentJob.isActive) {
+            matterLightFragmentJob.cancel()
+            println("Background task stopped")
+        }
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        stopBackgroundTask()
     }
 
     companion object {

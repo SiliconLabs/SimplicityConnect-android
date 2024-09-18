@@ -743,6 +743,7 @@
     <string name="security_mode_eap_wpa">EAP_WPA</string>
     <string name="security_mode_wep">WEP</string>
     <string name="security_mode_wpa2">WPA2</string>
+    <string name="security_mode_wpa3">WPA3</string>
     <string name="security_mode_wpa">WPA</string>
     <string name="security_mode_open">OPEN</string>
     <string name="connect_btn_txt">CONNECT</string>

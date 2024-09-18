@@ -61,7 +61,7 @@ class MatterScannedResultAdapter(
             holder.binding.swipe.findViewById(R.id.bottom_wrapper)
         )
         //viewHolder.swipeLayout.addDrag(SwipeLayout.DragEdge.Right, viewHolder.swipeLayout.findViewById(R.id.bottom_wrapper));
-        holder.binding.textViewHeader.setOnClickListener {
+        holder.binding.itemViewHolder.setOnClickListener {
 
             runBlocking {
                 if (onClickListener != null) {

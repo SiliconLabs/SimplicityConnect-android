@@ -17,13 +17,13 @@ import java.util.*
  * Created by harika on 18-04-2016.
  */
 class AccessPointsAdapter(
-        private val accessPoints: ArrayList<AccessPoint>,
-        private val listener: OnItemClickListener
+    private val accessPoints: ArrayList<AccessPoint>,
+    private val listener: OnItemClickListener
 ) : RecyclerView.Adapter<AccessPointViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccessPointViewHolder {
         val itemView = LayoutInflater.from(parent.context)
-                .inflate(R.layout.adapter_access_point, parent, false)
+            .inflate(R.layout.adapter_access_point, parent, false)
         return AccessPointViewHolder(itemView)
     }
 
@@ -44,6 +44,7 @@ class AccessPointsAdapter(
             SecurityMode.OPEN -> R.string.security_mode_open
             SecurityMode.WPA -> R.string.security_mode_wpa
             SecurityMode.WPA2 -> R.string.security_mode_wpa2
+            SecurityMode.WPA3 -> R.string.security_mode_wpa3
             SecurityMode.WEP -> R.string.security_mode_wep
             SecurityMode.EAP_WPA -> R.string.security_mode_eap_wpa
             SecurityMode.EAP_WPA2 -> R.string.security_mode_eap_wpa2

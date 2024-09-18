@@ -8,7 +8,8 @@ enum class SecurityMode(val value: Int) {
     EAP_WPA(4),
     EAP_WPA2(5),
     WPA_WPA2(6),
-    UNKNOWN(7);
+    WPA3(7),
+    UNKNOWN(8);
 
     companion object {
         fun fromInt(code: Int) : SecurityMode {

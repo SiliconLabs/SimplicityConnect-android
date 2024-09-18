@@ -200,7 +200,7 @@ class MatterScannedResultFragment : Fragment() {
                 ).navigateToDemo(matterThermostatFragment, model)
             }
 
-            LIGHTNING_TYPE -> {
+            LIGHTNING_TYPE, ENHANCED_COLOR_LIGHT_TYPE, ONOFF_LIGHT_TYPE, TEMPERATURE_COLOR_LIGHT_TYPE -> {
                 val matterLightFragment = MatterLightFragment.newInstance()
                 FragmentUtils.getHost(
                     this@MatterScannedResultFragment,
@@ -293,6 +293,9 @@ class MatterScannedResultFragment : Fragment() {
         public const val LIGHTNING_TYPE = 257
         public const val WINDOW_TYPE = 514
         public const val LOCK_TYPE = 10
+        public const val ENHANCED_COLOR_LIGHT_TYPE = 269
+        public const val ONOFF_LIGHT_TYPE = 256
+        public const val TEMPERATURE_COLOR_LIGHT_TYPE = 268
        // public const val SWITCH_TYPE = 259
         public const val OCCUPANCY_SENSOR_TYPE = 263
         public const val TEMPERATURE_SENSOR_TYPE = 770
