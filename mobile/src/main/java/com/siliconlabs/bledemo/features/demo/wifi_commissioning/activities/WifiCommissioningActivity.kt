@@ -5,6 +5,9 @@ import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.bluetooth.*
 import android.content.*
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -15,7 +18,10 @@ import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
+import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.databinding.ActivityWifiCommissioningBinding
+import com.siliconlabs.bledemo.features.demo.devkitsensor917.activities.DevKitSensor917Activity
+import com.siliconlabs.bledemo.features.demo.devkitsensor917.activities.DevKitSensor917Activity.Companion.IP_ADDRESS
 import com.siliconlabs.bledemo.utils.Converters
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.adapters.AccessPointsAdapter
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.AccessPoint
@@ -52,13 +58,17 @@ class WifiCommissioningActivity : BaseDemoActivity() {
 
     private val sleepForWrite: Long = 500
     private val sleepForRead: Long = 500
+    private lateinit var sharedPref: SharedPreferences
 
+    var connectType = BluetoothService.GattConnectType.WIFI_COMMISSIONING;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sharedPref = this.getSharedPreferences("WIFI_Comm_Pref", Context.MODE_PRIVATE)
         _binding = ActivityWifiCommissioningBinding.inflate(layoutInflater)
         setContentView(_binding.root)
-
+        connectType =
+            ((intent?.getSerializableExtra("connectType") as? BluetoothService.GattConnectType)!!)
         setupRecyclerView()
         setupUiListeners()
     }
@@ -119,11 +129,34 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     fun onAccessPointConnection(isSuccessful: Boolean) {
         dismissProgressDialog()
         if (isSuccessful) {
-            showToastOnUi(getString(R.string.ap_connect))
-            connectedAccessPoint = clickedAccessPoint
-            connectedAccessPoint?.status = true
+            when (connectType) {
+                BluetoothService.GattConnectType.WIFI_COMMISSIONING -> {
+                    showToastOnUi(getString(R.string.ap_connect))
+                    connectedAccessPoint = clickedAccessPoint
+                    connectedAccessPoint?.status = true
 
-            runOnUiThread { accessPointsAdapter?.notifyDataSetChanged() }
+                    runOnUiThread { accessPointsAdapter?.notifyDataSetChanged() }
+                }
+
+                BluetoothService.GattConnectType.DEV_KIT_SENSOR -> {
+                    showToastOnUi(getString(R.string.ap_connect))
+                    connectedAccessPoint = clickedAccessPoint
+                    connectedAccessPoint?.status = true
+                    val devKitIntent = Intent(
+                        this,
+                        DevKitSensor917Activity::class.java
+                    ).apply {
+                        putExtra(IP_ADDRESS, clickedAccessPoint?.ipAddress)
+                    }
+                    storeInfo(clickedAccessPoint!!.ipAddress!!)
+                    println("BLE_PROV ipAddress:${clickedAccessPoint!!.ipAddress}")
+                    startActivity(devKitIntent)
+                    this.finish()
+
+                }
+
+                else -> null
+            }
         } else {
             showToastOnUi(getString(R.string.ap_connect_fail))
         }
@@ -132,10 +165,23 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     fun onAccessPointDisconnection(isSuccessful: Boolean) {
         dismissProgressDialog()
         if (isSuccessful) {
-            connectedAccessPoint = null
             showToastOnUi(getString(R.string.ap_disconnect_success))
-            scanForAccessPoints()
-            toggleMainView(isAccessPointConnected = false)
+            when (connectType) {
+                BluetoothService.GattConnectType.WIFI_COMMISSIONING -> {
+                    connectedAccessPoint = null
+                    scanForAccessPoints()
+                    toggleMainView(isAccessPointConnected = false)
+                }
+
+                BluetoothService.GattConnectType.DEV_KIT_SENSOR -> {
+                    connectedAccessPoint = null
+                    scanForAccessPoints()
+                    toggleMainView(isAccessPointConnected = false)
+                    showToastOnUi(getString(R.string.ap_disconnect_success))
+                }
+
+                else -> null
+            }
         } else {
             showToastOnUi(getString(R.string.ap_disconnect_fail))
         }
@@ -144,10 +190,28 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     fun isAccessPointConnected(isConnected: Boolean) {
         dismissProgressDialog()
         if (isConnected) {
-            if (isItemClicked) { /* Board already connected when clicking on item */
-                showDisconnectionDialog()
-            } else { /* Board connected when entering the app */
-                toggleMainView(isAccessPointConnected = true)
+            when (connectType) {
+                BluetoothService.GattConnectType.WIFI_COMMISSIONING -> {
+                    if (isItemClicked) { /* Board already connected when clicking on item */
+                        showDisconnectionDialog()
+                    } else { /* Board connected when entering the app */
+                        toggleMainView(isAccessPointConnected = true)
+                    }
+                }
+
+                BluetoothService.GattConnectType.DEV_KIT_SENSOR -> {
+                    val devKitIntent = Intent(
+                        this,
+                        DevKitSensor917Activity::class.java
+                    ).apply {
+                        putExtra(IP_ADDRESS, getInfo())
+                    }
+                    println("BLE_PROV ipAddress:${getInfo()}")
+                    startActivity(devKitIntent)
+                    this.finish()
+                }
+
+                else -> null
             }
         } else {
             clickedAccessPoint?.let { /* No board connected when clicking on item */
@@ -484,7 +548,45 @@ class WifiCommissioningActivity : BaseDemoActivity() {
             }
         }.toString()
     }
-    
+
+    private fun isNetworkAvailable(context: Context?): Boolean {
+        if (context == null) return false
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (capabilities != null) {
+                when {
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
+                        return true
+                    }
+                }
+            }
+        } else {
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+            if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
+                return true
+            }
+        }
+        return false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        progressDialog?.dismiss()
+    }
+
+    private fun storeInfo(info: String) {
+        val ipInfo = sharedPref.edit()
+        ipInfo.putString("ipaddress", info)
+        ipInfo.apply()
+    }
+
+    private fun getInfo(): String? {
+        return sharedPref.getString("ipaddress", "")
+    }
+
     companion object {
         private const val RADIX_HEX = 16
         private const val PADDING_LENGTH = 2

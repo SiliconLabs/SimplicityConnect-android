@@ -60,8 +60,8 @@ android {
         create("Si-Connect") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 54
-            versionName = "2.9.2"
+            versionCode = 55
+            versionName = "2.9.3"
         }
     }
 
@@ -167,5 +167,5 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
-
+    implementation ("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
 }

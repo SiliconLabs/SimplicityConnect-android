@@ -9,6 +9,7 @@ import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.LEDStatusResp
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.MicrophoneResponse
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.ProvisionResponse
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.ScanResponse
+import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.SensorsResponse
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.StatusResponse
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.TempResponse
 import retrofit2.Response
@@ -66,5 +67,7 @@ interface APIInterface {
     @POST("/status_led")
     fun setLEDStatusOff(@Body body: Map<String, String>): Call<LEDStatusResponse>
 
+    @GET("/all_sensors")
+    suspend fun getAllSensor():Response<SensorsResponse>
 
 }

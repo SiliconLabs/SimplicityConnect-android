@@ -297,6 +297,7 @@ class SelectDeviceDialog(
         }
     }
 
+    @SuppressLint("StringFormatInvalid")
     private fun initDemoDescription() {
         binding.dialogTextInfo.apply {
             text = when (connectType) {
@@ -337,6 +338,11 @@ class SelectDeviceDialog(
 
                 GattConnectType.ESL_DEMO -> getString(
                     R.string.soc_must_be_connected,
+                    getString(R.string.demo_firmware_name_esl)
+                )
+
+                GattConnectType.DEV_KIT_SENSOR -> getString(
+                    R.string.demo_firmware_name_wifi_commission,
                     getString(R.string.demo_firmware_name_esl)
                 )
 
@@ -465,6 +471,10 @@ class SelectDeviceDialog(
                 add(buildFilter(GattService.EslDemoService))
             }
 
+            GattConnectType.DEV_KIT_SENSOR -> {
+                add(buildFilter(BuildFilterName.DEV_KIT_SENSOR))
+            }
+
             else -> Unit
         }
     }
@@ -517,12 +527,16 @@ class SelectDeviceDialog(
             GattConnectType.MOTION -> MotionActivity::class.java
             GattConnectType.ENVIRONMENT -> EnvironmentActivity::class.java
             GattConnectType.ESL_DEMO -> EslDemoActivity::class.java
+            GattConnectType.DEV_KIT_SENSOR -> WifiCommissioningActivity::class.java
+
             else -> null
         }
 
-        return clazz?.let {
-            Intent(activity, clazz)
+        val intent = clazz?.let { Intent(activity, it) }
+        if (connectType == GattConnectType.WIFI_COMMISSIONING || connectType == GattConnectType.DEV_KIT_SENSOR) {
+            intent?.putExtra("connectType", connectType)
         }
+        return intent
     }
 
     interface RangeTestCallback {
@@ -535,7 +549,7 @@ class SelectDeviceDialog(
     }
 
     override fun handleScanResult(scanResult: ScanResultCompat) {
-        viewModel.handleScanResult(scanResult,connectType,context)
+        viewModel.handleScanResult(scanResult, connectType, context)
     }
 
     override fun onDiscoveryFailed() {
@@ -575,5 +589,7 @@ class SelectDeviceDialog(
         IOP_TEST_UPDATE("IOP Test Update"),
         IOP_TEST_NO_1("IOP_Test_1"),
         IOP_TEST_NO_2("IOP_Test_2"),
+        DEV_KIT_SENSOR("WIFI_SENSOR")
+
     }
 }

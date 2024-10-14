@@ -239,22 +239,23 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
     }
 
     override fun onDemoItemClicked(demoItem: DemoMenuItem) {
-        if (demoItem.connectType == BluetoothService.GattConnectType.DEV_KIT_SENSOR) {
-            if (isNetworkAvailable(context)) {
-                requireContext().startActivity(
-                    Intent(
-                        requireContext(),
-                        DevKitSensor917Activity::class.java
-                    )
-                )
-            }else{
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.turn_on_wifi),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        } else if (demoItem.connectType == BluetoothService.GattConnectType.MATTER_DEMO) {
+        /* if (demoItem.connectType == BluetoothService.GattConnectType.DEV_KIT_SENSOR) {
+             if (isNetworkAvailable(context)) {
+                 requireContext().startActivity(
+                     Intent(
+                         requireContext(),
+                         DevKitSensor917Activity::class.java
+                     )
+                 )
+             }else{
+                 Toast.makeText(
+                     requireContext(),
+                     getString(R.string.turn_on_wifi),
+                     Toast.LENGTH_SHORT
+                 ).show()
+             }
+         } else */
+        if (demoItem.connectType == BluetoothService.GattConnectType.MATTER_DEMO) {
             requireContext().startActivity(Intent(requireContext(), MatterDemoActivity::class.java))
         } else if (demoItem.connectType == BluetoothService.GattConnectType.RANGE_TEST) {
             startActivity(Intent(requireContext(), RangeTestActivity::class.java))
@@ -279,6 +280,7 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                 ).show()
             }
         } else {
+            println("BLE_PROV demoItem:${demoItem.connectType}")
             selectDeviceDialog = SelectDeviceDialog.newDialog(demoItem.connectType)
             selectDeviceDialog?.show(childFragmentManager, "select_device_dialog")
         }

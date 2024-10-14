@@ -843,6 +843,7 @@
     <string name="demo_firmware_name_range_test">RAIL Bluetooth DMP - SoC Range Test</string>
     <string name="demo_firmware_name_throughput">Bluetooth - SoC Throughput</string>
     <string name="demo_firmware_name_esl">Bluetooth - NCP ESL Access Point</string>
+    <string name="demo_firmware_name_wifi_commission">1. The SoC and evaluation board (EVK) must be connected and running the correct firmware \n2. The Wi-Fi network on your mobile device should match the Wi-Fi network used for the sensor device\'s commissioning.\n3. Enable your phone\'s local network to access sensor data.</string>
     <string name="soc_wifi_commissioning_must_be_connected">A circuit board (SoC) and the
         evaluation board (EVK) must be connected and running proper firmwares. See <a href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-pc/update-evk-firmware">here</a>,
         <a href="https://docs.silabs.com/rs9116-wiseconnect/latest/wifibt-wc-getting-started-with-efx32/">here</a> and
@@ -1208,4 +1209,7 @@
     <string name="dev_kit_sensor_humidity_init_value">00 %</string>
     <string name="dev_kit_sensor_ambient_init_value">00.00 lx</string>
     <string name="dev_kit_sensor_micro_init_value">00 dB</string>
+    <string name="dev_kit_sensor_enable_wifi">Please turn on Wi-Fi in the mobile</string>
+    <string name="dev_kit_progress_bar_message">Waiting for Response</string>
 </resources>
+
