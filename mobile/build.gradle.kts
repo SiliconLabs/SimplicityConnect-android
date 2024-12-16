@@ -34,7 +34,7 @@ android {
             ndk {
                 abiFilters.add("armeabi-v7a")
                 abiFilters.add("arm64-v8a")
-                abiFilters.add("x86-64")
+                abiFilters.add("x86_64")
                 abiFilters.add("x86")
             }
         }
@@ -66,7 +66,7 @@ android {
         create("Si-Connect") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 56
+            versionCode = 57
             versionName = "3.0.0"
         }
     }
