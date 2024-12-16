@@ -3,7 +3,7 @@ package com.siliconlabs.bledemo.utils
 import android.content.Context
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.beacon_utils.BleFormat
-import kotlinx.android.synthetic.main.fragment_filter.*
+
 
 data class FilterDeviceParams(
         val name: String?,

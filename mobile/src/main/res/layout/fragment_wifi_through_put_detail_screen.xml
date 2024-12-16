@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/sl_light_grey"
+    tools:context=".features.demo.wifi_throughput.fragments.WifiThroughPutDetailScreen"
+    android:id="@+id/wifi_tp_main_layout">
+
+    <RelativeLayout
+        android:id="@+id/rl_speed_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.siliconlabs.bledemo.features.demo.throughput.views.SpeedView
+            android:id="@+id/wifi_speed_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="64dp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/headers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rl_speed_view"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/matter_8dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-black"
+            android:gravity="start"
+            android:text="@string/interval"
+            android:textColor="@color/silabs_black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-black"
+            android:gravity="start"
+            android:text="@string/transfer"
+            android:textColor="@color/silabs_black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_marginStart="@dimen/matter_5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-black"
+            android:gravity="start"
+            android:text="@string/bandwidth"
+            android:textColor="@color/silabs_black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/incremental_log"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/final_result_ll"
+        android:layout_below="@+id/headers" />
+
+    <LinearLayout
+        android:id="@+id/final_result_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button_actions"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/final_bytes_sent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/matter_8dp"
+            android:layout_marginTop="@dimen/matter_8dp"
+            android:layout_marginEnd="@dimen/matter_8dp"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/final_acheieved_bandvidth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/matter_8dp"
+            android:layout_marginStart="@dimen/matter_8dp"
+            android:layout_marginEnd="@dimen/matter_8dp"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/connection_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button_actions"
+        android:layout_marginBottom="@dimen/matter_30dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/connection_status_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/matter_8dp"
+            android:layout_marginTop="@dimen/matter_8dp"
+            android:layout_marginEnd="@dimen/matter_8dp"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="@string/wifi_throughput_connecting_status" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/button_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/matter_10dp"
+            android:minWidth="100dp"
+            android:padding="@dimen/matter_20dp"
+            android:text="@string/button_cancel"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/matter_10dp"
+            android:layout_toEndOf="@+id/cancel"
+            android:minWidth="100dp"
+            android:padding="@dimen/matter_20dp"
+            android:text="@string/button_start"
+            android:visibility="gone" />
+    </RelativeLayout>
+</RelativeLayout>

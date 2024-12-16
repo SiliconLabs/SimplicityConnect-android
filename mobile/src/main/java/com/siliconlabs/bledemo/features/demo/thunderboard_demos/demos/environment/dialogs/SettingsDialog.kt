@@ -11,22 +11,24 @@ import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.databinding.DialogSettingsBinding
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.model.TemperatureScale
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.utils.PreferenceManager
-import kotlinx.android.synthetic.main.dialog_settings.*
+
 
 class SettingsDialog(
-        context: Context,
-        private val settingsHandler: SettingsHandler
+    context: Context,
+    private val settingsHandler: SettingsHandler
 ) : BaseDialogFragment(
-        hasCustomWidth = true,
-        isCanceledOnTouchOutside = true
+    hasCustomWidth = true,
+    isCanceledOnTouchOutside = true
 ) {
 
     private val prefsManager = PreferenceManager(context)
 
     private lateinit var _binding: DialogSettingsBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = DialogSettingsBinding.inflate(inflater)
         return _binding.root
     }
@@ -49,9 +51,9 @@ class SettingsDialog(
     private fun loadPersonalize() {
         prefsManager.preferences.let {
             if (it.scale == TemperatureScale.CELSIUS) {
-                temperature_toggle.check(R.id.celsius)
+                _binding.temperatureToggle.check(R.id.celsius)
             } else if (it.scale == TemperatureScale.FAHRENHEIT) {
-                temperature_toggle.check(R.id.fahrenheit)
+                _binding.temperatureToggle.check(R.id.fahrenheit)
             }
         }
     }
@@ -59,8 +61,8 @@ class SettingsDialog(
     private fun saveSettings() {
         prefsManager.preferences.let {
             it.scale =
-                    if (temperature_toggle.checkedRadioButtonId == R.id.celsius) TemperatureScale.CELSIUS
-                    else TemperatureScale.FAHRENHEIT
+                if (_binding.temperatureToggle.checkedRadioButtonId == R.id.celsius) TemperatureScale.CELSIUS
+                else TemperatureScale.FAHRENHEIT
             prefsManager.savePreferences(it)
         }
     }

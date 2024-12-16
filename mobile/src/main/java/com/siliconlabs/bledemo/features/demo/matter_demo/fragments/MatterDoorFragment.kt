@@ -1,12 +1,10 @@
 package com.siliconlabs.bledemo.features.demo.matter_demo.fragments
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,12 +34,11 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.utils.MessageDialogFrag
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.annotations.NotNull
 import timber.log.Timber
+import java.util.Optional
 
 
 class MatterDoorFragment : Fragment() {
@@ -51,37 +48,35 @@ class MatterDoorFragment : Fragment() {
     private val deviceController: ChipDeviceController
         get() = ChipClient.getDeviceController(requireContext())
     private lateinit var mPrefs: SharedPreferences
-    private var scannedDeviceList = ArrayList<MatterScannedResultModel>()
+
     private lateinit var scope: CoroutineScope
     private lateinit var binding: FragmentMatterDoorLightBinding
     private var deviceId: Long = INIT
     private var endpointId: Int = ON_OFF_CLUSTER_ENDPOINT
     private lateinit var model: MatterScannedResultModel
     private var customProgressDialog: CustomProgressDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPrefs = requireContext().getSharedPreferences(
-            "your_preference_name",
+            MatterDemoActivity.MATTER_PREF,
             AppCompatActivity.MODE_PRIVATE
         )
         if (requireArguments() != null) {
             model = requireArguments().getParcelable(ARG_DEVICE_MODEL)!!
             deviceId = model.deviceId
-            Timber.tag(TAG).e("deviceID: " + model)
+            Timber.tag(TAG).e("deviceID: $model")
         }
         if (deviceId != null) {
 
-            showMatterProgressDialog(getString(R.string.please_wait))
-            // retrieveSavedDevices()
-            GlobalScope.launch {
+            showMatterProgressDialog(getString(R.string.matter_device_status))
+            CoroutineScope(Dispatchers.IO).launch {
                 // This code will run asynchronously
 
-                val resultq = checkForDeviceStatus()
-                if (resultq) {
+                val resulInfo = checkForDeviceStatus()
+                if (resulInfo) {
                     println("Operation was successful")
                     removeProgress()
-                    // prepareList()
-
                 }
             }
         }
@@ -124,6 +119,7 @@ class MatterDoorFragment : Fragment() {
     private fun showMatterProgressDialog(message: String) {
         customProgressDialog = CustomProgressDialog(requireContext())
         customProgressDialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        customProgressDialog!!.setCanceledOnTouchOutside(false)
         customProgressDialog!!.setMessage(message)
         customProgressDialog!!.show()
     }
@@ -131,7 +127,7 @@ class MatterDoorFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentMatterDoorLightBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -143,20 +139,21 @@ class MatterDoorFragment : Fragment() {
         deviceController.setCompletionListener(DoorChipControllerCallback())
         binding.btnMatterDeviceState.setImageResource(R.drawable.door_lock)
         binding.txtClusterName.text = requireContext().getText(R.string.matter_door_title)
-        binding.btnOn.setLongClickable(false);
-        binding.btnOff.setLongClickable(false);
+        binding.btnOn.isLongClickable = false;
+        binding.btnOff.isLongClickable = false;
 
         binding.btnOn.text = requireContext().getText(R.string.matter_locked_status)
         binding.btnOff.text = requireContext().getText(R.string.matter_unlock_status)
         binding.btnToggle.visibility = View.GONE
         binding.btnOn.setOnClickListener {
+            showMatterProgressDialog(getString(R.string.matter_door_lock_in_progress))
             scope.launch {
-                // showMatterProgressDialog(getString(R.string.please_wait))
                 sendLockCommandClick()
             }
         }
 
         binding.btnOff.setOnClickListener {
+            showMatterProgressDialog(getString(R.string.matter_door_lock_in_progress))
             scope.launch {
                 sendUnlockCommandClick()
             }
@@ -168,32 +165,23 @@ class MatterDoorFragment : Fragment() {
         )
     }
 
-    override fun onAttach(@NotNull context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-    }
-
     private fun showMessageDialog() {
 
         try {
-            if (isAdded && requireActivity() != null && !requireActivity().isFinishing) {
+            if (isAdded && !requireActivity().isFinishing) {
                 requireActivity().runOnUiThread {
                     if (!MessageDialogFragment.isDialogShowing()) {
                         dialog = MessageDialogFragment()
                         dialog.setMessage(getString(R.string.matter_device_offline_text))
                         dialog.setOnDismissListener {
                             removeProgress()
-                            if (requireActivity().supportFragmentManager.getBackStackEntryCount() > 0) {
-                                requireActivity().supportFragmentManager.popBackStack();
+                            if (requireActivity().supportFragmentManager.backStackEntryCount > 0) {
+                                requireActivity().supportFragmentManager.popBackStack()
                             } else {
                                 FragmentUtils.getHost(
                                     this@MatterDoorFragment,
                                     CallBackHandler::class.java
-                                )
-                                    .onBackHandler()
+                                ).onBackHandler()
                             }
                         }
                         val transaction: FragmentTransaction =
@@ -206,14 +194,14 @@ class MatterDoorFragment : Fragment() {
                 Timber.e("device offline")
             }
         } catch (e: Exception) {
-            Timber.e("device offline " + e)
+            Timber.e("device offline :$e")
         }
 
     }
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (requireActivity().supportFragmentManager.getBackStackEntryCount() > 0) {
+            if (requireActivity().supportFragmentManager.backStackEntryCount > 0) {
                 requireActivity().supportFragmentManager.popBackStack();
             } else {
                 FragmentUtils.getHost(this@MatterDoorFragment, CallBackHandler::class.java)
@@ -259,12 +247,11 @@ class MatterDoorFragment : Fragment() {
     }
 
     private suspend fun sendLockCommandClick() {
-
         getLockUnlockClusterForDevice().lockDoor(
             object : ChipClusters.DefaultClusterCallback {
                 override fun onSuccess() {
                     removeProgress()
-                    Timber.tag(TAG).e("lock command Success")
+                    Timber.tag(TAG).e("Lock command Success")
                     binding.btnMatterDeviceState.setImageResource(R.drawable.door_lock)
                 }
 
@@ -272,18 +259,19 @@ class MatterDoorFragment : Fragment() {
                     removeProgress()
                     SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
                     showMessageDialog()
-
                 }
 
-            }, null,
+            }, Optional.empty(),
             TIME_OUT
         )
     }
+
 
     private suspend fun sendUnlockCommandClick() {
         getLockUnlockClusterForDevice().unlockDoor(
             object : ChipClusters.DefaultClusterCallback {
                 override fun onSuccess() {
+                    removeProgress()
                     Timber.tag(TAG).e("Unlock command Success")
                     SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, true)
                     binding.btnMatterDeviceState.setImageResource(R.drawable.door_unlock)
@@ -291,12 +279,13 @@ class MatterDoorFragment : Fragment() {
 
                 @SuppressLint("TimberArgCount")
                 override fun onError(error: Exception?) {
+                    removeProgress()
                     SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
                     Timber.tag(TAG).e("Unlock command failure: $error")
                     showMessageDialog()
                 }
 
-            }, null,
+            }, Optional.empty(),
             TIME_OUT
         )
     }
@@ -311,7 +300,7 @@ class MatterDoorFragment : Fragment() {
     inner class DoorChipControllerCallback : GenericChipDeviceListener() {
         override fun onConnectDeviceComplete() {}
 
-        override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+        override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
             Timber.tag(TAG).d("onCommissioningComplete for nodeId $nodeId: $errorCode")
             // showMessage("Address update complete for nodeId $nodeId with code $errorCode")
         }
@@ -324,7 +313,7 @@ class MatterDoorFragment : Fragment() {
             Timber.tag(TAG).d("onCloseBleComplete")
         }
 
-        override fun onError(error: Throwable) {
+        override fun onError(error: Throwable?) {
             super.onError(error)
             Timber.tag(TAG).d("onError : $error")
         }
@@ -335,7 +324,7 @@ class MatterDoorFragment : Fragment() {
     }
 
     companion object {
-        private val TAG = MatterDoorFragment.javaClass.simpleName.toString()
+        private val TAG = Companion::class.java.simpleName.toString()
 
         fun newInstance(): MatterDoorFragment = MatterDoorFragment()
     }

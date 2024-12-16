@@ -15,16 +15,18 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.FragmentDemoBinding
+import com.siliconlabs.bledemo.databinding.FragmentDeviceStatusBinding
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.activities.ThunderboardActivity
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.viewmodels.StatusViewModel
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models.ThunderBoardDevice
-import kotlinx.android.synthetic.main.fragment_device_status.view.*
+
 
 class StatusFragment : Fragment() {
 
     lateinit var viewModel: StatusViewModel
 
-    private lateinit var rootView: View
+    private lateinit var rootView:FragmentDeviceStatusBinding
     private var isConnecting = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -34,10 +36,11 @@ class StatusFragment : Fragment() {
 
         setupDataListeners()
 
-        rootView = inflater.inflate(R.layout.fragment_device_status, container, false)
-        rootView.battery_indicator.visibility = View.INVISIBLE
-        rootView.battery_indicator.setBatteryValue(ThunderBoardDevice.PowerSource.UNKNOWN, 0)
-        return rootView
+        rootView = FragmentDeviceStatusBinding.inflate(inflater, container, false)
+
+        rootView.batteryIndicator.visibility = View.INVISIBLE
+        rootView.batteryIndicator.setBatteryValue(ThunderBoardDevice.PowerSource.UNKNOWN, 0)
+        return rootView.root
     }
 
     fun handleBaseCharacteristic(characteristic: BluetoothGattCharacteristic) {
@@ -70,12 +73,13 @@ class StatusFragment : Fragment() {
 
     private fun updateStatusViews(device: ThunderBoardDevice) {
         rootView.apply {
-            device_name.text = device.name
-            device_firmware.text =
+
+            deviceName.text = device.name
+            deviceFirmware.text =
                     if (device.firmwareVersion == null || device.firmwareVersion?.isEmpty()!!) {
                         getString(R.string.status_no_firmware_version)
                     } else device.firmwareVersion
-            battery_indicator.setBatteryValue(device.powerSource, device.batteryLevel)
+            batteryIndicator.setBatteryValue(device.powerSource, device.batteryLevel)
         }
     }
 
@@ -85,20 +89,20 @@ class StatusFragment : Fragment() {
             BluetoothProfile.STATE_CONNECTED -> {
                 resourceId = R.string.status_connected
                 isConnecting = false
-                rootView.battery_indicator.visibility = View.VISIBLE
-                rootView.progress_bar.visibility = View.INVISIBLE
+                rootView.batteryIndicator.visibility = View.VISIBLE
+                rootView.progressBar.visibility = View.INVISIBLE
             }
             BluetoothProfile.STATE_CONNECTING -> {
                 resourceId = R.string.status_connecting
                 isConnecting = true
-                rootView.battery_indicator.visibility = View.INVISIBLE
-                rootView.progress_bar.visibility = View.VISIBLE
+                rootView.batteryIndicator.visibility = View.INVISIBLE
+                rootView.progressBar.visibility = View.VISIBLE
             }
             BluetoothProfile.STATE_DISCONNECTING -> {
                 resourceId = BluetoothProfile.STATE_DISCONNECTING
                 isConnecting = false
-                rootView.battery_indicator.visibility = View.INVISIBLE
-                rootView.progress_bar.visibility = View.VISIBLE
+                rootView.batteryIndicator.visibility = View.INVISIBLE
+                rootView.progressBar.visibility = View.VISIBLE
             }
             else -> {
                 val titleId: Int
@@ -112,13 +116,13 @@ class StatusFragment : Fragment() {
                 }
                 resourceId = R.string.status_disconnected
                 isConnecting = false
-                rootView.battery_indicator.visibility = View.INVISIBLE
-                rootView.progress_bar.visibility = View.VISIBLE
+                rootView.batteryIndicator.visibility = View.INVISIBLE
+                rootView.progressBar.visibility = View.VISIBLE
                 animateDown()
                 showNotConnectedDialog(viewModel.thunderboardDevice.value?.name, titleId, messageId)
             }
         }
-        rootView.device_status.text = getString(resourceId)
+        rootView.deviceStatus.text = getString(resourceId)
     }
 
 

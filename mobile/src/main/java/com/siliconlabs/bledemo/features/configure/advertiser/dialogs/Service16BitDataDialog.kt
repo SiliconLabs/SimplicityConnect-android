@@ -20,27 +20,37 @@ import com.siliconlabs.bledemo.features.configure.advertiser.utils.Translator
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.Validator
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
-import kotlinx.android.synthetic.main.dialog_data_16bit_service.view.*
-import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.btn_cancel
-import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.btn_save
+import com.siliconlabs.bledemo.databinding.DialogData16bitServiceBinding
+//import kotlinx.android.synthetic.main.dialog_data_16bit_service.view.*
+//import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.btn_cancel
+//import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.btn_save
 
 class Service16BitDataDialog(val callback: Callback) : BaseDialogFragment() {
     private lateinit var predefinedServices: List<Service16Bit>
+    private lateinit var binding: DialogData16bitServiceBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_data_16bit_service, container, false).apply {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DialogData16bitServiceBinding.inflate(inflater, container, false).apply {
 
-            predefinedServices = Translator(context).get16BitServices()
-            val adapter = Service16BitAdapter(context, Translator(context).get16BitServices())
-            actv_16bit_services.setAdapter(adapter)
+            predefinedServices = Translator(requireContext()).get16BitServices()
+            val adapter = Service16BitAdapter(
+                requireContext(),
+                Translator(requireContext()).get16BitServices()
+            )
+            actv16bitServices.setAdapter(adapter)
 
-            btn_cancel.setOnClickListener { dismiss() }
-            btn_save.setOnClickListener { handleSave(actv_16bit_services) }
-            btn_clear.setOnClickListener { actv_16bit_services.setText("") }
+            btnCancel.setOnClickListener { dismiss() }
+            btnSave.setOnClickListener { handleSave(actv16bitServices) }
+            btnClear.setOnClickListener { actv16bitServices.setText("") }
 
-            verifyDataCorrectness(actv_16bit_services, btn_save)
-            handleClickOnBluetoothGattServices(btn_bluetooth_gatt_services)
+            verifyDataCorrectness(actv16bitServices, btnSave)
+            handleClickOnBluetoothGattServices(btnBluetoothGattServices)
         }
+        return binding.root
     }
 
     private fun handleSave(actv: AutoCompleteTextView) {
@@ -64,14 +74,18 @@ class Service16BitDataDialog(val callback: Callback) : BaseDialogFragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val text = actv.text.toString()
-                saveBtn.isEnabled = Validator.isCompanyIdentifierValid(text) || isPredefinedService(text, predefinedServices)
+                saveBtn.isEnabled = Validator.isCompanyIdentifierValid(text) || isPredefinedService(
+                    text,
+                    predefinedServices
+                )
             }
         })
     }
 
     private fun handleClickOnBluetoothGattServices(button: Button) {
         button.setOnClickListener {
-            val uriUrl = Uri.parse("https://" + getString(R.string.advertiser_url_bluetooth_gatt_services))
+            val uriUrl =
+                Uri.parse("https://" + getString(R.string.advertiser_url_bluetooth_gatt_services))
             val launchBrowser = Intent(Intent.ACTION_VIEW, uriUrl)
             startActivity(launchBrowser)
         }

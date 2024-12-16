@@ -24,13 +24,14 @@ Simplicity Connect includes many demos to test sample apps in the Silicon Labs G
 - **Health Thermometer**: Connect to a BLE hardware kit and receive the temperature data from the on-board sensor.
 - **Connected Lighting DMP**: Leverage the dynamic multi-protocol (DMP) sample apps to control a DMP light node from a mobile and protocol-specific switch node (Zigbee, proprietary) while keeping the light status in sync across all devices.
 - **Range Test**: Visualize the RSSI and other RF performance data on the mobile phone while running the Range Test sample application on a pair of Silicon Labs radio boards.
-- **Motion**: Control a 3D render of a Silicon Labs Thunderboard or Dev Kit that follows the phyiscal board movements.
+- **Motion**: Control a 3D render of a Silicon Labs Thunderboard or Dev Kit that follows the physical board movements.
 - **Environment**: Read and display the data from the on-board sensors on a Silicon Labs Thunderboard or Dev Kit.
 - **Wi-Fi Commissioning**: Commission a Wi-Fi device over BLE.
 - **Bluetooth Electronic Shelf Labels (ESL)**: Adds and commissions ESL tags to the system network by scanning the tag's QR code with the mobile device's camera and provides the user a UI to view the list commissioned tags and control them.
 - **Matter**: Commission and control of the Matter devices over Thread and Wi-Fi.
 - **Wi-Fi OTA Firmware Update**: The Wi-Fi OTA firmware update demo demonstrates how to update the SiWx91x user application firmware over Wi-Fi connection, by downloading the image from the mobile phone.
 - **Wi-Fi 917 Sensors**: The Wi-Fi 917 Sensor demo demonstrates to read and display sensor data from 917 Dev Kit.
+- **Wi-Fi Throughput**: Wi-Fi demo feature for measuring data throughput between SiWx91x device and the mobile phone.
 
 ## Development Features
 Simplicity Connect helps developers create and troubleshoot Bluetooth applications running on Silicon Labs’ BLE hardware. Here’s a rundown of some example functionalities.

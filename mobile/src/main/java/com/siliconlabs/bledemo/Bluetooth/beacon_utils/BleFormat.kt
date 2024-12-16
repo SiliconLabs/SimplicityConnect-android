@@ -2,6 +2,7 @@ package com.siliconlabs.bledemo.bluetooth.beacon_utils
 
 import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
 import com.siliconlabs.bledemo.R
+import java.util.Locale
 
 enum class BleFormat(val nameResId: Int, val iconResId: Int) {
     UNSPECIFIED(R.string.unspecified, R.drawable.ic_beacon_immediate),
@@ -66,7 +67,7 @@ enum class BleFormat(val nameResId: Int, val iconResId: Int) {
             val uuidList = deviceInfo.scanInfo?.scanRecord?.serviceUuids
             if (uuidList != null && !uuidList.isEmpty()) {
                 for (parcelUuid in uuidList) {
-                    val parcelString = parcelUuid.toString().substring(4, 8).toLowerCase()
+                    val parcelString = parcelUuid.toString().substring(4, 8).lowercase(Locale.US)
                     if (EDDYSTONE_SERVICE_UUID == parcelString) {
                         return true
                     }

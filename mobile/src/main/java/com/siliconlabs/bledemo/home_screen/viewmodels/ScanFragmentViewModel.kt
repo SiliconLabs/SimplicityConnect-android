@@ -221,7 +221,10 @@ class ScanFragmentViewModel(private val context: Context) : ScannerViewModel() {
 
     fun toggleViewExpansion(position: Int) {
         _filteredDevices.value = _filteredDevices.value?.apply {
-            set(position, this[position].copy(isBluetoothInfoExpanded = !this[position].isBluetoothInfoExpanded))
+            println("SICONNECT --this$this")
+            println("SICONNECT --isBluetoothInfoExpanded${this[position].isBluetoothInfoExpanded}")
+            set(position, this[position]
+                .copy(isBluetoothInfoExpanded = !this[position].isBluetoothInfoExpanded))
         }
     }
 

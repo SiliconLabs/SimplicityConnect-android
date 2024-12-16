@@ -11,17 +11,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.siliconlabs.bledemo.databinding.FragmentOtbrInputDialogBinding
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterConnectFragment.Companion.DIALOG_OTBR_INFO
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannerFragment.Companion.DIALOG_OTBR_INFO
 
 class MatterOTBRInputDialogFragment : DialogFragment() {
 
     private lateinit var binding: FragmentOtbrInputDialogBinding
 
     companion object {
-        public const val WINDOW_SIZE = 0.65
+        const val WINDOW_SIZE = 0.65
         fun newInstance(): MatterOTBRInputDialogFragment = MatterOTBRInputDialogFragment()
     }
 
@@ -29,12 +28,13 @@ class MatterOTBRInputDialogFragment : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         binding = FragmentOtbrInputDialogBinding.inflate(inflater, container, false)
         if (dialog != null && dialog!!.window != null) {
             dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog!!.window!!.requestFeature(Window.FEATURE_NO_TITLE);
+            dialog!!.setCanceledOnTouchOutside(false)
         }
         return binding.root
     }
@@ -74,19 +74,10 @@ class MatterOTBRInputDialogFragment : DialogFragment() {
         }
     }
 
-    fun stopDisplay() {
-        dismiss()
-    }
 
     private fun getScreenWidth(activity: Activity): Int {
         val size = Point()
         activity.windowManager.defaultDisplay.getSize(size)
         return size.x
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
-
 }

@@ -1,11 +1,10 @@
 package com.siliconlabs.bledemo.features.demo.matter_demo.fragments
 
-import android.content.Context
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,13 +22,11 @@ import com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone.Constants
 import com.siliconlabs.bledemo.databinding.FragmentMatterThermostatBinding
 import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoActivity
 import com.siliconlabs.bledemo.features.demo.matter_demo.controller.GenericChipDeviceListener
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterConnectFragment.Companion.SPACE
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ARG_DEVICE_INFO
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ARG_DEVICE_MODEL
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.INIT
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ON_OFF_CLUSTER_ENDPOINT
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannerFragment.Companion.SPACE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterTemperatureSensorFragment.Companion.TEMPERATURE_UNIT
-import com.siliconlabs.bledemo.features.demo.matter_demo.model.CHIPDeviceInfo
 import com.siliconlabs.bledemo.features.demo.matter_demo.model.MatterScannedResultModel
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ChipClient
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
@@ -38,13 +35,10 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.utils.MessageDialogFrag
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.annotations.NotNull
 import timber.log.Timber
-import java.text.DecimalFormat
 
 
 class MatterThermostatFragment : Fragment() {
@@ -63,28 +57,26 @@ class MatterThermostatFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPrefs = requireContext().getSharedPreferences(
-            "your_preference_name",
+            MatterDemoActivity.MATTER_PREF,
             AppCompatActivity.MODE_PRIVATE
         )
         if (requireArguments() != null) {
             model = requireArguments().getParcelable(ARG_DEVICE_MODEL)!!
             deviceId = model.deviceId
-            Timber.tag(TAG).e( "deviceID: " + model)
+            Timber.tag(TAG).e("deviceID: $model")
         }
         if (deviceId != null) {
 
-            showMatterProgressDialog(getString(R.string.please_wait))
+            showMatterProgressDialog(getString(R.string.matter_device_status))
 
             // retrieveSavedDevices()
-            GlobalScope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 // This code will run asynchronously
 
-                val resultq = checkForDeviceStatus()
-                if (resultq) {
+                val resInfo = checkForDeviceStatus()
+                if (resInfo) {
                     println("Operation was successful")
                     removeProgress()
-                    // prepareList()
-
                 }
             }
         }
@@ -118,30 +110,23 @@ class MatterThermostatFragment : Fragment() {
         }
     }
 
-    override fun onAttach(@NotNull context: Context) {
-        super.onAttach(context)
-    }
 
-    override fun onDetach() {
-        super.onDetach()
-    }
     private fun showMessageDialog() {
         try {
-            if (isAdded() && requireActivity()!=null && !requireActivity().isFinishing){
+            if (isAdded && !requireActivity().isFinishing) {
                 requireActivity().runOnUiThread {
                     if (!MessageDialogFragment.isDialogShowing()) {
                         dialog = MessageDialogFragment()
                         dialog.setMessage(getString(R.string.matter_device_offline_text))
                         dialog.setOnDismissListener {
                             removeProgress()
-                            if (requireActivity().supportFragmentManager.getBackStackEntryCount() > 0) {
-                                requireActivity().supportFragmentManager.popBackStack();
+                            if (requireActivity().supportFragmentManager.backStackEntryCount > 0) {
+                                requireActivity().supportFragmentManager.popBackStack()
                             } else {
                                 FragmentUtils.getHost(
                                     this@MatterThermostatFragment,
                                     MatterDoorFragment.CallBackHandler::class.java
-                                )
-                                    .onBackHandler()
+                                ).onBackHandler()
                             }
                         }
                         val transaction: FragmentTransaction =
@@ -150,18 +135,18 @@ class MatterThermostatFragment : Fragment() {
                         dialog.show(transaction, dialogTag)
                     }
                 }
-            }else{
+            } else {
                 Timber.e("device offline")
             }
-        }catch (e:Exception){
-            Timber.e("device offline"+e)
+        } catch (e: Exception) {
+            Timber.e("device offline $e")
         }
 
 
     }
 
     private fun removeProgress() {
-        if (customProgressDialog?.isShowing() == true) {
+        if (customProgressDialog?.isShowing == true) {
             customProgressDialog?.dismiss()
         }
     }
@@ -170,6 +155,7 @@ class MatterThermostatFragment : Fragment() {
         customProgressDialog = CustomProgressDialog(requireContext())
         customProgressDialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         customProgressDialog!!.setMessage(message)
+        customProgressDialog!!.setCanceledOnTouchOutside(false)
         customProgressDialog!!.show()
 
     }
@@ -189,8 +175,8 @@ class MatterThermostatFragment : Fragment() {
         scope = viewLifecycleOwner.lifecycleScope
         deviceController.setCompletionListener(DoorChipControllerCallback())
 
-        binding.btnReadValue.setLongClickable(false);
-        binding.btnReadValue.setText(requireContext().getText(R.string.matter_temp_refresh))
+        binding.btnReadValue.isLongClickable = false
+        binding.btnReadValue.text = requireContext().getText(R.string.matter_temp_refresh)
 
         binding.btnReadValue.setOnClickListener {
             scope.launch { sendReadValueCommandClick() }
@@ -200,8 +186,8 @@ class MatterThermostatFragment : Fragment() {
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
 
-            if (requireActivity().supportFragmentManager.getBackStackEntryCount() > 0) {
-                requireActivity().supportFragmentManager.popBackStack();
+            if (requireActivity().supportFragmentManager.backStackEntryCount > 0) {
+                requireActivity().supportFragmentManager.popBackStack()
             } else {
                 FragmentUtils.getHost(this@MatterThermostatFragment, CallBackHandler::class.java)
                     .onBackHandler()
@@ -242,26 +228,26 @@ class MatterThermostatFragment : Fragment() {
     private suspend fun sendReadValueCommandClick() {
         getThermostatClusterForDevice().readLocalTemperatureAttribute(object :
             ChipClusters.ThermostatCluster.LocalTemperatureAttributeCallback {
+            @SuppressLint("SetTextI18n")
             override fun onSuccess(value: Int?) {
-                SharedPrefsUtils.updateDeviceByDeviceId(mPrefs,deviceId,true)
-                requireActivity().runOnUiThread(Runnable {
+                SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, true)
+                requireActivity().runOnUiThread {
 
                     val resValue = roundDoubleToInt(addDecimalPointToInteger(value))
-                    Log.e(
-                        TAG,
-                        "read local temp command Success: " + addDecimalPointToInteger(value)
+                    Timber.tag(TAG).e(
+                        "read local temp command Success:  ${addDecimalPointToInteger(value)}"
                     )
                     binding.txtValue.setText(SPACE + (resValue) + TEMPERATURE_UNIT)
-                })
+                }
 
 
             }
 
-            override fun onError(ex: Exception?) {
-               // removeProgress()
+            override fun onError(exe: Exception?) {
+                // removeProgress()
                 SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
                 showMessageDialog()
-                Timber.tag(TAG).e( "read local temp command failure", ex)
+                Timber.tag(TAG).e("read local temp command failure:$exe")
             }
         })
     }
@@ -277,7 +263,7 @@ class MatterThermostatFragment : Fragment() {
     inner class DoorChipControllerCallback : GenericChipDeviceListener() {
         override fun onConnectDeviceComplete() {}
 
-        override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+        override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
             Timber.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
             //showMessage("Address update complete for nodeId $nodeId with code $errorCode")
         }
@@ -290,7 +276,7 @@ class MatterThermostatFragment : Fragment() {
             Timber.d(TAG, "onCloseBleComplete")
         }
 
-        override fun onError(error: Throwable) {
+        override fun onError(error: Throwable?) {
             super.onError(error)
             Timber.d(TAG, "onError : $error")
         }
@@ -301,7 +287,7 @@ class MatterThermostatFragment : Fragment() {
     }
 
     companion object {
-        private val TAG = MatterThermostatFragment.javaClass.simpleName.toString()
+        private val TAG = Companion::class.java.simpleName.toString()
 
         fun newInstance(): MatterThermostatFragment = MatterThermostatFragment()
     }

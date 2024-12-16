@@ -1,11 +1,13 @@
 package com.siliconlabs.bledemo.features.configure.gatt_configurator.viewholders
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.AdapterEditGattServerBinding
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.activities.GattServerActivity
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.adapters.EditGattServerAdapter.ServiceListener
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.dialogs.CharacteristicDialog
@@ -13,18 +15,19 @@ import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Chara
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Service
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.utils.removeAsking
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.views.GattCharacteristicView
-import kotlinx.android.synthetic.main.adapter_edit_gatt_server.view.*
+//import kotlinx.android.synthetic.main.adapter_edit_gatt_server.view.*
 
-class EditGattServerViewHolder(view: View, val list: ArrayList<Service>, val listener: ServiceListener) : RecyclerView.ViewHolder(view) {
-    private val llCharacteristics = view.ll_characteristics
-    private val llCharacteristicsOuter = view.ll_characteristics_outer
-    private val expandArrow = view.expand_arrow
-    private val tvName = view.tv_service_name
-    private val tvUuid = view.tv_service_uuid
-    private val tvType = view.tv_service_type
-    private val ibCopy = view.ib_copy
-    private val ibRemove = view.ib_remove
-    private val btnAddCharacteristic = view.btn_add_characteristic
+class EditGattServerViewHolder(view: AdapterEditGattServerBinding, val list: ArrayList<Service>, val listener: ServiceListener) :
+    RecyclerView.ViewHolder(view.root) {
+    private val llCharacteristics = view.llCharacteristics
+    private val llCharacteristicsOuter = view.llCharacteristicsOuter
+    private val expandArrow = view.expandArrow
+    private val tvName = view.tvServiceName
+    private val tvUuid = view.tvServiceUuid
+    private val tvType = view.tvServiceType
+    private val ibCopy = view.ibCopy
+    private val ibRemove = view.ibRemove
+    private val btnAddCharacteristic = view.btnAddCharacteristic
 
     fun bind(service: Service) {
         llCharacteristics.removeAllViews()
@@ -56,8 +59,8 @@ class EditGattServerViewHolder(view: View, val list: ArrayList<Service>, val lis
     private fun initCharacteristics(characteristics: ArrayList<Characteristic>) {
         for (characteristic in characteristics) {
             val view = GattCharacteristicView(itemView.context, characteristic)
-            handleCharacteristicClickEvents(view, characteristics)
             llCharacteristics.addView(view)
+            handleCharacteristicClickEvents(view, characteristics)
         }
     }
 
@@ -98,11 +101,25 @@ class EditGattServerViewHolder(view: View, val list: ArrayList<Service>, val lis
         llCharacteristics.addView(view)
     }
 
-    private fun editCharacteristic(characteristic: Characteristic, characteristics: ArrayList<Characteristic>) {
+    private fun editCharacteristic(
+        characteristic: Characteristic,
+        characteristics: ArrayList<Characteristic>
+    ) {
         CharacteristicDialog(object : CharacteristicDialog.CharacteristicChangeListener {
             override fun onCharacteristicChanged(characteristic: Characteristic) {
+
                 val index = characteristics.indexOf(characteristic)
-                (llCharacteristics[index] as GattCharacteristicView).refreshView()
+
+                // Get the view at the specified index in the LinearLayout
+                val view = llCharacteristics.getChildAt(index)
+
+                if (view is GattCharacteristicView) {
+                    // If the view is a GattCharacteristicView, call refreshView
+                    view.refreshView()
+                } else {
+                    // Handle the case where the view is not a GattCharacteristicView
+                    Log.e("EditCharacteristic", "View at index $index is not a GattCharacteristicView.")
+                }
             }
         }, characteristic).show((itemView.context as GattServerActivity).supportFragmentManager, "dialog_characteristic")
     }
@@ -123,8 +140,9 @@ class EditGattServerViewHolder(view: View, val list: ArrayList<Service>, val lis
 
     companion object {
         fun create(parent: ViewGroup, list: ArrayList<Service>, listener: ServiceListener): EditGattServerViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.adapter_edit_gatt_server, parent, false)
-            return EditGattServerViewHolder(view, list, listener)
+            val binding = AdapterEditGattServerBinding.inflate(LayoutInflater.from(parent.context))
+
+            return EditGattServerViewHolder(binding, list, listener)
         }
     }
 

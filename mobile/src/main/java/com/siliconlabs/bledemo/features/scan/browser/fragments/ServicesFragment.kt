@@ -10,23 +10,23 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.siliconlabs.bledemo.bluetooth.parsing.DescriptorParser
-import com.siliconlabs.bledemo.features.scan.browser.activities.DeviceServicesActivity
-import com.siliconlabs.bledemo.features.scan.browser.dialogs.DictionaryEntryEditDialog
-import com.siliconlabs.bledemo.features.scan.browser.adapters.MappingCallback
-import com.siliconlabs.bledemo.features.scan.browser.models.Mapping
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.features.scan.browser.views.CharacteristicItemContainer
-import com.siliconlabs.bledemo.features.scan.browser.views.DescriptorContainer
-import com.siliconlabs.bledemo.features.scan.browser.views.ServiceItemContainer
+import com.siliconlabs.bledemo.bluetooth.parsing.DescriptorParser
 import com.siliconlabs.bledemo.databinding.FragmentServicesBinding
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Property
 import com.siliconlabs.bledemo.features.iop_test.models.CommonUUID
+import com.siliconlabs.bledemo.features.scan.browser.activities.DeviceServicesActivity
+import com.siliconlabs.bledemo.features.scan.browser.adapters.MappingCallback
+import com.siliconlabs.bledemo.features.scan.browser.dialogs.DictionaryEntryEditDialog
+import com.siliconlabs.bledemo.features.scan.browser.models.Mapping
+import com.siliconlabs.bledemo.features.scan.browser.views.CharacteristicItemContainer
+import com.siliconlabs.bledemo.features.scan.browser.views.DescriptorContainer
+import com.siliconlabs.bledemo.features.scan.browser.views.ServiceItemContainer
 import com.siliconlabs.bledemo.utils.*
-import kotlinx.android.synthetic.main.descriptor_container.view.*
 import java.util.*
 
-abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layout.fragment_services) {
+abstract class ServicesFragment(private val isRemote: Boolean) :
+    Fragment(R.layout.fragment_services) {
 
     protected lateinit var binding: FragmentServicesBinding
 
@@ -40,9 +40,11 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
     protected var currentWriteReadFragment: FragmentCharacteristicDetail? = null
     private val descriptorsMap = mutableMapOf<BluetoothGattDescriptor, View>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        binding = FragmentServicesBinding.inflate(inflater)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentServicesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -62,10 +64,10 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
                 (activity as DeviceServicesActivity).refreshServices()
             }
             setColorSchemeColors(
-                    ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark),
-                    ContextCompat.getColor(requireContext(), android.R.color.holo_orange_dark),
-                    ContextCompat.getColor(requireContext(), android.R.color.holo_orange_light),
-                    ContextCompat.getColor(requireContext(), android.R.color.holo_red_light)
+                ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark),
+                ContextCompat.getColor(requireContext(), android.R.color.holo_orange_dark),
+                ContextCompat.getColor(requireContext(), android.R.color.holo_orange_light),
+                ContextCompat.getColor(requireContext(), android.R.color.holo_red_light)
             )
         }
     }
@@ -82,11 +84,20 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
         binding.servicesContainer.removeAllViews()
     }
 
+//    fun updateDescriptorView(descriptor: BluetoothGattDescriptor) {
+//        descriptorsMap[descriptor]?.apply {
+//            activity?.runOnUiThread {
+//
+//                container_descriptor_value.visibility = View.VISIBLE
+//                tv_value.text = DescriptorParser(descriptor).getFormattedValue()
+//            }
+//        }
+//    }
+    //TODO
     fun updateDescriptorView(descriptor: BluetoothGattDescriptor) {
         descriptorsMap[descriptor]?.apply {
             activity?.runOnUiThread {
-                container_descriptor_value.visibility = View.VISIBLE
-                tv_value.text = DescriptorParser(descriptor).getFormattedValue()
+
             }
         }
     }
@@ -125,20 +136,23 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
 
     private val characteristicContainerCallback = object : CharacteristicItemContainer.Callback {
         override fun onRenameClicked(container: CharacteristicItemContainer) {
-           DictionaryEntryEditDialog(
-                   container.getCharacteristicName(),
-                   UuidUtils.getUuidText(container.characteristic.uuid),
-                   Mapping.Type.CHARACTERISTIC,
-                   object : MappingCallback {
-                       override fun onNameChanged(mapping: Mapping) {
-                           container.setCharacteristicName(mapping.name)
-                           characteristicNamesMap[mapping.uuid] = mapping
-                       }
-                   }
-           ).show(parentFragmentManager, "dialog_mapping_edit")
+            DictionaryEntryEditDialog(
+                container.getCharacteristicName(),
+                UuidUtils.getUuidText(container.characteristic.uuid),
+                Mapping.Type.CHARACTERISTIC,
+                object : MappingCallback {
+                    override fun onNameChanged(mapping: Mapping) {
+                        container.setCharacteristicName(mapping.name)
+                        characteristicNamesMap[mapping.uuid] = mapping
+                    }
+                }
+            ).show(parentFragmentManager, "dialog_mapping_edit")
         }
 
-        override fun onPropertyClicked(property: Property, characteristicContainer: CharacteristicItemContainer) {
+        override fun onPropertyClicked(
+            property: Property,
+            characteristicContainer: CharacteristicItemContainer
+        ) {
             handleOnPropertyClicked(property, characteristicContainer)
         }
     }
@@ -153,29 +167,29 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
         context?.let {
             services.forEachIndexed { position, service ->
                 val serviceItemContainer = ServiceItemContainer(
-                        it,
-                        serviceContainerCallback,
-                        service,
-                        isMandatorySystemService(service.uuid),
-                        serviceNamesMap
+                    it,
+                    serviceContainerCallback,
+                    service,
+                    isMandatorySystemService(service.uuid),
+                    serviceNamesMap
                 )
 
                 service.characteristics.forEach { char ->
                     val characteristicContainer = CharacteristicItemContainer(
-                            it,
-                            characteristicContainerCallback,
-                            char,
-                            isMandatorySystemService(service.uuid),
-                            characteristicNamesMap
+                        it,
+                        characteristicContainerCallback,
+                        char,
+                        isMandatorySystemService(service.uuid),
+                        characteristicNamesMap
                     )
 
                     if (char.descriptors.isEmpty()) characteristicContainer.hideDescriptorsContainer()
                     else {
                         char.descriptors.forEach { descriptor ->
                             DescriptorContainer(
-                                    it,
-                                    descriptorContainerCallback,
-                                    descriptor
+                                it,
+                                descriptorContainerCallback,
+                                descriptor
                             ).also {
                                 characteristicContainer.addDescriptorContainer(it)
                                 descriptorsMap[descriptor] = it
@@ -187,23 +201,24 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
 
                 serviceItemContainer.setMargins(position)
                 binding.servicesContainer.addView(
-                        serviceItemContainer,
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    serviceItemContainer,
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
                 )
             }
-            (activity as? DeviceServicesActivity)?.isUiCreated = true // prevent from crashes when clicking "back" when still loading
+            (activity as? DeviceServicesActivity)?.isUiCreated =
+                true // prevent from crashes when clicking "back" when still loading
         }
 
     }
 
-    private  fun initFragmentCharacteristicDetail(
-            bluetoothGattCharacteristic: BluetoothGattCharacteristic,
-            expansionId: Int,
-            service: BluetoothGattService,
-            characteristicExpansion: LinearLayout,
-            displayWriteDialog: Boolean = false,
-            writeType: FragmentCharacteristicDetail.WriteType = FragmentCharacteristicDetail.WriteType.REMOTE_WRITE
+    private fun initFragmentCharacteristicDetail(
+        bluetoothGattCharacteristic: BluetoothGattCharacteristic,
+        expansionId: Int,
+        service: BluetoothGattService,
+        characteristicExpansion: LinearLayout,
+        displayWriteDialog: Boolean = false,
+        writeType: FragmentCharacteristicDetail.WriteType = FragmentCharacteristicDetail.WriteType.REMOTE_WRITE
     ): FragmentCharacteristicDetail {
         val characteristicDetail = FragmentCharacteristicDetail().apply {
             isRemote = this@ServicesFragment.isRemote
@@ -215,17 +230,17 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
         }
         // show characteristic's expansion and add the fragment to view/edit characteristic detail
         parentFragmentManager
-                .beginTransaction()
-                .add(expansionId, characteristicDetail, CHARACTERISTIC_ADD_FRAGMENT_TRANSACTION_ID)
-                .commitNow()
+            .beginTransaction()
+            .add(expansionId, characteristicDetail, CHARACTERISTIC_ADD_FRAGMENT_TRANSACTION_ID)
+            .commitNow()
 
         return characteristicDetail
     }
 
 
     private fun handleOnPropertyClicked(
-            property: Property,
-            characteristicContainer: CharacteristicItemContainer
+        property: Property,
+        characteristicContainer: CharacteristicItemContainer
     ) {
         if (isMandatorySystemService(characteristicContainer.characteristic.service.uuid)) return
 
@@ -236,16 +251,17 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
         when (property) {
             Property.READ -> {
                 saveCurrentWriteReadFragment(
-                        bluetoothGattCharacteristic,
-                        service,
-                        characteristicExpansion
+                    bluetoothGattCharacteristic,
+                    service,
+                    characteristicExpansion
                 )
                 readCharacteristic(bluetoothGattCharacteristic)
             }
+
             Property.WRITE -> {
                 val writeType =
-                        if (this is RemoteServicesFragment) FragmentCharacteristicDetail.WriteType.REMOTE_WRITE
-                        else FragmentCharacteristicDetail.WriteType.LOCAL_WRITE
+                    if (this is RemoteServicesFragment) FragmentCharacteristicDetail.WriteType.REMOTE_WRITE
+                    else FragmentCharacteristicDetail.WriteType.LOCAL_WRITE
                 openWriteDialog(
                     bluetoothGattCharacteristic,
                     service,
@@ -253,20 +269,20 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
                     writeType
                 )
             }
+
             Property.NOTIFY -> {
                 if (this is RemoteServicesFragment) {
                     saveCurrentWriteReadFragment(
-                            bluetoothGattCharacteristic,
-                            service,
-                            characteristicExpansion
+                        bluetoothGattCharacteristic,
+                        service,
+                        characteristicExpansion
                     )
                     toggleNotifications(
                         bluetoothGattCharacteristic,
                         characteristicContainer.getPropertyBinding(Property.NOTIFY),
                         characteristicContainer.getPropertyBinding(Property.INDICATE)
                     )
-                }
-                else {
+                } else {
                     openWriteDialog(
                         bluetoothGattCharacteristic,
                         service,
@@ -275,20 +291,20 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
                     )
                 }
             }
+
             Property.INDICATE -> {
                 if (this is RemoteServicesFragment) {
                     saveCurrentWriteReadFragment(
-                            bluetoothGattCharacteristic,
-                            service,
-                            characteristicExpansion
+                        bluetoothGattCharacteristic,
+                        service,
+                        characteristicExpansion
                     )
                     toggleIndications(
                         bluetoothGattCharacteristic,
                         characteristicContainer.getPropertyBinding(Property.INDICATE),
                         characteristicContainer.getPropertyBinding(Property.NOTIFY)
                     )
-                }
-                else {
+                } else {
                     openWriteDialog(
                         bluetoothGattCharacteristic,
                         service,
@@ -297,7 +313,8 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
                     )
                 }
             }
-            else -> { }
+
+            else -> {}
         }
     }
 
@@ -327,9 +344,9 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
     }
 
     private fun saveCurrentWriteReadFragment(
-            characteristic: BluetoothGattCharacteristic,
-            service: BluetoothGattService,
-            characteristicExpansion: LinearLayout
+        characteristic: BluetoothGattCharacteristic,
+        service: BluetoothGattService,
+        characteristicExpansion: LinearLayout
     ) {
         val id = characteristicExpansion.id
 
@@ -337,10 +354,10 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
             currentWriteReadFragment = characteristicFragments[id]
         } else {
             currentWriteReadFragment = initFragmentCharacteristicDetail(
-                    characteristic,
-                    id,
-                    service,
-                    characteristicExpansion
+                characteristic,
+                id,
+                service,
+                characteristicExpansion
             )
             characteristicFragments[id] = currentWriteReadFragment
         }
@@ -353,7 +370,7 @@ abstract class ServicesFragment(private val isRemote: Boolean) : Fragment(R.layo
     private fun isMandatorySystemService(uuid: UUID): Boolean {
         return (!isRemote &&
                 (uuid == UUID.fromString(CommonUUID.Service.UUID_GENERIC_ACCESS.toString())
-                || uuid == UUID.fromString(CommonUUID.Service.UUID_GENERIC_ATTRIBUTE.toString())))
+                        || uuid == UUID.fromString(CommonUUID.Service.UUID_GENERIC_ATTRIBUTE.toString())))
     }
 
     override fun onPause() {

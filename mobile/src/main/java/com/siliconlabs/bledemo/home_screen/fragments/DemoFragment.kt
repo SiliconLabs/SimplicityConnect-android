@@ -26,10 +26,12 @@ import com.siliconlabs.bledemo.features.demo.wifi_ota_update.AlertErrorDialog
 import com.siliconlabs.bledemo.features.demo.wifi_ota_update.WiFiOtaFileManager
 import com.siliconlabs.bledemo.features.demo.wifi_ota_update.WiFiOtaFileSelectionDialog
 import com.siliconlabs.bledemo.features.demo.wifi_ota_update.WiFiOtaProgressDialog
+import com.siliconlabs.bledemo.features.demo.wifi_throughput.activities.WifiThroughputActivity
 import com.siliconlabs.bledemo.home_screen.adapters.DemoAdapter
 import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 import com.siliconlabs.bledemo.home_screen.base.LocationDependent
+import com.siliconlabs.bledemo.home_screen.base.NotificationDependent
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import com.siliconlabs.bledemo.home_screen.menu_items.Blinky
 import com.siliconlabs.bledemo.home_screen.menu_items.ConnectedLighting
@@ -43,6 +45,7 @@ import com.siliconlabs.bledemo.home_screen.menu_items.Motion
 import com.siliconlabs.bledemo.home_screen.menu_items.OTADemo
 import com.siliconlabs.bledemo.home_screen.menu_items.RangeTest
 import com.siliconlabs.bledemo.home_screen.menu_items.Throughput
+import com.siliconlabs.bledemo.home_screen.menu_items.WiFiThroughput
 import com.siliconlabs.bledemo.home_screen.menu_items.WifiCommissioning
 import java.io.File
 import java.io.FileInputStream
@@ -170,6 +173,14 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                     getString(R.string.dev_kit_sensor_917_desc)
                 )
             )
+
+            add(
+                WiFiThroughput(
+                    R.drawable.redesign_ic_demo_wifi_throughput,
+                    getString(R.string.wifi_title_Throughput),
+                    getString(R.string.wifi_main_menu_description_wifi_throughput)
+                )
+            )
         }
     }
 
@@ -238,6 +249,7 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
         }
     }
 
+
     override fun onDemoItemClicked(demoItem: DemoMenuItem) {
         /* if (demoItem.connectType == BluetoothService.GattConnectType.DEV_KIT_SENSOR) {
              if (isNetworkAvailable(context)) {
@@ -273,6 +285,26 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                     it.show(childFragmentManager, "ota_file_selection_dialog")
                 }
             } else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.turn_on_wifi),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        } else if(demoItem.connectType == BluetoothService.GattConnectType.WIFI_THROUGHPUT_TEST){
+            if (isNetworkAvailable(context)) {
+                /*GlobalScope.launch(Dispatchers.Main) {
+                    val result = withContext(Dispatchers.IO) {
+                        ThroughputUtils.sendEvent()
+                    }
+                }*/
+                requireContext().startActivity(
+                    Intent(
+                        requireContext(),
+                        WifiThroughputActivity::class.java
+                    )
+                )
+            }else {
                 Toast.makeText(
                     requireContext(),
                     getString(R.string.turn_on_wifi),

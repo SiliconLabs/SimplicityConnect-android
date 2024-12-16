@@ -3,6 +3,7 @@ package com.siliconlabs.bledemo.features.configure.gatt_configurator.viewholders
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.siliconlabs.bledemo.R
@@ -107,7 +108,7 @@ class GattServerViewHolder(
                             if (service.characteristics.size == 1) R.string.gatt_configurator_one_characteristic
                             else R.string.gatt_configurator_n_characteristics, service.characteristics.size
                     )
-            ))
+            ).binding.root, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         }
     }
 

@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -22,8 +21,6 @@ import com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone.Constants
 import com.siliconlabs.bledemo.databinding.FragmentMatterDoorLightBinding
 import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoActivity
 import com.siliconlabs.bledemo.features.demo.matter_demo.controller.GenericChipDeviceListener
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterTemperatureSensorFragment.Companion.MAX_REFRESH_PERIOD_S
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterTemperatureSensorFragment.Companion.MIN_REFRESH_PERIOD_S
 import com.siliconlabs.bledemo.features.demo.matter_demo.model.MatterScannedResultModel
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ChipClient
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
@@ -32,7 +29,6 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.utils.MessageDialogFrag
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -55,21 +51,22 @@ class MatterLightFragment : Fragment() {
     private var currLightStatus: Boolean = false
     private lateinit var matterLightFragmentJob: Job
     private val matterLightFragmentScope = CoroutineScope(Dispatchers.Main)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mPrefs = requireContext().getSharedPreferences("your_preference_name", Context.MODE_PRIVATE)
+        mPrefs = requireContext().getSharedPreferences(
+            MatterDemoActivity.MATTER_PREF,
+            Context.MODE_PRIVATE
+        )
 
         model = requireArguments().getParcelable(ARG_DEVICE_MODEL)!!
         deviceId = model.deviceId
         Timber.tag(TAG).d("deviceID: $model")
 
-        showMatterProgressDialog(getString(R.string.please_wait))
+        showMatterProgressDialog(getString(R.string.matter_device_status))
 
         // retrieveSavedDevices()
-        GlobalScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             // This code will run asynchronously
-
             val results = checkForDeviceStatus()
             if (results) {
                 println("Operation was successful")
@@ -101,28 +98,6 @@ class MatterLightFragment : Fragment() {
                 })
 
             delay(Constants.SCAN_TIMER * 500)
-//            if (model.isDeviceOnline) {
-//                getOnOffClusterForDevice().subscribeOnOffAttribute(object :
-//                    ChipClusters.BooleanAttributeCallback {
-//                    override fun onSuccess(value: Boolean) {
-//                        println("subscribeOnOffAttribute $value")
-//                        Timber.tag(TAG).e("subscribeOnOffAttribute $value")
-//                        currLightStatus = value
-//                        if (currLightStatus) {
-//                            imageForLightOn()
-//                        } else {
-//                            imageForLightOff()
-//                        }
-//                    }
-//
-//                    override fun onError(error: java.lang.Exception?) {
-//                        Timber.tag(TAG).e("subscribeOnOffAttribute onError:$error")
-//                    }
-//
-//                }, MIN_REFRESH_PERIOD_S, MAX_REFRESH_PERIOD_S)
-//            }
-
-            // Return the result (true or false based on the actual result)
             true
         }
     }
@@ -140,7 +115,7 @@ class MatterLightFragment : Fragment() {
                         dialog.setOnDismissListener {
                             removeProgress()
                             if (requireActivity().supportFragmentManager.backStackEntryCount > 0) {
-                                requireActivity().supportFragmentManager.popBackStack();
+                                requireActivity().supportFragmentManager.popBackStack()
                             } else {
                                 FragmentUtils.getHost(
                                     this@MatterLightFragment, CallBackHandler::class.java
@@ -149,18 +124,15 @@ class MatterLightFragment : Fragment() {
                         }
                         val transaction: FragmentTransaction =
                             requireActivity().supportFragmentManager.beginTransaction()
-
                         dialog.show(transaction, dialogTag)
 
                     }
-
-
                 }
             } else {
                 Timber.tag(TAG).e("device offline")
             }
         } catch (e: Exception) {
-            Timber.e("" + e)
+            Timber.e("Exception Occurred $e")
         }
 
 
@@ -176,13 +148,14 @@ class MatterLightFragment : Fragment() {
         customProgressDialog = CustomProgressDialog(requireContext())
         customProgressDialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         customProgressDialog!!.setMessage(message)
+        customProgressDialog!!.setCanceledOnTouchOutside(false)
         customProgressDialog!!.show()
 
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentMatterDoorLightBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -192,27 +165,24 @@ class MatterLightFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         scope = viewLifecycleOwner.lifecycleScope
         deviceController.setCompletionListener(LightChipControllerCallback())
-        imageForLightOff()
-        binding.btnOn.setLongClickable(false);
-        binding.btnOff.setLongClickable(false);
+        startBackgroundTask()
+        binding.btnOn.isLongClickable = false
+        binding.btnOff.isLongClickable = false
         binding.btnOff.text = requireContext().getText(R.string.matter_light_off_status)
         binding.btnOn.text = requireContext().getText(R.string.matter_light_on_status)
         binding.btnToggle.text = requireContext().getText(R.string.matter_light_toggle_status)
 
         binding.btnOn.setOnClickListener {
             scope.launch {
-                //showMatterProgressDialog(getString(R.string.please_wait))
                 sendOnCommandClick()
             }
         }
 
         binding.btnOff.setOnClickListener {
-            // showMatterProgressDialog(getString(R.string.please_wait))
             scope.launch { sendOffCommandClick() }
         }
 
         binding.btnToggle.setOnClickListener {
-            //  showMatterProgressDialog(getString(R.string.please_wait))
             scope.launch { sendToggleCommandClicked() }
         }
         (activity as MatterDemoActivity).hideQRScanner()
@@ -227,15 +197,13 @@ class MatterLightFragment : Fragment() {
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (isAdded) {
-                if (requireActivity().supportFragmentManager.getBackStackEntryCount() > 0) {
-                    requireActivity().supportFragmentManager.popBackStack();
+                if (requireActivity().supportFragmentManager.backStackEntryCount > 0) {
+                    requireActivity().supportFragmentManager.popBackStack()
                 } else {
                     FragmentUtils.getHost(this@MatterLightFragment, CallBackHandler::class.java)
                         .onBackHandler()
                 }
             }
-
-
         }
     }
 
@@ -258,7 +226,7 @@ class MatterLightFragment : Fragment() {
                 showMessageDialog()
             }
 
-        })
+        }, TIME_OUT)
     }
 
     private suspend fun sendOffCommandClick() {
@@ -296,7 +264,7 @@ class MatterLightFragment : Fragment() {
     }
 
     private fun imageForLightOff() {
-        if (requireArguments() != null && isAdded) {
+        if (isAdded) {
             requireActivity().runOnUiThread {
                 binding.btnMatterDeviceState.setImageResource(R.drawable.matter_light)
                 binding.btnMatterDeviceState.setColorFilter(
@@ -309,7 +277,7 @@ class MatterLightFragment : Fragment() {
     }
 
     private fun imageForLightOn() {
-        if (requireArguments() != null && isAdded) {
+        if (isAdded) {
             requireActivity().runOnUiThread {
                 binding.btnMatterDeviceState.setImageResource(R.drawable.matter_light)
                 binding.btnMatterDeviceState.setColorFilter(
@@ -321,17 +289,11 @@ class MatterLightFragment : Fragment() {
         }
     }
 
-    private fun showMessage(msg: String) {
-        requireActivity().runOnUiThread {
-            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-        }
-    }
-
 
     inner class LightChipControllerCallback : GenericChipDeviceListener() {
         override fun onConnectDeviceComplete() {}
 
-        override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+        override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
             Timber.tag(TAG).d("onCommissioningComplete for nodeId $nodeId: $errorCode")
             // showMessage("Address update complete for nodeId $nodeId with code $errorCode")
         }
@@ -344,7 +306,7 @@ class MatterLightFragment : Fragment() {
             Timber.tag(TAG).d("onCloseBleComplete")
         }
 
-        override fun onError(error: Throwable) {
+        override fun onError(error: Throwable?) {
             super.onError(error)
             println("MatterLight OnError: $error")
             Timber.tag(TAG).e("OnError: $error")
@@ -360,11 +322,12 @@ class MatterLightFragment : Fragment() {
         matterLightFragmentJob = matterLightFragmentScope.launch(Dispatchers.IO) {
             while (true) {
                 delay(1000)
-                getOnOffClusterForDevice().readOnOffAttribute(object : ChipClusters.BooleanAttributeCallback{
+                getOnOffClusterForDevice().readOnOffAttribute(object :
+                    ChipClusters.BooleanAttributeCallback {
                     override fun onSuccess(value: Boolean) {
-                        if (value){
+                        if (value) {
                             imageForLightOn()
-                        }else{
+                        } else {
                             imageForLightOff()
                         }
                     }
@@ -376,12 +339,14 @@ class MatterLightFragment : Fragment() {
             }
         }
     }
+
     private fun stopBackgroundTask() {
         if (::matterLightFragmentJob.isInitialized && matterLightFragmentJob.isActive) {
             matterLightFragmentJob.cancel()
             println("Background task stopped")
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         stopBackgroundTask()
@@ -390,12 +355,12 @@ class MatterLightFragment : Fragment() {
     companion object {
         private const val TAG = "MatterLightFragment"
 
-        public const val ON_OFF_CLUSTER_ENDPOINT = 1
-        public const val LEVEL_CONTROL_CLUSTER_ENDPOINT = 1
-        public const val ARG_DEVICE_MODEL = "device_model"
-        public const val ARG_DEVICE_INFO = "device_info"
-        public const val TIME_OUT = 500
-        public const val INIT = 0L
+        const val ON_OFF_CLUSTER_ENDPOINT = 1
+
+        const val ARG_DEVICE_MODEL = "device_model"
+        const val ARG_DEVICE_INFO = "device_info"
+        const val TIME_OUT = 900
+        const val INIT = 0L
         fun newInstance(): MatterLightFragment = MatterLightFragment()
     }
 }

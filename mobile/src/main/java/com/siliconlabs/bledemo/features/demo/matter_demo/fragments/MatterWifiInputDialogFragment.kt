@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.siliconlabs.bledemo.R
@@ -32,7 +31,7 @@ class MatterWifiInputDialogFragment : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         if (!flag) {
             flag = true
             binding = DialogConfigureWifiMatterBinding.inflate(inflater, container, false)
@@ -40,6 +39,7 @@ class MatterWifiInputDialogFragment : DialogFragment() {
         if (dialog != null && dialog!!.window != null) {
             dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog!!.window!!.requestFeature(Window.FEATURE_NO_TITLE)
+            dialog!!.setCanceledOnTouchOutside(false)
         }
         return binding.root
     }
@@ -65,15 +65,19 @@ class MatterWifiInputDialogFragment : DialogFragment() {
         binding.positiveBtn.setOnClickListener {
             val wifiSSID = binding.editNetworkSSID.text.toString().trim()
             val wifiPassword = binding.editWiFiPassword.text.toString().trim()
-            if (wifiSSID.isNullOrBlank() || wifiPassword.isNullOrBlank()) {
-                Toast.makeText(requireContext(),
-                    getString(R.string.ssid_and_password_required), Toast.LENGTH_SHORT)
+            if (wifiSSID.isBlank() || wifiPassword.isBlank()) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.ssid_and_password_required), Toast.LENGTH_SHORT
+                )
                     .show()
                 return@setOnClickListener
             }
             if (!FragmentUtils.isPasswordValid(wifiPassword)) {
-                Toast.makeText(requireContext(),
-                    getString(R.string.password_must_be_min_8_characters), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.password_must_be_min_8_characters), Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
             val intent = Intent()
@@ -103,9 +107,11 @@ class MatterWifiInputDialogFragment : DialogFragment() {
             }
         }
     }
+
     interface CallBackHandler {
         fun onBackHandler()
     }
+
     private fun getScreenWidth(activity: Activity): Int {
         val size = Point()
         activity.windowManager.defaultDisplay.getSize(size)
@@ -120,4 +126,5 @@ class MatterWifiInputDialogFragment : DialogFragment() {
         super.onDestroy()
         flag = false
     }
+
 }

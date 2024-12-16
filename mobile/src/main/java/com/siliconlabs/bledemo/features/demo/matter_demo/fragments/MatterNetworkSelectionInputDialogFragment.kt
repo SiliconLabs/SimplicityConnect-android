@@ -34,12 +34,13 @@ class MatterNetworkSelectionInputDialogFragment : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DialogNetworkSelectionMatterBinding.inflate(inflater, container, false)
 
         if (dialog != null && dialog!!.window != null) {
             dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
             dialog!!.window!!.requestFeature(Window.FEATURE_NO_TITLE);
+            dialog!!.setCanceledOnTouchOutside(false)
         }
         return binding.root
     }
@@ -100,10 +101,6 @@ class MatterNetworkSelectionInputDialogFragment : DialogFragment() {
             )
             dismiss()
         }
-    }
-
-    fun stopDisplay() {
-        dismiss()
     }
 
     private fun getScreenWidth(activity: Activity): Int {

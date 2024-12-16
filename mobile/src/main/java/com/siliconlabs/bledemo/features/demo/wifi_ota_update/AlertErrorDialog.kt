@@ -7,23 +7,29 @@ import android.view.View
 import android.view.ViewGroup
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.R
-import kotlinx.android.synthetic.main.dialog_error.*
+import com.siliconlabs.bledemo.databinding.DialogAlertErrorBinding
+
 
 class AlertErrorDialog(
     private val otaErrorCallback: OtaErrorCallback
 ) : BaseDialogFragment(
-        hasCustomWidth = true,
-        isCanceledOnTouchOutside = false
+    hasCustomWidth = true,
+    isCanceledOnTouchOutside = false
 ) {
+    private lateinit var binding: DialogAlertErrorBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_alert_error, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DialogAlertErrorBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        btn_ok.setOnClickListener {
+        binding.btnOk.setOnClickListener {
             dismiss()
             otaErrorCallback.onDismiss()
         }

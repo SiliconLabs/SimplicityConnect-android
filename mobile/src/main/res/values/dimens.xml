@@ -316,8 +316,10 @@
     <dimen name="matter_36dp">36dp</dimen>
     <dimen name="matter_38dp">38dp</dimen>
     <dimen name="matter_40dp">40dp</dimen>
+    <dimen name="matter_45dp">45dp</dimen>
     <dimen name="matter_50dp">50dp</dimen>
     <dimen name="matter_90dp">90dp</dimen>
+    <dimen name="matter_100dp">100dp</dimen>
     <dimen name="matter_150dp">150dp</dimen>
     <dimen name="matter_200dp">200dp</dimen>
     <dimen name="matter_250dp">250dp</dimen>
@@ -331,4 +333,7 @@
     <dimen name="splash_screen_dim">240dp</dimen>
     <dimen name="splash_si_connect_logo">-40dp</dimen>
     <dimen name="splash_si_labs_logo">40dp</dimen>
+    <!-- wifi sensors -->
+    <dimen name="wifi_sensor_grid_width">118dp</dimen>
+    <dimen name="wifi_sensor_grid_height">118dp</dimen>
 </resources>

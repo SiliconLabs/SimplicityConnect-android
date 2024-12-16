@@ -25,17 +25,21 @@ import com.siliconlabs.bledemo.features.configure.gatt_configurator.utils.remove
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.viewmodels.GattServerViewModel
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.viewmodels.GattServerViewModel.Validation
 import com.siliconlabs.bledemo.common.other.EqualVerticalItemDecoration
-import kotlinx.android.synthetic.main.activity_gatt_server.*
+import com.siliconlabs.bledemo.databinding.ActivityGattServerBinding
+
+//import kotlinx.android.synthetic.main.activity_gatt_server.*
 
 class GattServerActivity : BaseActivity(), ServiceListener, AddServiceListener {
     private lateinit var viewModel: GattServerViewModel
     private lateinit var adapter: EditGattServerAdapter
 
     private var savedServerState: GattServer? = null
+    private lateinit var binding: ActivityGattServerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_gatt_server)
+        binding = ActivityGattServerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         viewModel = ViewModelProvider(this).get(GattServerViewModel::class.java)
 
         initViewModel()
@@ -63,7 +67,12 @@ class GattServerActivity : BaseActivity(), ServiceListener, AddServiceListener {
 
         viewModel.validation.observe(this, Observer {
             when (it) {
-                Validation.INVALID_NAME -> Toast.makeText(this, R.string.gatt_configurator_toast_invalid_gatt_server_name, Toast.LENGTH_SHORT).show()
+                Validation.INVALID_NAME -> Toast.makeText(
+                    this,
+                    R.string.gatt_configurator_toast_invalid_gatt_server_name,
+                    Toast.LENGTH_SHORT
+                ).show()
+
                 else -> saveGattServer()
             }
         })
@@ -79,7 +88,7 @@ class GattServerActivity : BaseActivity(), ServiceListener, AddServiceListener {
     }
 
     private fun handleGattServerNameChanges() {
-        et_gatt_server_name.addTextChangedListener(object : TextWatcher {
+        binding.etGattServerName.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -91,7 +100,7 @@ class GattServerActivity : BaseActivity(), ServiceListener, AddServiceListener {
 
     private fun prepopulateFields() {
         viewModel.getGattServerName()?.let { name ->
-            et_gatt_server_name.setText(name)
+            binding.etGattServerName.setText(name)
         }
     }
 
@@ -105,20 +114,21 @@ class GattServerActivity : BaseActivity(), ServiceListener, AddServiceListener {
 
     private fun exitServerConfigView() {
         if (hasConfigurationChanged() &&
-                GattConfiguratorStorage(this).shouldDisplayLeaveGattServerConfigDialog()) {
+            GattConfiguratorStorage(this).shouldDisplayLeaveGattServerConfigDialog()
+        ) {
             LeaveGattServerConfigDialog(object : LeaveGattServerConfigDialog.Callback {
                 override fun onYesClicked() {
-                    viewModel.validateGattServer(et_gatt_server_name.text.toString())
+                    viewModel.validateGattServer(binding.etGattServerName.text.toString())
                 }
+
                 override fun onNoClicked() {
                     super@GattServerActivity.onBackPressed()
                 }
             }).show(supportFragmentManager, "dialog_leave_gatt_server_config")
-        }
-        else super@GattServerActivity.onBackPressed()
+        } else super@GattServerActivity.onBackPressed()
     }
 
-    private fun hasConfigurationChanged() : Boolean {
+    private fun hasConfigurationChanged(): Boolean {
         return savedServerState != viewModel.getGattServer()
     }
 
@@ -130,19 +140,21 @@ class GattServerActivity : BaseActivity(), ServiceListener, AddServiceListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.save_gatt_server -> {
-                viewModel.validateGattServer(et_gatt_server_name.text.toString())
+                viewModel.validateGattServer(binding.etGattServerName.text.toString())
                 true
             }
+
             android.R.id.home -> {
                 exitServerConfigView()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun saveGattServer() {
-        viewModel.setGattServerName(et_gatt_server_name.text.toString())
+        viewModel.setGattServerName(binding.etGattServerName.text.toString())
         val intent = Intent().apply {
             putExtra(EXTRA_GATT_SERVER_POSITION, viewModel.getPosition()!!)
             putExtra(EXTRA_GATT_SERVER, viewModel.getGattServer())
@@ -154,10 +166,12 @@ class GattServerActivity : BaseActivity(), ServiceListener, AddServiceListener {
 
     private fun initAdapter() {
         adapter = EditGattServerAdapter(viewModel.getServiceList()!!, this, this)
-        rv_edit_gatt_server.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        rv_edit_gatt_server.addItemDecoration(
-                EqualVerticalItemDecoration(resources.getDimensionPixelSize(R.dimen.edit_gatt_server_adapter_margin)))
-        rv_edit_gatt_server.adapter = adapter
+        binding.rvEditGattServer.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.rvEditGattServer.addItemDecoration(
+            EqualVerticalItemDecoration(resources.getDimensionPixelSize(R.dimen.edit_gatt_server_adapter_margin))
+        )
+        binding.rvEditGattServer.adapter = adapter
     }
 
     override fun onCopyService(service: Service) {
@@ -179,6 +193,7 @@ class GattServerActivity : BaseActivity(), ServiceListener, AddServiceListener {
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         exitServerConfigView()
     }
 

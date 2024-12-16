@@ -27,6 +27,7 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.controller.GenericChipD
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ARG_DEVICE_MODEL
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.INIT
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ON_OFF_CLUSTER_ENDPOINT
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannerFragment.Companion.SPACE
 import com.siliconlabs.bledemo.features.demo.matter_demo.model.MatterScannedResultModel
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ChipClient
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
@@ -60,7 +61,7 @@ class MatterTemperatureSensorFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPrefs = requireContext().getSharedPreferences(
-            "your_preference_name",
+            MatterDemoActivity.MATTER_PREF,
             AppCompatActivity.MODE_PRIVATE
         )
         model = requireArguments().getParcelable(ARG_DEVICE_MODEL)!!
@@ -68,14 +69,13 @@ class MatterTemperatureSensorFragment : Fragment() {
 
         if (deviceId != null) {
 
-            showMatterProgressDialog(getString(R.string.please_wait))
+            showMatterProgressDialog(getString(R.string.matter_device_status))
 
-            // retrieveSavedDevices()
-            GlobalScope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 // This code will run asynchronously
 
-                val resultq = checkForDeviceStatus()
-                if (resultq) {
+                val resInfo = checkForDeviceStatus()
+                if (resInfo) {
                     println("Operation was successful")
                     removeProgress()
                 }
@@ -114,17 +114,10 @@ class MatterTemperatureSensorFragment : Fragment() {
         }
     }
 
-    override fun onAttach(@NotNull context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-    }
 
     private fun showMessageDialog() {
         try {
-            if (isAdded() && requireActivity() != null && !requireActivity().isFinishing) {
+            if (isAdded && !requireActivity().isFinishing) {
                 requireActivity().runOnUiThread {
                     if (!MessageDialogFragment.isDialogShowing()) {
                         dialog = MessageDialogFragment()
@@ -137,8 +130,7 @@ class MatterTemperatureSensorFragment : Fragment() {
                                 FragmentUtils.getHost(
                                     this@MatterTemperatureSensorFragment,
                                     CallBackHandler::class.java
-                                )
-                                    .onBackHandler()
+                                ).onBackHandler()
                             }
                         }
                         val transaction: FragmentTransaction =
@@ -151,14 +143,14 @@ class MatterTemperatureSensorFragment : Fragment() {
                 Timber.e("device offline")
             }
         } catch (e: Exception) {
-            Timber.e("" + e)
+            Timber.e("Exception Occurred $e")
         }
 
 
     }
 
     private fun removeProgress() {
-        if (customProgressDialog?.isShowing() == true) {
+        if (customProgressDialog?.isShowing == true) {
             customProgressDialog?.dismiss()
         }
     }
@@ -167,6 +159,7 @@ class MatterTemperatureSensorFragment : Fragment() {
         customProgressDialog = CustomProgressDialog(requireContext())
         customProgressDialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         customProgressDialog!!.setMessage(message)
+        customProgressDialog!!.setCanceledOnTouchOutside(false)
         customProgressDialog!!.show()
 
     }
@@ -174,7 +167,7 @@ class MatterTemperatureSensorFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         binding = FragmentMatterTemperatureSensorBinding.inflate(inflater, container, false)
         return binding.root
@@ -195,8 +188,8 @@ class MatterTemperatureSensorFragment : Fragment() {
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
 
-            if (requireActivity().supportFragmentManager.getBackStackEntryCount() > 0) {
-                requireActivity().supportFragmentManager.popBackStack();
+            if (requireActivity().supportFragmentManager.backStackEntryCount > 0) {
+                requireActivity().supportFragmentManager.popBackStack()
             } else {
                 FragmentUtils.getHost(
                     this@MatterTemperatureSensorFragment,
@@ -287,7 +280,7 @@ class MatterTemperatureSensorFragment : Fragment() {
             }
 
             override fun onError(ex: Exception?) {
-                Timber.e(TAG, "read local temp command failure", ex)
+                Timber.e(TAG, "read local temp command failure :$ex")
                 // removeProgress()
                 SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
                 showMessageDialog()
@@ -301,16 +294,16 @@ class MatterTemperatureSensorFragment : Fragment() {
             @SuppressLint("SetTextI18n")
             override fun onSuccess(value: Int?) {
                 // removeProgress()
-                requireActivity().runOnUiThread(Runnable {
+                requireActivity().runOnUiThread {
 
                     val resValue = addDecimalPointToInteger(value)
                     binding.txtValue.text = SPACE + (resValue) + TEMPERATURE_UNIT
-                })
+                }
             }
 
-            override fun onError(ex: java.lang.Exception?) {
+            override fun onError(exe: java.lang.Exception?) {
                 SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
-                Timber.tag(TAG).e( "read local temp command failure"+ ex)
+                Timber.tag(TAG).e("read local temp command failure :$exe")
                 showMessageDialog()
 
             }
@@ -330,7 +323,7 @@ class MatterTemperatureSensorFragment : Fragment() {
     inner class TempSensorChipControllerCallback : GenericChipDeviceListener() {
         override fun onConnectDeviceComplete() {}
 
-        override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+        override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
             Timber.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
             //showMessage("Address update complete for nodeId $nodeId with code $errorCode")
         }
@@ -343,7 +336,7 @@ class MatterTemperatureSensorFragment : Fragment() {
             Timber.d(TAG, "onCloseBleComplete")
         }
 
-        override fun onError(error: Throwable) {
+        override fun onError(error: Throwable?) {
             super.onError(error)
             Timber.d(TAG, "onError : $error")
         }
@@ -357,9 +350,8 @@ class MatterTemperatureSensorFragment : Fragment() {
         const val MIN_REFRESH_PERIOD_S = 2
         const val MAX_REFRESH_PERIOD_S = 10
         const val TEMPERATURE_UNIT = " \u2103"
-        const val SPACE = ""
 
-        private val TAG = MatterTemperatureSensorFragment.javaClass.simpleName.toString()
+        private val TAG = Companion::class.java.simpleName.toString()
 
         fun newInstance(): MatterTemperatureSensorFragment = MatterTemperatureSensorFragment()
     }

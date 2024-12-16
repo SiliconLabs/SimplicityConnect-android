@@ -11,20 +11,28 @@ import com.siliconlabs.bledemo.features.demo.connected_lighting.activities.Conne
 import com.siliconlabs.bledemo.features.demo.connected_lighting.presenters.ConnectedLightingPresenter
 import com.siliconlabs.bledemo.features.demo.connected_lighting.models.TriggerSource
 import com.siliconlabs.bledemo.R
-import kotlinx.android.synthetic.main.fragment_light.*
+import com.siliconlabs.bledemo.databinding.FragmentLightBinding
+
+//import kotlinx.android.synthetic.main.fragment_light.*
 
 class ConnectedLightingFragment : Fragment(), ConnectedLightingPresenter.View {
     lateinit var presenter: ConnectedLightingPresenter
+    private lateinit var binding: FragmentLightBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_light, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentLightBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         presenter = ConnectedLightingPresenter(this, activity as ConnectedLightingActivity)
 
-        btn_lightbulb.setOnClickListener {
+        binding.btnLightbulb.setOnClickListener {
             view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             presenter.onLightClicked()
         }
@@ -32,40 +40,43 @@ class ConnectedLightingFragment : Fragment(), ConnectedLightingPresenter.View {
 
     override fun showLightState(lightOn: Boolean) {
         if (lightOn) {
-            btn_lightbulb.setImageResource(R.drawable.light_on)
-            tv_light_status.setText(R.string.light_demo_on)
+            binding.btnLightbulb.setImageResource(R.drawable.light_on)
+            binding.tvLightStatus.setText(R.string.light_demo_on)
         } else {
-            btn_lightbulb.setImageResource(R.drawable.light_off)
-            tv_light_status.setText(R.string.light_demo_off)
+            binding.btnLightbulb.setImageResource(R.drawable.light_off)
+            binding.tvLightStatus.setText(R.string.light_demo_off)
         }
     }
 
     override fun showTriggerSourceDetails(source: TriggerSource?) {
+
         if (isAdded && !isDetached && !isRemoving) {
-            if(source?.iconId == android.R.color.transparent) {
-                iv_light_change_source_logo.visibility = View.GONE
+            if (source?.iconId == android.R.color.transparent) {
+                binding.ivLightChangeSourceLogo.visibility = View.GONE
             } else {
-                iv_light_change_source_logo.setImageResource(source?.iconId!!)
-                iv_light_change_source_logo.visibility = View.VISIBLE
+                binding.ivLightChangeSourceLogo.setImageResource(source?.iconId!!)
+                binding.ivLightChangeSourceLogo.visibility = View.VISIBLE
             }
-            tv_light_change_source_name.text = getText(source.textResId)
+
+            binding.tvLightChangeSourceName.text = getText(source.textResId)
         }
     }
 
     override fun showTriggerSourceAddress(sourceAddress: String, source: TriggerSource?) {
+        binding.tvLightChangeSource
         if (TriggerSource.UNKNOWN == source) {
-            tv_light_change_source.text = getString(R.string.light_demo_changed_source_unknown)
+             binding.tvLightChangeSource.text = getString(R.string.light_demo_changed_source_unknown)
         } else {
-            tv_light_change_source.text = StringBuffer(sourceAddress).reverse().toString()
+             binding.tvLightChangeSource.text = StringBuffer(sourceAddress).reverse().toString()
         }
     }
 
     override fun showDeviceDisconnectedDialog() {
-        AlertDialog.Builder(activity!!)
-                .setMessage(R.string.light_demo_connection_lost)
-                .setPositiveButton(R.string.light_demo_connection_lost_button) { dialog, which -> dialog.dismiss() }
-                .setOnDismissListener { presenter.leaveDemo() }
-                .create()
-                .show()
+        AlertDialog.Builder(requireActivity())
+            .setMessage(R.string.light_demo_connection_lost)
+            .setPositiveButton(R.string.light_demo_connection_lost_button) { dialog, which -> dialog.dismiss() }
+            .setOnDismissListener { presenter.leaveDemo() }
+            .create()
+            .show()
     }
 }

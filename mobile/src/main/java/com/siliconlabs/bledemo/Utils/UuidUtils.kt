@@ -14,7 +14,7 @@ object UuidUtils {
     }
 
     fun getUuidText(uuid: UUID): String {
-        val strUuid = uuid.toString().toUpperCase(Locale.getDefault())
+        val strUuid = uuid.toString().uppercase(Locale.getDefault())
         return if (isSig(strUuid)) {
             "0x" + convert128to16UUID(strUuid)
         } else {

@@ -66,10 +66,6 @@ class CustomInputDialog : DialogFragment() {
             onOkButtonClick()
         }
 
-        if (dialog != null && dialog!!.window != null) {
-            dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            dialog!!.window!!.requestFeature(Window.FEATURE_NO_TITLE);
-        }
         return builder.create()
     }
 
@@ -77,6 +73,12 @@ class CustomInputDialog : DialogFragment() {
         super.onStart()
         val dialog: Dialog? = dialog
         if (dialog != null) {
+//            if (dialog != null && dialog!!.window != null) {
+//                dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+//                dialog!!.window!!.requestFeature(Window.FEATURE_NO_TITLE);
+//
+//            }
+            dialog.setCanceledOnTouchOutside(false)
             dialog.window!!
                 .setLayout(
                     (getScreenWidth(requireActivity()) * MatterOTBRInputDialogFragment.WINDOW_SIZE).toInt(),
@@ -87,6 +89,7 @@ class CustomInputDialog : DialogFragment() {
 
     private fun getScreenWidth(activity: Activity): Int {
         val size = Point()
+
         activity.windowManager.defaultDisplay.getSize(size)
         return size.x
     }
@@ -99,11 +102,15 @@ class CustomInputDialog : DialogFragment() {
             dismiss()
         } else {
             if (enteredText.isEmpty()) {
-                Toast.makeText(requireContext(),
-                    getString(R.string.please_enter_device_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.please_enter_device_name), Toast.LENGTH_SHORT
+                ).show()
             } else {
-                Toast.makeText(requireContext(),
-                    getString(R.string.please_enter_valid_device_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.please_enter_valid_device_name), Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

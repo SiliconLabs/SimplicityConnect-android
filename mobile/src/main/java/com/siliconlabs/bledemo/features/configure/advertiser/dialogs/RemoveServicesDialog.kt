@@ -7,23 +7,35 @@ import android.view.ViewGroup
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.AdvertiserStorage
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.R
-import kotlinx.android.synthetic.main.dialog_info_ok_cancel.view.*
+import com.siliconlabs.bledemo.databinding.DialogInfoOkCancelBinding
+
+//import kotlinx.android.synthetic.main.dialog_info_ok_cancel.view.*
 
 class RemoveServicesDialog(val callback: Callback) : BaseDialogFragment() {
+    private lateinit var binding: DialogInfoOkCancelBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_info_ok_cancel, container, false).apply {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DialogInfoOkCancelBinding.inflate(inflater, container, false).apply {
 
-            tv_dialog_title.text = context.getString(R.string.advertiser_title_remove_service_list)
-            tv_dialog_content.text = context.getString(R.string.advertiser_note_remove_services)
+            tvDialogTitle.text =
+                requireContext().getString(R.string.advertiser_title_remove_service_list)
+            tvDialogContent.text =
+                requireContext().getString(R.string.advertiser_note_remove_services)
 
-            btn_ok.setOnClickListener {
-                if (cb_dont_show_again.isChecked) AdvertiserStorage(context).setShouldDisplayRemoveServicesDialog(false)
+            btnOk.setOnClickListener {
+                if (cbDontShowAgain.isChecked) AdvertiserStorage(requireContext()).setShouldDisplayRemoveServicesDialog(
+                    false
+                )
                 callback.onOkClicked()
                 dismiss()
             }
-            btn_cancel.setOnClickListener { dismiss() }
+            btnCancel.setOnClickListener { dismiss() }
         }
+        return binding.root
     }
 
     interface Callback {

@@ -6,33 +6,41 @@ import android.view.View
 import android.view.ViewGroup
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
+import com.siliconlabs.bledemo.databinding.DialogInfoOkCancelBinding
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.utils.GattConfiguratorStorage
-import kotlinx.android.synthetic.main.dialog_info_ok_cancel.*
+
+//import kotlinx.android.synthetic.main.dialog_info_ok_cancel.*
 
 class LeaveGattServerConfigDialog(val callback: Callback) : BaseDialogFragment() {
+    private lateinit var binding: DialogInfoOkCancelBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_info_ok_cancel, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DialogInfoOkCancelBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tv_dialog_title.text = context?.getString(R.string.title_unsaved_changes)
-        tv_dialog_content.text = context?.getString(R.string.gatt_configurator_leave_config_dialog_content)
+        binding.tvDialogTitle.text = context?.getString(R.string.title_unsaved_changes)
+        binding.tvDialogContent.text =
+            context?.getString(R.string.gatt_configurator_leave_config_dialog_content)
 
-        btn_ok.text = context?.getString(R.string.button_yes)
-        btn_cancel.text = context?.getString(R.string.button_no)
+        binding.btnOk.text = context?.getString(R.string.button_yes)
+        binding.btnCancel.text = context?.getString(R.string.button_no)
 
-        btn_ok.setOnClickListener {
-            if (cb_dont_show_again.isChecked) GattConfiguratorStorage(requireContext())
-                    .setShouldDisplayLeaveGattServerConfigDialog(false)
+        binding.btnOk.setOnClickListener {
+            if (binding.cbDontShowAgain.isChecked
+            ) GattConfiguratorStorage(requireContext())
+                .setShouldDisplayLeaveGattServerConfigDialog(false)
             callback.onYesClicked()
             dismiss()
         }
 
-        btn_cancel.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             dismiss()
             callback.onNoClicked()
         }

@@ -1,6 +1,7 @@
 package com.siliconlabs.bledemo.home_screen.activities
 
 import android.Manifest
+import android.app.NotificationManager
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -13,25 +14,26 @@ import androidx.navigation.ui.NavigationUI
 import com.siliconlabs.bledemo.base.activities.BaseActivity
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.ActivityMainBinding
 import com.siliconlabs.bledemo.home_screen.dialogs.PermissionsDialog
 import com.siliconlabs.bledemo.home_screen.viewmodels.MainActivityViewModel
 import com.siliconlabs.bledemo.home_screen.views.HidableBottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_main.*
+
 
 @AndroidEntryPoint
 open class MainActivity : BaseActivity(),
         BluetoothService.ServicesStateListener
 {
-
+    private lateinit var _binding:ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
     private lateinit var binding: BluetoothService.Binding
     var bluetoothService: BluetoothService? = null
         private set
 
     private val neededPermissions = mutableListOf(
-            Manifest.permission.ACCESS_FINE_LOCATION
-    )
+            Manifest.permission.ACCESS_FINE_LOCATION,
+        )
 
     @RequiresApi(Build.VERSION_CODES.S)
     private val android12Permissions = listOf(
@@ -44,7 +46,9 @@ open class MainActivity : BaseActivity(),
         setTheme(R.style.MainAppTheme)
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        _binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
+       // setContentView(R.layout.activity_main)
+        setContentView(_binding.root)
         supportActionBar?.show()
 
         viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
@@ -66,7 +70,8 @@ open class MainActivity : BaseActivity(),
     private fun setupMainNavigationListener() {
         val navFragment = supportFragmentManager.findFragmentById(R.id.main_fragment) as NavHostFragment
         val navController = navFragment.navController
-        NavigationUI.setupWithNavController(main_navigation, navController)
+
+        NavigationUI.setupWithNavController(_binding.mainNavigation, navController)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -81,9 +86,9 @@ open class MainActivity : BaseActivity(),
 
     fun toggleMainNavigation(isOn: Boolean) {
         if(isOn) {
-            main_navigation.show(instant = true)
+            _binding.mainNavigation.show(instant = true)
         } else {
-            main_navigation.hide(instant = true)
+            _binding.mainNavigation.hide(instant = true)
         }
     }
 
@@ -114,6 +119,7 @@ open class MainActivity : BaseActivity(),
         bluetoothService?.let {
             viewModel.setIsBluetoothOn(it.isBluetoothOn())
             viewModel.setIsLocationOn(it.isLocationOn())
+            viewModel.setIsNotificationOn(it.areNotificationOn())
         }
         observeChanges()
         viewModel.setIsSetupFinished(isSetupFinished = true)
@@ -127,7 +133,7 @@ open class MainActivity : BaseActivity(),
     }
 
     fun getMainNavigation(): HidableBottomNavigationView? {
-        return main_navigation
+        return _binding.mainNavigation
     }
 
     override fun onBluetoothStateChanged(isOn: Boolean) {
@@ -138,6 +144,9 @@ open class MainActivity : BaseActivity(),
         viewModel.setIsLocationOn(isOn)
     }
 
+    override fun onNotificationStateChanged(isOn: Boolean) {
+        viewModel.setIsNotificationOn(isOn)
+    }
 
     private fun handlePermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

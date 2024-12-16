@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.siliconlabs.bledemo.databinding.DialogDeviceInfoLayoutBinding
 import com.siliconlabs.bledemo.features.iop_test.utils.DialogDeviceInfoFragment
-import kotlinx.android.synthetic.main.adapter_scanned_device.title
+
 
 class MatterDialogDeviceInfoFragment: DialogFragment() {
     private var title: String? = null

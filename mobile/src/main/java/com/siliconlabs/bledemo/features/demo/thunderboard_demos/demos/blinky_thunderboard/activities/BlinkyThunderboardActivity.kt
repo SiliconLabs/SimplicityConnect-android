@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.activities
 
+//import kotlinx.android.synthetic.main.activity_blinky_thunderboard.*
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
@@ -10,18 +11,17 @@ import android.view.View
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
-import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.viewmodels.BlinkyThunderboardViewModel
+import com.siliconlabs.bledemo.databinding.ActivityBlinkyThunderboardBinding
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.activities.ThunderboardActivity
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models.ThunderBoardDevice
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.control.ColorLEDControl
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.control.ColorLEDControl.ColorLEDControlListener
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.activities.ThunderboardActivity
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.model.LedRGBState
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models.ThunderBoardDevice
-import kotlinx.android.synthetic.main.activity_blinky_thunderboard.*
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.viewmodels.BlinkyThunderboardViewModel
+import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import java.util.*
 
 class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListener {
@@ -30,18 +30,20 @@ class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListen
     private lateinit var colorLEDControl: ColorLEDControl
 
     private lateinit var viewModel: BlinkyThunderboardViewModel
+    private lateinit var binding:ActivityBlinkyThunderboardBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val view = LayoutInflater.from(this).inflate(R.layout.activity_blinky_thunderboard, null, false)
-        colorLEDControl = view.findViewById(R.id.color_led_control) // make the view gone (if necessary) before it can be showed
-        ledsControl = view.findViewById(R.id.leds_control)
+        binding = ActivityBlinkyThunderboardBinding. inflate(LayoutInflater.from(this), null, false)
+
+        colorLEDControl = binding.colorLedControl  // make the view gone (if necessary) before it can be showed
+        ledsControl = binding.ledsControl
         val powerSourceIntent = intent.getIntExtra(SelectDeviceDialog.POWER_SOURCE_EXTRA, 0)
         val modelNumberIntent = intent.getStringExtra(SelectDeviceDialog.MODEL_TYPE_EXTRA)
         setControlsVisibility(ThunderBoardDevice.PowerSource.fromInt(powerSourceIntent), modelNumberIntent)
 
-        mainSection?.addView(view)
+        mainSection?.addView(binding.root)
 
         viewModel = ViewModelProvider(this).get(BlinkyThunderboardViewModel::class.java)
 
@@ -50,20 +52,21 @@ class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListen
     }
 
     private fun setupUiListeners() {
-        led_0.setOnCheckedChangeListener { _, isChecked ->
+
+        binding.led0.setOnCheckedChangeListener { _, isChecked ->
             var action = 0
             if (isChecked) action = BlinkyThunderboardViewModel.LED_0_ON
-            if (led_1.isChecked) action = action or BlinkyThunderboardViewModel.LED_1_ON
+            if (binding.led1.isChecked) action = action or BlinkyThunderboardViewModel.LED_1_ON
 
             getDigitalWriteCharacteristic()?.apply {
                 value = byteArrayOf(action.toByte())
                 gattQueue.queueWrite(this)
             }
         }
-        led_1.setOnCheckedChangeListener { _, isChecked ->
+        binding.led1.setOnCheckedChangeListener { _, isChecked ->
             var action = 0
             if (isChecked) action = BlinkyThunderboardViewModel.LED_1_ON
-            if (led_0.isChecked) action = action or BlinkyThunderboardViewModel.LED_0_ON
+            if (binding.led0.isChecked) action = action or BlinkyThunderboardViewModel.LED_0_ON
 
             getDigitalWriteCharacteristic()?.apply {
                 value = byteArrayOf(action.toByte())
@@ -74,12 +77,13 @@ class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListen
     }
 
     private fun setupDataListeners(modelNumber: String?) {
-        viewModel.button0.observe(this, Observer { switch_0.setChecked(it) })
-        viewModel.button1.observe(this, Observer { switch_1.setChecked(it) })
+
+        viewModel.button0.observe(this, Observer { binding.switch0.setChecked(it) })
+        viewModel.button1.observe(this, Observer { binding.switch1.setChecked(it) })
         viewModel.led0.observe(this, Observer {
-            if (it != led_0.isChecked) led_0.isChecked = it })
+            if (it != binding.led0.isChecked) binding.led0.isChecked = it })
         viewModel.led1.observe(this, Observer {
-            if (it != led_1.isChecked) led_1.isChecked = it })
+            if (it != binding.led1.isChecked) binding.led1.isChecked = it })
 
         when (modelNumber) {
             ThunderBoardDevice.THUNDERBOARD_MODEL_DEV_KIT_V3,

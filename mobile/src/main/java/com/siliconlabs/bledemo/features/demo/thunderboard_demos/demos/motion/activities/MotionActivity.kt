@@ -19,14 +19,12 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
+import com.siliconlabs.bledemo.databinding.ActivityMotionBinding
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.utils.SensorChecker
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.utils.SensorChecker.ThunderboardSensor
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.adapters.GdxAdapter
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.viewmodels.MotionViewModel
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
-import kotlinx.android.synthetic.main.activity_motion.*
-import kotlinx.android.synthetic.main.motiondemo_acceleration.*
-import kotlinx.android.synthetic.main.motiondemo_orientation.*
 import timber.log.Timber
 
 class MotionActivity : GdxActivity() {
@@ -35,12 +33,13 @@ class MotionActivity : GdxActivity() {
     private var gdxAdapter: GdxAdapter? = null
 
     private lateinit var viewModel: MotionViewModel
+    private lateinit var binding: ActivityMotionBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val view = LayoutInflater.from(this)
-                .inflate(R.layout.activity_motion, null, false)
-        mainSection?.addView(view)
+        binding = ActivityMotionBinding
+            .inflate(LayoutInflater.from(this), null, false)
+        mainSection?.addView(binding.root)
         viewModel = ViewModelProvider(this).get(MotionViewModel::class.java)
 
         setupClickListeners()
@@ -82,22 +81,23 @@ class MotionActivity : GdxActivity() {
 
     private fun setAcceleration(x: Float, y: Float, z: Float) {
         val accelerationString = getString(R.string.motion_acceleration_g)
-        acceleration_x.text = String.format(accelerationString, x)
-        acceleration_y.text = String.format(accelerationString, y)
-        acceleration_z.text = String.format(accelerationString, z)
+        binding.motionDemoAccelerationParent.accelerationX.text = String.format(accelerationString, x)
+        binding.motionDemoAccelerationParent.accelerationY.text = String.format(accelerationString, y)
+        binding.motionDemoAccelerationParent.accelerationZ.text = String.format(accelerationString, z)
     }
 
     // Angles are measured in degrees (-180 to 180)
     private fun setOrientation(x: Float, y: Float, z: Float) {
         val degreeString = getString(R.string.motion_orientation_degree)
-        orientation_x.text = String.format(degreeString, x)
-        orientation_y.text = String.format(degreeString, y)
-        orientation_z.text = String.format(degreeString, z)
+
+        binding.motionDemoOrientationParent.orientationX.text = String.format(degreeString, x)
+        binding.motionDemoOrientationParent.orientationY.text = String.format(degreeString, y)
+        binding.motionDemoOrientationParent.orientationZ.text = String.format(degreeString, z)
         gdxAdapter?.setOrientation(x, y, z)
     }
 
     private fun setupClickListeners() {
-        calibrate.setOnClickListener {
+       binding.calibrate .setOnClickListener {
             popupCalibratingDialog()
             Handler(Looper.getMainLooper()).postDelayed({
                 viewModel.calibrate(gatt)
@@ -134,8 +134,8 @@ class MotionActivity : GdxActivity() {
     }
 
     private fun setCalibrateVisible(enabled: Boolean) {
-        calibrate.visibility =
-            if (enabled)  View.VISIBLE
+        binding.calibrate.visibility =
+            if (enabled) View.VISIBLE
             else View.INVISIBLE
     }
 
@@ -156,15 +156,19 @@ class MotionActivity : GdxActivity() {
             useWakelock = false
         }
         val gdx3dView = initializeForView(gdxAdapter, config)
-        car_animation.addView(gdx3dView)
+       binding.carAnimation .addView(gdx3dView)
     }
 
     @SuppressLint("MissingPermission")
     private fun showBrokenSensorsMessage(brokenSensors: Set<ThunderboardSensor>) {
         AlertDialog.Builder(this).apply {
             setTitle(getString(R.string.sensor_malfunction_dialog_title))
-            setMessage(getString(R.string.critical_sensor_malfunction_dialog_message,
-                    TextUtils.join(", ", brokenSensors)))
+            setMessage(
+                getString(
+                    R.string.critical_sensor_malfunction_dialog_message,
+                    TextUtils.join(", ", brokenSensors)
+                )
+            )
             setPositiveButton(getString(R.string.button_ok)) { _, _ ->
                 gatt?.disconnect() ?: onDeviceDisconnected()
             }
@@ -201,9 +205,11 @@ class MotionActivity : GdxActivity() {
             queueMotionNotificationsSetup()
         }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt,
-                                          characteristic: BluetoothGattCharacteristic,
-                                          status: Int) {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             super.onCharacteristicRead(gatt, characteristic, status)
             gattQueue.handleCommandProcessed()
             if (status != BluetoothGatt.GATT_SUCCESS) return
@@ -215,14 +221,19 @@ class MotionActivity : GdxActivity() {
                 GattCharacteristic.ModelNumberString,
                 GattCharacteristic.BatteryLevel,
                 GattCharacteristic.PowerSource,
-                GattCharacteristic.FirmwareRevision -> statusFragment.handleBaseCharacteristic(characteristic)
-                else -> { }
+                GattCharacteristic.FirmwareRevision -> statusFragment.handleBaseCharacteristic(
+                    characteristic
+                )
+
+                else -> {}
             }
         }
 
-        override fun onCharacteristicWrite(gatt: BluetoothGatt,
-                                           characteristic: BluetoothGattCharacteristic,
-                                           status: Int) {
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
             if (status != BluetoothGatt.GATT_SUCCESS) return
 
@@ -230,20 +241,24 @@ class MotionActivity : GdxActivity() {
                 when (characteristic.value[0]) {
                     0x01.toByte() -> viewModel.resetOrientation(gatt, characteristic)
                     0x02.toByte() -> closeCalibratingDialog()
-                    else ->  { }
+                    else -> {}
                 }
             }
         }
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt,
-                                             characteristic: BluetoothGattCharacteristic) {
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic
+        ) {
             super.onCharacteristicChanged(gatt, characteristic)
 
             val gattCharacteristic = GattCharacteristic.fromUuid(characteristic.uuid)
 
             when (gattCharacteristic) {
                 GattCharacteristic.BatteryLevel,
-                GattCharacteristic.PowerSource -> statusFragment.handleBaseCharacteristic(characteristic)
+                GattCharacteristic.PowerSource -> statusFragment.handleBaseCharacteristic(
+                    characteristic
+                )
 
                 GattCharacteristic.Acceleration -> {
                     val accelerationX = characteristic.getIntValue(gattCharacteristic.format, 0)
@@ -252,13 +267,19 @@ class MotionActivity : GdxActivity() {
                     Timber.d("Acceleration; X = $accelerationX, Y = $accelerationY, Z = $accelerationZ")
 
                     if (setup) {
-                        sensorChecker.checkIfMotionSensorBroken(ThunderboardSensor.Acceleration,
-                                accelerationX, accelerationY, accelerationZ)
+                        sensorChecker.checkIfMotionSensorBroken(
+                            ThunderboardSensor.Acceleration,
+                            accelerationX, accelerationY, accelerationZ
+                        )
                     }
 
-                    viewModel.acceleration.postValue(floatArrayOf(
-                            accelerationX / 1000f, accelerationY / 1000f, accelerationZ / 1000f))
+                    viewModel.acceleration.postValue(
+                        floatArrayOf(
+                            accelerationX / 1000f, accelerationY / 1000f, accelerationZ / 1000f
+                        )
+                    )
                 }
+
                 GattCharacteristic.Orientation -> {
                     val orientationX = characteristic.getIntValue(gattCharacteristic.format, 0)
                     val orientationY = characteristic.getIntValue(gattCharacteristic.format, 2)
@@ -266,8 +287,10 @@ class MotionActivity : GdxActivity() {
                     Timber.d("Orientation; X = $orientationX, Y = $orientationY, Z = $orientationZ")
 
                     if (setup) {
-                        sensorChecker.checkIfMotionSensorBroken(ThunderboardSensor.Orientation,
-                                orientationX, orientationY, orientationZ)
+                        sensorChecker.checkIfMotionSensorBroken(
+                            ThunderboardSensor.Orientation,
+                            orientationX, orientationY, orientationZ
+                        )
                         val brokenSensors = sensorChecker.motionSensors.filter {
                             it.value == SensorChecker.SensorState.BROKEN
                         }.keys
@@ -280,21 +303,31 @@ class MotionActivity : GdxActivity() {
                         }
                     }
 
-                    viewModel.orientation.postValue(floatArrayOf(
-                            orientationX / 100f, orientationY / 100f, orientationZ / 100f))
+                    viewModel.orientation.postValue(
+                        floatArrayOf(
+                            orientationX / 100f, orientationY / 100f, orientationZ / 100f
+                        )
+                    )
                 }
+
                 GattCharacteristic.Calibration -> {
                     when (characteristic.value[1]) {
-                        0x01.toByte() -> viewModel.resetOrientation(gatt, characteristic) /* Somehow needed for properly resetting char's value */
-                        else ->  { }
+                        0x01.toByte() -> viewModel.resetOrientation(
+                            gatt,
+                            characteristic
+                        ) /* Somehow needed for properly resetting char's value */
+                        else -> {}
                     }
                 }
-                else -> { }
+
+                else -> {}
             }
         }
 
-        override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor,
-                                       status: Int) {
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
             super.onDescriptorWrite(gatt, descriptor, status)
             gattQueue.handleCommandProcessed()
         }

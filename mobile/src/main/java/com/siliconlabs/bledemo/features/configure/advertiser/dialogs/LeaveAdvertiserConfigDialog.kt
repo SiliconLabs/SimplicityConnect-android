@@ -7,30 +7,35 @@ import android.view.ViewGroup
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.AdvertiserStorage
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.R
-import kotlinx.android.synthetic.main.dialog_info_ok_cancel.*
+import com.siliconlabs.bledemo.databinding.DialogInfoOkCancelBinding
+
+//mport kotlinx.android.synthetic.main.dialog_info_ok_cancel.*
 
 class LeaveAdvertiserConfigDialog(var callback: Callback) : BaseDialogFragment() {
+    private lateinit var binding:DialogInfoOkCancelBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_info_ok_cancel, container, false)
+       // return inflater.inflate(R.layout.dialog_info_ok_cancel, container, false)
+        binding = DialogInfoOkCancelBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tv_dialog_title.text = context?.getString(R.string.title_unsaved_changes)
-        tv_dialog_content.text = context?.getString(R.string.advertiser_note_leave_advertiser_config)
+        binding.tvDialogTitle.text = context?.getString(R.string.title_unsaved_changes)
+        binding.tvDialogContent.text = context?.getString(R.string.advertiser_note_leave_advertiser_config)
 
-        btn_ok.text = context?.getString(R.string.button_yes)
-        btn_cancel.text = context?.getString(R.string.button_no)
+        binding.btnOk.text = context?.getString(R.string.button_yes)
+        binding.btnCancel.text = context?.getString(R.string.button_no)
 
-        btn_ok.setOnClickListener {
-            if (cb_dont_show_again.isChecked) AdvertiserStorage(requireContext()).setShouldDisplayLeaveAdvertiserConfigDialog(false)
+        binding.btnOk.setOnClickListener {
+            if (binding.cbDontShowAgain.isChecked) AdvertiserStorage(requireContext()).setShouldDisplayLeaveAdvertiserConfigDialog(false)
             callback.onYesClicked()
             dismiss()
         }
 
-        btn_cancel.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             dismiss()
             callback.onNoClicked()
         }

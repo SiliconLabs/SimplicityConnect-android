@@ -8,8 +8,8 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardview_env_tile"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="@dimen/wifi_sensor_grid_width"
+        android:layout_height="@dimen/wifi_sensor_grid_height"
         android:layout_margin="4dp"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground"
@@ -22,6 +22,7 @@
             android:layout_margin="@dimen/space_XSS"
             android:padding="8dp"
             android:gravity="center"
+            android:layout_gravity="center_horizontal|center_vertical"
             android:orientation="vertical">
 
             <ImageView

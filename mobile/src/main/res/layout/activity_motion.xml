@@ -16,6 +16,7 @@
         android:paddingRight="@dimen/iodemo_margin" />
 
     <ScrollView
+        android:id="@+id/scrollerViewParent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:gravity="center"
@@ -23,6 +24,7 @@
         android:layout_weight="0.4">
 
         <LinearLayout
+            android:id="@+id/llParent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -30,6 +32,7 @@
             android:orientation="vertical">
 
             <RelativeLayout
+                android:id="@+id/rlParent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -37,6 +40,7 @@
                 android:paddingRight="@dimen/space_L">
 
                 <include
+                    android:id="@+id/motionDemoOrientationParent"
                     layout="@layout/motiondemo_orientation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -52,6 +56,7 @@
                     android:background="@color/main_background" />
 
                 <include
+                    android:id="@+id/motionDemoAccelerationParent"
                     layout="@layout/motiondemo_acceleration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

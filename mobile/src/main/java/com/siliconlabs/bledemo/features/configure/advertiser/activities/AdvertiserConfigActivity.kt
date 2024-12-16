@@ -12,31 +12,43 @@ import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 import android.text.TextWatcher
 import android.text.style.RelativeSizeSpan
 import android.util.TypedValue
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.LinearLayout
 import android.widget.Spinner
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.base.activities.BaseActivity
+import com.siliconlabs.bledemo.databinding.ActivityAdvertiserConfigBinding
+import com.siliconlabs.bledemo.databinding.AdvertiserDataContainerBinding
+import com.siliconlabs.bledemo.databinding.DataTypeItemBinding
+import com.siliconlabs.bledemo.databinding.DataTypeLayoutBinding
 import com.siliconlabs.bledemo.features.configure.advertiser.adapters.DataTypeAdapter
+import com.siliconlabs.bledemo.features.configure.advertiser.dialogs.LeaveAdvertiserConfigDialog
+import com.siliconlabs.bledemo.features.configure.advertiser.dialogs.ManufacturerDataDialog
+import com.siliconlabs.bledemo.features.configure.advertiser.dialogs.RemoveServicesDialog
+import com.siliconlabs.bledemo.features.configure.advertiser.dialogs.Service128BitDataDialog
+import com.siliconlabs.bledemo.features.configure.advertiser.dialogs.Service16BitDataDialog
+import com.siliconlabs.bledemo.features.configure.advertiser.enums.AdvertisingMode
+import com.siliconlabs.bledemo.features.configure.advertiser.enums.DataMode
+import com.siliconlabs.bledemo.features.configure.advertiser.enums.DataType
+import com.siliconlabs.bledemo.features.configure.advertiser.enums.LimitType
+import com.siliconlabs.bledemo.features.configure.advertiser.enums.Phy
+import com.siliconlabs.bledemo.features.configure.advertiser.models.AdvertiserData
+import com.siliconlabs.bledemo.features.configure.advertiser.models.DataPacket
+import com.siliconlabs.bledemo.features.configure.advertiser.models.ExtendedSettings
+import com.siliconlabs.bledemo.features.configure.advertiser.models.Manufacturer
+import com.siliconlabs.bledemo.features.configure.advertiser.models.Service128Bit
+import com.siliconlabs.bledemo.features.configure.advertiser.models.Service16Bit
 import com.siliconlabs.bledemo.features.configure.advertiser.presenters.AdvertiserConfigActivityPresenter
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.AdvertiserStorage
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.Translator
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.Validator
-import com.siliconlabs.bledemo.base.activities.BaseActivity
-import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.features.configure.advertiser.dialogs.*
-import com.siliconlabs.bledemo.features.configure.advertiser.enums.*
-import com.siliconlabs.bledemo.features.configure.advertiser.models.*
-import kotlinx.android.synthetic.main.advertiser_config_data.*
-import kotlinx.android.synthetic.main.advertiser_config_name.*
-import kotlinx.android.synthetic.main.advertiser_config_parameters.*
-import kotlinx.android.synthetic.main.advertiser_config_type.*
-import kotlinx.android.synthetic.main.advertiser_data_container.view.*
-import kotlinx.android.synthetic.main.data_type_item.view.*
-import kotlinx.android.synthetic.main.data_type_layout.*
-import kotlinx.android.synthetic.main.data_type_layout.view.*
-import kotlinx.android.synthetic.main.data_type_layout.view.ib_remove
+
 
 class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
     private lateinit var presenter: AdvertiserConfigActivityPresenter
@@ -48,6 +60,7 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
 
     private var spLegacyInitialSetup = true
     private var spExtendedInitialSetup = true
+    private lateinit var binding: ActivityAdvertiserConfigBinding
 
     companion object {
         const val EXTRA_ADVERTISER_ITEM = "EXTRA_ADVERTISER_ITEM"
@@ -56,18 +69,26 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_advertiser_config)
+        binding = ActivityAdvertiserConfigBinding.inflate(LayoutInflater.from(this))
+        setContentView(binding.root)
         prepareToolbar()
 
         resetInitialSetupFlags()
 
-        presenter = AdvertiserConfigActivityPresenter(this, AdvertiserStorage(this@AdvertiserConfigActivity))
+        presenter = AdvertiserConfigActivityPresenter(
+            this,
+            AdvertiserStorage(this@AdvertiserConfigActivity)
+        )
         presenter.prepareAdvertisingTypes()
         presenter.preparePhyParameters()
 
-        advertiserData = intent.extras?.getParcelable<AdvertiserData>(EXTRA_ADVERTISER_ITEM) as AdvertiserData
+        advertiserData =
+            intent.extras?.getParcelable<AdvertiserData>(EXTRA_ADVERTISER_ITEM) as AdvertiserData
         position = intent.getIntExtra(EXTRA_ITEM_POSITION, 0)
-        presenter.onItemReceived(advertiserData, AdvertiserStorage(this@AdvertiserConfigActivity).isAdvertisingExtensionSupported())
+        presenter.onItemReceived(
+            advertiserData,
+            AdvertiserStorage(this@AdvertiserConfigActivity).isAdvertisingExtensionSupported()
+        )
 
         startConfigData = advertiserData.deepCopy()
 
@@ -94,15 +115,18 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
                 presenter.handleSave()
                 true
             }
+
             android.R.id.home -> {
                 exitConfigView()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     override fun onBackPressed() {
+        super.onBackPressed()
         exitConfigView()
     }
 
@@ -142,15 +166,16 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
         // 3. Verify if other data has changed
         startConfigData.apply {
             when {
-                name != et_advertising_set_name.text.toString() -> return true
-                isLegacy != rb_legacy_advertising.isChecked -> return true
+
+                name != binding.advConfigName.etAdvertisingSetName.text.toString() -> return true
+                isLegacy != binding.advConfigType.rbLegacyAdvertising.isChecked -> return true
                 mode != getAdvertisingMode() -> return true
                 settings != getExtendedSettings() -> return true
                 advertisingIntervalMs != getAdvertisingInterval() -> return true
                 txPower != getTxPower() -> return true
                 limitType != getAdvertisingLimitType() -> return true
-                timeLimit.toString() != et_time_limit.text.toString() -> return true
-                isEventLimitAvailable() && eventLimit.toString() != et_event_limit.text.toString() -> return true
+                timeLimit.toString() != binding.advConfigParam.etTimeLimit.text.toString() -> return true
+                isEventLimitAvailable() && eventLimit.toString() != binding.advConfigParam.etEventLimit.text.toString() -> return true
             }
         }
 
@@ -160,7 +185,7 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
 
 
     private fun handleAdvertisingSetNameChanges() {
-        et_advertising_set_name.addTextChangedListener(object : TextWatcher {
+        binding.advConfigName.etAdvertisingSetName.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -170,23 +195,32 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
     }
 
     private fun isEventLimitAvailable(): Boolean {
-        return ll_event_limit.visibility == View.VISIBLE
+        return binding.advConfigParam.llEventLimit.visibility == View.VISIBLE
     }
 
     private fun isTxPowerNotValid(): Boolean {
-        return ll_tx_power.visibility == View.VISIBLE && !Validator.isTxPowerValid(et_tx_power.text.toString())
+
+        return binding.advConfigParam.llTxPower.visibility == View.VISIBLE &&
+                !Validator.isTxPowerValid(binding.advConfigParam.etTxPower.text.toString())
     }
 
     private fun isAdvertisingIntervalNotValid(): Boolean {
-        return ll_advertising_interval.visibility == View.VISIBLE && !Validator.isAdvertisingIntervalValid(et_advertising_interval.text.toString())
+        return binding.advConfigParam.llAdvertisingInterval.visibility == View.VISIBLE &&
+                !Validator.isAdvertisingIntervalValid(
+                    binding.advConfigParam.etAdvertisingInterval.text.toString()
+                )
     }
 
     private fun isTimeLimitNotValid(): Boolean {
-        return rb_time_limit.isChecked && !Validator.isAdvertisingTimeLimitValid(et_time_limit.text.toString(), true)
+        return binding.advConfigParam.rbTimeLimit.isChecked && !Validator.isAdvertisingTimeLimitValid(
+            binding.advConfigParam.etTimeLimit.text.toString(),
+            true
+        )
     }
 
     private fun isEventLimitNotValid(): Boolean {
-        return rb_event_limit.isChecked && !Validator.isAdvertisingEventLimitValid(et_event_limit.text.toString())
+        return binding.advConfigParam.rbEventLimit.isChecked &&
+                !Validator.isAdvertisingEventLimitValid(binding.advConfigParam.etEventLimit.text.toString())
     }
 
     private fun isAnyInputNotValid(): Boolean {
@@ -203,8 +237,8 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
         else if (isEventLimitNotValid())
             showMessage(R.string.advertiser_config_message_invalid_event_limit)
         else {
-            val name = et_advertising_set_name.text.toString()
-            val isLegacy = rb_legacy_advertising.isChecked
+            val name = binding.advConfigName.etAdvertisingSetName.text.toString()
+            val isLegacy = binding.advConfigType.rbLegacyAdvertising.isChecked
             val advertisingMode = getAdvertisingMode()
             val settings = getExtendedSettings()
             val interval = getAdvertisingInterval()
@@ -228,502 +262,777 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
     }
 
     private fun getAdvertisingInterval(): Int {
-        return et_advertising_interval.text.toString().toInt()
+        return binding.advConfigParam.etAdvertisingInterval.text.toString().toInt()
     }
 
     private fun getTxPower(): Int {
-        return et_tx_power.text.toString().toInt()
+        return binding.advConfigParam.etTxPower.text.toString().toInt()
     }
 
     private fun getAdvertisingLimitType(): LimitType {
         return when {
-            rb_no_limit.isChecked -> LimitType.NO_LIMIT
-            rb_time_limit.isChecked -> LimitType.TIME_LIMIT
+            binding.advConfigParam.rbNoLimit.isChecked -> LimitType.NO_LIMIT
+            binding.advConfigParam.rbTimeLimit.isChecked -> LimitType.TIME_LIMIT
             else -> LimitType.EVENT_LIMIT
         }
     }
 
     private fun getAdvertisingTimeLimit(): Int {
-        return if (rb_time_limit.isChecked) et_time_limit.text.toString().toInt()
+        return if (binding.advConfigParam.rbTimeLimit.isChecked) binding.advConfigParam.etTimeLimit.text.toString()
+            .toInt()
         else -1
     }
 
     private fun getAdvertisingEventLimit(): Int {
-        return if (rb_event_limit.isChecked) et_event_limit.text.toString().toInt()
+        return if (binding.advConfigParam.rbEventLimit.isChecked) binding.advConfigParam.etEventLimit.text.toString()
+            .toInt()
         else -1
     }
 
     private fun getAdvertisingMode(): AdvertisingMode {
-        return if (rb_legacy_advertising.isChecked) translator.getStringAsAdvertisingMode(sp_legacy.selectedItem.toString())
-        else translator.getStringAsAdvertisingMode(sp_extended.selectedItem.toString())
+
+        return if (binding.advConfigType.rbLegacyAdvertising.isChecked) translator.getStringAsAdvertisingMode(
+            binding.advConfigType.spLegacy.selectedItem.toString()
+        )
+        else translator
+            .getStringAsAdvertisingMode(binding.advConfigType.spExtended.selectedItem.toString())
     }
 
     private fun getExtendedSettings(): ExtendedSettings {
-        return if (sp_primary_phy.isEnabled) {
-            val primaryPhy = translator.getStringAsPhy(sp_primary_phy.selectedItem.toString())
-            val secondaryPhy: Phy = translator.getStringAsPhy(sp_secondary_phy.selectedItem.toString())
-            ExtendedSettings(cb_include_tx_power.isChecked, cb_anonymous.isChecked, primaryPhy, secondaryPhy)
-        } else ExtendedSettings(cb_include_tx_power.isChecked, cb_anonymous.isChecked, null, null)
+
+        return if (binding.advConfigParam.spPrimaryPhy.isEnabled) {
+            val primaryPhy =
+                translator.getStringAsPhy(binding.advConfigParam.spPrimaryPhy.selectedItem.toString())
+            val secondaryPhy: Phy =
+                translator.getStringAsPhy(binding.advConfigParam.spSecondaryPhy.selectedItem.toString())
+            ExtendedSettings(
+                binding.advConfigType.cbIncludeTxPower.isChecked,
+                binding.advConfigType.cbAnonymous.isChecked,
+                primaryPhy,
+                secondaryPhy
+            )
+        } else ExtendedSettings(
+            binding.advConfigType.cbIncludeTxPower.isChecked,
+            binding.advConfigType.cbAnonymous.isChecked,
+            null,
+            null
+        )
     }
 
     private fun handleAdvertisingLimitSelection() {
-        rb_no_limit.setOnClickListener {
-            rb_no_limit.isChecked = true
+        binding.advConfigParam.rbNoLimit.setOnClickListener {
+            binding.advConfigParam.rbNoLimit.isChecked = true
             setTimeLimitState(false)
             setEventLimitState(false)
         }
-        rb_time_limit.setOnClickListener {
-            rb_no_limit.isChecked = false
+        binding.advConfigParam.rbTimeLimit.setOnClickListener {
+            binding.advConfigParam.rbNoLimit.isChecked = false
             setTimeLimitState(true)
             setEventLimitState(false)
         }
-        rb_event_limit.setOnClickListener {
-            rb_no_limit.isChecked = false
+        binding.advConfigParam.rbEventLimit.setOnClickListener {
+            binding.advConfigParam.rbNoLimit.isChecked = false
             setTimeLimitState(false)
             setEventLimitState(true)
         }
     }
 
     private fun setTimeLimitState(enabled: Boolean) {
-        rb_time_limit.isChecked = enabled
-        et_time_limit.isEnabled = enabled
+        binding.advConfigParam.rbTimeLimit.isChecked = enabled
+        binding.advConfigParam.etTimeLimit.isEnabled = enabled
     }
 
     private fun setEventLimitState(enabled: Boolean) {
-        rb_event_limit.isChecked = enabled
-        et_event_limit.isEnabled = enabled
+        binding.advConfigParam.rbEventLimit.isChecked = enabled
+        binding.advConfigParam.etEventLimit.isEnabled = enabled
     }
 
-    private fun updateAdvertisingLimitLabels(){
-        rb_time_limit.text = buildLabelWithResizedHint(getString(R.string.advertiser_label_time_limit))
-        rb_event_limit.text = buildLabelWithResizedHint(getString(R.string.advertiser_label_event_limit))
+    private fun updateAdvertisingLimitLabels() {
+        binding.advConfigParam.rbTimeLimit.text =
+            buildLabelWithResizedHint(getString(R.string.advertiser_label_time_limit))
+        binding.advConfigParam.rbEventLimit.text =
+            buildLabelWithResizedHint(getString(R.string.advertiser_label_event_limit))
     }
 
     private fun buildLabelWithResizedHint(labelText: String): SpannableString {
         val linebreakIndex = labelText.indexOf('\n')
         val label = SpannableString(labelText)
         if (linebreakIndex > -1) {
-            label.setSpan(RelativeSizeSpan(12f/14f), linebreakIndex + 1, labelText.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+            label.setSpan(
+                RelativeSizeSpan(12f / 14f),
+                linebreakIndex + 1,
+                labelText.length,
+                SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
         return label
     }
 
-    override fun onAdvertisingTypesPrepared(isLegacy: Boolean, legacyModes: List<AdvertisingMode>, extendedModes: List<AdvertisingMode>) {
-        val legacyAdapter = ArrayAdapter(this, R.layout.spinner_item_layout_medium, translator.getValuesAsStringList(legacyModes))
+    override fun onAdvertisingTypesPrepared(
+        isLegacy: Boolean,
+        legacyModes: List<AdvertisingMode>,
+        extendedModes: List<AdvertisingMode>
+    ) {
+        val legacyAdapter = ArrayAdapter(
+            this,
+            R.layout.spinner_item_layout_medium,
+            translator.getValuesAsStringList(legacyModes)
+        )
+
         legacyAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_layout)
-        sp_legacy.adapter = legacyAdapter
+        binding.advConfigType.spLegacy.adapter = legacyAdapter
 
-        val extendedAdapter = ArrayAdapter(this, R.layout.spinner_item_layout_medium, translator.getValuesAsStringList(extendedModes))
+        val extendedAdapter = ArrayAdapter(
+            this,
+            R.layout.spinner_item_layout_medium,
+            translator.getValuesAsStringList(extendedModes)
+        )
         extendedAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_layout)
-        sp_extended.adapter = extendedAdapter
+        binding.advConfigType.spExtended.adapter = extendedAdapter
 
-        if (isLegacy) tv_extended_adv_not_supported.visibility = View.VISIBLE
-        sp_extended.isEnabled = false
-        cb_anonymous.isEnabled = false
-        cb_include_tx_power.isEnabled = false
-        rb_extended_advertising.isEnabled = !isLegacy
-        sp_primary_phy.isEnabled = false
-        sp_secondary_phy.isEnabled = false
+        if (isLegacy) binding.advConfigType.tvExtendedAdvNotSupported.visibility = View.VISIBLE
+        binding.advConfigType.spExtended.isEnabled = false
+        binding.advConfigType.cbAnonymous.isEnabled = false
+        binding.advConfigType.cbIncludeTxPower.isEnabled = false
+        binding.advConfigType.rbExtendedAdvertising.isEnabled = !isLegacy
+        binding.advConfigParam.spPrimaryPhy.isEnabled = false
+        binding.advConfigParam.spSecondaryPhy.isEnabled = false
 
         if (!isLegacy) {
-            rb_extended_advertising.setOnCheckedChangeListener { _, isChecked ->
+            binding.advConfigType.rbExtendedAdvertising.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
-                    cb_anonymous.isEnabled = sp_extended.selectedItem.toString() == getString(R.string.advertiser_mode_non_connectable_non_scannable)
-                    rb_legacy_advertising.isChecked = false
-                    sp_legacy.isEnabled = false
-                    sp_legacy.visibility = View.GONE
-                    sp_extended.isEnabled = true
-                    sp_extended.visibility = View.VISIBLE
-                    cb_include_tx_power.isEnabled = true
-                    sp_primary_phy.isEnabled = true
-                    sp_secondary_phy.isEnabled = true
+                    binding.advConfigType.cbAnonymous.isEnabled =
+                        binding.advConfigType.spExtended.selectedItem.toString() == getString(R.string.advertiser_mode_non_connectable_non_scannable)
+                    binding.advConfigType.rbLegacyAdvertising.isChecked = false
+                    binding.advConfigType.spLegacy.isEnabled = false
+                    binding.advConfigType.spLegacy.visibility = View.GONE
+                    binding.advConfigType.spExtended.isEnabled = true
+                    binding.advConfigType.spExtended.visibility = View.VISIBLE
+                    binding.advConfigType.cbIncludeTxPower.isEnabled = true
+                    binding.advConfigParam.spPrimaryPhy.isEnabled = true
+                    binding.advConfigParam.spSecondaryPhy.isEnabled = true
 
-                    presenter.setSupportedData(false, translator.getStringAsAdvertisingMode(sp_extended.selectedItem.toString()))
+                    presenter.setSupportedData(
+                        false,
+                        translator.getStringAsAdvertisingMode(binding.advConfigType.spExtended.selectedItem.toString())
+                    )
                 }
             }
 
-            sp_extended.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
-                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    if (!spExtendedInitialSetup) {
-                        if (sp_extended.selectedItem.toString() == getString(R.string.advertiser_mode_non_connectable_non_scannable)) {
-                            cb_anonymous.isEnabled = true
+            binding.advConfigType.spExtended.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        if (!spExtendedInitialSetup) {
+                            if (binding.advConfigType.spExtended.selectedItem.toString() == getString(
+                                    R.string.advertiser_mode_non_connectable_non_scannable
+                                )
+                            ) {
+                                binding.advConfigType.cbAnonymous.isEnabled = true
+                            } else {
+                                binding.advConfigType.cbAnonymous.isEnabled = false
+                                binding.advConfigType.cbAnonymous.isChecked = false
+                            }
+                            presenter.setSupportedData(
+                                false,
+                                translator.getStringAsAdvertisingMode(binding.advConfigType.spExtended.selectedItem.toString())
+                            )
                         } else {
-                            cb_anonymous.isEnabled = false
-                            cb_anonymous.isChecked = false
+                            spExtendedInitialSetup = false
                         }
-                        presenter.setSupportedData(false, translator.getStringAsAdvertisingMode(sp_extended.selectedItem.toString()))
+                    }
+                }
+        }
+
+        binding.advConfigType.rbLegacyAdvertising.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                binding.advConfigType.rbExtendedAdvertising.isChecked = false
+                binding.advConfigType.spLegacy.isEnabled = true
+                binding.advConfigType.spLegacy.visibility = View.VISIBLE
+                binding.advConfigType.spExtended.isEnabled = false
+                binding.advConfigType.spExtended.visibility = View.GONE
+                binding.advConfigType.cbAnonymous.isEnabled = false
+                binding.advConfigType.cbIncludeTxPower.isEnabled = false
+                binding.advConfigParam.spPrimaryPhy.isEnabled = false
+                binding.advConfigParam.spSecondaryPhy.isEnabled = false
+                binding.advConfigType.cbIncludeTxPower.isChecked = false
+                binding.advConfigType.cbAnonymous.isChecked = false
+
+                presenter.setSupportedData(
+                    true,
+                    translator.getStringAsAdvertisingMode(binding.advConfigType.spLegacy.selectedItem.toString())
+                )
+            }
+        }
+
+        binding.advConfigType.spLegacy.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    if (!spLegacyInitialSetup) {
+                        presenter.setSupportedData(
+                            true,
+                            translator.getStringAsAdvertisingMode(binding.advConfigType.spLegacy.selectedItem.toString())
+                        )
                     } else {
-                        spExtendedInitialSetup = false
+                        spLegacyInitialSetup = false
                     }
                 }
             }
-        }
-
-        rb_legacy_advertising.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                rb_extended_advertising.isChecked = false
-                sp_legacy.isEnabled = true
-                sp_legacy.visibility = View.VISIBLE
-                sp_extended.isEnabled = false
-                sp_extended.visibility = View.GONE
-                cb_anonymous.isEnabled = false
-                cb_include_tx_power.isEnabled = false
-                sp_primary_phy.isEnabled = false
-                sp_secondary_phy.isEnabled = false
-                cb_include_tx_power.isChecked = false
-                cb_anonymous.isChecked = false
-
-                presenter.setSupportedData(true, translator.getStringAsAdvertisingMode(sp_legacy.selectedItem.toString()))
-            }
-        }
-
-        sp_legacy.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (!spLegacyInitialSetup) {
-                    presenter.setSupportedData(true, translator.getStringAsAdvertisingMode(sp_legacy.selectedItem.toString()))
-                } else {
-                    spLegacyInitialSetup = false
-                }
-            }
-        }
     }
 
-    override fun onAdvertisingParametersPrepared(isLegacy: Boolean, primaryPhys: List<Phy>, secondaryPhys: List<Phy>) {
-        val primaryPhyAdapter = ArrayAdapter(this, R.layout.spinner_item_layout_medium, translator.getValuesAsStringList(primaryPhys))
+    override fun onAdvertisingParametersPrepared(
+        isLegacy: Boolean,
+        primaryPhys: List<Phy>,
+        secondaryPhys: List<Phy>
+    ) {
+        binding.advConfigType
+        val primaryPhyAdapter = ArrayAdapter(
+            this,
+            R.layout.spinner_item_layout_medium,
+            translator.getValuesAsStringList(primaryPhys)
+        )
         primaryPhyAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_layout)
-        sp_primary_phy.adapter = primaryPhyAdapter
+        binding.advConfigParam.spPrimaryPhy.adapter = primaryPhyAdapter
 
-        val secondaryPhyAdapter = ArrayAdapter(this, R.layout.spinner_item_layout_medium, translator.getValuesAsStringList(secondaryPhys))
+        val secondaryPhyAdapter = ArrayAdapter(
+            this,
+            R.layout.spinner_item_layout_medium,
+            translator.getValuesAsStringList(secondaryPhys)
+        )
         secondaryPhyAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_layout)
-        sp_secondary_phy.adapter = secondaryPhyAdapter
+        binding.advConfigParam.spSecondaryPhy.adapter = secondaryPhyAdapter
     }
 
     override fun onSupportedDataPrepared(isAdvertisingData: Boolean, isScanRespData: Boolean) {
-        btn_add_advertising_data.isEnabled = isAdvertisingData
-        tv_adv_data_available_bytes.visibility = if (isAdvertisingData) View.VISIBLE else View.GONE
-        ll_data_advertising_data.visibility = if (isAdvertisingData) View.VISIBLE else View.GONE
-        btn_add_scan_response_data.isEnabled = isScanRespData
-        tv_scan_resp_available_bytes.visibility = if (isScanRespData) View.VISIBLE else View.GONE
-        ll_data_scan_resp_data.visibility = if (isScanRespData) View.VISIBLE else View.GONE
+
+        binding.advConfigData.btnAddAdvertisingData.isEnabled = isAdvertisingData
+        binding.advConfigData.tvAdvDataAvailableBytes.visibility =
+            if (isAdvertisingData) View.VISIBLE else View.GONE
+        binding.advConfigData.llDataAdvertisingData.root.visibility =
+            if (isAdvertisingData) View.VISIBLE else View.GONE
+        binding.advConfigData.btnAddScanResponseData.isEnabled = isScanRespData
+        binding.advConfigData.tvScanRespAvailableBytes.visibility =
+            if (isScanRespData) View.VISIBLE else View.GONE
+        binding.advConfigData.llDataScanRespData.root.visibility =
+            if (isScanRespData) View.VISIBLE else View.GONE
     }
 
     override fun populateUi(data: AdvertiserData, isAdvertisingEventSupported: Boolean) {
-        et_advertising_set_name.setText(data.name)
+        binding.advConfigName.etAdvertisingSetName.setText(data.name)
         title = data.name
 
         data.isLegacy.let {
-            if (data.isLegacy) setSpinnerSelection(data.mode, sp_legacy)
-            else setSpinnerSelection(data.mode, sp_extended)
-            rb_legacy_advertising.isChecked = data.isLegacy
-            rb_extended_advertising.isChecked = !data.isLegacy
+            if (data.isLegacy) setSpinnerSelection(data.mode, binding.advConfigType.spLegacy)
+            else setSpinnerSelection(data.mode, binding.advConfigType.spExtended)
+            binding.advConfigType.rbLegacyAdvertising.isChecked = data.isLegacy
+            binding.advConfigType.rbExtendedAdvertising.isChecked = !data.isLegacy
         }
 
         data.settings.let {
-            cb_include_tx_power.isChecked = data.settings.includeTxPower
-            cb_anonymous.isChecked = data.settings.anonymous
-            setSpinnerSelection(data.settings.primaryPhy, sp_primary_phy)
-            setSpinnerSelection(data.settings.secondaryPhy, sp_secondary_phy)
+            binding.advConfigType.cbIncludeTxPower.isChecked = data.settings.includeTxPower
+            binding.advConfigType.cbAnonymous.isChecked = data.settings.anonymous
+            setSpinnerSelection(data.settings.primaryPhy, binding.advConfigParam.spPrimaryPhy)
+            setSpinnerSelection(data.settings.secondaryPhy, binding.advConfigParam.spSecondaryPhy)
         }
 
-        et_advertising_interval.setText(data.advertisingIntervalMs.toString())
-        et_tx_power.setText(data.txPower.toString())
+        binding.advConfigParam.etAdvertisingInterval.setText(data.advertisingIntervalMs.toString())
+        binding.advConfigParam.etTxPower.setText(data.txPower.toString())
 
-        rb_time_limit.text = getString(R.string.advertiser_label_time_limit)
+        binding.advConfigParam.rbTimeLimit.text = getString(R.string.advertiser_label_time_limit)
 
-        rb_no_limit.isChecked = data.limitType == LimitType.NO_LIMIT
+        binding.advConfigParam.rbNoLimit.isChecked = data.limitType == LimitType.NO_LIMIT
         setTimeLimitState(data.limitType == LimitType.TIME_LIMIT)
         setEventLimitState(data.limitType == LimitType.EVENT_LIMIT)
-        et_time_limit.setText(data.timeLimit.toString())
+        binding.advConfigParam.etTimeLimit.setText(data.timeLimit.toString())
 
-        if (isAdvertisingEventSupported) et_event_limit.setText(data.eventLimit.toString())
-        else ll_event_limit.visibility = View.GONE
+        if (isAdvertisingEventSupported) binding.advConfigParam.etEventLimit.setText(data.eventLimit.toString())
+        else binding.advConfigParam.llEventLimit.visibility = View.GONE
     }
 
     private fun setSpinnerSelection(selection: Any?, spinner: Spinner) {
-        for (i in 0 until spinner.adapter.count) if (spinner.getItemAtPosition(i) == translator.getString(selection)) {
-            spinner.setSelection(i); break
-        }
+        for (i in 0 until spinner.adapter.count)
+            if (spinner.getItemAtPosition(i) == translator.getString(selection)
+            ) {
+                spinner.setSelection(i); break
+            }
     }
 
     private fun loadData() {
         presenter.loadData(DataMode.ADVERTISING_DATA)
         presenter.loadData(DataMode.SCAN_RESPONSE_DATA)
-        handleAddData(ll_data_advertising_data.findViewById<LinearLayout>(R.id.data_flags), DataType.FLAGS, DataMode.ADVERTISING_DATA)
+
+        handleAddData(
+            binding.advConfigData.llDataAdvertisingData.dataFlags,
+            DataType.FLAGS,
+            DataMode.ADVERTISING_DATA
+        )
     }
 
     private fun prepareDataSpinners() {
-        prepareDataSpinner(sp_advertising_data, ll_data_advertising_data, DataMode.ADVERTISING_DATA)
-        prepareDataSpinner(sp_scan_response_data, ll_data_scan_resp_data, DataMode.SCAN_RESPONSE_DATA)
-        btn_add_advertising_data.setOnClickListener { sp_advertising_data.performClick() }
-        btn_add_scan_response_data.setOnClickListener { sp_scan_response_data.performClick() }
+        prepareDataSpinner(
+            binding.advConfigData.spAdvertisingData,
+            binding.advConfigData.llDataAdvertisingData,
+            DataMode.ADVERTISING_DATA
+        )
+        prepareDataSpinner(
+            binding.advConfigData.spScanResponseData,
+            binding.advConfigData.llDataScanRespData,
+            DataMode.SCAN_RESPONSE_DATA
+        )
+        binding.advConfigData.btnAddAdvertisingData.setOnClickListener {
+            binding.advConfigData.spAdvertisingData.performClick()
+        }
+        binding.advConfigData.btnAddScanResponseData.setOnClickListener {
+            binding.advConfigData.spScanResponseData.performClick()
+        }
     }
 
     override fun onDataLoaded(data: DataPacket?, mode: DataMode) {
-        val dataContainer = if (mode == DataMode.ADVERTISING_DATA) ll_data_advertising_data else ll_data_scan_resp_data
+        val dataContainer =
+            if (mode == DataMode.ADVERTISING_DATA) {
+                binding.advConfigData.llDataAdvertisingData
+            } else {
+                binding.advConfigData.llDataScanRespData
+            }
 
         data?.let {
             if (data.includeCompleteLocalName)
-                handleAddData(dataContainer.findViewById(R.id.data_complete_local_name), DataType.COMPLETE_LOCAL_NAME, mode)
+                handleAddData(
+                    dataContainer.dataCompleteLocalName,
+                    DataType.COMPLETE_LOCAL_NAME,
+                    mode
+                )
             if (data.manufacturers.isNotEmpty())
-                for (item in data.manufacturers) handleAddData(dataContainer.findViewById(R.id.data_manufacturer_data), DataType.MANUFACTURER_SPECIFIC_DATA, mode, item)
+                for (item in data.manufacturers) handleAddData(
+                    dataContainer.dataManufacturerData,
+                    DataType.MANUFACTURER_SPECIFIC_DATA,
+                    mode,
+                    item
+                )
             if (data.includeTxPower)
-                handleAddData(dataContainer.findViewById(R.id.data_tx_power), DataType.TX_POWER, mode)
+                handleAddData(
+                    dataContainer.dataTxPower,
+                    DataType.TX_POWER,
+                    mode
+                )
             if (data.services16Bit.isNotEmpty())
-                handleAddData(dataContainer.findViewById(R.id.data_16bit_services), DataType.COMPLETE_16_BIT, mode, data.services16Bit)
+                handleAddData(
+
+                    dataContainer.data16bitServices,
+                    DataType.COMPLETE_16_BIT,
+                    mode,
+                    data.services16Bit
+                )
             if (data.services128Bit.isNotEmpty())
-                handleAddData(dataContainer.findViewById(R.id.data_128bit_services), DataType.COMPLETE_128_BIT, mode, data.services128Bit)
+                handleAddData(
+                    //dataContainer.findViewById(R.id.data_128bit_services),
+                    dataContainer.data128bitServices,
+                    DataType.COMPLETE_128_BIT,
+                    mode,
+                    data.services128Bit
+                )
         }
     }
 
-    private fun prepareDataSpinner(spinner: Spinner, dataContainer: View, mode: DataMode) {
+    private fun prepareDataSpinner(spinner: Spinner, dataContainer: AdvertiserDataContainerBinding, mode: DataMode) {
         spinner.setSelection(0)
-        spinner.adapter = DataTypeAdapter(this, translator.getAdvertisingDataTypes(), object : DataTypeAdapter.Callback {
-            override fun onItemClick(position: Int) {
-                when (position) {
-                    0 -> handleAddData(dataContainer.findViewById(R.id.data_complete_local_name), DataType.COMPLETE_LOCAL_NAME, mode)
-                    1 -> {
-                        currentFocus?.clearFocus()
-                        hideKeyboard()
-                        handleAddData(dataContainer.findViewById(R.id.data_manufacturer_data), DataType.MANUFACTURER_SPECIFIC_DATA, mode)
+        spinner.adapter = DataTypeAdapter(
+            this,
+            translator.getAdvertisingDataTypes(),
+            object : DataTypeAdapter.Callback {
+                override fun onItemClick(position: Int) {
+                    when (position) {
+                        0 -> handleAddData(
+                            //dataContainer.findViewById(R.id.data_complete_local_name),
+                            dataContainer.dataCompleteLocalName,
+                            DataType.COMPLETE_LOCAL_NAME,
+                            mode
+                        )
+
+                        1 -> {
+                            currentFocus?.clearFocus()
+                            hideKeyboard()
+                            handleAddData(
+                                //dataContainer.findViewById(R.id.data_manufacturer_data),
+                                dataContainer.dataManufacturerData,
+                                DataType.MANUFACTURER_SPECIFIC_DATA,
+                                mode
+                            )
+                        }
+
+                        2 -> handleAddData(dataContainer.dataTxPower, DataType.TX_POWER, mode)
+                        3 -> handleAddData(
+                            dataContainer.data16bitServices,
+                            DataType.COMPLETE_16_BIT,
+                            mode
+                        )
+
+                        4 -> handleAddData(
+                            dataContainer.data128bitServices,
+                            DataType.COMPLETE_128_BIT,
+                            mode
+                        )
                     }
-                    2 -> handleAddData(dataContainer.data_tx_power, DataType.TX_POWER, mode)
-                    3 -> handleAddData(dataContainer.data_16bit_services, DataType.COMPLETE_16_BIT, mode)
-                    4 -> handleAddData(dataContainer.data_128bit_services, DataType.COMPLETE_128_BIT, mode)
                 }
-            }
-        })
+            })
     }
 
-    private fun handleAddData(layout: ViewGroup, type: DataType, mode: DataMode, extra: Any? = null) {
+    private fun handleAddData(
+        layout: ViewGroup,
+        type: DataType,
+        mode: DataMode,
+        extra: Any? = null
+    ) {
         val baseContainer = prepareBaseContainer(layout, type)
         when (type) {
             DataType.FLAGS -> addFlagsData(layout, baseContainer)
-            DataType.COMPLETE_16_BIT -> addServiceData(layout, baseContainer, mode, DataType.COMPLETE_16_BIT, extra)
-            DataType.COMPLETE_128_BIT -> addServiceData(layout, baseContainer, mode, DataType.COMPLETE_128_BIT, extra)
-            DataType.COMPLETE_LOCAL_NAME -> addCompleteLocalNameData(layout, baseContainer, mode)
+            DataType.COMPLETE_16_BIT -> addServiceData(
+                layout,
+                baseContainer,
+                mode,
+                DataType.COMPLETE_16_BIT,
+                extra
+            )
+
+            DataType.COMPLETE_128_BIT -> addServiceData(
+                layout,
+                baseContainer,
+                mode,
+                DataType.COMPLETE_128_BIT,
+                extra
+            )
+
+            DataType.COMPLETE_LOCAL_NAME -> addCompleteLocalNameData(
+                layout,
+                baseContainer,
+                mode
+            )
+
             DataType.TX_POWER -> addTxPowerData(layout, baseContainer, mode)
-            DataType.MANUFACTURER_SPECIFIC_DATA -> addManufacturerSpecificData(layout, baseContainer, mode, extra)
+            DataType.MANUFACTURER_SPECIFIC_DATA -> addManufacturerSpecificData(
+                layout,
+                baseContainer,
+                mode,
+                extra
+            )
         }
     }
 
-    private fun addFlagsData(layout: ViewGroup, baseContainer: View) {
-        baseContainer.ib_remove.visibility = View.INVISIBLE
-        val itemContainer = prepareItemContainer(baseContainer, getString(R.string.advertiser_label_flags_default))
-        itemContainer.ib_remove.visibility = View.GONE
-        baseContainer.ll_data.addView(itemContainer)
-        layout.addView(baseContainer)
+    private fun addFlagsData(layout: ViewGroup, baseContainer: DataTypeLayoutBinding) {
+        baseContainer.ibRemove.visibility = View.INVISIBLE
+        val itemContainer =
+            prepareItemContainer(baseContainer, getString(R.string.advertiser_label_flags_default))
+        itemContainer.ibRemove.visibility = View.GONE
+        baseContainer.llData.addView(itemContainer.root)
+        layout.addView(baseContainer.root)
     }
 
-    private fun addServiceData(layout: ViewGroup, baseContainer: View, mode: DataMode, type: DataType, extra: Any? = null) {
+    private fun addServiceData(
+        layout: ViewGroup,
+        baseContainer: DataTypeLayoutBinding,
+        mode: DataMode,
+        type: DataType,
+        extra: Any? = null
+    ) {
         baseContainer.apply {
-            ib_remove.setOnClickListener { layout.removeView(baseContainer) }
-            btn_add_service.apply {
+            ibRemove.setOnClickListener { layout.removeView(baseContainer.root) }
+            btnAddService.apply {
                 visibility = View.VISIBLE
-                text = if (type == DataType.COMPLETE_16_BIT) getString(R.string.advertiser_button_add_16bit_service) else getString(R.string.advertiser_button_add_128bit_service)
+                text =
+                    if (type == DataType.COMPLETE_16_BIT) getString(R.string.advertiser_button_add_16bit_service) else getString(
+                        R.string.advertiser_button_add_128bit_service
+                    )
             }
-            ll_data_spacer.visibility = View.VISIBLE
-            (ll_data.layoutParams as ConstraintLayout.LayoutParams).apply {
-                endToEnd = ib_remove.id
-                topToBottom = ib_remove.id
+            llDataSpacer.visibility = View.VISIBLE
+            (llData.layoutParams as ConstraintLayout.LayoutParams).apply {
+                endToEnd = ibRemove.id
+                topToBottom = ibRemove.id
             }
-            ll_data.requestLayout()
+            llData.requestLayout()
             setDataSpinnerItemState(false, mode, if (type == DataType.COMPLETE_16_BIT) 3 else 4)
 
-            btn_add_service.setOnClickListener {
+            btnAddService.setOnClickListener {
                 currentFocus?.clearFocus()
                 hideKeyboard()
                 if (type == DataType.COMPLETE_16_BIT) {
                     Service16BitDataDialog(object : Service16BitDataDialog.Callback {
                         override fun onSave(service: Service16Bit) {
-                            val serviceItem = prepareItemContainer(baseContainer, service.toString())
+                            val serviceItem =
+                                prepareItemContainer(baseContainer, service.toString())
                             presenter.include16BitService(mode, service)
 
-                            serviceItem.ib_remove.setOnClickListener {
+                            serviceItem.ibRemove.setOnClickListener {
                                 presenter.exclude16BitService(mode, service)
-                                ll_data.removeView(serviceItem)
+                                llData.removeView(serviceItem.root)
                             }
 
-                            ll_data.addView(serviceItem)
+                            llData.addView(serviceItem.root)
                         }
                     }).show(supportFragmentManager, "dialog_16bit_service_data")
                 } else {
                     Service128BitDataDialog(object : Service128BitDataDialog.Callback {
                         override fun onSave(service: Service128Bit) {
-                            val serviceItem = prepareItemContainer(baseContainer, service.uuid.toString())
+                            val serviceItem =
+                                prepareItemContainer(baseContainer, service.uuid.toString())
                             presenter.include128BitService(mode, service)
 
-                            serviceItem.ib_remove.setOnClickListener {
+                            serviceItem.ibRemove.setOnClickListener {
                                 presenter.exclude128BitService(mode, service)
-                                ll_data.removeView(serviceItem)
+                                llData.removeView(serviceItem.root)
                             }
 
-                            ll_data.addView(serviceItem)
+                            llData.addView(serviceItem.root)
                         }
                     }).show(supportFragmentManager, "dialog_128bit_service_data")
                 }
             }
 
-            ib_remove.setOnClickListener {
+            ibRemove.setOnClickListener {
                 currentFocus?.clearFocus()
                 hideKeyboard()
-                val count = ll_data.childCount
+                val count = llData.childCount
                 removeServicesIfAllowed(layout, baseContainer, count, mode, type)
             }
 
             extra?.let {
                 for (service in extra as List<*>) {
-                    val serviceItem = prepareItemContainer(baseContainer, if (service is Service16Bit) service.toString() else (service as Service128Bit).uuid.toString())
+                    val serviceItem = prepareItemContainer(
+                        baseContainer,
+                        if (service is Service16Bit) service.toString() else (service as Service128Bit).uuid.toString()
+                    )
 
-                    serviceItem.ib_remove.setOnClickListener {
+                    serviceItem.ibRemove.setOnClickListener {
                         if (service is Service16Bit) presenter.exclude16BitService(mode, service)
-                        else if (service is Service128Bit) presenter.exclude128BitService(mode, service)
-                        ll_data.removeView(serviceItem)
+                        else if (service is Service128Bit) presenter.exclude128BitService(
+                            mode,
+                            service
+                        )
+                        llData.removeView(serviceItem.root)
                     }
 
-                    ll_data.addView(serviceItem)
+                    llData.addView(serviceItem.root)
                 }
             }
         }
 
-        layout.addView(baseContainer)
+        layout.addView(baseContainer.root)
     }
 
     @SuppressLint("MissingPermission")
-    private fun addCompleteLocalNameData(layout: ViewGroup, baseContainer: View, mode: DataMode) {
-        val itemContainer = prepareItemContainer(baseContainer, BluetoothAdapter.getDefaultAdapter().name)
-        itemContainer.ib_remove.visibility = View.GONE
+    private fun addCompleteLocalNameData(
+        layout: ViewGroup, baseContainer: DataTypeLayoutBinding,
+        mode: DataMode
+    ) {
+        val itemContainer =
+            prepareItemContainer(baseContainer, BluetoothAdapter.getDefaultAdapter().name)
+        itemContainer.ibRemove.visibility = View.GONE
         setDataSpinnerItemState(false, mode, 0)
 
         presenter.includeCompleteLocalName(mode)
 
-        baseContainer.ib_remove.setOnClickListener {
-            layout.removeView(baseContainer)
+        baseContainer.ibRemove.setOnClickListener {
+            layout.removeView(baseContainer.root)
             presenter.excludeCompleteLocalName(mode)
             setDataSpinnerItemState(true, mode, 0)
         }
 
-        baseContainer.ll_data.addView(itemContainer)
-        layout.addView(baseContainer)
+        baseContainer.llData.addView(itemContainer.root)
+        layout.addView(baseContainer.root)
     }
 
-    private fun addTxPowerData(layout: ViewGroup, baseContainer: View, mode: DataMode) {
-        val itemContainer = prepareItemContainer(baseContainer, getString(R.string.unit_value_dbm, getTxPower()))
+    private fun addTxPowerData(
+        layout: ViewGroup, baseContainer: DataTypeLayoutBinding,
+        mode: DataMode
+    ) {
+        val itemContainer =
+            prepareItemContainer(baseContainer, getString(R.string.unit_value_dbm, getTxPower()))
 
-        et_tx_power.addTextChangedListener(object : TextWatcher {
+        binding.advConfigParam.etTxPower.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (Validator.isTxPowerValid(et_tx_power.text.toString())) {
-                    itemContainer.tv_data_text.text = getString(R.string.unit_value_dbm, et_tx_power.text.toString().toInt())
+                if (Validator.isTxPowerValid(binding.advConfigParam.etTxPower.text.toString())) {
+                    itemContainer.tvDataText.text =
+                        getString(
+                            R.string.unit_value_dbm,
+                            binding.advConfigParam.etTxPower.text.toString().toInt()
+                        )
                 }
             }
         })
 
-        itemContainer.ib_remove.visibility = View.GONE
+        itemContainer.ibRemove.visibility = View.GONE
         setDataSpinnerItemState(false, mode, 2)
 
         presenter.includeTxPower(mode)
 
-        baseContainer.ib_remove.setOnClickListener {
-            layout.removeView(baseContainer)
+        baseContainer.ibRemove.setOnClickListener {
+            layout.removeView(baseContainer.root)
             presenter.excludeTxPower(mode)
             setDataSpinnerItemState(true, mode, 2)
         }
 
-        baseContainer.ll_data.addView(itemContainer)
-        layout.addView(baseContainer)
+        baseContainer.llData.addView(itemContainer.root)
+        layout.addView(baseContainer.root)
     }
 
-    private fun addManufacturerSpecificData(layout: ViewGroup, baseContainer: View, mode: DataMode, extra: Any? = null) {
+    private fun addManufacturerSpecificData(
+        layout: ViewGroup,
+        baseContainer: DataTypeLayoutBinding,
+        mode: DataMode,
+        extra: Any? = null
+    ) {
         if (extra == null) {
-            ManufacturerDataDialog(presenter.getManufacturers(mode), object : ManufacturerDataDialog.Callback {
-                override fun onSave(manufacturer: Manufacturer) {
-                    val itemContainer = prepareItemContainer(baseContainer, manufacturer.getAsDescriptiveText())
-                    itemContainer.ib_remove.visibility = View.GONE
+            ManufacturerDataDialog(
+                presenter.getManufacturers(mode),
+                object : ManufacturerDataDialog.Callback {
+                    override fun onSave(manufacturer: Manufacturer) {
+                        val itemContainer =
+                            prepareItemContainer(baseContainer, manufacturer.getAsDescriptiveText())
+                        itemContainer.ibRemove.visibility = View.GONE
 
-                    presenter.includeManufacturerSpecificData(mode, manufacturer)
+                        presenter.includeManufacturerSpecificData(mode, manufacturer)
 
-                    baseContainer.ib_remove.setOnClickListener {
-                        presenter.excludeManufacturerSpecificData(mode, manufacturer)
-                        layout.removeView(baseContainer)
+                        baseContainer.ibRemove.setOnClickListener {
+                            presenter.excludeManufacturerSpecificData(mode, manufacturer)
+                            layout.removeView(baseContainer.root)
+                        }
+
+                        baseContainer.llData.addView(itemContainer.root)
+                        layout.addView(baseContainer.root)
                     }
-
-                    baseContainer.ll_data.addView(itemContainer)
-                    layout.addView(baseContainer)
-                }
-            }).show(supportFragmentManager, "dialog_manufacturer_data")
+                }).show(supportFragmentManager, "dialog_manufacturer_data")
         } else {
             val manufacturer = extra as Manufacturer
-            val itemContainer = prepareItemContainer(baseContainer, manufacturer.getAsDescriptiveText())
-            itemContainer.ib_remove.visibility = View.GONE
+            val itemContainer =
+                prepareItemContainer(baseContainer, manufacturer.getAsDescriptiveText())
+            itemContainer.ibRemove.visibility = View.GONE
 
-            baseContainer.ib_remove.setOnClickListener {
+            baseContainer.ibRemove.setOnClickListener {
                 presenter.excludeManufacturerSpecificData(mode, manufacturer)
-                layout.removeView(baseContainer)
+                layout.removeView(baseContainer.root)
             }
 
-            baseContainer.ll_data.addView(itemContainer)
-            layout.addView(baseContainer)
+            baseContainer.llData.addView(itemContainer.root)
+            layout.addView(baseContainer.root)
         }
     }
 
-    private fun prepareBaseContainer(layout: ViewGroup, type: DataType): View {
-        val container = LayoutInflater.from(this@AdvertiserConfigActivity).inflate(R.layout.data_type_layout, layout, false)
-        setBaseContainerTitle(container, type)
-        return container
+    private fun prepareBaseContainer(layout: ViewGroup, type: DataType):
+            DataTypeLayoutBinding {
+        lateinit var binding: DataTypeLayoutBinding
+        val container = LayoutInflater.from(this@AdvertiserConfigActivity)
+        binding = DataTypeLayoutBinding.inflate(container)
+        setBaseContainerTitle(binding, type)
+        return binding
     }
 
-    private fun setBaseContainerTitle(container: View, type: DataType) {
-        val name = "<b>".plus(type.getIdentifier().plus(" </b>").plus(translator.getDataTypeAsString(type)))
-        container.tv_name.text = Html.fromHtml(name, Html.FROM_HTML_MODE_LEGACY)
+    private fun prepareItemContainer(
+        baseContainer: DataTypeLayoutBinding,
+        text: String
+    ): DataTypeItemBinding {
+        lateinit var binding: DataTypeItemBinding
+        val container = LayoutInflater.from(this@AdvertiserConfigActivity)
+        binding = DataTypeItemBinding.inflate(container)
+        binding.tvDataText.text = text
+        return binding
     }
 
-    private fun prepareItemContainer(baseContainer: View, text: String): View {
-        val container = LayoutInflater.from(this@AdvertiserConfigActivity).inflate(R.layout.data_type_item, baseContainer.ll_data, false)
-        container.tv_data_text.text = text
-        return container
+    private fun setBaseContainerTitle(container: DataTypeLayoutBinding, type: DataType) {
+        val name = "<b>".plus(
+            type.getIdentifier().plus(" </b>").plus(translator.getDataTypeAsString(type))
+        )
+        container.tvName.text = Html.fromHtml(name, Html.FROM_HTML_MODE_LEGACY)
     }
 
-    private fun removeServicesIfAllowed(layout: ViewGroup, container: View, count: Int, mode: DataMode, type: DataType) {
+    private fun removeServicesIfAllowed(
+        layout: ViewGroup,
+        container: DataTypeLayoutBinding,
+        count: Int,
+        mode: DataMode,
+        type: DataType
+    ) {
         if (count > 0 && AdvertiserStorage(this).shouldDisplayRemoveServicesDialog()) {
             RemoveServicesDialog(object : RemoveServicesDialog.Callback {
                 override fun onOkClicked() {
                     presenter.excludeServices(mode, type)
-                    layout.removeView(container)
-                    setDataSpinnerItemState(true, mode, if (type == DataType.COMPLETE_16_BIT) 3 else 4)
+                    layout.removeView(container.root)
+                    setDataSpinnerItemState(
+                        true,
+                        mode,
+                        if (type == DataType.COMPLETE_16_BIT) 3 else 4
+                    )
                 }
             }).show(supportFragmentManager, "dialog_remove_services")
         } else {
             presenter.excludeServices(mode, type)
-            layout.removeView(container)
+            layout.removeView(container.root)
             setDataSpinnerItemState(true, mode, if (type == DataType.COMPLETE_16_BIT) 3 else 4)
         }
     }
 
     private fun setDataSpinnerItemState(enabled: Boolean, mode: DataMode, position: Int) {
-        if (mode == DataMode.ADVERTISING_DATA) (sp_advertising_data.adapter as DataTypeAdapter).setItemState(enabled, position)
-        else (sp_scan_response_data.adapter as DataTypeAdapter).setItemState(enabled, position)
+
+        if (mode == DataMode.ADVERTISING_DATA) (binding.advConfigData.spAdvertisingData.adapter as DataTypeAdapter)
+            .setItemState(
+                enabled,
+                position
+            )
+        else (binding.advConfigData.spScanResponseData.adapter as DataTypeAdapter).setItemState(
+            enabled,
+            position
+        )
     }
 
-    override fun updateAvailableBytes(advDataBytes: Int, scanRespDataBytes: Int, maxPacketSize: Int, includeFlags: Boolean) {
-        changeDataContainerPadding(advDataBytes < maxPacketSize, ll_data_advertising_data)
-        changeDataContainerPadding(scanRespDataBytes < maxPacketSize, ll_data_scan_resp_data)
+    override fun updateAvailableBytes(
+        advDataBytes: Int,
+        scanRespDataBytes: Int,
+        maxPacketSize: Int,
+        includeFlags: Boolean
+    ) {
+        changeDataContainerPadding(
+            advDataBytes < maxPacketSize,
+            binding.advConfigData.llDataAdvertisingData.root
+        )
+        changeDataContainerPadding(
+            scanRespDataBytes < maxPacketSize,
+            binding.advConfigData.llDataScanRespData.root
+        )
 
-        ll_data_advertising_data.findViewById<LinearLayout>(R.id.data_flags).visibility = if (includeFlags) View.VISIBLE else View.GONE
+        binding.advConfigData.llDataAdvertisingData.dataFlags.visibility =
+            if (includeFlags) View.VISIBLE else View.GONE
 
-        tv_adv_data_available_bytes.setTextAppearance(if (advDataBytes >= 0) R.style.TextViewNoteInfo else R.style.TextViewNoteWarning)
-        tv_adv_data_available_bytes.text = (if (advDataBytes >= 0) getString(R.string.advertiser_note_x_bytes_available, advDataBytes)
+        binding.advConfigData.tvAdvDataAvailableBytes.setTextAppearance(if (advDataBytes >= 0) R.style.TextViewNoteInfo else R.style.TextViewNoteWarning)
+        binding.advConfigData.tvAdvDataAvailableBytes.text = (if (advDataBytes >= 0) getString(
+            R.string.advertiser_note_x_bytes_available,
+            advDataBytes
+        )
         else getString(R.string.advertiser_note_x_bytes_beyond, -advDataBytes))
 
-        tv_scan_resp_available_bytes.setTextAppearance(if (scanRespDataBytes >= 0) R.style.TextViewNoteInfo else R.style.TextViewNoteWarning)
-        tv_scan_resp_available_bytes.text = (if (scanRespDataBytes >= 0) getString(R.string.advertiser_note_x_bytes_available, scanRespDataBytes)
-        else getString(R.string.advertiser_note_x_bytes_beyond, -scanRespDataBytes))
+        binding.advConfigData.tvScanRespAvailableBytes.setTextAppearance(if (scanRespDataBytes >= 0) R.style.TextViewNoteInfo else R.style.TextViewNoteWarning)
+        binding.advConfigData.tvScanRespAvailableBytes.text =
+            (if (scanRespDataBytes >= 0) getString(
+                R.string.advertiser_note_x_bytes_available,
+                scanRespDataBytes
+            )
+            else getString(R.string.advertiser_note_x_bytes_beyond, -scanRespDataBytes))
     }
 
     private fun changeDataContainerPadding(showPadding: Boolean, container: View) {
-        val padding8Dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
+        val padding8Dp =
+            TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics)
+                .toInt()
         if (showPadding) container.setPadding(0, padding8Dp, 0, padding8Dp)
         else container.setPadding(0, 0, 0, 0)
     }

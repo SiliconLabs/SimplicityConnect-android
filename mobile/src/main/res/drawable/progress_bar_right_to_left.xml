@@ -1,0 +1,19 @@
+<!-- res/drawable/progress_drawable.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background color (secondary color) -->
+    <item android:id="@android:id/background">
+        <shape>
+            <corners android:radius="4dp" />
+            <solid android:color="@color/sl_light_grey" /> <!-- Secondary color -->
+        </shape>
+    </item>
+    <!-- Progress color (primary color) -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <corners android:radius="4dp" />
+                <solid android:color="@color/silabs_dark_blue" /> <!-- Primary blue color -->
+            </shape>
+        </clip>
+    </item>
+</layer-list>

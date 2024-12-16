@@ -1,11 +1,10 @@
 package com.siliconlabs.bledemo.features.demo.matter_demo.fragments
 
-import android.content.Context
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,11 +32,9 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.utils.MessageDialogFrag
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.annotations.NotNull
 import timber.log.Timber
 
 
@@ -58,24 +55,24 @@ class MatterPlugFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPrefs = requireContext().getSharedPreferences(
-            "your_preference_name",
+            MatterDemoActivity.MATTER_PREF,
             AppCompatActivity.MODE_PRIVATE
         )
         if (requireArguments() != null) {
             model = requireArguments().getParcelable(ARG_DEVICE_MODEL)!!
             deviceId = model.deviceId
-            Timber.tag(TAG).e( "deviceID: " + model)
+            Timber.tag(TAG).e("deviceID: $model")
         }
         if (deviceId != null) {
 
-            showMatterProgressDialog(getString(R.string.please_wait))
+            showMatterProgressDialog(getString(R.string.matter_device_status))
 
             // retrieveSavedDevices()
-            GlobalScope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 // This code will run asynchronously
 
-                val resultq = checkForDeviceStatus()
-                if (resultq) {
+                val resultInfo = checkForDeviceStatus()
+                if (resultInfo) {
                     println("Operation was successful")
                     removeProgress()
                 }
@@ -86,7 +83,7 @@ class MatterPlugFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentMatterPlugBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -107,13 +104,13 @@ class MatterPlugFragment : Fragment() {
                     removeProgress()
                     SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
                     showMessageDialog()
-                    requireActivity().runOnUiThread(Runnable {
+                    requireActivity().runOnUiThread {
                         binding.btnMatterDeviceState.setImageResource(R.drawable.matter_plug_off)
                         binding.btnMatterDeviceState.setColorFilter(
                             ContextCompat.getColor(requireContext(), R.color.silabs_grey),
                             android.graphics.PorterDuff.Mode.SRC_IN
                         )
-                    })
+                    }
                 }
             })
 
@@ -125,31 +122,22 @@ class MatterPlugFragment : Fragment() {
         }
     }
 
-    override fun onAttach(@NotNull context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-    }
-
     private fun showMessageDialog() {
         try {
-            if (isAdded() && requireActivity() != null && !requireActivity().isFinishing) {
+            if (isAdded && !requireActivity().isFinishing) {
                 requireActivity().runOnUiThread {
                     if (!MessageDialogFragment.isDialogShowing()) {
                         dialog = MessageDialogFragment()
                         dialog.setMessage(getString(R.string.matter_device_offline_text))
                         dialog.setOnDismissListener {
                             removeProgress()
-                            if (requireActivity().supportFragmentManager.getBackStackEntryCount() > 0) {
-                                requireActivity().supportFragmentManager.popBackStack();
+                            if (requireActivity().supportFragmentManager.backStackEntryCount > 0) {
+                                requireActivity().supportFragmentManager.popBackStack()
                             } else {
                                 FragmentUtils.getHost(
                                     this@MatterPlugFragment,
                                     CallBackHandler::class.java
-                                )
-                                    .onBackHandler()
+                                ).onBackHandler()
                             }
                         }
                         val transaction: FragmentTransaction =
@@ -162,14 +150,14 @@ class MatterPlugFragment : Fragment() {
                 Timber.e("device offline")
             }
         } catch (e: Exception) {
-            Timber.e("" + e)
+            Timber.e("Exception Occurred: $e")
         }
 
 
     }
 
     private fun removeProgress() {
-        if (customProgressDialog?.isShowing() == true) {
+        if (customProgressDialog?.isShowing == true) {
             customProgressDialog?.dismiss()
         }
     }
@@ -178,6 +166,7 @@ class MatterPlugFragment : Fragment() {
         customProgressDialog = CustomProgressDialog(requireContext())
         customProgressDialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         customProgressDialog!!.setMessage(message)
+        customProgressDialog!!.setCanceledOnTouchOutside(false)
         customProgressDialog!!.show()
     }
 
@@ -186,8 +175,8 @@ class MatterPlugFragment : Fragment() {
         scope = viewLifecycleOwner.lifecycleScope
         deviceController.setCompletionListener(LightChipControllerCallback())
         binding.btnMatterDeviceState.setImageResource(R.drawable.matter_plug_off)
-        binding.btnOn.setLongClickable(false);
-        binding.btnOff.setLongClickable(false);
+        binding.btnOn.isLongClickable = false
+        binding.btnOff.isLongClickable = false
         binding.btnOff.text = requireContext().getText(R.string.matter_light_off_status)
         binding.btnOn.text = requireContext().getText(R.string.matter_light_on_status)
 
@@ -210,8 +199,8 @@ class MatterPlugFragment : Fragment() {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (requireActivity().supportFragmentManager.getBackStackEntryCount() > 0) {
-                requireActivity().supportFragmentManager.popBackStack();
+            if (requireActivity().supportFragmentManager.backStackEntryCount > 0) {
+                requireActivity().supportFragmentManager.popBackStack()
             } else {
                 FragmentUtils.getHost(this@MatterPlugFragment, CallBackHandler::class.java)
                     .onBackHandler()
@@ -231,16 +220,17 @@ class MatterPlugFragment : Fragment() {
         getPlugCluster().on(object : ChipClusters.DefaultClusterCallback {
             override fun onSuccess() {
                 SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, true)
-                requireActivity().runOnUiThread(Runnable {
+                requireActivity().runOnUiThread {
                     binding.btnMatterDeviceState.setImageResource(R.drawable.matter_plug_on)
-                })
+                }
 
             }
 
+            @SuppressLint("TimberArgCount")
             override fun onError(ex: Exception) {
                 removeProgress()
                 SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
-                Timber.tag(TAG).e( "ON command failure", ex)
+                Timber.tag(TAG).e("ON command failure: $ex")
                 showMessageDialog()
             }
 
@@ -251,16 +241,15 @@ class MatterPlugFragment : Fragment() {
         getPlugCluster().off(object : ChipClusters.DefaultClusterCallback {
             override fun onSuccess() {
                 SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, true)
-                requireActivity().runOnUiThread(Runnable {
+                requireActivity().runOnUiThread {
                     binding.btnMatterDeviceState.setImageResource(R.drawable.matter_plug_off)
-                })
-
+                }
             }
 
             override fun onError(ex: Exception) {
                 removeProgress()
                 SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
-                Timber.tag(TAG).e( "OFF command failure", ex)
+                Timber.tag(TAG).e("OFF command failure :$ex")
                 showMessageDialog()
             }
         })
@@ -281,22 +270,22 @@ class MatterPlugFragment : Fragment() {
     inner class LightChipControllerCallback : GenericChipDeviceListener() {
         override fun onConnectDeviceComplete() {}
 
-        override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-             Timber.tag(TAG).d( "onCommissioningComplete for nodeId $nodeId: $errorCode")
+        override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
+            Timber.tag(TAG).d("onCommissioningComplete for nodeId $nodeId: $errorCode")
             //showMessage("Address update complete for nodeId $nodeId with code $errorCode")
         }
 
         override fun onNotifyChipConnectionClosed() {
-             Timber.tag(TAG).d( "onNotifyChipConnectionClosed")
+            Timber.tag(TAG).d("onNotifyChipConnectionClosed")
         }
 
         override fun onCloseBleComplete() {
-             Timber.tag(TAG).d( "onCloseBleComplete")
+            Timber.tag(TAG).d("onCloseBleComplete")
         }
 
-        override fun onError(error: Throwable) {
+        override fun onError(error: Throwable?) {
             super.onError(error)
-             Timber.tag(TAG).d( "onError: $error")
+            Timber.tag(TAG).d("onError: $error")
         }
 
     }
@@ -307,7 +296,7 @@ class MatterPlugFragment : Fragment() {
 
     companion object {
         private const val TAG = "MatterPlugFragment"
-        public const val ARG_DEVICE_MODEL = "device_model"
+        const val ARG_DEVICE_MODEL = "device_model"
         fun newInstance(): MatterPlugFragment = MatterPlugFragment()
     }
 }

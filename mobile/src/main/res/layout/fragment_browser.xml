@@ -41,7 +41,6 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
-
     <TextView
         android:id="@+id/active_filters_description"
         android:layout_width="match_parent"

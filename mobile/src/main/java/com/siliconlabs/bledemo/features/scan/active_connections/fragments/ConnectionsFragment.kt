@@ -22,6 +22,7 @@ import com.siliconlabs.bledemo.common.other.CardViewListDecoration
 import com.siliconlabs.bledemo.home_screen.base.ViewPagerFragment
 import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
+import com.siliconlabs.bledemo.home_screen.base.NotificationDependent
 
 class ConnectionsFragment : BaseServiceDependentMainMenuFragment() {
 
@@ -33,7 +34,9 @@ class ConnectionsFragment : BaseServiceDependentMainMenuFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        service = (activity as MainActivity).bluetoothService!!
+        if(null != (activity as MainActivity).bluetoothService){
+            service = (activity as MainActivity).bluetoothService!!
+        }
         viewModel = (parentFragment as ViewPagerFragment).getScanFragment().viewModel
     }
 
@@ -68,6 +71,7 @@ class ConnectionsFragment : BaseServiceDependentMainMenuFragment() {
             _binding.bluetoothPermissionsBar.setFragmentManager(childFragmentManager)
         }
     }
+
 
     override fun onResume() {
         super.onResume()

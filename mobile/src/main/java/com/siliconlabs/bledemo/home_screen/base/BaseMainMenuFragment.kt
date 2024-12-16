@@ -22,7 +22,7 @@ abstract class BaseMainMenuFragment : Fragment(), WithHidableUIElements {
         }
     }
 
-    private fun restoreHiddenUI() {
+    fun restoreHiddenUI() {
         hidableActionButton?.show()
         bottomNav.show()
     }

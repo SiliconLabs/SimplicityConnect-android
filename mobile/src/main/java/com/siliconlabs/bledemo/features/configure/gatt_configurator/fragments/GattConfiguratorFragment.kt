@@ -135,6 +135,7 @@ class GattConfiguratorFragment : BaseMainMenuFragment(), OnClickListener {
             } else {
                 fullScreenInfo.root.visibility = View.VISIBLE
                 rvMainView.visibility = View.GONE
+                restoreHiddenUI()
             }
         }
     }

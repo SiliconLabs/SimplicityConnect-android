@@ -25,6 +25,7 @@ import com.siliconlabs.bledemo.features.scan.rssi_graph.utils.GraphDataExporter
 import com.siliconlabs.bledemo.features.scan.rssi_graph.views.ChartView
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 import com.siliconlabs.bledemo.home_screen.base.LocationDependent
+import com.siliconlabs.bledemo.home_screen.base.NotificationDependent
 import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.ScheduledThreadPoolExecutor

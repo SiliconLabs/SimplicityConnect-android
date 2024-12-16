@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:grid="http://schemas.android.com/apk/res-auto"
+    style="@style/match"
+    android:background="@color/sl_light_grey"
+    android:id="@+id/throughput_container">
+    <!--<FrameLayout
+        android:id="@+id/throughput_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"/>-->
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/my_composable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</FrameLayout>

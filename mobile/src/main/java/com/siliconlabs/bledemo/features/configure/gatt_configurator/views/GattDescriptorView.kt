@@ -8,33 +8,44 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.ViewGattDescriptorBinding
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Descriptor
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Property
-import kotlinx.android.synthetic.main.view_gatt_descriptor.view.*
-import kotlinx.android.synthetic.main.view_gatt_descriptor.view.ib_copy
-import kotlinx.android.synthetic.main.view_gatt_descriptor.view.ib_edit
-import kotlinx.android.synthetic.main.view_gatt_descriptor.view.ib_remove
-import kotlinx.android.synthetic.main.view_gatt_descriptor.view.tv_property_read
-import kotlinx.android.synthetic.main.view_gatt_descriptor.view.tv_property_write
 
-class GattDescriptorView(context: Context, attributeSet: AttributeSet? = null) : FrameLayout(context, attributeSet) {
+//import kotlinx.android.synthetic.main.view_gatt_descriptor.view.*
+//import kotlinx.android.synthetic.main.view_gatt_descriptor.view.ib_copy
+//import kotlinx.android.synthetic.main.view_gatt_descriptor.view.ib_edit
+//import kotlinx.android.synthetic.main.view_gatt_descriptor.view.ib_remove
+//import kotlinx.android.synthetic.main.view_gatt_descriptor.view.tv_property_read
+//import kotlinx.android.synthetic.main.view_gatt_descriptor.view.tv_property_write
+
+class GattDescriptorView(context: Context, attributeSet: AttributeSet? = null) :
+    FrameLayout(context, attributeSet) {
     private var descriptor: Descriptor? = null
+    lateinit var gattViewDescriptorBinding: ViewGattDescriptorBinding
 
     constructor(context: Context, descriptor: Descriptor) : this(context) {
         this.descriptor = descriptor
 
         initView(descriptor)
-        if(descriptor.isPredefined) hideButtons()
+        if (descriptor.isPredefined) hideButtons()
     }
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_gatt_descriptor, this, true)
+        gattViewDescriptorBinding = ViewGattDescriptorBinding.inflate(LayoutInflater.from(context),this,true)
     }
 
     private fun initView(descriptor: Descriptor) {
-        tv_descriptor_name.text = descriptor.name
-        tv_descriptor_uuid.text = buildBoldHeaderTextLine(context.getString(R.string.UUID_colon_space), descriptor.uuid?.getAsFormattedText())
-        tv_descriptor_value.text = buildBoldHeaderTextLine(context.getString(R.string.value_colon_space), descriptor.value?.getAsFormattedText())
+
+        gattViewDescriptorBinding.tvDescriptorName.text = descriptor.name
+        gattViewDescriptorBinding.tvDescriptorUuid.text = buildBoldHeaderTextLine(
+            context.getString(R.string.UUID_colon_space),
+            descriptor.uuid?.getAsFormattedText()
+        )
+        gattViewDescriptorBinding.tvDescriptorValue.text = buildBoldHeaderTextLine(
+            context.getString(R.string.value_colon_space),
+            descriptor.value?.getAsFormattedText()
+        )
         showSelectedProperties(descriptor)
     }
 
@@ -52,39 +63,42 @@ class GattDescriptorView(context: Context, attributeSet: AttributeSet? = null) :
         descriptor?.let {
             initView(it)
         }
+        gattViewDescriptorBinding.root.invalidate()
     }
-
     private fun hideButtons() {
-        ib_copy.visibility = View.GONE
-        ib_remove.visibility = View.GONE
-        ib_edit.visibility = View.GONE
+
+        gattViewDescriptorBinding.ibCopy.visibility = View.GONE
+        gattViewDescriptorBinding.ibRemove.visibility = View.GONE
+        gattViewDescriptorBinding.ibEdit.visibility = View.GONE
     }
 
     private fun hideAllProperties() {
-        tv_property_read.visibility = View.GONE
-        tv_property_write.visibility = View.GONE
+        gattViewDescriptorBinding.tvPropertyRead.visibility = View.GONE
+
+         gattViewDescriptorBinding.tvPropertyWrite.visibility = View.GONE
     }
 
     private fun showSelectedProperties(descriptor: Descriptor) {
         hideAllProperties()
         descriptor.properties.apply {
-            if (containsKey(Property.READ)) tv_property_read.visibility = View.VISIBLE
-            if (containsKey(Property.WRITE)) tv_property_write.visibility = View.VISIBLE
+            gattViewDescriptorBinding.tvPropertyRead
+            if (containsKey(Property.READ)) gattViewDescriptorBinding.tvPropertyRead.visibility = View.VISIBLE
+            if (containsKey(Property.WRITE))  gattViewDescriptorBinding.tvPropertyWrite.visibility = View.VISIBLE
         }
     }
 
     fun setDescriptorListener(listener: DescriptorListener) {
-        ib_copy.setOnClickListener {
+        gattViewDescriptorBinding.ibCopy.setOnClickListener {
             descriptor?.let {
                 listener.onCopyDescriptor(it)
             }
         }
-        ib_edit.setOnClickListener {
+        gattViewDescriptorBinding.ibEdit.setOnClickListener {
             descriptor?.let {
                 listener.onEditDescriptor(it)
             }
         }
-        ib_remove.setOnClickListener {
+        gattViewDescriptorBinding.ibRemove.setOnClickListener {
             descriptor?.let {
                 listener.onRemoveDescriptor(it)
             }

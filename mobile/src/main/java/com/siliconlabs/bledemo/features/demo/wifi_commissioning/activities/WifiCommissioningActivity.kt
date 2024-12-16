@@ -200,6 +200,8 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                 }
 
                 BluetoothService.GattConnectType.DEV_KIT_SENSOR -> {
+                    // println("--------------Connected${connectedAccessPoint!!.ipAddress}")
+                    // println("--------------Connected${clickedAccessPoint!!.ipAddress}")
                     val devKitIntent = Intent(
                         this,
                         DevKitSensor917Activity::class.java

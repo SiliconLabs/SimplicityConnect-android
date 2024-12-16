@@ -1,5 +1,7 @@
 package com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone
 
+import java.util.Locale
+
 // Copyright 2015 Google Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -147,11 +149,11 @@ class Beacon(private val deviceAddress: String, var rssi: Int) {
      */
     operator fun contains(s: String?): Boolean {
         return (s == null || s.isEmpty()
-                || deviceAddress.replace(":", "").toLowerCase().contains(s.toLowerCase())
+                || deviceAddress.replace(":", "").lowercase().contains(s.lowercase(Locale.US))
                 || (uidStatus.uidValue != null
-                && uidStatus.uidValue?.toLowerCase()?.contains(s.toLowerCase())!!)
+                && uidStatus.uidValue?.lowercase()?.contains(s.lowercase(Locale.US))!!)
                 || (urlStatus.urlValue != null
-                && urlStatus.urlValue?.toLowerCase()?.contains(s.toLowerCase())!!))
+                && urlStatus.urlValue?.lowercase()?.contains(s.lowercase(Locale.US))!!))
     }
 
 }

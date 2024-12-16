@@ -40,4 +40,5 @@ class Utils {
             return (capitalize(manufacturer) + "_" + model).replace(" ", "_")
         }
     }
+
 }

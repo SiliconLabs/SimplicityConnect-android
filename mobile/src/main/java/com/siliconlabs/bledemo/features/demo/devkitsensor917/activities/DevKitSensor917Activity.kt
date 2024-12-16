@@ -1,10 +1,15 @@
 package com.siliconlabs.bledemo.features.demo.devkitsensor917.activities
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -14,10 +19,10 @@ import androidx.fragment.app.Fragment
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.Activity917DevKitSensorLayoutBinding
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.APIInterface
-import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.ScanResponse
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.SensorsResponse
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.utils.DevKitSensorChecker
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.utils.DevKitSensorControl
+import com.siliconlabs.bledemo.features.demo.devkitsensor917.utils.DevKitSensorSharedData
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -49,13 +54,23 @@ class DevKitSensor917Activity : AppCompatActivity() {
         actionBar!!.setHomeAsUpIndicator(R.drawable.matter_back)
         actionBar.setDisplayHomeAsUpEnabled(true)
         val ipAddress = intent.getStringExtra(IP_ADDRESS)
-        if (ipAddress != null) {
-            showProgressDialog(this.getString(R.string.dev_kit_progress_bar_message))
-            println("IP ADDRESS Imported: $ipAddress")
-            initGrid(ipAddress)
-            GlobalScope.launch {
-                doInSensorBackground(ipAddress)
+        if (isNetworkAvailable(this)) {
+            if (ipAddress != null) {
+                binding.envGridPlace.visibility = View.VISIBLE
+                binding.envGrid.visibility = View.VISIBLE
+                binding.placeholder.visibility = View.GONE
+                showProgressDialog(this.getString(R.string.dev_kit_progress_bar_message))
+                println("IP ADDRESS Imported: $ipAddress")
+                initGrid(ipAddress)
+                GlobalScope.launch {
+                    doInSensorBackground(ipAddress)
+                }
             }
+        } else {
+            binding.envGridPlace.visibility = View.GONE
+            binding.envGrid.visibility = View.GONE
+            binding.placeholder.visibility = View.VISIBLE
+            Toast.makeText(this, "Please turn the WiFi Setting", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -84,7 +99,7 @@ class DevKitSensor917Activity : AppCompatActivity() {
                     removeProgress()
                     runOnUiThread {
                         Toast.makeText(
-                             baseContext,
+                            baseContext,
                             "API All Sensors Response failed",
                             Toast.LENGTH_SHORT
                         ).show()
@@ -120,9 +135,8 @@ class DevKitSensor917Activity : AppCompatActivity() {
                     getString(getTileDescription(it.key)),
                     ContextCompat.getDrawable(this.context, getTileIcon(it.key))
                 ).also {
-
-                    addView(it)
-                    it.setListener(it.tag, ipAddress)
+                    addView(it.sensorDemoGridItemBinding.root)
+                    it.setListener(DevKitSensorSharedData.sensorDescription.toString(), ipAddress)
 
 
                 }
@@ -177,6 +191,29 @@ class DevKitSensor917Activity : AppCompatActivity() {
             customProgressDialog!!.show()
         }
 
+    }
+
+    private fun isNetworkAvailable(context: Context?): Boolean {
+        if (context == null) return false
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (capabilities != null) {
+                when {
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
+                        return true
+                    }
+                }
+            }
+        } else {
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+            if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
+                return true
+            }
+        }
+        return false
     }
 
     interface ResponseListener {

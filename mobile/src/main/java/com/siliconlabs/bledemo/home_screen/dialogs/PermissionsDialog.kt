@@ -48,6 +48,10 @@ class PermissionsDialog(
             }
             if (rationalesToShow.contains(Manifest.permission.ACCESS_FINE_LOCATION)) {
                 append(getString(R.string.permissions_rationale_location_html))
+                append("<br>")
+            }
+            if(rationalesToShow.contains(Manifest.permission.POST_NOTIFICATIONS)){
+                append(getString(R.string.permissions_rationale_notification_html))
             }
         }.toString()
     }

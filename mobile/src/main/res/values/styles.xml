@@ -103,7 +103,7 @@
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:background">@drawable/btn_rounded_blue</item>
         <item name="android:capitalize">none</item>
-        <item name="textAllCaps">false</item>
+        <item name="textAllCaps">true</item>
     </style>
 
     <style name="ButtonBlue" parent="Widget.AppCompat.Button.Colored">

@@ -12,15 +12,17 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.appcompat.widget.SwitchCompat
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.IodemoColorLedsBinding
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.model.LedRGBState
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.ui.ColorLEDs
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.ui.HueBackgroundView
-import kotlinx.android.synthetic.main.iodemo_color_leds.view.*
+
+//import kotlinx.android.synthetic.main.iodemo_color_leds.view.*
 
 class ColorLEDControl @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private lateinit var colorLEDs: ColorLEDs
@@ -31,29 +33,32 @@ class ColorLEDControl @JvmOverloads constructor(
 
     private var hue: Float = 0f // from 0 to 360
     private var brightness: Float = 1f // from 0 to 1
+    private lateinit var binding: IodemoColorLedsBinding  //iodemo_color_leds
 
     private var colorLEDControlListener: ColorLEDControlListener? = null
 
-    private fun setupViews(rootView: LinearLayout) {
-        colorLEDs = rootView.iodemo_color_leds
-        hueSelect = rootView.iodemo_hue_select
-        brightnessSelect = rootView.iodemo_brightness_select
-        colorSwitch = rootView.iodemo_color_switch
-        hueBackgroundView = rootView.iodemo_hue_background
+    private fun setupViews(rootView: IodemoColorLedsBinding) {
+
+        colorLEDs = rootView.iodemoColorLeds
+        hueSelect = rootView.iodemoHueSelect
+        brightnessSelect = rootView.iodemoBrightnessSelect
+        colorSwitch = rootView.iodemoColorSwitch
+        hueBackgroundView = rootView.iodemoHueBackground
     }
 
-    private var selectBrightnessListener: OnSeekBarChangeListener = object : OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-            brightness = findBrightness(progress)
-            setColorLEDs(colorSwitch.isChecked, hue, brightness)
-            colorLEDs.setAlpha(progress)
-        }
+    private var selectBrightnessListener: OnSeekBarChangeListener =
+        object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                brightness = findBrightness(progress)
+                setColorLEDs(colorSwitch.isChecked, hue, brightness)
+                colorLEDs.setAlpha(progress)
+            }
 
-        override fun onStartTrackingTouch(seekBar: SeekBar) {}
-        override fun onStopTrackingTouch(seekBar: SeekBar) {
-            colorLEDControlListener?.onLedUpdateStop()
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                colorLEDControlListener?.onLedUpdateStop()
+            }
         }
-    }
 
     fun setColorLEDControlListener(listener: ColorLEDControlListener?) {
         colorLEDControlListener = listener
@@ -65,10 +70,11 @@ class ColorLEDControl @JvmOverloads constructor(
         enableControls(isOn)
         val hsv = FloatArray(3)
         Color.RGBToHSV(
-                colorLEDsValue.red,
-                colorLEDsValue.green,
-                colorLEDsValue.blue,
-                hsv)
+            colorLEDsValue.red,
+            colorLEDsValue.green,
+            colorLEDsValue.blue,
+            hsv
+        )
         hue = hsv[0]
         brightness = hsv[2]
         hueSelect.progress = hue.toInt()
@@ -97,12 +103,14 @@ class ColorLEDControl @JvmOverloads constructor(
 
     private fun setColorLEDs(switchState: Boolean, hue: Float, brightness: Float) {
         val color = hsvToRGB(hue, brightness)
-        colorLEDControlListener?.updateColorLEDs(LedRGBState(
+        colorLEDControlListener?.updateColorLEDs(
+            LedRGBState(
                 switchState,
                 Color.red(color),
                 Color.green(color),
                 Color.blue(color)
-        ))
+            )
+        )
     }
 
     private fun hsvToRGB(hue: Float, brightness: Float): Int {
@@ -127,10 +135,11 @@ class ColorLEDControl @JvmOverloads constructor(
     }
 
     init {
-        val layout = LayoutInflater.from(context).inflate(
-                R.layout.iodemo_color_leds, this, false) as LinearLayout
+//        val layout = LayoutInflater.from(context).inflate(
+//                R.layout.iodemo_color_leds, this, false) as LinearLayout
+        val layout = IodemoColorLedsBinding.inflate(LayoutInflater.from(context))
         setupViews(layout)
-        addView(layout)
+        addView(layout.root)
 
         val color = hsvToRGB(hue, brightness)
 

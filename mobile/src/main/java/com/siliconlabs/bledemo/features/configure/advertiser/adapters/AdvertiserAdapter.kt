@@ -112,9 +112,13 @@ class AdvertiserAdapter(
         }
 
         private fun handleDetailsView(item: Advertiser) {
+            println("Show Advertiser Data ${item.data}")
+
             viewBinding.llAdvertisementDetails.apply {
                 removeAllViews()
-                addView(AdvertiserDetails(itemView.context).getAdvertiserDetailsView(item, translator))
+
+                val advertiserDetailContainer = AdvertiserDetails(itemView.context).getAdvertiserDetailsView(item, translator)
+                addView(advertiserDetailContainer.rootView,LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             }
             toggleDetailsView(item.displayDetailsView)
         }
@@ -131,6 +135,7 @@ class AdvertiserAdapter(
         }
 
         fun toggleDetailsView(displayDetails: Boolean) {
+            println("displayDetails:--> $displayDetails")
             viewBinding.llAdvertisementDetails.visibility = if (displayDetails) View.VISIBLE else View.GONE
             viewBinding.expandArrow.setState(displayDetails)
         }

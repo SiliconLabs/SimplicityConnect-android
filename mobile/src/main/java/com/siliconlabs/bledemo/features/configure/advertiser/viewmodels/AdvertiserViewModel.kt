@@ -116,7 +116,9 @@ class AdvertiserViewModel(private val advertiserStorage: AdvertiserStorage) : Vi
 
     fun switchAllItemsOff() {
         _advertisers.value?.forEachIndexed { index, advertiser ->
-            if (advertiser.isRunning) { stopAdvertiserItem(index) }
+            //if (advertiser.isRunning) {
+                stopAdvertiserItem(index)
+            //}
         }
         saveAdvertiserList()
     }

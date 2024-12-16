@@ -11,7 +11,7 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.FragmentFilterBinding
 import com.siliconlabs.bledemo.home_screen.fragments.ScanFragment
 import com.siliconlabs.bledemo.utils.FilterDeviceParams
-import kotlinx.android.synthetic.main.fragment_filter.*
+//import kotlinx.android.synthetic.main.fragment_filter.*
 import java.util.*
 
 class FilterFragment : DialogFragment() {
@@ -25,7 +25,11 @@ class FilterFragment : DialogFragment() {
         viewModel = (parentFragment as ScanFragment).viewModel
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         setHasOptionsMenu(true)
         viewBinding = FragmentFilterBinding.inflate(inflater)
         return viewBinding.root
@@ -50,6 +54,7 @@ class FilterFragment : DialogFragment() {
                 resetFilters()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -72,10 +77,13 @@ class FilterFragment : DialogFragment() {
                     seekBarRssi.seekControlBar.progress = getSeekbarProgress(it.rssiValue)
                     seekBarRssi.seekControlText.text = getString(R.string.n_dBm, it.rssiValue)
                 }
-                if (it.bleFormats.contains(BleFormat.UNSPECIFIED)) beaconTypeUnspecified.isChecked = true
-                if (it.bleFormats.contains(BleFormat.ALT_BEACON)) beaconTypeAltBeacon.isChecked = true
+                if (it.bleFormats.contains(BleFormat.UNSPECIFIED)) beaconTypeUnspecified.isChecked =
+                    true
+                if (it.bleFormats.contains(BleFormat.ALT_BEACON)) beaconTypeAltBeacon.isChecked =
+                    true
                 if (it.bleFormats.contains(BleFormat.I_BEACON)) beaconTypeIBeacon.isChecked = true
-                if (it.bleFormats.contains(BleFormat.EDDYSTONE)) beaconTypeEddystone.isChecked = true
+                if (it.bleFormats.contains(BleFormat.EDDYSTONE)) beaconTypeEddystone.isChecked =
+                    true
 
                 if (it.isOnlyConnectable) cbOnlyConnectable.isChecked = true
                 if (it.isOnlyBonded) cbOnlyBonded.isChecked = true
@@ -117,7 +125,8 @@ class FilterFragment : DialogFragment() {
                 }
             }
 
-            seekBarRssi.seekControlBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            seekBarRssi.seekControlBar.setOnSeekBarChangeListener(object :
+                SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                     rssiFlag = true
                     val rssi = getRssiValue(progress)
@@ -134,7 +143,7 @@ class FilterFragment : DialogFragment() {
         return progress - requireContext().resources.getInteger(R.integer.rssi_value_range)
     }
 
-    private fun getSeekbarProgress(rssiValue: Int) : Int {
+    private fun getSeekbarProgress(rssiValue: Int): Int {
         return rssiValue + requireContext().resources.getInteger(R.integer.rssi_value_range)
     }
 
@@ -154,13 +163,13 @@ class FilterFragment : DialogFragment() {
         val name = viewBinding.etSearchDeviceName.text.toString()
         val rssi = getRssiValue(viewBinding.seekBarRssi.seekControlBar.progress)
         val activeFilter = FilterDeviceParams(
-                if (name.isNotBlank()) name else null,
-                rssi,
-                rssiFlag,
-                selectedBeacons,
-                cb_only_favourites.isChecked,
-                cb_only_connectable.isChecked,
-                cb_only_bonded.isChecked
+            if (name.isNotBlank()) name else null,
+            rssi,
+            rssiFlag,
+            selectedBeacons,
+            viewBinding.cbOnlyFavourites.isChecked,
+            viewBinding.cbOnlyConnectable.isChecked,
+            viewBinding.cbOnlyBonded.isChecked
         )
         return if (!activeFilter.isEmpty) activeFilter else null
     }

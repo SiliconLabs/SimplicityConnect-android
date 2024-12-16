@@ -1,6 +1,8 @@
 package com.siliconlabs.bledemo.bluetooth.parsing
 
 import android.bluetooth.BluetoothGattDescriptor
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.siliconlabs.bledemo.utils.Converters
 import com.siliconlabs.bledemo.utils.StringUtils.removeWhitespaceAndCommaIfNeeded
 import java.lang.StringBuilder
@@ -8,6 +10,7 @@ import java.util.*
 
 class DescriptorParser(val descriptor: BluetoothGattDescriptor) {
 
+    @RequiresApi(Build.VERSION_CODES.GINGERBREAD)
     fun getFormattedValue(): String {
         val uuid = descriptor.uuid
         val value = descriptor.value
@@ -64,7 +67,7 @@ class DescriptorParser(val descriptor: BluetoothGattDescriptor) {
             }
         }
 
-        return "0x".plus(Converters.bytesToHex(value).toUpperCase(Locale.ROOT))
+        return "0x".plus(Converters.bytesToHex(value).uppercase(Locale.ROOT))
     }
 
 
@@ -127,7 +130,7 @@ class DescriptorParser(val descriptor: BluetoothGattDescriptor) {
         return Converters.byteToUnsignedInt(bytes[0]).toString()
     }
 
-
+    @RequiresApi(Build.VERSION_CODES.GINGERBREAD)
     private fun getReportReference(bytes: ByteArray): String {
         return if (bytes.size != 2) {
             return getUnknownValue(bytes)
@@ -136,14 +139,17 @@ class DescriptorParser(val descriptor: BluetoothGattDescriptor) {
             val reportType = bytes[1]
 
             val result = StringBuilder()
-            result.append("Report ID: 0x").append(Converters.getHexValue(reportId).toUpperCase(Locale.ROOT)).append("\n")
-            result.append("Report Type: 0x").append(Converters.getHexValue(reportType).toUpperCase(Locale.ROOT))
+            result.append("Report ID: 0x").append(Converters.getHexValue(reportId)
+                .uppercase(Locale.ROOT)).append("\n")
+            result.append("Report Type: 0x").append(Converters.getHexValue(reportType)
+                .uppercase(Locale.ROOT))
 
             result.toString()
         }
     }
 
-
+    
+    @RequiresApi(Build.VERSION_CODES.GINGERBREAD)
     private fun getValidRange(bytes: ByteArray): String {
         val size = bytes.size
 
@@ -154,20 +160,21 @@ class DescriptorParser(val descriptor: BluetoothGattDescriptor) {
 
             result.append("Lower inclusive value: 0x")
             for (i in 0 until size / 2) {
-                result.append(Converters.getHexValue(bytes[i]).toUpperCase(Locale.ROOT))
+                result.append(Converters.getHexValue(bytes[i]).uppercase(Locale.ROOT))
             }
 
             result.append("\nUpper inclusive value: 0x")
             for (i in size / 2 until size) {
-                result.append(Converters.getHexValue(bytes[i]).toUpperCase(Locale.ROOT))
+                result.append(Converters.getHexValue(bytes[i]).uppercase(Locale.ROOT))
             }
 
             return result.toString()
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.GINGERBREAD)
     private fun getUnknownValue(bytes: ByteArray): String {
-        return "Unknown value: 0x".plus(Converters.bytesToHex(bytes).toUpperCase(Locale.ROOT))
+        return "Unknown value: 0x".plus(Converters.bytesToHex(bytes).uppercase(Locale.ROOT))
     }
 
 

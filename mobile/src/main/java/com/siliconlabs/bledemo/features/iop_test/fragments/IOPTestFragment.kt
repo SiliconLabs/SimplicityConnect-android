@@ -20,18 +20,20 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.features.iop_test.activities.IOPTestActivity
 import com.siliconlabs.bledemo.features.iop_test.adapters.IOPTestAdapter
 import com.siliconlabs.bledemo.features.iop_test.models.IOPTest
 import com.siliconlabs.bledemo.features.iop_test.models.ItemTestCaseInfo
 import com.siliconlabs.bledemo.common.other.CardViewListDecoration
-import kotlinx.android.synthetic.main.fragment_iop_test.*
+import com.siliconlabs.bledemo.databinding.FragmentIopTestBinding
 import java.util.*
 
 class IOPTestFragment : Fragment(R.layout.fragment_iop_test), IOPTestActivity.Listener {
     private lateinit var testAdapter: IOPTestAdapter
     private var listItemTest: List<ItemTestCaseInfo> = ArrayList()
+    private val binding by viewBinding(FragmentIopTestBinding::bind)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,7 +48,8 @@ class IOPTestFragment : Fragment(R.layout.fragment_iop_test), IOPTestActivity.Li
 
     private fun initAdapter() {
         testAdapter = IOPTestAdapter(listItemTest)
-        rv_iop_tests.apply {
+
+        binding.rvIopTests.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             addItemDecoration(CardViewListDecoration())
             this.adapter = testAdapter
@@ -54,8 +57,8 @@ class IOPTestFragment : Fragment(R.layout.fragment_iop_test), IOPTestActivity.Li
     }
 
     override fun scrollViewToPosition(position: Int) {
-        rv_iop_tests.post {
-            rv_iop_tests.smoothScrollToPosition(position)
+        binding.rvIopTests.post {
+            binding.rvIopTests.smoothScrollToPosition(position)
         }
     }
 

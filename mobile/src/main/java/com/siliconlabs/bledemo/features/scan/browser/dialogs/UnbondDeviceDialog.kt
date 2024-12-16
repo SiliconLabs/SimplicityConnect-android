@@ -6,24 +6,37 @@ import android.view.View
 import android.view.ViewGroup
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.DialogInfoOkCancelBinding
 import com.siliconlabs.bledemo.utils.SharedPrefUtils
-import kotlinx.android.synthetic.main.dialog_info_ok_cancel.view.*
+
 
 class UnbondDeviceDialog(val callback: Callback) : BaseDialogFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_info_ok_cancel, container, false).apply {
+    private lateinit var binding: DialogInfoOkCancelBinding//dialog_info_ok_cancel
 
-            tv_dialog_title.text = context.getString(R.string.device_services_title_unbond_device)
-            tv_dialog_content.text = context.getString(R.string.device_services_note_unbond_device)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DialogInfoOkCancelBinding.inflate(inflater, container, false).apply {
 
-            btn_ok.setOnClickListener {
-                if (cb_dont_show_again.isChecked) SharedPrefUtils(requireContext()).setShouldDisplayUnbondDeviceDialog(false)
-                callback.onOkClicked()
-                dismiss()
-            }
-            btn_cancel.setOnClickListener { dismiss() }
+            tvDialogTitle.text =
+                requireContext().getString(R.string.device_services_title_unbond_device)
+            tvDialogContent.text =
+                requireContext().getString(R.string.device_services_note_unbond_device)
+
+            btnOk
+                .setOnClickListener {
+                    if (cbDontShowAgain.isChecked) SharedPrefUtils(requireContext()).setShouldDisplayUnbondDeviceDialog(
+                        false
+                    )
+                    callback.onOkClicked()
+                    dismiss()
+                }
+            btnCancel.setOnClickListener { dismiss() }
         }
+        return binding.root
     }
 
     interface Callback {

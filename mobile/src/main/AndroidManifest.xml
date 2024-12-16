@@ -23,6 +23,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -31,7 +32,7 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".application.SiliconLabsDemoApplication"
         android:allowBackup="false"
@@ -43,7 +44,10 @@
         android:theme="@style/MainAppTheme"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup">
-
+        <activity
+            android:name=".features.demo.wifi_throughput.activities.WifiThroughputActivity"
+            android:exported="false"
+            android:theme="@style/MainAppTheme" />
         <activity
             android:name=".features.configure.gatt_configurator.activities.GattServerActivity"
             android:label="@string/title_new_GATT_Server" />

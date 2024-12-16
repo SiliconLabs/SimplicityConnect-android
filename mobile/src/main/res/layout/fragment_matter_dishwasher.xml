@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/sl_light_grey">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="top|center_vertical"
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
+
+        <TextView
+            android:id="@+id/txt_cluster_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="@dimen/matter_5dp"
+            android:gravity="center"
+            android:text="@string/matter_dishwasher_cluster"
+            android:textColor="@color/masala"
+            android:textSize="@dimen/text_size_XL"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_cluster_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="@dimen/matter_5dp"
+            android:gravity="center"
+            android:text="@string/matter_dishwasher_cluster"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/text_size_L"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/btn_matter_device_state"
+            android:layout_width="@dimen/matter_200dp"
+            android:layout_height="@dimen/matter_200dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/matter_10dp"
+            android:layout_marginBottom="@dimen/matter_18dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter" />
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_on"
+                    style="@style/MatterButtonBlue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/matter_20dp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/btn_pause"
+                    style="@style/MatterButtonBlue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/matter_20dp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/btn_off"
+                    style="@style/MatterButtonBlue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/matter_20dp"
+                    android:layout_weight="1" />
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginHorizontal="@dimen/matter_10dp"
+                android:layout_marginTop="@dimen/matter_15dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    app:cardCornerRadius="@dimen/matter_8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/matter_10dp"
+                            android:gravity="start"
+                            android:orientation="horizontal">
+
+
+                            <ImageView
+                                android:layout_width="@dimen/matter_30dp"
+                                android:layout_height="@dimen/matter_30dp"
+                                android:layout_gravity="center_horizontal|center"
+                                android:background="@drawable/background_blue_box"
+                                android:src="@drawable/ic_electric_dish_washer">
+
+                            </ImageView>
+
+                            <TextView
+                                android:id="@+id/txt_energy_consumed_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/matter_5dp"
+                                android:layout_weight="1"
+                                android:text="@string/matter_dishwasher_energy_consumption_title"
+                                android:textColor="@color/masala"
+                                android:textSize="@dimen/matter_20dp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/matter_5dp"
+                                android:text="@string/dish_washer_timing"
+                                android:textColor="@color/masala"
+                                android:textSize="@dimen/matter_20dp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/matter_1dp"
+                            android:background="@color/sl_light_grey"></View>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="@dimen/matter_5dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_marginStart="@dimen/matter_5dp"
+                                android:id="@+id/tv_total_energy_consumption"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/matter_5dp"
+                                android:layout_marginBottom="@dimen/matter_5dp"
+                                android:text="@string/matter_zero_prefix"
+                                android:textColor="@color/masala"
+                                android:textSize="@dimen/text_size_L"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/matter_5dp"
+                                android:layout_weight="1"
+                                android:text="@string/matter_total"
+                                android:textColor="@color/silabs_grey"
+                                android:textSize="@dimen/text_size_M"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="@dimen/matter_5dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_marginStart="@dimen/matter_5dp"
+                                android:id="@+id/tv_current_cycle_energy_comp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/matter_5dp"
+                                android:layout_marginBottom="@dimen/matter_5dp"
+                                android:text="@string/matter_zero_prefix"
+                                android:textColor="@color/masala"
+                                android:textSize="@dimen/text_size_L"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/matter_5dp"
+                                android:layout_weight="1"
+                                android:text="@string/matter_in_current_cycle"
+                                android:textColor="@color/silabs_grey"
+                                android:textSize="@dimen/text_size_M"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="@dimen/matter_5dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_marginStart="@dimen/matter_5dp"
+                                android:id="@+id/tv_energy_meter_reading"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/matter_5dp"
+                                android:layout_marginBottom="@dimen/matter_5dp"
+                                android:text="@string/matter_zero_prefix"
+                                android:textColor="@color/masala"
+                                android:textSize="@dimen/text_size_L"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/matter_5dp"
+                                android:layout_weight="1"
+                                android:text="@string/mater_average_energy_per_cycle"
+                                android:textColor="@color/silabs_grey"
+                                android:textSize="@dimen/text_size_M"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <ProgressBar
+                                android:id="@+id/matterProgressBar"
+                                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/matter_10dp"
+                                android:layout_marginBottom="8dp"
+                                android:layoutDirection="rtl"
+                                android:progressDrawable="@drawable/progress_bar_right_to_left" />
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:orientation="horizontal"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:id="@+id/tv_completed_cycle_text"
+                                    android:layout_width="@dimen/matter_0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:textColor="#000000"
+                                    android:textSize="15sp"
+                                    tools:text="Completed Cycle" />
+
+                                <TextView
+                                    android:id="@+id/progressMatterText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="#000000"
+                                    android:textSize="15sp"
+                                    tools:text="Remaining time in 10mins" />
+                            </LinearLayout>
+
+                            <!-- Text color -->
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <com.siliconlabs.bledemo.common.views.HorizontalShadow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/matter_10dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:textSize="12sp"
+            android:padding="@dimen/matter_10dp"
+            android:textColor="@color/masala"
+            android:gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:text="@string/dishwasher_resfresh_text"
+            android:layout_height="wrap_content">
+        </TextView>
+
+    </LinearLayout>
+</RelativeLayout>
+

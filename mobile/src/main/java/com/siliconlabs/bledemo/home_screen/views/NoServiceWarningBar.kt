@@ -7,9 +7,11 @@ import android.provider.Settings
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat.startActivity
 import androidx.fragment.app.FragmentManager
 import com.siliconlabs.bledemo.databinding.NoServiceWarningBarBinding
 import com.siliconlabs.bledemo.home_screen.dialogs.WarningBarInfoDialog
+
 
 abstract class NoServiceWarningBar(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
 
@@ -29,6 +31,13 @@ abstract class NoServiceWarningBar(context: Context, attrs: AttributeSet?) : Lin
         Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             .apply { data = Uri.fromParts("package", context.packageName, null) }
             .also { context.startActivity(it) }
+    }
+
+    protected fun showAppNotificationSettingsScreen() {
+        val intent = Intent()
+        intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName())
+        context.startActivity(intent)
     }
 
     protected fun showInfoDialog(type: WarningBarInfoDialog.Type) {

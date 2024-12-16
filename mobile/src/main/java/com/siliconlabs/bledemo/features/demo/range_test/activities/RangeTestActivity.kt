@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.WindowManager
 import android.widget.TextView
@@ -16,6 +17,7 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
 import com.siliconlabs.bledemo.bluetooth.ble.*
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
+import com.siliconlabs.bledemo.databinding.ActivityRangeTestBinding
 import com.siliconlabs.bledemo.features.demo.range_test.dialogs.RangeTestModeDialog
 import com.siliconlabs.bledemo.features.demo.range_test.fragments.RangeTestFragment
 import com.siliconlabs.bledemo.features.demo.range_test.models.*
@@ -25,7 +27,6 @@ import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPres
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
 import com.siliconlabs.bledemo.utils.Notifications
-import kotlinx.android.synthetic.main.activity_range_test.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -39,7 +40,7 @@ import kotlin.math.abs
 @SuppressLint("MissingPermission")
 class RangeTestActivity : BaseDemoActivity(), Controller {
 
-      private var lowerLimit: Int = 0
+    private var lowerLimit: Int = 0
     private var upperLimit: Int = 0
     private var descriptor2906: BluetoothGattDescriptor? = null
     private var activeDeviceId = 1
@@ -53,7 +54,7 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
     private var timerStarted = false
 
     private var retryAttempts = 0
-
+    private lateinit var binding: ActivityRangeTestBinding
     private var txUpdateTimer: TxUpdateTimer? = null
 
 
@@ -125,23 +126,26 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_range_test)
+        binding = ActivityRangeTestBinding.inflate(LayoutInflater.from(baseContext))
+        setContentView(binding.root)
+        //setContentView(R.layout.activity_range_test)
         setupUiListeners()
     }
 
     private fun setupUiListeners() {
-        tv_device1_tab.setOnClickListener {
-            changeDevice(tv_device1_tab, 1)
+
+        binding.tvDevice1Tab.setOnClickListener {
+            changeDevice(binding.tvDevice1Tab, 1)
         }
 
-        tv_device2_tab.setOnClickListener {
-            changeDevice(tv_device2_tab, 2)
+        binding.tvDevice2Tab.setOnClickListener {
+            changeDevice(binding.tvDevice2Tab, 2)
         }
     }
 
     override fun onBluetoothServiceBound() {
-        selectTab(tv_device1_tab)
-        changeDevice(tv_device1_tab, 1)
+        selectTab(binding.tvDevice1Tab)
+        changeDevice(binding.tvDevice1Tab, 1)
     }
 
 
@@ -191,8 +195,8 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                         }
                     })
                 }.also {
-                it.show(supportFragmentManager, "select_device_dialog")
-            }
+                    it.show(supportFragmentManager, "select_device_dialog")
+                }
         } else {
             showRangeTestFragment(presenter.getMode())
         }
@@ -567,11 +571,11 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                         presenter.resetDeviceAt(resetDeviceId)
 
                         if (resetDeviceId == 1) {
-                            tv_device1_tab.text = getString(R.string.range_test_no_device)
-                            changeDevice(tv_device1_tab, 1)
+                            binding.tvDevice1Tab.text = getString(R.string.range_test_no_device)
+                            changeDevice(binding.tvDevice1Tab, 1)
                         } else {
-                            tv_device2_tab.text = getString(R.string.range_test_no_device)
-                            changeDevice(tv_device2_tab, 2)
+                            binding.tvDevice2Tab.text = getString(R.string.range_test_no_device)
+                            changeDevice(binding.tvDevice2Tab, 2)
                         }
                     }
                 }
@@ -785,9 +789,9 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
         ) {
             super.onCharacteristicRead(gatt, characteristic, status)
 
-            val descriptorUuid=UUID.fromString("00002906-0000-1000-8000-00805f9b34fb")
-            if(characteristic!=null){
-                descriptor2906=characteristic.getDescriptor(descriptorUuid)
+            val descriptorUuid = UUID.fromString("00002906-0000-1000-8000-00805f9b34fb")
+            if (characteristic != null) {
+                descriptor2906 = characteristic.getDescriptor(descriptorUuid)
             }
             if (status != BluetoothGatt.GATT_SUCCESS) {
                 handleConnectionError()
@@ -806,9 +810,8 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
                     if (descriptors.size > 1) {
                         queueReadDescriptor(gatt, characteristic, descriptors[descriptors.size - 1])
                     }
-                }
-                else{
-                    if (gattCharacteristic===GattCharacteristic.RangeTestChannel){
+                } else {
+                    if (gattCharacteristic === GattCharacteristic.RangeTestChannel) {
                         val descriptors = characteristic.descriptors
                         if (descriptors.size > 1) {
                             descriptor2906?.let { queueReadDescriptor(gatt, characteristic, it) }
@@ -828,16 +831,18 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             if (descriptor?.uuid == UUID.fromString("00002906-0000-1000-8000-00805f9b34fb")) {
                 try {
                     val validRangeValue = descriptor.value
-                    lowerLimit = (validRangeValue[1].toInt() and 0xFF) shl 8 or (validRangeValue[0].toInt() and 0xFF)
-                    upperLimit = (validRangeValue[3].toInt() and 0xFF) shl 8 or (validRangeValue[2].toInt() and 0xFF)
+                    lowerLimit =
+                        (validRangeValue[1].toInt() and 0xFF) shl 8 or (validRangeValue[0].toInt() and 0xFF)
+                    upperLimit =
+                        (validRangeValue[3].toInt() and 0xFF) shl 8 or (validRangeValue[2].toInt() and 0xFF)
                     RangeTestValues.setChannelsMinMax(lowerLimit, upperLimit)
-                    val gattCharacteristic1 = GattCharacteristic.fromUuid(descriptor.characteristic.uuid)
+                    val gattCharacteristic1 =
+                        GattCharacteristic.fromUuid(descriptor.characteristic.uuid)
                     gattCharacteristic1?.let {
                         updatePresenter(gatt, descriptor, it)
                     }
 
-                }catch (e:Exception)
-                {
+                } catch (e: Exception) {
                     e.stackTrace
                 }
             }
@@ -1221,8 +1226,8 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
     }
 
     private fun selectTab(tvTab: TextView) {
-        setTabUnselected(tv_device1_tab)
-        setTabUnselected(tv_device2_tab)
+        setTabUnselected(binding.tvDevice1Tab)
+        setTabUnselected(binding.tvDevice2Tab)
         setTabSelected(tvTab)
     }
 
@@ -1244,7 +1249,7 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
             android.R.id.home -> {
                 service?.disconnectAllGatts()
                 gatt?.disconnect()
-                Handler(Looper.getMainLooper()).postDelayed({ onBackPressed() },500)
+                Handler(Looper.getMainLooper()).postDelayed({ onBackPressed() }, 500)
                 true
             }
 

@@ -12,22 +12,29 @@ import com.siliconlabs.bledemo.features.configure.advertiser.models.Service128Bi
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.Validator
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.R
-import kotlinx.android.synthetic.main.dialog_data_128bit_service.view.*
+import com.siliconlabs.bledemo.databinding.DialogData128bitServiceBinding
+//import kotlinx.android.synthetic.main.dialog_data_128bit_service.view.*
 import java.util.*
 
 class Service128BitDataDialog(val callback: Callback) : BaseDialogFragment() {
+    private lateinit var binding: DialogData128bitServiceBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_data_128bit_service, container, false).apply {
-            btn_cancel.setOnClickListener { dismiss() }
-            btn_save.setOnClickListener {
-                handleSave(et_128bit_service)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DialogData128bitServiceBinding.inflate(inflater, container, false).apply {
+            btnCancel.setOnClickListener { dismiss() }
+            btnSave.setOnClickListener {
+                handleSave(et128bitService)
                 dismiss()
             }
-            btn_clear.setOnClickListener { et_128bit_service.setText("") }
+            btnClear.setOnClickListener { et128bitService.setText("") }
 
-            handleUuidChanges(et_128bit_service, btn_save)
+            handleUuidChanges(et128bitService, btnSave)
         }
+        return binding.root
     }
 
     private fun handleSave(et: EditText) {

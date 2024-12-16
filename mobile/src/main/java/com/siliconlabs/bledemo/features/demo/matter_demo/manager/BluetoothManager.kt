@@ -196,7 +196,7 @@ class BluetoothManager : BleCallback {
                 wrappedCallback.onCharacteristicChanged(gatt, characteristic)
             }
 
-            @SuppressLint("MissingPermission")
+            @SuppressLint("MissingPermission", "LogNotTimber")
             override fun onCharacteristicRead(
                 gatt: BluetoothGatt,
                 characteristic: BluetoothGattCharacteristic,

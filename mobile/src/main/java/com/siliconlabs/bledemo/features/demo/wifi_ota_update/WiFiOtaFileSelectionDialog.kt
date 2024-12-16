@@ -7,18 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.databinding.DialogWifiOtaFileUpdateBinding
-import kotlinx.android.synthetic.main.dialog_ota_file_selection_iop.ota_cancel
 
-class WiFiOtaFileSelectionDialog(private val cancelCallback: CancelCallback,
-                                 private val listener: FileSelectionListener, private val ipAddress: String?) : BaseDialogFragment(
-        hasCustomWidth = true,
-        isCanceledOnTouchOutside = false
+
+class WiFiOtaFileSelectionDialog(
+    private val cancelCallback: CancelCallback,
+    private val listener: FileSelectionListener, private val ipAddress: String?
+) : BaseDialogFragment(
+    hasCustomWidth = true,
+    isCanceledOnTouchOutside = false
 ) {
 
     private lateinit var _binding: DialogWifiOtaFileUpdateBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         _binding = DialogWifiOtaFileUpdateBinding.inflate(inflater)
         _binding.wifiIpAddress.text = ipAddress
         return _binding.root
@@ -27,7 +31,7 @@ class WiFiOtaFileSelectionDialog(private val cancelCallback: CancelCallback,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUiListeners()
-        ota_cancel.setOnClickListener {
+        _binding.otaCancel.setOnClickListener {
             dismiss()
             cancelCallback.onDismiss()
         }
@@ -49,6 +53,7 @@ class WiFiOtaFileSelectionDialog(private val cancelCallback: CancelCallback,
     fun checkPortNumberValid(): Boolean {
         return _binding.portId.text.length >= 4
     }
+
     fun changeFileName(newName: String?) {
         _binding.selectAppFileBtn.text = newName
     }
@@ -61,7 +66,7 @@ class WiFiOtaFileSelectionDialog(private val cancelCallback: CancelCallback,
         _binding.otaProceed.isEnabled = false
     }
 
-    fun getPortId() : String {
+    fun getPortId(): String {
         return _binding.portId.text.toString()
     }
 

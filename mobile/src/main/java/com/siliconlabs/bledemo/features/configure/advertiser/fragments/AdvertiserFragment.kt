@@ -25,6 +25,7 @@ import com.siliconlabs.bledemo.home_screen.activities.MainActivity
 import com.siliconlabs.bledemo.common.other.CardViewListDecoration
 import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
+import com.siliconlabs.bledemo.home_screen.base.NotificationDependent
 
 
 class AdvertiserFragment : BaseServiceDependentMainMenuFragment(), AdvertiserAdapter.OnItemClickListener {
@@ -50,8 +51,9 @@ class AdvertiserFragment : BaseServiceDependentMainMenuFragment(), AdvertiserAda
                 viewModelStore,
                 AdvertiserViewModel.Factory(AdvertiserStorage(requireContext()))
         ).get(AdvertiserViewModel::class.java)
-        service = (activity as MainActivity).bluetoothService!!
-
+        if(null != (activity as MainActivity).bluetoothService){
+            service = (activity as MainActivity).bluetoothService!!
+        }
         initMainViewValues()
         setUiListeners()
         observeChanges()
@@ -113,6 +115,8 @@ class AdvertiserFragment : BaseServiceDependentMainMenuFragment(), AdvertiserAda
             viewBinding.bluetoothPermissionsBar.setFragmentManager(childFragmentManager)
         }
     }
+
+
 
     private fun initAdapter() {
         advertiserAdapter = AdvertiserAdapter(viewModel?.advertisers?.value ?: arrayListOf(), this)
@@ -185,6 +189,7 @@ class AdvertiserFragment : BaseServiceDependentMainMenuFragment(), AdvertiserAda
             } else {
                 fullScreenInfo.root.visibility = View.VISIBLE
                 rvMainView.visibility = View.GONE
+                restoreHiddenUI()
             }
         }
     }

@@ -5,9 +5,8 @@
 
     <androidx.gridlayout.widget.GridLayout
         android:id="@+id/env_grid"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:paddingTop="@dimen/iodemo_margin"
         android:paddingLeft="@dimen/iodemo_margin"
         android:paddingRight="@dimen/iodemo_margin"

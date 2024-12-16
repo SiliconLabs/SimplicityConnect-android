@@ -5,35 +5,40 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
-import kotlinx.android.synthetic.main.dialog_info_ok_cancel.view.*
+import com.siliconlabs.bledemo.databinding.DialogInfoOkCancelBinding
+
 
 abstract class RemovalDialog(
     @StringRes private val nameRes: Int,
     private val onOkClicked: () -> Unit
 ) : BaseDialogFragment() {
-
+    //  private val binding by viewBinding(DialogInfoOkCancelBinding::bind)
+    private lateinit var binding: DialogInfoOkCancelBinding
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = inflater
-        .inflate(R.layout.dialog_info_ok_cancel, container, false)
-        .apply {
-            val name = context.getString(nameRes)
-            tv_dialog_title.text = context.getString(R.string.dialog_title_remove, name)
-            tv_dialog_content.text = context.getString(R.string.dialog_description_remove, name)
+    ): View {
+        binding = DialogInfoOkCancelBinding.inflate(inflater, container, false).apply {
+            val name = context?.getString(nameRes)
+            tvDialogTitle.text = context?.getString(R.string.dialog_title_remove, name)
+            tvDialogContent.text =
+                context?.getString(R.string.dialog_description_remove, name)
 
-            btn_ok.setOnClickListener {
-                if (cb_dont_show_again.isChecked) {
+            btnOk.setOnClickListener {
+                if (binding.cbDontShowAgain.isChecked) {
                     blockDisplayingRemovalDialog()
                 }
                 onOkClicked()
                 dismiss()
             }
-            btn_cancel.setOnClickListener { dismiss() }
+            btnCancel.setOnClickListener { dismiss() }
         }
+        return binding.root
+    }
 
     abstract fun blockDisplayingRemovalDialog()
 }

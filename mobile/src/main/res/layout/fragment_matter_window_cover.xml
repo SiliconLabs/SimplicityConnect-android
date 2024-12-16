@@ -19,19 +19,36 @@
                 android:textSize="@dimen/text_size_XL"
                 android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/btn_matter_window_state"
+            <FrameLayout
+                android:layout_marginTop="@dimen/matter_30dp"
                 android:layout_width="wrap_content"
-                android:layout_height="300dp"
+                android:layout_height="250dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="@dimen/matter_18dp"
-                android:background="@color/silabs_transparent"
-                android:scaleType="centerInside" />
+                android:layout_marginBottom="@dimen/matter_30dp">
+
+                <ImageView
+                    android:id="@+id/btn_matter_window_state"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/matter_20dp"
+                    android:background="@color/silabs_transparent"
+                    android:scaleType="centerInside" />
+
+                <ImageView
+                    android:id="@+id/overlay_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/matter_20dp"
+                    android:background="@color/silabs_transparent"
+                    android:scaleType="centerInside" />
+            </FrameLayout>
 
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/matter_10dp"
+                android:layout_marginLeft="@dimen/matter_10dp"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center"
                 android:orientation="horizontal">
@@ -39,20 +56,87 @@
                 <Button
                     android:id="@+id/btn_window_open"
                     style="@style/MatterButtonBlue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/matter_20dp"
+                    android:layout_width="@dimen/matter_200dp"
+                    android:layout_height="@dimen/matter_50dp"
+                    android:layout_margin="@dimen/matter_10dp"
                     android:layout_weight="1"
+                    android:textSize="@dimen/text_size_SM"
                     android:text="@string/matter_window_open" />
 
                 <Button
                     android:id="@+id/btn_window_close"
                     style="@style/MatterButtonBlue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/matter_20dp"
+                    android:layout_width="@dimen/matter_200dp"
+                    android:layout_height="@dimen/matter_50dp"
+                    android:textSize="@dimen/text_size_SM"
+                    android:layout_margin="@dimen/matter_10dp"
                     android:layout_weight="1"
                     android:text="@string/matter_window_close" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/matter_10dp"
+                android:layout_marginLeft="@dimen/matter_10dp"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <EditText
+                    android:layout_weight="1"
+                    style="@style/MatterButtonBlue"
+                    android:id="@+id/et_lift"
+                    android:hint="@string/enter_lift_value"
+                    android:background="@drawable/background_grey_box"
+                    android:layout_width="@dimen/matter_200dp"
+                    android:layout_height="@dimen/matter_50dp"
+                    android:textSize="@dimen/text_size_SM"
+                    android:maxLength="3"
+                    android:layout_margin="@dimen/matter_10dp"
+                    android:inputType="number"
+                    android:textColor="@color/black"/>
+
+                <Button
+                    android:id="@+id/btn_window_lift"
+                    style="@style/MatterButtonBlue"
+                    android:layout_width="@dimen/matter_200dp"
+                    android:layout_height="@dimen/matter_50dp"
+                    android:textSize="@dimen/text_size_SM"
+                    android:layout_margin="@dimen/matter_10dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_weight="1"
+                    android:text="@string/lift" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:layout_marginRight="@dimen/matter_10dp"
+                android:layout_marginLeft="@dimen/matter_10dp"
+                android:orientation="horizontal">
+                <EditText
+                    android:layout_weight="1"
+                    style="@style/MatterButtonBlue"
+                    android:id="@+id/et_tilt"
+                    android:inputType="number"
+                    android:maxLength="3"
+                    android:hint="@string/enter_tilt_value"
+                    android:background="@drawable/background_grey_box"
+                    android:layout_width="@dimen/matter_200dp"
+                    android:layout_height="@dimen/matter_50dp"
+                    android:textSize="@dimen/text_size_SM"
+                    android:layout_margin="@dimen/matter_10dp"
+                    android:textColor="@color/black"/>
+
+                <Button
+                    android:id="@+id/btn_window_tilt"
+                    style="@style/MatterButtonBlue"
+                    android:layout_width="@dimen/matter_200dp"
+                    android:layout_height="@dimen/matter_50dp"
+                    android:textSize="@dimen/text_size_SM"
+                    android:layout_margin="@dimen/matter_10dp"
+                    android:layout_weight="1"
+                    android:text="@string/tilt" />
             </LinearLayout>
         </LinearLayout>
 

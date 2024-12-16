@@ -39,9 +39,9 @@ class MatterScannedResultFragment : Fragment() {
     private lateinit var scope: CoroutineScope
     private lateinit var deviceList: ArrayList<MatterScannedResultModel>
     private lateinit var binding: FragmentMatterScannedResultsBinding
-    private var deviceId: Long = 0;
-    private var deviceType: Int = 0;
-    private var pos: Int = 0;
+    private var deviceId: Long = 0
+    private var deviceType: Int = 0
+    private var pos: Int = 0
     private lateinit var matterAdapter: MatterScannedResultAdapter
     private lateinit var mPrefs: SharedPreferences
 
@@ -57,7 +57,7 @@ class MatterScannedResultFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         scope = viewLifecycleOwner.lifecycleScope
         binding = FragmentMatterScannedResultsBinding.inflate(inflater, container, false)
@@ -113,7 +113,10 @@ class MatterScannedResultFragment : Fragment() {
         binding.tvQuickStartHyperlink.movementMethod = LinkMovementMethod.getInstance()
 
         setListDisplay()
-        requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            onBackPressedCallback
+        )
 
     }
 
@@ -123,7 +126,7 @@ class MatterScannedResultFragment : Fragment() {
         if (deviceList.size !== 0) {
             Timber.tag(TAG).e("+ deviceList $deviceList")
             matterAdapter = MatterScannedResultAdapter(deviceList)
-            binding.recyclerViewScannedDevices.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+            binding.recyclerViewScannedDevices.scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
             binding.recyclerViewScannedDevices.adapter = matterAdapter
             binding.recyclerViewScannedDevices.addItemDecoration(
                 RecyclerViewMargin(resources.getDimensionPixelSize(R.dimen.matter_margin))
@@ -151,7 +154,6 @@ class MatterScannedResultFragment : Fragment() {
                         .setPositiveButton(ok, dialogClickListener)
                         .setNegativeButton(cancel, dialogClickListener).show()
                 }
-
             })
         } else {
             binding.placeholder.visibility = View.VISIBLE
@@ -189,7 +191,7 @@ class MatterScannedResultFragment : Fragment() {
 
 
     private fun navigateToDemos(model: MatterScannedResultModel) {
-        deviceType = model.deviceType!!
+        deviceType = model.deviceType
         when (deviceType) {
 
             THERMOSTAT_TYPE -> {
@@ -200,7 +202,7 @@ class MatterScannedResultFragment : Fragment() {
                 ).navigateToDemo(matterThermostatFragment, model)
             }
 
-            LIGHTNING_TYPE, ENHANCED_COLOR_LIGHT_TYPE, ONOFF_LIGHT_TYPE, TEMPERATURE_COLOR_LIGHT_TYPE -> {
+            DIMMABLE_LIGHT_TYPE, ENHANCED_COLOR_LIGHT_TYPE, ON_OFF_LIGHT_TYPE, COLOR_TEMPERATURE_LIGHT_TYPE -> {
                 val matterLightFragment = MatterLightFragment.newInstance()
                 FragmentUtils.getHost(
                     this@MatterScannedResultFragment,
@@ -208,7 +210,7 @@ class MatterScannedResultFragment : Fragment() {
                 ).navigateToDemo(matterLightFragment, model)
             }
 
-            WINDOW_TYPE -> {
+            WINDOW_COVERING_TYPE -> {
                 val matterWindowCoverFragment = MatterWindowCoverFragment.newInstance()
                 FragmentUtils.getHost(
                     this@MatterScannedResultFragment,
@@ -216,7 +218,7 @@ class MatterScannedResultFragment : Fragment() {
                 ).navigateToDemo(matterWindowCoverFragment, model)
             }
 
-            LOCK_TYPE -> {
+            DOOR_LOCK_TYPE -> {
                 val matterDoorFragment = MatterDoorFragment.newInstance()
                 FragmentUtils.getHost(
                     this@MatterScannedResultFragment,
@@ -248,13 +250,20 @@ class MatterScannedResultFragment : Fragment() {
                 ).navigateToDemo(matterTemperatureSensorFragment, model)
             }
 
-            PLUG_TYPE -> {
+            DIMMABLE_PLUG_IN_UNIT_TYPE -> {
                 val matterPlugFragment = MatterPlugFragment.newInstance()
                 FragmentUtils.getHost(
                     this@MatterScannedResultFragment,
-                    Callback::
-                    class.java
+                    Callback::class.java
                 ).navigateToDemo(matterPlugFragment, model)
+            }
+
+            DISHWASHER_TYPE -> {
+                val matterDishwasherFragment = MatterDishwasherFragment.newInstance()
+                FragmentUtils.getHost(
+                    this@MatterScannedResultFragment,
+                    Callback::class.java
+                ).navigateToDemo(matterDishwasherFragment, model)
             }
 
             else -> {
@@ -271,11 +280,6 @@ class MatterScannedResultFragment : Fragment() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-    }
-
 
     interface Callback {
         fun navigateToDemo(
@@ -289,18 +293,73 @@ class MatterScannedResultFragment : Fragment() {
         private const val ARG_DEVICE_LIST = "device_list"
         private const val TAG = "MatterScannedResultFragment"
         private const val MATTER_URL = "https://docs.silabs.com/matter/2.1.0/matter-overview"
-        public const val THERMOSTAT_TYPE = 769
-        public const val LIGHTNING_TYPE = 257
-        public const val WINDOW_TYPE = 514
-        public const val LOCK_TYPE = 10
-        public const val ENHANCED_COLOR_LIGHT_TYPE = 269
-        public const val ONOFF_LIGHT_TYPE = 256
-        public const val TEMPERATURE_COLOR_LIGHT_TYPE = 268
-       // public const val SWITCH_TYPE = 259
-        public const val OCCUPANCY_SENSOR_TYPE = 263
-        public const val TEMPERATURE_SENSOR_TYPE = 770
-        public const val CONTACT_SENSOR_TYPE = 21
-        public const val PLUG_TYPE = 267
+
+
+        //Lighting Type
+        const val ON_OFF_LIGHT_TYPE = 256
+        const val DIMMABLE_LIGHT_TYPE = 257
+        const val COLOR_TEMPERATURE_LIGHT_TYPE = 268
+        const val ENHANCED_COLOR_LIGHT_TYPE = 269
+
+        //smart plugs/outlets and other actuators
+        const val ON_OFF_PLUG_IN_UNIT_TYPE = 266
+        const val DIMMABLE_PLUG_IN_UNIT_TYPE = 267
+        const val PUMP = 771
+
+        //switches and controls
+        const val ON_OFF_LIGHT_SWITCH = 259
+        const val DIMMER_SWITCH = 260
+        const val COLOR_DIMMER_SWITCH = 261
+        const val CONTROL_BRIDGE = 2112
+        const val PUMP_CONTROLLER = 772
+        const val GENERIC_SWITCH = 15
+
+        //sensors
+        const val CONTACT_SENSOR_TYPE = 21
+        const val LIGHT_SENSOR_TYPE = 262
+        const val OCCUPANCY_SENSOR_TYPE = 263
+        const val TEMPERATURE_SENSOR_TYPE = 770
+        const val PRESSURE_SENSOR_TYPE = 773
+        const val FLOW_SENSOR_TYPE = 774
+        const val HUMIDITY_SENSOR_TYPE = 775
+        const val ON_OFF_SENSOR_TYPE = 2128
+        const val SMOKE_CO_ALARM_TYPE = 118
+
+        //closures
+        const val DOOR_LOCK_TYPE = 10
+        const val DOOR_LOCK_CONTROLLER_TYPE = 11
+        const val WINDOW_COVERING_TYPE = 514
+        const val WINDOW_COVERING_CONTROLLER_TYPE = 515
+
+        //HVAC
+        const val HEATING_COOLING_UNIT_TYPE = 768
+        const val THERMOSTAT_TYPE = 769
+        const val FAN_TYPE = 43
+        const val AIR_PURIFIER_TYPE = 45
+        const val AIR_QUALITY_SENSOR_TYPE = 44
+
+        //media
+        const val BASIC_VIDEO_PLAYER_TYPE = 40
+        const val CASTING_VIDEO_PLAYER_TYPE = 35
+        const val SPEAKER_TYPE = 34
+        const val CONTENT_APP_TYPE = 36
+        const val CASTING_VIDEO_CLIENT_TYPE = 41
+        const val VIDEO_REMOTE_CONTROL_TYPE = 42
+
+        //Generic
+        const val MODE_SELECT_TYPE = 39
+
+        //robotic devices
+        const val ROBOTIC_VACUUM_CLEANER_TYPE = 116
+
+        //appliances
+        const val REFRIGERATOR_TYPE = 112
+        const val TEMPERATURE_CONTROLLED_CABINET_TYPE = 113
+        const val ROOM_AIR_CONDITIONER_TYPE =114
+        const val LAUNDRY_WASHER_TYPE = 115
+        const val DISHWASHER_TYPE = 117
+
+        //Hyperlink const
         private const val HYPERLINK_START = 89
         private const val HYPERLINK_END = 107
 

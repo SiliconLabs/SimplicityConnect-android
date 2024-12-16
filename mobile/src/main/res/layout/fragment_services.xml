@@ -7,7 +7,7 @@
     tools:context=".features.scan.browser.fragments.ServicesFragment">
 
     <ScrollView
-        android:id="@+id/scrollview"
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 

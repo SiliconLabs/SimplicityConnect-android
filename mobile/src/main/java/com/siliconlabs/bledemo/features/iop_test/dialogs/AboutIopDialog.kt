@@ -8,15 +8,22 @@ import android.view.View
 import android.view.ViewGroup
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.R
-import kotlinx.android.synthetic.main.dialog_info_iop.*
+import com.siliconlabs.bledemo.databinding.DialogInfoIopBinding
+
 
 class AboutIopDialog : BaseDialogFragment(
-        hasCustomWidth = true,
-        isCanceledOnTouchOutside = true
+    hasCustomWidth = true,
+    isCanceledOnTouchOutside = true
 ) {
+    private lateinit var binding: DialogInfoIopBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_info_iop, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DialogInfoIopBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -25,9 +32,9 @@ class AboutIopDialog : BaseDialogFragment(
     }
 
     private fun handleClickEvents() {
-        btn_ok.setOnClickListener { dismiss() }
+        binding.btnOk.setOnClickListener { dismiss() }
 
-        btn_interoperability_test.setOnClickListener {
+        binding.btnInteroperabilityTest.setOnClickListener {
             handleClickOnInteroperabilityTest()
         }
     }
@@ -40,6 +47,7 @@ class AboutIopDialog : BaseDialogFragment(
     }
 
     companion object {
-        private const val IOP_LINK = "https://www.silabs.com/documents/public/application-notes/an1346-running-ble-iop-test.pdf"
+        private const val IOP_LINK =
+            "https://www.silabs.com/documents/public/application-notes/an1346-running-ble-iop-test.pdf"
     }
 }

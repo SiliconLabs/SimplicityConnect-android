@@ -15,32 +15,48 @@ import com.siliconlabs.bledemo.features.configure.advertiser.models.Manufacturer
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.Validator
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.DialogDataManufacturerBinding
 import com.siliconlabs.bledemo.utils.Converters
-import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.*
 
-class ManufacturerDataDialog(private val manufacturers: List<Manufacturer>, val callback: Callback) : BaseDialogFragment() {
+//import kotlinx.android.synthetic.main.dialog_data_manufacturer.view.*
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_data_manufacturer, container, false).apply {
+class ManufacturerDataDialog(
+    private val manufacturers: List<Manufacturer>,
+    val callback: Callback
+) : BaseDialogFragment() {
 
-            btn_clear.setOnClickListener {
-                et_company_identifier.setText("")
-                et_data_in_hex_format.setText("")
+    private lateinit var binding: DialogDataManufacturerBinding
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DialogDataManufacturerBinding.inflate(inflater, container, false).apply {
+
+            btnClear.setOnClickListener {
+                etCompanyIdentifier.setText("")
+                etDataInHexFormat.setText("")
             }
 
-            btn_cancel.setOnClickListener {
+            btnCancel.setOnClickListener {
                 dismiss()
             }
 
-            btn_save.setOnClickListener {
-                handleSave(et_company_identifier, et_data_in_hex_format)
+            btnSave.setOnClickListener {
+                handleSave(etCompanyIdentifier, etDataInHexFormat)
                 dismiss()
             }
 
-            verifyDataCorrectness(et_company_identifier, et_data_in_hex_format, btn_save, tv_id_already_exists)
-            handleClickOnCompanyIdentifiers(btn_company_identifiers)
-
+            verifyDataCorrectness(
+                etCompanyIdentifier,
+                etDataInHexFormat,
+                btnSave,
+                tvIdAlreadyExists
+            )
+            handleClickOnCompanyIdentifiers(btnCompanyIdentifiers)
         }
+        return binding.root
     }
 
     private fun identifierCurrentlyExists(currentId: String): Boolean {
@@ -53,15 +69,23 @@ class ManufacturerDataDialog(private val manufacturers: List<Manufacturer>, val 
         }
     }
 
-    private fun verifyDataCorrectness(etIdentifier: EditText, etData: EditText, btnSave: Button, tvNote: TextView) {
+    private fun verifyDataCorrectness(
+        etIdentifier: EditText,
+        etData: EditText,
+        btnSave: Button,
+        tvNote: TextView
+    ) {
         etIdentifier.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val id = etIdentifier.text.toString()
                 val data = etData.text.toString()
-                tvNote.visibility = if(identifierCurrentlyExists(id)) View.VISIBLE else View.GONE
-                btnSave.isEnabled = (Validator.isCompanyIdentifierValid(id) && Validator.isCompanyDataValid(data) && !identifierCurrentlyExists(id))
+                tvNote.visibility = if (identifierCurrentlyExists(id)) View.VISIBLE else View.GONE
+                btnSave.isEnabled =
+                    (Validator.isCompanyIdentifierValid(id) && Validator.isCompanyDataValid(data) && !identifierCurrentlyExists(
+                        id
+                    ))
             }
         })
 
@@ -71,15 +95,19 @@ class ManufacturerDataDialog(private val manufacturers: List<Manufacturer>, val 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val id = etIdentifier.text.toString()
                 val data = etData.text.toString()
-                tvNote.visibility = if(identifierCurrentlyExists(id)) View.VISIBLE else View.GONE
-                btnSave.isEnabled = (Validator.isCompanyIdentifierValid(id) && Validator.isCompanyDataValid(data) && !identifierCurrentlyExists(id))
+                tvNote.visibility = if (identifierCurrentlyExists(id)) View.VISIBLE else View.GONE
+                btnSave.isEnabled =
+                    (Validator.isCompanyIdentifierValid(id) && Validator.isCompanyDataValid(data) && !identifierCurrentlyExists(
+                        id
+                    ))
             }
         })
     }
 
     private fun handleClickOnCompanyIdentifiers(btn: Button) {
         btn.setOnClickListener {
-            val uriUrl = Uri.parse("https://" + getString(R.string.advertiser_url_company_identifiers))
+            val uriUrl =
+                Uri.parse("https://" + getString(R.string.advertiser_url_company_identifiers))
             val launchBrowser = Intent(Intent.ACTION_VIEW, uriUrl)
             startActivity(launchBrowser)
         }

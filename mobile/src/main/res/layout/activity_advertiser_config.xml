@@ -29,13 +29,21 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <include layout="@layout/advertiser_config_name" />
+                    <include
+                        android:id="@+id/adv_config_name"
+                        layout="@layout/advertiser_config_name" />
 
-                    <include layout="@layout/advertiser_config_type" />
+                    <include
+                        android:id="@+id/adv_config_type"
+                        layout="@layout/advertiser_config_type" />
 
-                    <include layout="@layout/advertiser_config_data" />
+                    <include
+                        android:id="@+id/adv_config_data"
+                        layout="@layout/advertiser_config_data" />
 
-                    <include layout="@layout/advertiser_config_parameters" />
+                    <include
+                        android:id="@+id/adv_config_param"
+                        layout= "@layout/advertiser_config_parameters" />
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

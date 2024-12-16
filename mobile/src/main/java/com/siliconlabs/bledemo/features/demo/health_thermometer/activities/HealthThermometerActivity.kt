@@ -7,6 +7,8 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.LayoutInflater
+import android.widget.TextView
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
@@ -15,9 +17,11 @@ import com.siliconlabs.bledemo.features.demo.health_thermometer.models.Temperatu
 import com.siliconlabs.bledemo.features.demo.health_thermometer.models.TemperatureReading.HtmType
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
+import com.siliconlabs.bledemo.databinding.ActivityThermometerBinding
 import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
 import com.siliconlabs.bledemo.utils.Notifications
-import kotlinx.android.synthetic.main.activity_thermometer.*
+
+//import kotlinx.android.synthetic.main.activity_thermometer.*
 
 @SuppressLint("MissingPermission")
 class HealthThermometerActivity : BaseDemoActivity() {
@@ -26,6 +30,7 @@ class HealthThermometerActivity : BaseDemoActivity() {
 
     private var currentReading: TemperatureReading? = null
     private var currentType: TemperatureReading.Type? = null
+    private lateinit var binding: ActivityThermometerBinding
 
     private val gattCallback: TimeoutGattCallback = object : TimeoutGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
@@ -53,13 +58,18 @@ class HealthThermometerActivity : BaseDemoActivity() {
                 }
             }
             if (startNotificationForCharacteristicFromHere) {
-                setNotificationForCharacteristic(gatt, GattService.HealthThermometer,
-                        GattCharacteristic.Temperature,
-                        Notifications.INDICATE)
+                setNotificationForCharacteristic(
+                    gatt, GattService.HealthThermometer,
+                    GattCharacteristic.Temperature,
+                    Notifications.INDICATE
+                )
             }
         }
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic
+        ) {
             super.onCharacteristicChanged(gatt, characteristic)
             if (GattCharacteristic.fromUuid(characteristic.uuid) == GattCharacteristic.Temperature) {
                 val reading = TemperatureReading.fromCharacteristic(characteristic)
@@ -70,40 +80,56 @@ class HealthThermometerActivity : BaseDemoActivity() {
                 }
                 runOnUiThread {
                     setCurrentReading(reading)
-                    connection_bar_text.text = getString(R.string.demo_connected_to, deviceName)
+                    binding.connectionBarText.text =
+                        getString(R.string.demo_connected_to, deviceName)
                 }
             }
         }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             super.onCharacteristicRead(gatt, characteristic, status)
             if (GattCharacteristic.fromUuid(characteristic.uuid) == GattCharacteristic.TemperatureType) {
-                htmType = HtmType.values()[characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0)]
-                setNotificationForCharacteristic(gatt, GattService.HealthThermometer,
-                        GattCharacteristic.Temperature,
-                        Notifications.INDICATE)
+                htmType = HtmType.values()[characteristic.getIntValue(
+                    BluetoothGattCharacteristic.FORMAT_UINT8,
+                    0
+                )]
+                setNotificationForCharacteristic(
+                    gatt, GattService.HealthThermometer,
+                    GattCharacteristic.Temperature,
+                    Notifications.INDICATE
+                )
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_thermometer)
+        binding = ActivityThermometerBinding.inflate(LayoutInflater.from(this))
+        setContentView(binding.root)
+        //setContentView(R.layout.activity_thermometer)
 
-        thermo_large_temperature.setFontFamily("sans-serif-thin", Typeface.NORMAL)
-        type_switch.setOnCheckedChangeListener { _, isChecked -> onTabClick(isChecked) }
+        binding.thermoLargeTemperature.setFontFamily("sans-serif-thin", Typeface.NORMAL)
+        binding.typeSwitch.setOnCheckedChangeListener { _, isChecked -> onTabClick(isChecked) }
     }
 
     override fun onResume() {
         super.onResume()
-        if (serviceHasBeenSet && service == null || service != null && !service?.isGattConnected(connectionAddress)!!) {
+        if (serviceHasBeenSet && service == null || service != null && !service?.isGattConnected(
+                connectionAddress
+            )!!
+        ) {
             onDeviceDisconnected()
         }
     }
 
     private fun onTabClick(isFahrenheitUnit: Boolean) {
-        currentType = if (isFahrenheitUnit) TemperatureReading.Type.FAHRENHEIT else TemperatureReading.Type.CELSIUS
-        thermo_large_temperature.setCurrentType(currentType)
+        currentType =
+            if (isFahrenheitUnit) TemperatureReading.Type.FAHRENHEIT else TemperatureReading.Type.CELSIUS
+        binding.thermoLargeTemperature.setCurrentType(currentType)
     }
 
     fun setCurrentReading(temperatureReading: TemperatureReading?) {
@@ -113,13 +139,16 @@ class HealthThermometerActivity : BaseDemoActivity() {
 
     private fun refreshUi() {
         if (currentReading != null) {
-            thermo_large_temperature?.setTemperature(currentReading)
-            thermo_type_value_text?.text = getString(currentReading?.htmType?.nameResId!!)
-            thermo_type_value?.text = getString(R.string.temperature_type,
-                    getString(currentReading?.htmType?.nameResId!!))
-            thermo_large_time_text?.text = currentReading?.getFormattedTime()
+            binding.thermoLargeTemperature.setTemperature(currentReading)
+            binding.thermoTypeValueText.text = getString(currentReading?.htmType?.nameResId!!)
+            binding.thermoTypeValue.text = getString(R.string.temperature_type,
+                getString(currentReading?.htmType?.nameResId!!))
+
+            binding.thermoLargeTimeText.text = currentReading?.getFormattedTime()
         }
     }
+
+    //private fun textView(): TextView = binding.thermoTypeValue.text
 
     override fun onBluetoothServiceBound() {
         serviceHasBeenSet = true
@@ -130,7 +159,8 @@ class HealthThermometerActivity : BaseDemoActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         //When you switch thermometers, this activity should get a new intent - at this point, we hide the dialog
-        val dialog = supportFragmentManager.findFragmentByTag("select_device_tag") as SelectDeviceDialog?
+        val dialog =
+            supportFragmentManager.findFragmentByTag("select_device_tag") as SelectDeviceDialog?
         if (dialog != null && dialog.isVisible) {
             dialog.dismiss()
         }

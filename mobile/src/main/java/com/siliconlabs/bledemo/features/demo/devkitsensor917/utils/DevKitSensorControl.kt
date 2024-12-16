@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -14,17 +15,13 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.gridlayout.widget.GridLayout
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.SensorDemoGridItemBinding
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.APIInterface
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.activities.DevKitSensor917Activity
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.AccelerometerGyroScopeResponse
-import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.AmbientLightResponse
-import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.HumidityResponse
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.LEDResponse
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.LEDStatusResponse
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.SensorsResponse
-import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.TempResponse
-import kotlinx.android.synthetic.main.environmentdemo_tile.view.env_description
-import kotlinx.android.synthetic.main.environmentdemo_tile.view.env_icon
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -62,18 +59,19 @@ open class DevKitSensorControl(
 
     constructor(context: Context) : this(context, null, null)
 
-    private val tileView: View = inflate(context, R.layout.sensor_demo_grid_item, this)
+    var sensorDemoGridItemBinding: SensorDemoGridItemBinding =
+        SensorDemoGridItemBinding.inflate(LayoutInflater.from(context))
 
     fun setListener(tag: Any, ipAddress: String) {
         val code = tag.toString()
-        tileView.setOnClickListener {
+        sensorDemoGridItemBinding.cardviewEnvTile.setOnClickListener {
             when (code) {
-                temperature -> showTemperatureDialog(code, ipAddress)
-                humidity -> showHumidityDialog(code, ipAddress)
-                ambientLight -> showAmbientLightDialog(code, ipAddress)
-                microphone -> showMicrophoneDialog(code, ipAddress)
+                TEMPERATURE -> showTemperatureDialog(code, ipAddress)
+                HUMIDITY -> showHumidityDialog(code, ipAddress)
+                AMBIENT_LIGHT -> showAmbientLightDialog(code, ipAddress)
+                MICROPHONE -> showMicrophoneDialog(code, ipAddress)
                 LED -> showLEDControlDialog(code, ipAddress)
-                motion -> showMotionDialog(code, ipAddress)
+                MOTION -> showMotionDialog(code, ipAddress)
             }
         }
     }
@@ -88,12 +86,12 @@ open class DevKitSensorControl(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        val header = devkitSensorDialog.findViewById(R.id.header) as TextView
-        val yesBtn = devkitSensorDialog.findViewById(R.id.yes_opt) as TextView
-        val noBtn = devkitSensorDialog.findViewById(R.id.no_opt) as TextView
-        val orientationX = devkitSensorDialog.findViewById(R.id.orient_x) as TextView
-        val orientationY = devkitSensorDialog.findViewById(R.id.orientation_y) as TextView
-        val orientationZ = devkitSensorDialog.findViewById(R.id.orientation_z) as TextView
+        val header: TextView = devkitSensorDialog.findViewById(R.id.header)
+        val yesBtn: TextView = devkitSensorDialog.findViewById(R.id.yes_opt)
+        val noBtn: TextView = devkitSensorDialog.findViewById(R.id.no_opt)
+        val orientationX: TextView = devkitSensorDialog.findViewById(R.id.orient_x)
+        val orientationY: TextView = devkitSensorDialog.findViewById(R.id.orientation_y)
+        val orientationZ: TextView = devkitSensorDialog.findViewById(R.id.orientation_z)
         val degreeString = context.getString(R.string.motion_orientation_degree)
         if (gyroResponse != null && gyroResponse!!.x.isNotEmpty()) {
             orientationX.text = String.format(degreeString, gyroResponse!!.x.toFloat())
@@ -112,9 +110,9 @@ open class DevKitSensorControl(
         }
 
         val accelerationString = context.getString(R.string.motion_acceleration_g)
-        val acceloX = devkitSensorDialog.findViewById(R.id.accelo_x) as TextView
-        val acceloY = devkitSensorDialog.findViewById(R.id.accelo_y) as TextView
-        val acceloZ = devkitSensorDialog.findViewById(R.id.accelo_z) as TextView
+        val acceloX: TextView = devkitSensorDialog.findViewById(R.id.accelo_x)
+        val acceloY: TextView = devkitSensorDialog.findViewById(R.id.accelo_y)
+        val acceloZ: TextView = devkitSensorDialog.findViewById(R.id.accelo_z)
         if (acceloResponse != null && acceloResponse!!.x.isNotEmpty()) {
             acceloX.text = String.format(accelerationString, acceloResponse!!.x.toFloat())
         } else {
@@ -151,7 +149,7 @@ open class DevKitSensorControl(
                 apiJob?.cancel()
             }
         }
-        header.text = title + space + context.getString(R.string.title_sensor)
+        header.text = title + SPACE + context.getString(R.string.title_sensor)
         devkitSensorDialog.show()
         apiJob = CoroutineScope(Dispatchers.IO).launch {
             while (true) {
@@ -259,19 +257,19 @@ open class DevKitSensorControl(
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
 
-        val header = devKitSensorDialog.findViewById(R.id.header) as TextView
-        val subTitle = devKitSensorDialog.findViewById(R.id.subTitle) as TextView
-        val yesBtn = devKitSensorDialog.findViewById(R.id.yes_opt) as TextView
-        val noBtn = devKitSensorDialog.findViewById(R.id.no_opt) as TextView
-        val image = devKitSensorDialog.findViewById(R.id.image) as ImageView
-        val dataHolder = devKitSensorDialog.findViewById(R.id.txt_value) as TextView
+        val header: TextView = devKitSensorDialog.findViewById(R.id.header)
+        val subTitle: TextView = devKitSensorDialog.findViewById(R.id.subTitle)
+        val yesBtn: TextView = devKitSensorDialog.findViewById(R.id.yes_opt)
+        val noBtn: TextView = devKitSensorDialog.findViewById(R.id.no_opt)
+        val image: ImageView = devKitSensorDialog.findViewById(R.id.image)
+        val dataHolder: TextView = devKitSensorDialog.findViewById(R.id.txt_value)
         dataHolder.text = context.getString(R.string.matter_init_value)
         // println("tempResponse :${tempResponse!!.temperature_celcius}")
         if (tempResponse != null && tempResponse!!.isNotEmpty()) {
-            dataHolder.text = tempResponse + " ℃"
+            dataHolder.text = "$tempResponse ℃"
         }
         image.setImageResource(R.drawable.icon_temp)
-        header.text = title + space + context.getString(R.string.title_sensor)
+        header.text = title + SPACE + context.getString(R.string.title_sensor)
         subTitle.text = title
         yesBtn.setOnClickListener {
             yesBtn.isEnabled = false
@@ -436,17 +434,19 @@ open class DevKitSensorControl(
     }
 
     init {
-        tileView.setTag(description)
-        tileView.apply {
-            env_description.text = description
-            env_icon.setImageDrawable(icon)
+        DevKitSensorSharedData.sensorDescription = description
+        sensorDemoGridItemBinding.cardviewEnvTile.apply {
+            sensorDemoGridItemBinding.envDescription.text = description
+            sensorDemoGridItemBinding.envIcon.setImageDrawable(icon)
         }
+
         layoutParams = GridLayout.LayoutParams(
             GridLayout.spec(GridLayout.UNDEFINED, 1f),
             GridLayout.spec(GridLayout.UNDEFINED, 1f)
         ).apply {
             width = 0
         }
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -458,15 +458,15 @@ open class DevKitSensorControl(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        val header = devKitSensorDialog.findViewById(R.id.header) as TextView
-        val subTitle = devKitSensorDialog.findViewById(R.id.subTitle) as TextView
-        val yesBtn = devKitSensorDialog.findViewById(R.id.yes_opt) as TextView
-        val noBtn = devKitSensorDialog.findViewById(R.id.no_opt) as TextView
-        val image = devKitSensorDialog.findViewById(R.id.image) as ImageView
+        val header: TextView = devKitSensorDialog.findViewById(R.id.header)
+        val subTitle: TextView = devKitSensorDialog.findViewById(R.id.subTitle)
+        val yesBtn: TextView = devKitSensorDialog.findViewById(R.id.yes_opt)
+        val noBtn: TextView = devKitSensorDialog.findViewById(R.id.no_opt)
+        val image: ImageView = devKitSensorDialog.findViewById(R.id.image)
         val microphoneHolder = devKitSensorDialog.findViewById(R.id.txt_value) as TextView
         microphoneHolder.text = context.getString(R.string.dev_kit_sensor_micro_init_value)
         image.setImageResource(R.drawable.icon_sound)
-        header.text = title + space + context.getString(R.string.title_sensor)
+        header.text = title + SPACE + context.getString(R.string.title_sensor)
         subTitle.text = title
         yesBtn.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
@@ -499,20 +499,20 @@ open class DevKitSensorControl(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        val header = devKitSensorDialog.findViewById(R.id.header) as TextView
-        val subTitle = devKitSensorDialog.findViewById(R.id.subTitle) as TextView
-        val yesBtn = devKitSensorDialog.findViewById(R.id.yes_opt) as TextView
-        val noBtn = devKitSensorDialog.findViewById(R.id.no_opt) as TextView
-        val image = devKitSensorDialog.findViewById(R.id.image) as ImageView
-        val abiHolder = devKitSensorDialog.findViewById(R.id.txt_value) as TextView
+        val header: TextView = devKitSensorDialog.findViewById(R.id.header)
+        val subTitle: TextView = devKitSensorDialog.findViewById(R.id.subTitle)
+        val yesBtn: TextView = devKitSensorDialog.findViewById(R.id.yes_opt)
+        val noBtn: TextView = devKitSensorDialog.findViewById(R.id.no_opt)
+        val image: ImageView = devKitSensorDialog.findViewById(R.id.image)
+        val abiHolder: TextView = devKitSensorDialog.findViewById(R.id.txt_value)
 
         abiHolder.text = context.getString(R.string.dev_kit_sensor_ambient_init_value)
         if (ambiResponse != null && ambiResponse!!.isNotEmpty()) {
-            abiHolder.text = ambiResponse + " lx"
+            abiHolder.text = "$ambiResponse lx"
         }
         abiHolder.textSize = 50F
         image.setImageResource(R.drawable.icon_light)
-        header.text = title + space + context.getString(R.string.title_sensor)
+        header.text = title + SPACE + context.getString(R.string.title_sensor)
         subTitle.text = title
 
         yesBtn.setOnClickListener {
@@ -579,18 +579,18 @@ open class DevKitSensorControl(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        val header = devKitSensorDialog.findViewById(R.id.header) as TextView
-        val subTitle = devKitSensorDialog.findViewById(R.id.subTitle) as TextView
-        val yesBtn = devKitSensorDialog.findViewById(R.id.yes_opt) as TextView
-        val noBtn = devKitSensorDialog.findViewById(R.id.no_opt) as TextView
-        onLEDBtn = devKitSensorDialog.findViewById(R.id.onButton) as Button
-        offLEDBtn = devKitSensorDialog.findViewById(R.id.offButton) as Button
-        redLEDBtn = devKitSensorDialog.findViewById(R.id.redButton) as Button
-        greenLEDBtn = devKitSensorDialog.findViewById(R.id.greenButton) as Button
-        blueLEDBtn = devKitSensorDialog.findViewById(R.id.blueButton) as Button
-        ledImageStatus = devKitSensorDialog.findViewById(R.id.imageLight) as ImageView
+        val header: TextView = devKitSensorDialog.findViewById(R.id.header)
+        val subTitle: TextView = devKitSensorDialog.findViewById(R.id.subTitle)
+        val yesBtn: TextView = devKitSensorDialog.findViewById(R.id.yes_opt)
+        val noBtn: TextView = devKitSensorDialog.findViewById(R.id.no_opt)
+        onLEDBtn = devKitSensorDialog.findViewById(R.id.onButton)!!
+        offLEDBtn = devKitSensorDialog.findViewById(R.id.offButton)!!
+        redLEDBtn = devKitSensorDialog.findViewById(R.id.redButton)!!
+        greenLEDBtn = devKitSensorDialog.findViewById(R.id.greenButton)!!
+        blueLEDBtn = devKitSensorDialog.findViewById(R.id.blueButton)!!
+        ledImageStatus = devKitSensorDialog.findViewById(R.id.imageLight)!!
 
-        header.text = title + space + context.getString(R.string.title_control)
+        header.text = title + SPACE + context.getString(R.string.title_control)
         subTitle.text = title
         subTitle.visibility = View.GONE
 
@@ -687,8 +687,7 @@ open class DevKitSensorControl(
         if (btnBlueStatus) {
             onLEDBtn.setBackgroundResource(R.drawable.button_background_soft_black_box)
             blueLEDBtn.setBackgroundResource(R.drawable.button_background_blue_box)
-        } else {
-            offLEDBtn.setBackgroundResource(R.drawable.button_background_grey_box)
+        }else{
             blueLEDBtn.setBackgroundResource(R.drawable.button_background_grey_box)
         }
         if (btnRedStatus && btnGreenStatus && btnBlueStatus) {
@@ -740,7 +739,7 @@ open class DevKitSensorControl(
             val retro = Retrofit.Builder().baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create()).build()
             val ledStatus = retro.create(APIInterface::class.java)
-            val params: MutableMap<String, String> = HashMap<String, String>()
+            val params: MutableMap<String, String> = HashMap()
             var statusRed: String = OFF
             if (red) {
                 statusRed = ON
@@ -775,7 +774,7 @@ open class DevKitSensorControl(
                             setBtnColorBackground()
                         }
                     } else {
-
+                            //ignore
                     }
                 }
 
@@ -902,7 +901,7 @@ open class DevKitSensorControl(
                     btnBlueStatus = false
                     btnGreenStatus = false
                     setOffBtnBackground()
-                    imageForLightOn(view, false, false, false)
+                    imageForLightOn(view, btnRedStatus, btnBlueStatus, btnGreenStatus)
                     Toast.makeText(
                         context,
                         "Failed to connect. Check your Wi-Fi connection",
@@ -1024,18 +1023,18 @@ open class DevKitSensorControl(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        val header = devKitSensorDialog.findViewById(R.id.header) as TextView
-        val subTitle = devKitSensorDialog.findViewById(R.id.subTitle) as TextView
-        val yesBtn = devKitSensorDialog.findViewById(R.id.yes_opt) as TextView
-        val noBtn = devKitSensorDialog.findViewById(R.id.no_opt) as TextView
-        val image = devKitSensorDialog.findViewById(R.id.image) as ImageView
-        val humidityHolder = devKitSensorDialog.findViewById(R.id.txt_value) as TextView
+        val header: TextView = devKitSensorDialog.findViewById(R.id.header)
+        val subTitle: TextView = devKitSensorDialog.findViewById(R.id.subTitle)
+        val yesBtn: TextView = devKitSensorDialog.findViewById(R.id.yes_opt)
+        val noBtn: TextView = devKitSensorDialog.findViewById(R.id.no_opt)
+        val image: ImageView = devKitSensorDialog.findViewById(R.id.image)
+        val humidityHolder: TextView = devKitSensorDialog.findViewById(R.id.txt_value)
         humidityHolder.text = context.getString(R.string.dev_kit_sensor_humidity_init_value)
         if (humiResponse != null && humiResponse!!.isNotEmpty()) {
-            humidityHolder.text = humiResponse + " %"
+            humidityHolder.text = "$humiResponse %"
         }
         image.setImageResource(R.drawable.icon_environment)
-        header.text = title + space + context.getString(R.string.title_sensor)
+        header.text = title + SPACE + context.getString(R.string.title_sensor)
         subTitle.text = title
         yesBtn.setOnClickListener {
             yesBtn.isEnabled = false
@@ -1063,36 +1062,31 @@ open class DevKitSensorControl(
 
 
     override fun fetchData(response: SensorsResponse?) {
-        //temperatureResponse = tempResponse
-        println("----------------${response!!.led.blue}")
         if (response != null) {
             //Temp
-            if (response.temperature != null && response.temperature.temperature_celcius.isNotEmpty()) {
-                println("----------------${response.temperature.temperature_celcius}")
+            if (response.temperature.temperature_celcius.isNotEmpty()) {
                 tempResponse = response.temperature.temperature_celcius
             }
             //Humi
-            if (response.humidity != null && response.humidity.humidity_percentage.isNotEmpty()) {
-                println("----------------${response.humidity.humidity_percentage}")
+            if (response.humidity.humidity_percentage.isNotEmpty()) {
                 humiResponse = response.temperature.temperature_celcius
             }
             //Ambi
-            if (response.light != null && response.light.ambient_light_lux.isNotEmpty()) {
-                println("----------------${response.light.ambient_light_lux}")
+            if (response.light.ambient_light_lux.isNotEmpty()) {
                 ambiResponse = response.light.ambient_light_lux
             }
         }
-
     }
 
+
     companion object {
-        const val space = " "
-        const val temperature = "Temperature"
-        const val humidity = "Humidity"
-        const val ambientLight = "Ambient Light"
-        const val microphone = "Microphone"
+        const val SPACE = " "
+        const val TEMPERATURE = "Temperature"
+        const val HUMIDITY = "Humidity"
+        const val AMBIENT_LIGHT = "Ambient Light"
+        const val MICROPHONE = "Microphone"
         const val LED = "LED"
-        const val motion = "Motion"
+        const val MOTION = "Motion"
         const val TIME_OUT = 2000L
         const val OFF = "off"
         const val ON = "on"

@@ -52,7 +52,8 @@ import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
 import com.siliconlabs.bledemo.features.scan.browser.adapters.DebugModeCallback
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 import com.siliconlabs.bledemo.home_screen.base.LocationDependent
-import kotlinx.android.synthetic.main.fragment_browser.view.*
+import com.siliconlabs.bledemo.home_screen.base.NotificationDependent
+
 
 class BrowserFragment : BaseServiceDependentMainMenuFragment(),
         OnRefreshListener {
@@ -125,6 +126,7 @@ class BrowserFragment : BaseServiceDependentMainMenuFragment(),
             viewBinding.locationPermissionBar.setFragmentManager(childFragmentManager)
         }
     }
+
 
     private val scanFragmentListener = object: ScanFragment.ScanFragmentListener{
         override fun onScanningStateChanged(isOn: Boolean) {

@@ -25,13 +25,13 @@ import com.github.mikephil.charting.utils.Transformer
 import com.github.mikephil.charting.utils.Utils
 import com.github.mikephil.charting.utils.ViewPortHandler
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.FragmentRangeTestBinding
 import com.siliconlabs.bledemo.features.demo.range_test.activities.RangeTestActivity
 import com.siliconlabs.bledemo.features.demo.range_test.models.RangeTestMode
 import com.siliconlabs.bledemo.features.demo.range_test.models.RangeTestValues
 import com.siliconlabs.bledemo.features.demo.range_test.models.TxPower
 import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPresenter
 import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPresenter.Controller
-import kotlinx.android.synthetic.main.fragment_range_test.*
 import java.util.*
 import java.util.regex.Pattern
 
@@ -59,6 +59,7 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
     private var txLayouts: ArrayList<View> = ArrayList()
     private var rxLayouts: ArrayList<View> = ArrayList()
     private var disabledLayouts: ArrayList<View> = ArrayList()
+    private lateinit var binding: FragmentRangeTestBinding
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,60 +71,66 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
     }
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_range_test, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentRangeTestBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         txLayouts.apply {
-            add(range_transmitted_layout)
-            add(tv_range_tx_power_layout_1)
-            add(range_tx_power_layout_2)
+            add(binding.rangeTransmittedLayout)
+            add(binding.tvRangeTxPowerLayout1)
+            add(binding.rangeTxPowerLayout2)
         }
 
         rxLayouts.apply {
-            add(range_rx_data_row_1)
-            add(range_rx_data_row_2)
-            add(chart)
-            add(tv_range_rx_chart_label)
+            add(binding.rangeRxDataRow1)
+            add(binding.rangeRxDataRow2)
+            add(binding.chart)
+            add(binding.tvRangeRxChartLabel)
         }
 
         disabledLayouts.apply {
-            add(sb_range_tx_power)
-            add(sb_range_payload_length)
-            add(range_seek_ma_window_size)
-            add(sp_tx_power)
-            add(sp_payload_length)
-            add(sp_ma_window_size)
-            add(sp_remote_id)
-            add(sp_self_id)
-            add(range_check_uart_log)
-            add(range_check_packet_repeat)
-            add(sp_phy_config)
+            add(binding.sbRangeTxPower)
+            add(binding.sbRangePayloadLength)
+            add(binding.rangeSeekMaWindowSize)
+            add(binding.spTxPower)
+            add(binding.spPayloadLength)
+            add(binding.spMaWindowSize)
+            add(binding.spRemoteId)
+            add(binding.spSelfId)
+            add(binding.rangeCheckUartLog)
+            add(binding.rangeCheckPacketRepeat)
+            add(binding.spPhyConfig)
         }
 
 
         mode?.let { setup(it) }
         controller.setView(this)
 
-        range_test_start_stop.setOnClickListener {
+        binding.rangeTestStartStop.setOnClickListener {
             controller.toggleRunningState()
         }
 
-        range_check_packet_repeat.setOnCheckedChangeListener { _, checked ->
-            sp_packet_count.isEnabled = !checked
+        binding.rangeCheckPacketRepeat.setOnCheckedChangeListener { _, checked ->
+
+            binding.spPacketCount.isEnabled = !checked
             if (checked) {
                 controller.updatePacketCount(RangeTestValues.PACKET_COUNT_REPEAT)
             } else {
-                val packetCountIndex = sp_packet_count.selectedItemPosition
+                val packetCountIndex = binding.spPacketCount.selectedItemPosition
                 val packetCount = RangeTestValues.PACKET_COUNT_LOOKUP[packetCountIndex]
                 controller.updatePacketCount(packetCount)
             }
         }
 
-        range_check_uart_log.setOnCheckedChangeListener { _, checked ->
+        binding.rangeCheckUartLog.setOnCheckedChangeListener { _, checked ->
             controller.updateUartLogEnabled(checked)
         }
 
@@ -136,7 +143,7 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
     }
 
     private fun clearChart() {
-        if (chart == null || chartDataSet == null) {
+        if (binding.chart == null || chartDataSet == null) {
             return
         }
 
@@ -148,8 +155,8 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
         }
 
         chartData?.notifyDataChanged()
-        chart.notifyDataSetChanged()
-        chart.invalidate()
+        binding.chart.notifyDataSetChanged()
+        binding.chart.invalidate()
     }
 
     override fun runOnUiThread(runnable: Runnable?) {
@@ -157,75 +164,79 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
     }
 
     override fun showDeviceName(name: String?) {
-        tv_range_device_name.text = name
+        binding.tvRangeDeviceName.text = name
     }
 
     override fun showModelNumber(number: String?, running: Boolean?) {
-        tv_range_model_number.text = number
+        binding.tvRangeModelNumber.text = number
         val pattern = Pattern.compile(SERIES_2_REGEX, Pattern.CASE_INSENSITIVE)
         series1 = !pattern.matcher(number).find()
 
-        if (running != null && running) sp_channel_number.isEnabled = false
-        else sp_channel_number.isEnabled = series1
+
+        if (running != null && running) binding.spChannelNumber.isEnabled = false
+        else binding.spChannelNumber.isEnabled = series1
     }
 
     override fun showTxPower(power: TxPower?, values: List<TxPower>) {
         if (values != txPowerValues) {
-            setupSpinnerValues(sp_tx_power, values)
-            sb_range_tx_power.max = values.size - 1
-            sb_range_tx_power.setOnSeekBarChangeListener(seekBarsListener)
-            sp_tx_power.onItemSelectedListener = SpinnerSeekBarListener(sb_range_tx_power)
+            setupSpinnerValues(binding.spTxPower, values)
+            binding.sbRangeTxPower.max = values.size - 1
+            binding.sbRangeTxPower.setOnSeekBarChangeListener(seekBarsListener)
+            binding.spTxPower.onItemSelectedListener =
+                SpinnerSeekBarListener(binding.sbRangeTxPower)
             txPowerValues = values
         }
         val index = values.indexOf(power)
         if (index != -1) {
-            sb_range_tx_power.progress = index
-            sp_tx_power.setSelection(index)
+            binding.sbRangeTxPower.progress = index
+            binding.spTxPower.setSelection(index)
         }
     }
 
     override fun showPayloadLength(length: Int, values: List<Int>) {
         if (values != payloadLengthValues) {
-            setupSpinnerValues(sp_payload_length, values)
-            sb_range_payload_length.max = values.size - 1
-            sb_range_payload_length.setOnSeekBarChangeListener(seekBarsListener)
-            sp_payload_length.onItemSelectedListener = SpinnerSeekBarListener(sb_range_payload_length)
+            setupSpinnerValues(binding.spPayloadLength, values)
+            binding.sbRangePayloadLength.max = values.size - 1
+            binding.sbRangePayloadLength.setOnSeekBarChangeListener(seekBarsListener)
+            binding.spPayloadLength.onItemSelectedListener =
+                SpinnerSeekBarListener(binding.sbRangePayloadLength)
             payloadLengthValues = values
         }
         val index = values.indexOf(length)
         if (index != -1) {
-            sb_range_payload_length.progress = index
-            sp_payload_length.setSelection(index)
+            binding.sbRangePayloadLength.progress = index
+            binding.spPayloadLength.setSelection(index)
         }
     }
 
     override fun showMaWindowSize(size: Int, values: List<Int>) {
         if (values != maWindowSizeValues) {
-            setupSpinnerValues(sp_ma_window_size, values)
-            range_seek_ma_window_size.max = values.size - 1
-            range_seek_ma_window_size.setOnSeekBarChangeListener(seekBarsListener)
-            sp_ma_window_size.onItemSelectedListener = SpinnerSeekBarListener(range_seek_ma_window_size)
+            setupSpinnerValues(binding.spMaWindowSize, values)
+            binding.rangeSeekMaWindowSize.max = values.size - 1
+            binding.rangeSeekMaWindowSize.setOnSeekBarChangeListener(seekBarsListener)
+            binding.spMaWindowSize.onItemSelectedListener =
+                SpinnerSeekBarListener(binding.rangeSeekMaWindowSize)
             maWindowSizeValues = values
         }
         val index = values.indexOf(size)
         if (index != -1) {
-            range_seek_ma_window_size.progress = index
-            sp_ma_window_size.setSelection(index)
+            binding.rangeSeekMaWindowSize.progress = index
+            binding.spMaWindowSize.setSelection(index)
         }
     }
 
     override fun showChannelNumber(number: Int) {
         val index = RangeTestValues.CHANNEL_LOOKUP.indexOf(number)
-        sp_channel_number.setSelection(index)
+        binding.spChannelNumber.setSelection(index)
     }
 
     override fun showPacketCountRepeat(enabled: Boolean) {
-        range_check_packet_repeat.isChecked = enabled
+        binding.rangeCheckPacketRepeat.isChecked = enabled
     }
 
     override fun showPacketRequired(required: Int) {
         val index = RangeTestValues.PACKET_COUNT_LOOKUP.indexOf(required)
-        sp_packet_count.setSelection(index)
+        binding.spPacketCount.setSelection(index)
     }
 
     override fun showPacketSent(sent: Int) {
@@ -242,16 +253,16 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
 
     override fun showRemoteId(id: Int) {
         val index = RangeTestValues.ID_LOOKUP.indexOf(id)
-        sp_remote_id.setSelection(index)
+        binding.spRemoteId.setSelection(index)
     }
 
     override fun showSelfId(id: Int) {
         val index = RangeTestValues.ID_LOOKUP.indexOf(id)
-        sp_self_id.setSelection(index)
+        binding.spSelfId.setSelection(index)
     }
 
     override fun showUartLogEnabled(enabled: Boolean) {
-        range_check_uart_log.isChecked = enabled
+        binding.rangeCheckUartLog.isChecked = enabled
     }
 
     override fun showRunningState(running: Boolean) {
@@ -272,16 +283,17 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
             return
         }
 
-        val valuesList: List<Map.Entry<Int, String>> = ArrayList<Map.Entry<Int, String>>(values.entries)
+        val valuesList: List<Map.Entry<Int, String>> =
+            ArrayList<Map.Entry<Int, String>>(values.entries)
         if (valuesList != phyValues) {
-            setupSpinnerValues(sp_phy_config, ArrayList(values.values))
+            setupSpinnerValues(binding.spPhyConfig, ArrayList(values.values))
             phyValues = valuesList
         }
 
         for (i in valuesList.indices) {
             val entry = valuesList[i]
             if (entry.key == phy) {
-                sp_phy_config.setSelection(i)
+                binding.spPhyConfig.setSelection(i)
                 return
             }
         }
@@ -296,7 +308,7 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
         seekBarsListener = SeekBarsListener()
         if (mode == RangeTestMode.Tx) {
             setVisibility(rxLayouts, View.GONE)
-            setupSpinnerValues(sp_tx_power, listOf(""))
+            setupSpinnerValues(binding.spTxPower, listOf(""))
             buttonStringIdOff = R.string.range_tx_start
             buttonStringIdOn = R.string.range_tx_stop
             setPacketSent(0)
@@ -311,93 +323,96 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
             setPer(0f)
         }
 
-        setupSpinnerValues(sp_payload_length, listOf(""))
-        setupSpinnerValues(sp_ma_window_size, listOf(""))
-        setupSpinnerValues(sp_channel_number, RangeTestValues.CHANNEL_LOOKUP)
-        setupSpinnerValues(sp_packet_count, RangeTestValues.PACKET_COUNT_LOOKUP)
-        setupSpinnerValues(sp_remote_id, RangeTestValues.ID_LOOKUP)
-        setupSpinnerValues(sp_self_id, RangeTestValues.ID_LOOKUP)
+        setupSpinnerValues(binding.spPayloadLength, listOf(""))
+        setupSpinnerValues(binding.spMaWindowSize, listOf(""))
+        setupSpinnerValues(binding.spChannelNumber, RangeTestValues.CHANNEL_LOOKUP)
+        setupSpinnerValues(binding.spPacketCount, RangeTestValues.PACKET_COUNT_LOOKUP)
+        setupSpinnerValues(binding.spRemoteId, RangeTestValues.ID_LOOKUP)
+        setupSpinnerValues(binding.spSelfId, RangeTestValues.ID_LOOKUP)
 
-        sp_channel_number.onItemSelectedListener = object : SpinnerListener() {
+        binding.spChannelNumber.onItemSelectedListener = object : SpinnerListener() {
             override fun onItemSelected(index: Int) {
                 val channel = RangeTestValues.CHANNEL_LOOKUP[index]
                 controller.updateChannel(channel)
             }
         }
 
-        sp_packet_count.onItemSelectedListener = object : SpinnerListener() {
+        binding.spPacketCount.onItemSelectedListener = object : SpinnerListener() {
             override fun onItemSelected(index: Int) {
                 val packetCount = RangeTestValues.PACKET_COUNT_LOOKUP[index]
                 controller.updatePacketCount(packetCount)
             }
         }
 
-        sp_remote_id.onItemSelectedListener = object : SpinnerListener() {
+        binding.spRemoteId.onItemSelectedListener = object : SpinnerListener() {
             override fun onItemSelected(index: Int) {
                 val id = RangeTestValues.ID_LOOKUP[index]
                 controller.updateRemoteId(id)
             }
         }
 
-        sp_self_id.onItemSelectedListener = object : SpinnerListener() {
+        binding.spSelfId.onItemSelectedListener = object : SpinnerListener() {
             override fun onItemSelected(index: Int) {
                 val id = RangeTestValues.ID_LOOKUP[index]
                 controller.updateSelfId(id)
             }
         }
 
-        sp_phy_config.onItemSelectedListener = object : SpinnerListener() {
+        binding.spPhyConfig.onItemSelectedListener = object : SpinnerListener() {
             override fun onItemSelected(index: Int) {
                 val id = phyValues!![index].key
                 controller.updatePhyConfig(id)
             }
         }
 
-        sb_range_tx_power.isEnabled = false
-        sp_tx_power.isEnabled = false
-        sb_range_payload_length.isEnabled = false
-        sp_payload_length.isEnabled = false
-        range_seek_ma_window_size.isEnabled = false
-        sp_ma_window_size.isEnabled = false
-        sp_phy_config.isEnabled = false
+        binding.sbRangeTxPower.isEnabled = false
+        binding.spTxPower.isEnabled = false
+        binding.sbRangePayloadLength.isEnabled = false
+        binding.spPayloadLength.isEnabled = false
+        binding.rangeSeekMaWindowSize.isEnabled = false
+        binding.spMaWindowSize.isEnabled = false
+        binding.spPhyConfig.isEnabled = false
         setupRunning(false)
     }
 
     private fun appendChartData(rssi: Float) {
-        if (chart == null || chartDataSet == null) {
+        if (binding.chart == null || chartDataSet == null) {
             return
         }
         val index = chartDataSet!!.entryCount
         chartDataSet!!.addEntry(Entry(index.toFloat(), rssi))
-        chart.xAxis.axisMinimum = 0f
-        chart.xAxis.axisMaximum = Math.max(50, index).toFloat()
-        chart.setVisibleXRange(50f, 50f)
-        chart.moveViewToX(index.toFloat())
+        binding.chart.xAxis.axisMinimum = 0f
+        binding.chart.xAxis.axisMaximum = Math.max(50, index).toFloat()
+        binding.chart.setVisibleXRange(50f, 50f)
+        binding.chart.moveViewToX(index.toFloat())
         chartDataSet?.notifyDataSetChanged()
         chartData?.notifyDataChanged()
-        chart.notifyDataSetChanged()
-        chart.invalidate()
+        binding.chart.notifyDataSetChanged()
+        binding.chart.invalidate()
     }
 
 
     private fun setPacketSent(packetSent: Int) {
-        tv_range_test_packet_count.text = packetSent.toString()
+        binding.tvRangeTestPacketCount.text = packetSent.toString()
     }
 
     private fun setRx(received: Int, required: Int) {
-        setValue(tv_range_test_rx, R.string.range_rx_rx, received, required)
+
+        setValue(binding.tvRangeTestRx, R.string.range_rx_rx, received, required)
     }
 
     private fun setRssi(rssi: Int) {
-        setValue(tv_range_test_rssi, R.string.range_rx_rssi, rssi)
+
+        setValue(binding.tvRangeTestRssi, R.string.range_rx_rssi, rssi)
     }
 
     private fun setMa(ma: Float) {
-        tv_range_test_ma.text = String.format(Locale.US,"%.1f",ma).plus("%")
+
+        binding.tvRangeTestMa.text = String.format(Locale.US, "%.1f", ma).plus("%")
     }
 
     private fun setPer(per: Float) {
-        tv_range_test_ma.text = String.format(Locale.US,"%.1f",per).plus("%")
+        binding.tvRangeTestMa.text = String.format(Locale.US, "%.1f", per).plus("%")
     }
 
     private fun setValue(view: TextView, resId: Int, vararg args: Any) {
@@ -407,15 +422,17 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
     private fun updateControllerFromSeekBar(seekBar: SeekBar) {
         val progress = seekBar.progress
         when {
-            seekBar === sb_range_tx_power -> {
+            seekBar === binding.sbRangeTxPower -> {
                 val power = txPowerValues!![progress]
                 controller.updateTxPower(power.asCharacteristicValue())
             }
-            seekBar === sb_range_payload_length -> {
+
+            seekBar === binding.sbRangePayloadLength -> {
                 val payloadLength = payloadLengthValues!![progress]
                 controller.updatePayloadLength(payloadLength)
             }
-            seekBar === range_seek_ma_window_size -> {
+
+            seekBar === binding.rangeSeekMaWindowSize -> {
                 val maWindowSize = maWindowSizeValues!![progress]
                 controller.updateMaWindowSize(maWindowSize)
             }
@@ -425,16 +442,16 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
     private fun setupRunning(running: Boolean) {
         if (running) {
             setEnabled(disabledLayouts, false)
-            sp_channel_number.isEnabled = false
-            sp_packet_count.isEnabled = false
-            range_test_start_stop.setText(buttonStringIdOn)
-            range_test_start_stop.isEnabled = mode != RangeTestMode.Rx
+            binding.spChannelNumber.isEnabled = false
+            binding.spPacketCount.isEnabled = false
+            binding.rangeTestStartStop.setText(buttonStringIdOn)
+            binding.rangeTestStartStop.isEnabled = mode != RangeTestMode.Rx
         } else {
             setEnabled(disabledLayouts, true)
-            sp_channel_number.isEnabled = series1
-            sp_packet_count.isEnabled = !range_check_packet_repeat.isChecked
-            range_test_start_stop.setText(buttonStringIdOff)
-            range_test_start_stop.isEnabled = true
+            binding.spChannelNumber.isEnabled = series1
+            binding.spPacketCount.isEnabled = !binding.rangeCheckPacketRepeat.isChecked
+            binding.rangeTestStartStop.setText(buttonStringIdOff)
+            binding.rangeTestStartStop.isEnabled = true
         }
     }
 
@@ -462,7 +479,7 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
         val axisColor = ContextCompat.getColor(requireContext(), R.color.silabs_dark_gray_text)
         val graphColor = ContextCompat.getColor(requireContext(), R.color.silabs_blue)
 
-        chart.apply {
+        binding.chart.apply {
             description?.isEnabled = false
             legend?.isEnabled = false
             setScaleEnabled(false)
@@ -480,7 +497,11 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
             axisLeft.setDrawAxisLine(true)
             axisLeft.axisLineWidth = 0.5f
             axisLeft.axisLineColor = axisColor
-            rendererLeftYAxis = YAxisArrowRenderer(chart.viewPortHandler, chart.axisLeft, chart.rendererLeftYAxis.transformer)
+            rendererLeftYAxis = YAxisArrowRenderer(
+                binding.chart.viewPortHandler,
+                binding.chart.axisLeft,
+                binding.chart.rendererLeftYAxis.transformer
+            )
             xAxis.setDrawGridLines(false)
             xAxis.setDrawAxisLine(false)
             xAxis.axisMinimum = 0f
@@ -497,11 +518,11 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
         }
 
         val chartData = createChartData(graphColor)
-        chart.data = chartData
+        binding.chart.data = chartData
         chartDataSet!!.notifyDataSetChanged()
         chartData.notifyDataChanged()
-        chart.notifyDataSetChanged()
-        chart.invalidate()
+        binding.chart.notifyDataSetChanged()
+        binding.chart.invalidate()
     }
 
     private fun createChartData(color: Int): LineData {
@@ -550,14 +571,16 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
         override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
             if (fromUser) {
                 when {
-                    seekBar === sb_range_tx_power -> {
-                        sp_tx_power.setSelection(progress)
+                    seekBar === binding.sbRangeTxPower -> {
+                        binding.spTxPower.setSelection(progress)
                     }
-                    seekBar === sb_range_payload_length -> {
-                        sp_payload_length.setSelection(progress)
+
+                    seekBar === binding.sbRangePayloadLength -> {
+                        binding.spPayloadLength.setSelection(progress)
                     }
-                    seekBar === range_seek_ma_window_size -> {
-                        sp_ma_window_size.setSelection(progress)
+
+                    seekBar === binding.rangeSeekMaWindowSize -> {
+                        binding.spMaWindowSize.setSelection(progress)
                     }
                 }
             }
@@ -569,7 +592,8 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
         }
     }
 
-    private inner class SpinnerSeekBarListener(private val seekBar: SeekBar) : AdapterView.OnItemSelectedListener {
+    private inner class SpinnerSeekBarListener(private val seekBar: SeekBar) :
+        AdapterView.OnItemSelectedListener {
         override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
             seekBar.progress = position
             updateControllerFromSeekBar(seekBar)
@@ -601,12 +625,19 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
     }
 
     private inner class CubicLineSampleFillFormatter : IFillFormatter {
-        override fun getFillLinePosition(dataSet: ILineDataSet, dataProvider: LineDataProvider): Float {
+        override fun getFillLinePosition(
+            dataSet: ILineDataSet,
+            dataProvider: LineDataProvider
+        ): Float {
             return (-100).toFloat()
         }
     }
 
-    private class YAxisArrowRenderer(viewPortHandler: ViewPortHandler, yAxis: YAxis, trans: Transformer) : YAxisRenderer(viewPortHandler, yAxis, trans) {
+    private class YAxisArrowRenderer(
+        viewPortHandler: ViewPortHandler,
+        yAxis: YAxis,
+        trans: Transformer
+    ) : YAxisRenderer(viewPortHandler, yAxis, trans) {
         private val ARROW_SIZE = Utils.convertDpToPixel(3.5f)
         private val arrowPath = Path()
         private val arrowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -622,18 +653,46 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
             arrowPaint.color = mYAxis.axisLineColor
             arrowPath.reset()
             if (mYAxis.axisDependency == YAxis.AxisDependency.LEFT) {
-                c.drawLine(mViewPortHandler.contentLeft(), mViewPortHandler.contentTop() - ARROW_SIZE * 1.5f, mViewPortHandler.contentLeft(),
-                        mViewPortHandler.contentBottom(), mAxisLinePaint)
-                arrowPath.moveTo(mViewPortHandler.contentLeft(), mViewPortHandler.contentTop() - ARROW_SIZE * 1.5f)
-                arrowPath.lineTo(mViewPortHandler.contentLeft() + ARROW_SIZE / 2f, mViewPortHandler.contentTop() - ARROW_SIZE * 0.5f)
-                arrowPath.lineTo(mViewPortHandler.contentLeft() - ARROW_SIZE / 2f, mViewPortHandler.contentTop() - ARROW_SIZE * 0.5f)
+                c.drawLine(
+                    mViewPortHandler.contentLeft(),
+                    mViewPortHandler.contentTop() - ARROW_SIZE * 1.5f,
+                    mViewPortHandler.contentLeft(),
+                    mViewPortHandler.contentBottom(),
+                    mAxisLinePaint
+                )
+                arrowPath.moveTo(
+                    mViewPortHandler.contentLeft(),
+                    mViewPortHandler.contentTop() - ARROW_SIZE * 1.5f
+                )
+                arrowPath.lineTo(
+                    mViewPortHandler.contentLeft() + ARROW_SIZE / 2f,
+                    mViewPortHandler.contentTop() - ARROW_SIZE * 0.5f
+                )
+                arrowPath.lineTo(
+                    mViewPortHandler.contentLeft() - ARROW_SIZE / 2f,
+                    mViewPortHandler.contentTop() - ARROW_SIZE * 0.5f
+                )
                 arrowPath.close()
             } else {
-                c.drawLine(mViewPortHandler.contentRight(), mViewPortHandler.contentTop() - ARROW_SIZE * 1.5f, mViewPortHandler.contentRight(),
-                        mViewPortHandler.contentBottom(), mAxisLinePaint)
-                arrowPath.moveTo(mViewPortHandler.contentRight(), mViewPortHandler.contentTop() - ARROW_SIZE * 1.5f)
-                arrowPath.lineTo(mViewPortHandler.contentRight() + ARROW_SIZE / 2f, mViewPortHandler.contentTop() - ARROW_SIZE * 0.5f)
-                arrowPath.lineTo(mViewPortHandler.contentRight() - ARROW_SIZE / 2f, mViewPortHandler.contentTop() - ARROW_SIZE * 0.5f)
+                c.drawLine(
+                    mViewPortHandler.contentRight(),
+                    mViewPortHandler.contentTop() - ARROW_SIZE * 1.5f,
+                    mViewPortHandler.contentRight(),
+                    mViewPortHandler.contentBottom(),
+                    mAxisLinePaint
+                )
+                arrowPath.moveTo(
+                    mViewPortHandler.contentRight(),
+                    mViewPortHandler.contentTop() - ARROW_SIZE * 1.5f
+                )
+                arrowPath.lineTo(
+                    mViewPortHandler.contentRight() + ARROW_SIZE / 2f,
+                    mViewPortHandler.contentTop() - ARROW_SIZE * 0.5f
+                )
+                arrowPath.lineTo(
+                    mViewPortHandler.contentRight() - ARROW_SIZE / 2f,
+                    mViewPortHandler.contentTop() - ARROW_SIZE * 0.5f
+                )
                 arrowPath.close()
             }
             c.drawPath(arrowPath, arrowPaint)
@@ -669,8 +728,14 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
                     arrowPaint.color = l.getLineColor()
                     arrowPath.reset()
                     arrowPath.moveTo(mViewPortHandler.contentRight(), pts[1])
-                    arrowPath.lineTo(mViewPortHandler.contentRight() - ARROW_SIZE, pts[1] + ARROW_SIZE / 2f)
-                    arrowPath.lineTo(mViewPortHandler.contentRight() - ARROW_SIZE, pts[1] - ARROW_SIZE / 2f)
+                    arrowPath.lineTo(
+                        mViewPortHandler.contentRight() - ARROW_SIZE,
+                        pts[1] + ARROW_SIZE / 2f
+                    )
+                    arrowPath.lineTo(
+                        mViewPortHandler.contentRight() - ARROW_SIZE,
+                        pts[1] - ARROW_SIZE / 2f
+                    )
                     arrowPath.close()
                     c.drawPath(arrowPath, arrowPaint)
                 }
@@ -690,24 +755,32 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
                     val position = l.labelPosition
                     if (position == LimitLine.LimitLabelPosition.RIGHT_TOP) {
                         mLimitLinePaint.textAlign = Paint.Align.RIGHT
-                        c.drawText(label,
-                                mViewPortHandler.contentRight() - xOffset,
-                                pts[1] - yOffset + labelLineHeight, mLimitLinePaint)
+                        c.drawText(
+                            label,
+                            mViewPortHandler.contentRight() - xOffset,
+                            pts[1] - yOffset + labelLineHeight, mLimitLinePaint
+                        )
                     } else if (position == LimitLine.LimitLabelPosition.RIGHT_BOTTOM) {
                         mLimitLinePaint.textAlign = Paint.Align.RIGHT
-                        c.drawText(label,
-                                mViewPortHandler.contentRight() - xOffset,
-                                pts[1] + yOffset, mLimitLinePaint)
+                        c.drawText(
+                            label,
+                            mViewPortHandler.contentRight() - xOffset,
+                            pts[1] + yOffset, mLimitLinePaint
+                        )
                     } else if (position == LimitLine.LimitLabelPosition.LEFT_TOP) {
                         mLimitLinePaint.textAlign = Paint.Align.LEFT
-                        c.drawText(label,
-                                mViewPortHandler.contentLeft() + xOffset,
-                                pts[1] - yOffset + labelLineHeight, mLimitLinePaint)
+                        c.drawText(
+                            label,
+                            mViewPortHandler.contentLeft() + xOffset,
+                            pts[1] - yOffset + labelLineHeight, mLimitLinePaint
+                        )
                     } else {
                         mLimitLinePaint.textAlign = Paint.Align.LEFT
-                        c.drawText(label,
-                                mViewPortHandler.offsetLeft() + xOffset,
-                                pts[1] + yOffset, mLimitLinePaint)
+                        c.drawText(
+                            label,
+                            mViewPortHandler.offsetLeft() + xOffset,
+                            pts[1] + yOffset, mLimitLinePaint
+                        )
                     }
                 }
                 c.restoreToCount(clipRestoreCount)

@@ -9,12 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
+import com.siliconlabs.bledemo.databinding.DialogRangeTestModeBinding
 import com.siliconlabs.bledemo.features.demo.range_test.activities.RangeTestActivity
 import com.siliconlabs.bledemo.features.demo.range_test.models.RangeTestMode
 import com.siliconlabs.bledemo.features.demo.range_test.models.TxPower
 import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPresenter.Controller
 import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPresenter.RangeTestView
-import kotlinx.android.synthetic.main.dialog_range_test_mode.*
 import java.text.DecimalFormat
 import java.util.*
 
@@ -22,10 +22,11 @@ import java.util.*
  * @author Comarch S.A.
  */
 class RangeTestModeDialog : BaseDialogFragment(
-        hasCustomWidth = true,
-        isCanceledOnTouchOutside = false
+    hasCustomWidth = true,
+    isCanceledOnTouchOutside = false
 ), RangeTestView {
     lateinit var controller: Controller
+    private lateinit var binding: DialogRangeTestModeBinding
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return object : Dialog(requireContext(), theme) {
@@ -44,8 +45,13 @@ class RangeTestModeDialog : BaseDialogFragment(
         setStyle(STYLE_NO_TITLE, theme)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_range_test_mode, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DialogRangeTestModeBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
 
@@ -54,16 +60,13 @@ class RangeTestModeDialog : BaseDialogFragment(
 
         controller = activity as RangeTestActivity
         controller.setView(this)
-
-        tx_mode.setOnClickListener {
+        binding.txMode.setOnClickListener {
             onTxModeButtonClicked()
         }
-
-        rx_mode.setOnClickListener {
+        binding.rxMode.setOnClickListener {
             onRxModeButtonClicked()
         }
-
-        btn_cancel.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             onCancelButtonClicked()
         }
 
@@ -92,17 +95,17 @@ class RangeTestModeDialog : BaseDialogFragment(
     }
 
     override fun showDeviceName(name: String?) {
-        tv_device_name.text = name
+        binding.tvDeviceName.text = name
     }
 
     override fun showModelNumber(number: String?, running: Boolean?) {
-        tv_device_number.text = number
+        binding.tvDeviceNumber .text = number
     }
 
     override fun showTxPower(power: TxPower?, values: List<TxPower>) {
         val value = power?.asDisplayValue()
         val formatter = DecimalFormat("#.##")
-        tv_tx_power.text = String.format(Locale.ROOT, "%sdBm", formatter.format(value?.toDouble()))
+        binding.tvTxPower.text = String.format(Locale.ROOT, "%sdBm", formatter.format(value?.toDouble()))
     }
 
     override fun showPayloadLength(length: Int, values: List<Int>) {

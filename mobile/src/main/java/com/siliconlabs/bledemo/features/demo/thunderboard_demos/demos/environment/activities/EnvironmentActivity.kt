@@ -16,25 +16,24 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
-import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.viewmodels.EnvironmentViewModel
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.dialogs.SettingsDialog
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.control.*
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.model.HallState
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.model.TemperatureScale
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.utils.SensorChecker.ThunderboardSensor
+import com.siliconlabs.bledemo.databinding.ActivityEnvironmentBinding
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.activities.ThunderboardActivity
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models.ThunderBoardDevice
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.utils.SensorChecker
-import com.siliconlabs.bledemo.features.scan.browser.activities.DeviceServicesActivity
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.utils.SensorChecker.ThunderboardSensor
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.control.*
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.dialogs.SettingsDialog
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.model.HallState
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.model.TemperatureScale
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.viewmodels.EnvironmentViewModel
 import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.utils.Converters
-import kotlinx.android.synthetic.main.activity_environment.*
 import timber.log.Timber
 
 class EnvironmentActivity : ThunderboardActivity() {
@@ -43,14 +42,18 @@ class EnvironmentActivity : ThunderboardActivity() {
     private var hallStateControl: HallStateControl? = null
 
     private lateinit var viewModel: EnvironmentViewModel
+    private lateinit var binding: ActivityEnvironmentBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val view = LayoutInflater
-                .from(this).inflate(R.layout.activity_environment, null, false)
-        mainSection?.addView(view)
-        viewModel = ViewModelProvider(this,
-                EnvironmentViewModel.Factory(this)).get(EnvironmentViewModel::class.java)
+        binding = ActivityEnvironmentBinding.inflate(
+            layoutInflater
+        )
+        mainSection?.addView(binding.root)
+        viewModel = ViewModelProvider(
+            this,
+            EnvironmentViewModel.Factory(this)
+        ).get(EnvironmentViewModel::class.java)
         setupDataListeners()
     }
 
@@ -104,7 +107,8 @@ class EnvironmentActivity : ThunderboardActivity() {
             controls[ThunderboardSensor.MagneticField]?.setHallStrength(it)
         })
         viewModel.hallState.observe(this, Observer {
-            hallStateControl?.setHallState(it)
+          //  hallStateControl?.setHallState(it)
+            controls[ThunderboardSensor.DoorState]?.setHallState(it)
         })
     }
 
@@ -113,10 +117,14 @@ class EnvironmentActivity : ThunderboardActivity() {
             it.value == SensorChecker.SensorState.WORKING
         }.any()
         val dialogMessage =
-                if (isAnySensorWorking) getString(R.string.sensor_malfunction_dialog_message,
-                        TextUtils.join(", ", brokenSensors))
-                else getString(R.string.critical_sensor_malfunction_dialog_message,
-                        TextUtils.join(", ", brokenSensors))
+            if (isAnySensorWorking) getString(
+                R.string.sensor_malfunction_dialog_message,
+                TextUtils.join(", ", brokenSensors)
+            )
+            else getString(
+                R.string.critical_sensor_malfunction_dialog_message,
+                TextUtils.join(", ", brokenSensors)
+            )
 
         AlertDialog.Builder(this).apply {
             setTitle(getString(R.string.sensor_malfunction_dialog_title))
@@ -154,10 +162,12 @@ class EnvironmentActivity : ThunderboardActivity() {
                 gatt?.disconnect()
                 true
             }
+
             R.id.action_settings -> {
                 showSettings()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -187,7 +197,7 @@ class EnvironmentActivity : ThunderboardActivity() {
     }
 
     private fun initGrid() {
-        env_grid.apply {
+        binding.envGrid.apply {
             sensorChecker.environmentSensors.filter {
                 it.value == SensorChecker.SensorState.WORKING
             }.forEach {
@@ -195,45 +205,70 @@ class EnvironmentActivity : ThunderboardActivity() {
                 if (it.key == ThunderboardSensor.TVOC && !isPowerSufficient()) return@forEach
 
                 if (it.key != ThunderboardSensor.DoorState) {
-                    controls[it.key] = EnvironmentControl(this@EnvironmentActivity,
-                            getString(getTileDescription(it.key)),
-                            ContextCompat.getDrawable(this@EnvironmentActivity, getTileIcon(it.key))).also {
-                        runOnUiThread { addView(it) }
+                    controls[it.key] = EnvironmentControl(
+                        this@EnvironmentActivity,
+                        getString(getTileDescription(it.key)),
+                        ContextCompat.getDrawable(this@EnvironmentActivity, getTileIcon(it.key))
+                    ).also {
+                        runOnUiThread { addView(it.tileView.root) }
                     }
                 } else {
-                    hallStateControl = HallStateControl(this@EnvironmentActivity,
-                            getString(getTileDescription(it.key)),
-                            ContextCompat.getDrawable(this@EnvironmentActivity, getTileIcon(it.key))).also {
-                        it.setOnClickListener { onHallStateClick() }
-                        runOnUiThread { addView(it) }
+
+                    controls[it.key] = EnvironmentControl(
+                        this@EnvironmentActivity,
+                        getString(getTileDescription(it.key)),
+                        ContextCompat.getDrawable(this@EnvironmentActivity, getTileIcon(it.key))
+                    ).also {
+                        runOnUiThread { addView(it.tileView.root) }
                     }
                 }
             }
         }
+
     }
 
     private fun setupSensorCharacteristics() {
         sensorChecker.let {
-            it.setupEnvSensorCharacteristic(ThunderboardSensor.Temperature,
-                getEnvironmentalSensingCharacteristic(GattCharacteristic.EnvironmentTemperature))
-            it.setupEnvSensorCharacteristic(ThunderboardSensor.Humidity,
-                getEnvironmentalSensingCharacteristic(GattCharacteristic.Humidity))
-            it.setupEnvSensorCharacteristic(ThunderboardSensor.UvIndex,
-                getEnvironmentalSensingCharacteristic(GattCharacteristic.UvIndex))
-            it.setupEnvSensorCharacteristic(ThunderboardSensor.Pressure,
-                getEnvironmentalSensingCharacteristic(GattCharacteristic.Pressure))
-            it.setupEnvSensorCharacteristic(ThunderboardSensor.SoundLevel,
-                getEnvironmentalSensingCharacteristic(GattCharacteristic.SoundLevel))
-            it.setupEnvSensorCharacteristic(ThunderboardSensor.AmbientLight,
-                getAmbientLightCharacteristic())
-            it.setupEnvSensorCharacteristic(ThunderboardSensor.CO2,
-                getAirQualityCharacteristic(GattCharacteristic.CO2Reading))
-            it.setupEnvSensorCharacteristic(ThunderboardSensor.TVOC,
-                getAirQualityCharacteristic(GattCharacteristic.TVOCReading))
-            it.setupEnvSensorCharacteristic(ThunderboardSensor.MagneticField,
-                getHallEffectCharacteristic(GattCharacteristic.HallFieldStrength))
-            it.setupEnvSensorCharacteristic(ThunderboardSensor.DoorState,
-                getHallEffectCharacteristic(GattCharacteristic.HallState))
+            it.setupEnvSensorCharacteristic(
+                ThunderboardSensor.Temperature,
+                getEnvironmentalSensingCharacteristic(GattCharacteristic.EnvironmentTemperature)
+            )
+            it.setupEnvSensorCharacteristic(
+                ThunderboardSensor.Humidity,
+                getEnvironmentalSensingCharacteristic(GattCharacteristic.Humidity)
+            )
+            it.setupEnvSensorCharacteristic(
+                ThunderboardSensor.UvIndex,
+                getEnvironmentalSensingCharacteristic(GattCharacteristic.UvIndex)
+            )
+            it.setupEnvSensorCharacteristic(
+                ThunderboardSensor.Pressure,
+                getEnvironmentalSensingCharacteristic(GattCharacteristic.Pressure)
+            )
+            it.setupEnvSensorCharacteristic(
+                ThunderboardSensor.SoundLevel,
+                getEnvironmentalSensingCharacteristic(GattCharacteristic.SoundLevel)
+            )
+            it.setupEnvSensorCharacteristic(
+                ThunderboardSensor.AmbientLight,
+                getAmbientLightCharacteristic()
+            )
+            it.setupEnvSensorCharacteristic(
+                ThunderboardSensor.CO2,
+                getAirQualityCharacteristic(GattCharacteristic.CO2Reading)
+            )
+            it.setupEnvSensorCharacteristic(
+                ThunderboardSensor.TVOC,
+                getAirQualityCharacteristic(GattCharacteristic.TVOCReading)
+            )
+            it.setupEnvSensorCharacteristic(
+                ThunderboardSensor.MagneticField,
+                getHallEffectCharacteristic(GattCharacteristic.HallFieldStrength)
+            )
+            it.setupEnvSensorCharacteristic(
+                ThunderboardSensor.DoorState,
+                getHallEffectCharacteristic(GattCharacteristic.HallState)
+            )
         }
     }
 
@@ -253,26 +288,28 @@ class EnvironmentActivity : ThunderboardActivity() {
     }
 
     private fun getEnvironmentalSensingCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        return gatt?.getService(GattService.EnvironmentalSensing.number)?.
-        getCharacteristic(characteristic.uuid)
+        return gatt?.getService(GattService.EnvironmentalSensing.number)
+            ?.getCharacteristic(characteristic.uuid)
     }
 
     private fun getAirQualityCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        return gatt?.getService(GattService.IndoorAirQuality.number)?.
-        getCharacteristic(characteristic.uuid)
+        return gatt?.getService(GattService.IndoorAirQuality.number)
+            ?.getCharacteristic(characteristic.uuid)
     }
 
     private fun getHallEffectCharacteristic(characteristic: GattCharacteristic): BluetoothGattCharacteristic? {
-        return gatt?.getService(GattService.HallEffect.number)?.
-        getCharacteristic(characteristic.uuid)
+        return gatt?.getService(GattService.HallEffect.number)
+            ?.getCharacteristic(characteristic.uuid)
     }
 
-    private fun getAmbientLightCharacteristic() : BluetoothGattCharacteristic? {
+    private fun getAmbientLightCharacteristic(): BluetoothGattCharacteristic? {
         val lightReact = getEnvironmentalSensingCharacteristic(GattCharacteristic.AmbientLightReact)
         if (lightReact != null) return lightReact
 
-        val lightReact2 = BLEUtils.getCharacteristic(gatt, GattService.AmbientLight,
-                GattCharacteristic.AmbientLightReact)
+        val lightReact2 = BLEUtils.getCharacteristic(
+            gatt, GattService.AmbientLight,
+            GattCharacteristic.AmbientLightReact
+        )
         if (lightReact2 != null) return lightReact2
 
         val lightSense = getEnvironmentalSensingCharacteristic(GattCharacteristic.AmbientLightSense)
@@ -282,7 +319,7 @@ class EnvironmentActivity : ThunderboardActivity() {
     }
 
     @StringRes
-    private fun getTileDescription(sensor: ThunderboardSensor) : Int {
+    private fun getTileDescription(sensor: ThunderboardSensor): Int {
         return when (sensor) {
             ThunderboardSensor.Temperature -> R.string.environment_temp
             ThunderboardSensor.Humidity -> R.string.environment_humidity
@@ -299,7 +336,7 @@ class EnvironmentActivity : ThunderboardActivity() {
     }
 
     @DrawableRes
-    private fun getTileIcon(sensor: ThunderboardSensor) : Int {
+    private fun getTileIcon(sensor: ThunderboardSensor): Int {
         return when (sensor) {
             ThunderboardSensor.Temperature -> R.drawable.icon_temp
             ThunderboardSensor.Humidity -> R.drawable.icon_environment
@@ -333,9 +370,11 @@ class EnvironmentActivity : ThunderboardActivity() {
             queueReadingEnvironmentalData()
         }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt,
-                                          characteristic: BluetoothGattCharacteristic,
-                                          status: Int) {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             super.onCharacteristicRead(gatt, characteristic, status)
             gattQueue.handleCommandProcessed()
             if (status != BluetoothGatt.GATT_SUCCESS) return
@@ -347,36 +386,54 @@ class EnvironmentActivity : ThunderboardActivity() {
                 GattCharacteristic.ModelNumberString,
                 GattCharacteristic.BatteryLevel,
                 GattCharacteristic.PowerSource,
-                GattCharacteristic.FirmwareRevision -> statusFragment.handleBaseCharacteristic(characteristic)
+                GattCharacteristic.FirmwareRevision -> statusFragment.handleBaseCharacteristic(
+                    characteristic
+                )
 
                 GattCharacteristic.EnvironmentTemperature -> {
                     val temperature = characteristic.getIntValue(gattCharacteristic.format, 0)
                     if (setup) {
-                        sensorChecker.checkIfEnvSensorBroken(ThunderboardSensor.Temperature, temperature.toLong())
+                        sensorChecker.checkIfEnvSensorBroken(
+                            ThunderboardSensor.Temperature,
+                            temperature.toLong()
+                        )
                     } else viewModel.incrementControlsRead()
                     viewModel.temperature.postValue(temperature / 100.0f)
                 }
+
                 GattCharacteristic.Humidity -> {
                     val humidity = characteristic.getIntValue(gattCharacteristic.format, 0)
                     if (setup) {
-                        sensorChecker.checkIfEnvSensorBroken(ThunderboardSensor.Humidity, humidity.toLong())
+                        sensorChecker.checkIfEnvSensorBroken(
+                            ThunderboardSensor.Humidity,
+                            humidity.toLong()
+                        )
                     } else viewModel.incrementControlsRead()
                     viewModel.humidity.postValue(humidity / 100)
                 }
+
                 GattCharacteristic.UvIndex -> {
                     val uvIndex = characteristic.getIntValue(gattCharacteristic.format, 0)
                     if (setup) {
-                        sensorChecker.checkIfEnvSensorBroken(ThunderboardSensor.UvIndex, uvIndex.toLong())
+                        sensorChecker.checkIfEnvSensorBroken(
+                            ThunderboardSensor.UvIndex,
+                            uvIndex.toLong()
+                        )
                     } else viewModel.incrementControlsRead()
                     viewModel.uvIndex.postValue(uvIndex)
                 }
+
                 GattCharacteristic.SoundLevel -> {
                     val soundLevel = characteristic.getIntValue(gattCharacteristic.format, 0)
                     if (setup) {
-                        sensorChecker.checkIfEnvSensorBroken(ThunderboardSensor.SoundLevel, soundLevel.toLong())
+                        sensorChecker.checkIfEnvSensorBroken(
+                            ThunderboardSensor.SoundLevel,
+                            soundLevel.toLong()
+                        )
                     } else viewModel.incrementControlsRead()
                     viewModel.soundLevel.postValue(soundLevel / 100)
                 }
+
                 GattCharacteristic.Pressure -> {
                     val pressure = Converters.calculateLongValue(characteristic.value, false)
                     if (setup) {
@@ -384,24 +441,36 @@ class EnvironmentActivity : ThunderboardActivity() {
                     } else viewModel.incrementControlsRead()
                     viewModel.pressure.postValue(pressure / 1000)
                 }
+
                 GattCharacteristic.CO2Reading -> {
                     val co2Level = characteristic.getIntValue(gattCharacteristic.format, 0)
                     if (setup) {
-                        sensorChecker.checkIfEnvSensorBroken(ThunderboardSensor.CO2, co2Level.toLong())
+                        sensorChecker.checkIfEnvSensorBroken(
+                            ThunderboardSensor.CO2,
+                            co2Level.toLong()
+                        )
                     } else viewModel.incrementControlsRead()
                     viewModel.co2Level.postValue(co2Level)
                 }
+
                 GattCharacteristic.TVOCReading -> {
                     val tvocLevel = characteristic.getIntValue(gattCharacteristic.format, 0)
                     if (setup) {
-                        sensorChecker.checkIfEnvSensorBroken(ThunderboardSensor.TVOC, tvocLevel.toLong())
+                        sensorChecker.checkIfEnvSensorBroken(
+                            ThunderboardSensor.TVOC,
+                            tvocLevel.toLong()
+                        )
                     } else viewModel.incrementControlsRead()
                     viewModel.tvocLevel.postValue(tvocLevel)
                 }
+
                 GattCharacteristic.HallFieldStrength -> {
                     val hallStrength = characteristic.getIntValue(gattCharacteristic.format, 0)
                     if (setup) {
-                        sensorChecker.checkIfEnvSensorBroken(ThunderboardSensor.MagneticField, hallStrength.toLong())
+                        sensorChecker.checkIfEnvSensorBroken(
+                            ThunderboardSensor.MagneticField,
+                            hallStrength.toLong()
+                        )
                         val brokenSensors = sensorChecker.environmentSensors.filter {
                             it.value == SensorChecker.SensorState.BROKEN
                         }.keys
@@ -417,6 +486,7 @@ class EnvironmentActivity : ThunderboardActivity() {
                     viewModel.hallStrength.postValue(hallStrength)
 
                 }
+
                 GattCharacteristic.HallState -> {
                     val hallState = characteristic.getIntValue(gattCharacteristic.format, 0)
                     viewModel.hallState.postValue(HallState.fromValue(hallState))
@@ -433,21 +503,27 @@ class EnvironmentActivity : ThunderboardActivity() {
                 GattCharacteristic.AmbientLightSense -> {
                     var ambientLight = Converters.calculateLongValue(characteristic.value, false)
                     if (setup) {
-                        sensorChecker.checkIfEnvSensorBroken(ThunderboardSensor.AmbientLight, ambientLight)
+                        sensorChecker.checkIfEnvSensorBroken(
+                            ThunderboardSensor.AmbientLight,
+                            ambientLight
+                        )
                     } else viewModel.incrementControlsRead()
                     ambientLight /= 100
                     viewModel.ambientLight.postValue(
-                            if (ambientLight > MAX_AMBIENT_LIGHT) MAX_AMBIENT_LIGHT.toLong()
-                            else ambientLight
+                        if (ambientLight > MAX_AMBIENT_LIGHT) MAX_AMBIENT_LIGHT.toLong()
+                        else ambientLight
                     )
                 }
-                else -> { }
+
+                else -> {}
             }
         }
 
-        override fun onCharacteristicWrite(gatt: BluetoothGatt,
-                                           characteristic: BluetoothGattCharacteristic,
-                                           status: Int) {
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
             gattQueue.handleCommandProcessed()
             if (status != BluetoothGatt.GATT_SUCCESS) return
@@ -457,25 +533,34 @@ class EnvironmentActivity : ThunderboardActivity() {
             }
         }
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt,
-                                             characteristic: BluetoothGattCharacteristic) {
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic
+        ) {
             super.onCharacteristicChanged(gatt, characteristic)
 
             val gattCharacteristic = GattCharacteristic.fromUuid(characteristic.uuid)
 
             when (gattCharacteristic) {
                 GattCharacteristic.BatteryLevel,
-                GattCharacteristic.PowerSource -> statusFragment.handleBaseCharacteristic(characteristic)
+                GattCharacteristic.PowerSource -> statusFragment.handleBaseCharacteristic(
+                    characteristic
+                )
 
                 GattCharacteristic.HallState -> {
                     val hallState = characteristic.getIntValue(gattCharacteristic.format, 0)
                     viewModel.hallState.postValue(HallState.fromValue(hallState))
                 }
-                else -> { }
+
+                else -> {}
             }
         }
 
-        override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
             super.onDescriptorWrite(gatt, descriptor, status)
             gattQueue.handleCommandProcessed()
         }

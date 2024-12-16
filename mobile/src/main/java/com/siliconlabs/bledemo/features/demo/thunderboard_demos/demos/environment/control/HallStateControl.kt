@@ -2,13 +2,15 @@ package com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environme
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.view.View
+import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.EnvironmentdemoTileBinding
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.model.HallState
-import kotlinx.android.synthetic.main.environmentdemo_tile.view.*
+
+//import kotlinx.android.synthetic.main.environmentdemo_tile.view.*
 
 /**
  * Displays an icon and the Hall State value in a combo control.
@@ -17,14 +19,14 @@ import kotlinx.android.synthetic.main.environmentdemo_tile.view.*
  * The HallStateMeter and the TextView are added to the layout dynamically
  */
 class HallStateControl(
-        context: Context,
-        description: String?,
-        icon: Drawable?
+    context: Context,
+    description: String?,
+    icon: Drawable?
 ) : EnvironmentControl(context, description, icon) {
 
     constructor(context: Context) : this(context, null, null)
 
-    private val tileView: View = inflate(context, R.layout.environmentdemo_tile, this)
+    /*val tileViewHallState = EnvironmentdemoTileBinding.inflate(LayoutInflater.from(context))
     private val resetTamperTextView: TextView
 
     fun setHallState(hallState: HallState) {
@@ -38,12 +40,13 @@ class HallStateControl(
                 hallStateTextResId = R.string.environment_hall_state_tampered
                 hallStateStyleResId = R.style.EnvironmentControlLabel_HallStateTampered
             }
+
             HallState.CLOSED -> hallStateTextResId = R.string.environment_hall_state_closed
             HallState.OPENED -> hallStateTextResId = R.string.environment_hall_state_opened
         }
 
-        tileView.env_value.text = context.getString(hallStateTextResId)
-        tileView.env_value.setTextAppearance(hallStateStyleResId)
+        tileViewHallState.envValue.text = context.getString(hallStateTextResId)
+        tileViewHallState.envValue.setTextAppearance(hallStateStyleResId)
         resetTamperTextView.visibility = resetTamperVisible
     }
 
@@ -53,7 +56,7 @@ class HallStateControl(
             setTextAppearance(R.style.EnvironmentControlLabel_HallStateTampered)
             visibility = GONE
         }
-        env_layout.addView(resetTamperTextView)
-        cardview_env_tile.isEnabled = false
-    }
+        tileViewHallState.envLayout.addView(resetTamperTextView)
+        tileViewHallState.cardviewEnvTile.isEnabled = false
+    }*/
 }

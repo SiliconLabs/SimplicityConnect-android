@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,14 +20,11 @@ import chip.devicecontroller.GetConnectedDeviceCallbackJni
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone.Constants
 import com.siliconlabs.bledemo.databinding.FragmentMatterOccupancySensorBinding
-import com.siliconlabs.bledemo.databinding.FragmentMatterThermostatBinding
 import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoActivity
 import com.siliconlabs.bledemo.features.demo.matter_demo.controller.GenericChipDeviceListener
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ARG_DEVICE_INFO
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ARG_DEVICE_MODEL
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.INIT
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ON_OFF_CLUSTER_ENDPOINT
-import com.siliconlabs.bledemo.features.demo.matter_demo.model.CHIPDeviceInfo
 import com.siliconlabs.bledemo.features.demo.matter_demo.model.MatterScannedResultModel
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ChipClient
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
@@ -45,8 +41,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.NotNull
 import timber.log.Timber
-import java.text.DecimalFormat
-import kotlin.Exception
 
 
 class MatterOccupancySensorFragment : Fragment() {
@@ -66,7 +60,7 @@ class MatterOccupancySensorFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPrefs = requireContext().getSharedPreferences(
-            "your_preference_name",
+            MatterDemoActivity.MATTER_PREF,
             AppCompatActivity.MODE_PRIVATE
         )
         if (requireArguments() != null) {
@@ -80,7 +74,7 @@ class MatterOccupancySensorFragment : Fragment() {
             showMatterProgressDialog(getString(R.string.matter_device_status))
 
             // retrieveSavedDevices()
-            GlobalScope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 // This code will run asynchronously
 
                 val resultq = checkForDeviceStatus()
@@ -107,7 +101,6 @@ class MatterOccupancySensorFragment : Fragment() {
                     model.isDeviceOnline = true
                     SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, true)
                     //   removeProgress()
-
                 }
 
                 override fun onConnectionFailure(nodeId: Long, error: Exception?) {
@@ -124,17 +117,9 @@ class MatterOccupancySensorFragment : Fragment() {
         }
     }
 
-    override fun onAttach(@NotNull context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-    }
-
     private fun showMessageDialog() {
         try {
-            if (isAdded() && requireActivity() != null && !requireActivity().isFinishing) {
+            if (isAdded && !requireActivity().isFinishing) {
                 requireActivity().runOnUiThread {
                     if (!MessageDialogFragment.isDialogShowing()) {
                         dialog = MessageDialogFragment()
@@ -161,14 +146,14 @@ class MatterOccupancySensorFragment : Fragment() {
                 Timber.e("device offline")
             }
         } catch (e: Exception) {
-            Timber.e("" + e)
+            Timber.e("Exception Occurred :$e")
         }
 
 
     }
 
     private fun removeProgress() {
-        if (customProgressDialog?.isShowing() == true) {
+        if (customProgressDialog?.isShowing == true) {
             customProgressDialog?.dismiss()
         }
     }
@@ -177,13 +162,14 @@ class MatterOccupancySensorFragment : Fragment() {
         customProgressDialog = CustomProgressDialog(requireContext())
         customProgressDialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         customProgressDialog!!.setMessage(message)
+        customProgressDialog!!.setCanceledOnTouchOutside(false)
         customProgressDialog!!.show()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         binding = FragmentMatterOccupancySensorBinding.inflate(inflater, container, false)
         return binding.root
@@ -263,7 +249,7 @@ class MatterOccupancySensorFragment : Fragment() {
 
             override fun onError(error: Exception?) {
                 SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
-                Timber.tag(TAG).e( "error readOccupancySensorType  " + error)
+                Timber.tag(TAG).e( "error readOccupancySensorType  :$error" )
                 showMessageDialog()
             }
         })
@@ -286,7 +272,7 @@ class MatterOccupancySensorFragment : Fragment() {
     inner class OccupancySensorChipControllerCallback : GenericChipDeviceListener() {
         override fun onConnectDeviceComplete() {}
 
-        override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+        override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
              Timber.tag(TAG).d( "onCommissioningComplete for nodeId $nodeId: $errorCode")
             //showMessage("Address update complete for nodeId $nodeId with code $errorCode")
         }
@@ -299,7 +285,7 @@ class MatterOccupancySensorFragment : Fragment() {
              Timber.tag(TAG).d( "onCloseBleComplete")
         }
 
-        override fun onError(error: Throwable) {
+        override fun onError(error: Throwable?) {
             super.onError(error)
              Timber.tag(TAG).d( "onError : $error")
         }
@@ -310,7 +296,7 @@ class MatterOccupancySensorFragment : Fragment() {
     }
 
     companion object {
-        private val TAG = MatterOccupancySensorFragment.javaClass.simpleName.toString()
+        private val TAG = Companion::class.java.simpleName.toString()
 
         fun newInstance(): MatterOccupancySensorFragment = MatterOccupancySensorFragment()
     }

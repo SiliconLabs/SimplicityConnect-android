@@ -5,9 +5,21 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.bluetooth.*
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
+import android.bluetooth.BluetoothGattServer
+import android.bluetooth.BluetoothGattServerCallback
+import android.bluetooth.BluetoothGattService
+import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanCallback.*
+import android.bluetooth.le.ScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED
+import android.bluetooth.le.ScanCallback.SCAN_FAILED_FEATURE_UNSUPPORTED
+import android.bluetooth.le.ScanCallback.SCAN_FAILED_INTERNAL_ERROR
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanSettings
 import android.content.BroadcastReceiver
@@ -22,19 +34,31 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.core.location.LocationManagerCompat
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.bluetooth.ble.*
+import com.siliconlabs.bledemo.bluetooth.ble.BleScanCallback
+import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
+import com.siliconlabs.bledemo.bluetooth.ble.BluetoothScanCallback
+import com.siliconlabs.bledemo.bluetooth.ble.ConnectedDeviceInfo
+import com.siliconlabs.bledemo.bluetooth.ble.GattConnection
+import com.siliconlabs.bledemo.bluetooth.ble.ScanResultCompat
+import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
 import com.siliconlabs.bledemo.features.configure.advertiser.activities.PendingServerConnectionActivity
 import com.siliconlabs.bledemo.features.configure.advertiser.services.AdvertiserService
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.utils.BluetoothGattServicesCreator
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.utils.GattConfiguratorStorage
-import com.siliconlabs.bledemo.features.scan.browser.models.logs.*
+import com.siliconlabs.bledemo.features.scan.browser.models.logs.ConnectionStateChangeLog
+import com.siliconlabs.bledemo.features.scan.browser.models.logs.GattOperationLog
+import com.siliconlabs.bledemo.features.scan.browser.models.logs.GattOperationWithDataLog
+import com.siliconlabs.bledemo.features.scan.browser.models.logs.GattOperationWithParameterLog
+import com.siliconlabs.bledemo.features.scan.browser.models.logs.Log
+import com.siliconlabs.bledemo.features.scan.browser.models.logs.TimeoutLog
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity
 import com.siliconlabs.bledemo.utils.LocalService
 import com.siliconlabs.bledemo.utils.Notifications
 import com.siliconlabs.bledemo.utils.UuidConsts
 import timber.log.Timber
 import java.lang.reflect.Method
-import java.util.*
+import java.util.LinkedList
+import java.util.UUID
 
 /**
  * Service handling Bluetooth (regular and BLE) communications.
@@ -81,7 +105,8 @@ class BluetoothService : LocalService<BluetoothService>() {
         ESL_DEMO,
         MATTER_DEMO,
         WIFI_OTA_UPDATE,
-        DEV_KIT_SENSOR
+        DEV_KIT_SENSOR,
+        WIFI_THROUGHPUT_TEST
     }
 
     interface ScanListener {
@@ -211,6 +236,7 @@ class BluetoothService : LocalService<BluetoothService>() {
     interface ServicesStateListener {
         fun onBluetoothStateChanged(isOn: Boolean)
         fun onLocationStateChanged(isOn: Boolean)
+        fun onNotificationStateChanged(isOn: Boolean)
     }
 
     private val bluetoothReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -249,6 +275,10 @@ class BluetoothService : LocalService<BluetoothService>() {
     fun isLocationOn() : Boolean {
         val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         return LocationManagerCompat.isLocationEnabled(locationManager)
+    }
+
+    fun areNotificationOn() : Boolean {
+        return (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).areNotificationsEnabled()
     }
 
     fun initGattServer() {
@@ -858,7 +888,7 @@ class BluetoothService : LocalService<BluetoothService>() {
                 .setContentTitle(getString(R.string.notification_title_device_has_connected, deviceName))
                 .setContentText(getString(R.string.notification_note_debug_connection))
                 .addAction(buildAction(getString(R.string.button_yes), getYesPendingIntent(device)))
-                .addAction(buildAction(getString(R.string.notification_button_yes_and_open), getYesAndOpenPendingIntent(device)))
+               /* .addAction(buildAction(getString(R.string.notification_button_yes_and_open), getYesAndOpenPendingIntent(device)))*/
                 .addAction(buildAction(getString(R.string.button_no), getNoPendingIntent()))
                 .build()
 

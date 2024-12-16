@@ -102,7 +102,10 @@
     <string name="warning_bar_additional_info">Info</string>
     <string name="location_enable">Enable</string>
     <string name="location_disabled">Location disabled</string>
+    <string name="notification_disabled">Notifications Disabled</string>
     <string name="bluetooth_permissions_denied">Bluetooth permissions denied</string>
+    <string name="notifications_permission_denied">Notification permissions denied</string>
+    <string name="notification_click_to_allow">Enable</string>
     <string name="Location_service">Location service</string>
     <string name="location_service_info">On some Android phones you have to enable Location
         service in order to scan for Bluetooth Low Energy devices. If you can\'t find any
@@ -112,11 +115,20 @@
         you have to grant a permission first. Please keep in mind, that on some Android
         devices this service is needed for proper Bluetooth Low Energy device discovery.</string>
     <string name="bluetooth_permissions">Bluetooth permissions</string>
+    <string name="notification_permissions">Notification permissions</string>
     <string name="bluetooth_permissions_info">Since Android 12, performing BLE-related operations
         (such as scanning, advertising or connecting) requires the user to explicitly grant the
         \"Nearby devices\" permission for the app. Please keep in mind that this app relies
         heavily on these system features and its capabilities will be severely reduced without them.
     </string>
+    <string name="notification_permissions_info">To ensure you have the best experience with our app, we need your help! Enabling notifications allows us to keep you informed about essential updates related to your nearby Bluetooth devices.&#10;&#10;
+    \n\n
+    <b>Why Enable Notifications?</b>&#10;\n
+    - <b>Real-Time Alerts:</b> Receive instant notifications about successful connections, disconnections, and any issues that may arise while using Bluetooth devices.&#10;\n
+    - <b>Timely Updates:</b> Get notified when new features or device settings are available, ensuring you’re always using the latest capabilities of your connected devices.&#10;\n
+    - <b>Critical Reminders:</b> Stay aware of important events, such as battery status and maintenance alerts, so you can manage your devices effectively.&#10;&#10;
+
+    Your privacy is our priority, and we only send notifications that enhance your experience. \n\nPlease allow notifications so you can make the most of your Bluetooth-enabled devices.</string>
     <string name="text_advertiser_purpose_explanation">Utilize this device as a Bluetooth \n Low
         Energy peripheral</string>
     <string name="main_menu_description_thermometer">View readings from the Health Thermometer service</string>
@@ -601,7 +613,7 @@
     <string name="gatt_configurator_popup_import_successful_title">Successful import</string>
     <string name="gatt_configurator_popup_import_successful_content">Created 1 configuration from the XML file</string>
     <string name="gatt_configurator_popup_import_unsuccessful_title">Import with error</string>
-    <string name="gatt_configurator_popup_import_unsuccessful_content_forbidden_value">Provided: \"%s\", expected: %s. </string>
+    <string name="gatt_configurator_popup_import_unsuccessful_content_forbidden_value" formatted="false">Provided: \"%s\", expected: %s. </string>
     <string name="gatt_configurator_popup_import_unsuccessful_content_occurrence_error">Specifically: \"%s\".</string>
     <string name="gatt_configurator_popup_import_unsuccessful_content_regex_mismatch">Provided: \"%s\", expected regex pattern: %s.</string>
 
@@ -809,6 +821,8 @@
         crucial for this app to work as intended</string>
     <string name="permissions_rationale_location_html">\u2022 &lt;b>location&lt;/b> - ensures proper
         functioning of the bluetooth scanner</string>
+    <string name="permissions_rationale_notification_html">\u2022 &lt;b>notification&lt;/b> - This app requires notification permission to send you important alerts and updates.
+        Please allow notifications so you can stay informed.</string>
     <string name="btn_understood">Understood</string>
 
     <string name="string_placeholder">%s</string>
@@ -1097,7 +1111,7 @@
     <string name="plug_off_in_progress">Plug off is in-progress for </string>
     <string name="closing_window_in_progress">Closing window cover is in-progress for </string>
     <string name="matter_commissioning_completed">Commissioning completed with result: %1$d</string>
-    <string name="matter_commissioning_device">Commissioning Device</string>
+    <string name="matter_commissioning_device">Commissioning Device…</string>
     <string name="mater_scan_qr_code">Scan QR Code</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="matter_light_on_status">ON</string>
@@ -1111,7 +1125,7 @@
     <string name="matter_switch_on_off_cluster">Switch On Off</string>
     <string name="matter_window_open">Open</string>
     <string name="matter_window_close">Close</string>
-    <string name="matter_window_open_close_cluster">Curtain Open Close</string>
+    <string name="matter_window_open_close_cluster">Window Covering</string>
     <string name="matter_thermostat_cluster">Thermostat</string>
     <string name="matter_occupancy_cluster">Occupancy Sensor</string>
     <string name="matter_temp_sensor_cluster">Temperature Sensor</string>
@@ -1124,8 +1138,9 @@
     <string name="matter_network_selection_alert_title">Commissioning</string>
     <string name="matter_wifi_configuration_alert_title">WiFi Configuration</string>
     <string name="matter_wifi_configuration_input_alert_title">Input network SSID and password that your phone is connected to</string>
-    <string name="matter_alert_message">Enter OTBR dataset to control</string>
-    <string name="matter_select_network_mode_alert_message">Select Network Mode</string>
+    <string name="matter_wifi_not_connected">WiFi Not Connected</string>
+    <string name="matter_otbr_alert_message">Enter OTBR dataset to connect</string>
+    <string name="matter_select_network_mode_alert_message">Select network mode</string>
     <string name="matter_on_off_cluster_title">Light On Off</string>
     <string name="matter_wifi">Wi-Fi</string>
     <string name="matter_thread">Thread</string>
@@ -1141,23 +1156,24 @@
     <string name="matter_occupancy_sensor_list">Occupancy Sensor</string>
     <string name="matter_temperature_sensor_list">Temperature Sensor</string>
     <string name="matter_contact_sensor_list">Contact Sensor</string>
-    <string name="matter_device_status">Connecting to commissioned device…</string>
+    <string name="matter_device_status">Connecting to\ncommissioned device…</string>
     <string name="matter_scanner_instruction">Please position the camera to point at the QR code</string>
     <string name="matter_contact_sensor_action">Press and Hold to detect the contact and release the button to undetect the contact</string>
     <string name="matter_refresh_button">Refresh</string>
     <string name="matter_thermostat_list">Thermostat</string>
     <string name="matter_light_list">Light</string>
     <string name="matter_window_list">Window Cover</string>
+    <string name="matter_dishwahser_list">Dishwasher</string>
     <string name="please_wait">Please wait while the work is in progress..</string>
     <string name="temp_note_message">Please press BTN1 button to change sensor value on the Baseboard to test the Temprature Sensor</string>
     <string name="matter_tile">Matter Devices</string>
-    <string name="matter_alert_ok">Ok</string>
+    <string name="matter_alert_ok">OK</string>
     <string name="matter_delete_alert_title">Alert</string>
     <string name="matter_delete_message">Do you want to delete Device?</string>
     <string name="matter_validation_manual_qrcode">Enter valid QR Code</string>
     <string name="matter_occupancy_sensor_action">Press and Hold to detect the occupancy” and release the button to undetect the occupancy</string>
     <string name="ssid_and_password_required">SSID and password required.</string>
-    <string name="password_must_be_min_8_characters">Password must be minimum 8 characters.</string>BT
+    <string name="password_must_be_min_8_characters">Password must be minimum 8 characters.</string>
     <string name="add_device_subtitle">Add the device name. This is the name that will be used to reference this device.</string>
     <string name="add_device_name">Add Device Name</string>
     <string name="matter_scanner_info">Manual QR code payload ID:</string>
@@ -1168,8 +1184,28 @@
     <string name="please_enter_valid_device_name">Please enter valid device name</string>
     <string name="start_commissioning">Start Commissioning</string>
     <string name="qr_code_info">QR Code info</string>
+    <string name="matter_dishwasher_cluster">Dishwasher</string>
+    <string name="matter_qr_code_info">QR Code Info</string>
+    <string name="matter_dishwasher_on">START</string>
+    <string name="matter_dishwasher_off">STOP</string>
+    <string name="matter_dishwasher_pause">PAUSE</string>
+    <string name="matter_cumulative_energy">Cumulative Energy</string>
+    <string name="matter_door_lock_in_progress">Please wait…</string>
+    <string name="matter_dishwasher_energy_consumption_title">Energy Consumption</string>
+    <string name="matter_dishwasher_energy_consumption_average_cycle">average per cycle</string>
+    <string name="matter_device_commissioning_failed">Error while retrieving device information. Please try again.</string>
+    <string name="matter_commissioning_message">If you cancel, commissioning will stop and it will redirect to the home screen. You need to restart board and try again.</string>
+    <string name="dish_washer_timing">10 min</string>
+    <string name="matter_in_current_cycle">in current cycle</string>
+    <string name="matter_remaining_time">Remaining time</string>
+    <string name="matter_min">min</string>
+    <string name="matter_resume">RESUME</string>
+    <string name="matter_total">in total</string>
+    <string name="mater_average_energy_per_cycle">average energy per cycle</string>
+    <string name="matter_completed_cycle">Completed Cycle:</string>
 
-<!--    Wi-Fi OTA Firmware Update Demo-->
+
+    <!--    Wi-Fi OTA Firmware Update Demo-->
     <string name="ota_demo_title">Wi-Fi OTA Demo</string>
     <string name="ota_demo_title_desc">Control OTA Firmware update over Wi-Fi.</string>
     <string name="ota_demo_desc">This is a demonstration how to update the SiWx91x firmware via Wi-Fi by downloading an image from a remote TCP server. Mobile App will act as a TCP server.</string>
@@ -1190,7 +1226,7 @@
     <string name="btn_update">Update</string>
     <string name="update_firmware">Updating Firmware</string>
     <string name="alert">Alert</string>
-    <string name="matter_qr_code_info">QR Code Info</string>
+
 
 <!--    917 DevKit Sensor Demo-->
     <string name="dev_kit_sensor_917_title">Wi-Fi Sensors</string>
@@ -1211,5 +1247,53 @@
     <string name="dev_kit_sensor_micro_init_value">00 dB</string>
     <string name="dev_kit_sensor_enable_wifi">Please turn on Wi-Fi in the mobile</string>
     <string name="dev_kit_progress_bar_message">Waiting for Response</string>
-</resources>
+    <string name="dev_kit_sensor_empty">Connect your device with Wi-Fi enabled device</string>
+    <string name="tilt">Tilt</string>
+    <string name="lift">Lift</string>
+    <string name="enter_lift_value">Enter Lift % value</string>
+    <string name="enter_tilt_value">Enter Tilt % value</string>
+    <string name="enter_lift_value_error">Enter lift value</string>
+    <string name="enter_valid_lift_value_error">Please enter value between 1 – 100 to perform Lift Window Curtain.</string>
+    <string name="enter_valid_tilt_value_error">Please enter value between 1 – 100 to perform Tilt Window Curtain.</string>
+    <string name="enter_tilt_value_error">Enter Tilt Value</string>
+    <string name="matter_zero_prefix">0.00 kWh</string>
 
+    <!-- Wi-Fi Throughput -->
+    <string name="wifi_title_Throughput">Wi-Fi Throughput</string>
+    <string name="wifi_main_menu_description_throughput">Measure Wi-Fi throughput between the mobile device and EFR32</string>
+    <string name="tcp_send_title">TCP Upload</string>
+    <string name="udp_send_title">UDP Upload</string>
+    <string name="tls_send_title">TLS Upload</string>
+    <string name="tcp_receive_title">TCP Download</string>
+    <string name="udp_receive_title">UDP Download</string>
+    <string name="tls_receive_title">TLS Download</string>
+    <string name="dialog_start_server">Start Server</string>
+    <string name="tcp_download_sub_title">Ensure to flash TCP_TX on the FW and enter the below details  to perform TCP throughput.</string>
+    <string name="tcp_upload_sub_title">Ensure to flash TCP_RX on the FW and enter the below details  to perform TCP throughput.</string>
+    <string name="dialog_udp_download_sub_title">Ensure to flash UDP_TX on the FW and enter the below details  to perform UDP throughput.</string>
+    <string name="dialog_udp_upload_sub_title">Ensure to flash UDP_RX on the FW and enter the below details  to perform UDP throughput.</string>
+    <string name="dialog_tls_download_sub_title">Ensure to flash TLS_TX on the FW and enter the below details  to perform TLS throughput.</string>
+    <string name="dialog_sub_title_tls_upload">Ensure to flash TLS_RX on the FW and enter the below details  to perform TLS throughput.</string>
+    <string name="wifi_throughput_connecting_status">Connecting to server...</string>
+    <string name="interval">Interval</string>
+    <string name="transfer">Transfer</string>
+    <string name="bandwidth">Bandwidth</string>
+    <string name="enter_port_number">Enter Port number</string>
+    <string name="wifi_main_menu_description_wifi_throughput">Measure Wi-Fi throughput between the mobile device and SiW917</string>
+    <string name="tcp_server">TCP Server</string>
+    <string name="tcp_client">TCP Client</string>
+    <string name="udp_server">UDP Server</string>
+    <string name="udp_client">UDP Client</string>
+    <string name="tls_server">TLS Server</string>
+    <string name="enter_ip_address">Enter IP Address</string>
+    <string name="please_enter_valid_port_number">Please enter valid port number</string>
+    <string name="total_bytes_received">Total bytes received</string>
+    <string name="total_bytes_sent">Total bytes sent</string>
+    <string name="throughput_achieved">Throughput achieved</string>
+    <string name="mbps_in_30_successfully">Mbps in 30sec successfully</string>
+    <string name="connection_couldn_t_be_established">Connection couldn\'t be established</string>
+    <string name="ensure_right_combination_of_fw_is_flashed">Ensure right combination of FW is flashed.</string>
+    <string name="matter_dishwasher_navigating_back">Navigating back will cause the dishwasher to enter the pause state</string>
+    <string name="dishwasher_resfresh_text">The Dishwasher energy data will refresh every minute</string>
+
+</resources>

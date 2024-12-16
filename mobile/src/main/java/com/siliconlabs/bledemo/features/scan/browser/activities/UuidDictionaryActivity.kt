@@ -6,18 +6,22 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import com.siliconlabs.bledemo.features.scan.browser.dialogs.AboutUuidDictionaryDialog
 import com.siliconlabs.bledemo.features.scan.browser.fragments.CharacteristicMappingsFragment
 import com.siliconlabs.bledemo.features.scan.browser.fragments.ServiceMappingsFragment
 import com.siliconlabs.bledemo.R
-import kotlinx.android.synthetic.main.activity_uuid_dictionary.*
+import com.siliconlabs.bledemo.databinding.ActivityUuidDictionaryBinding
+
 
 class UuidDictionaryActivity : AppCompatActivity() {
-
+    //private val binding by viewBinding(ActivityUuidDictionaryBinding::bind)  //activity_uuid_dictionary
+    private lateinit var binding: ActivityUuidDictionaryBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_uuid_dictionary)
+        binding = ActivityUuidDictionaryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         setupViewPager()
         setupActionBar()
@@ -31,8 +35,12 @@ class UuidDictionaryActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.mappings_about -> {
-                AboutUuidDictionaryDialog().show(supportFragmentManager, "about_mappings_dictionary_dialog")
+                AboutUuidDictionaryDialog().show(
+                    supportFragmentManager,
+                    "about_mappings_dictionary_dialog"
+                )
             }
+
             android.R.id.home -> onBackPressed()
             else -> {
             }
@@ -41,9 +49,11 @@ class UuidDictionaryActivity : AppCompatActivity() {
     }
 
     private fun setupViewPager() {
-        view_pager2.adapter = ViewPagerAdapter()
 
-        TabLayoutMediator(uuid_dictionary_tab_layout, view_pager2) { tab, position ->
+        binding.viewPager2.adapter = ViewPagerAdapter()
+
+
+        TabLayoutMediator(binding.uuidDictionaryTabLayout, binding.viewPager2) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.title_services)
                 1 -> getString(R.string.title_characteristics)

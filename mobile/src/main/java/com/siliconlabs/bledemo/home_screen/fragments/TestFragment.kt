@@ -11,6 +11,7 @@ import com.siliconlabs.bledemo.features.iop_test.dialogs.AboutIopDialog
 import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 import com.siliconlabs.bledemo.home_screen.base.LocationDependent
+import com.siliconlabs.bledemo.home_screen.base.NotificationDependent
 
 class TestFragment : BaseServiceDependentMainMenuFragment(), DialogInterface.OnDismissListener {
 
@@ -106,6 +107,8 @@ class TestFragment : BaseServiceDependentMainMenuFragment(), DialogInterface.OnD
             viewBinding.locationPermissionBar.setFragmentManager(childFragmentManager)
         }
     }
+
+
 
     override fun onDismiss(dialogInterface: DialogInterface) {
         selectDeviceDialog = null

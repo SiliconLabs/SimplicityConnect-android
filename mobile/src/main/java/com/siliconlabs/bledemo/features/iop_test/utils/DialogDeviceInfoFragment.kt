@@ -3,6 +3,8 @@ package com.siliconlabs.bledemo.features.iop_test.utils
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +30,10 @@ class DialogDeviceInfoFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DialogDeviceInfoLayoutBinding.inflate(inflater, container, false)
+        if (dialog != null && dialog!!.window != null) {
+            dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog!!.setCanceledOnTouchOutside(false)
+        }
         return binding.root
     }
 
@@ -56,30 +62,6 @@ class DialogDeviceInfoFragment : DialogFragment() {
         binding.btnNegative.text = negativeButtonText
 
     }
-    /*override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(requireActivity())
-
-        builder.setTitle(title)
-        builder.setMessage(message)
-
-        if (positiveButtonText != null) {
-            builder.setPositiveButton(positiveButtonText, positiveClickListener)
-        }
-
-        if (negativeButtonText != null) {
-            builder.setNegativeButton(negativeButtonText, negativeClickListener)
-        }
-
-        val dialog = builder.create()
-        dialog.setOnShowListener {
-            dialogShowing = true
-        }
-        dialog.setOnDismissListener {
-            dialogShowing = false
-        }
-
-        return dialog
-    }*/
 
     // Builder pattern for setting dialog properties
     class Builder {

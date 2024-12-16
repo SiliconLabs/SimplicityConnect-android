@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.devkitsensor917.model
 
+
 data class SensorsResponse(
     val led: LEDResponse,
     val light: AmbientLightResponse,

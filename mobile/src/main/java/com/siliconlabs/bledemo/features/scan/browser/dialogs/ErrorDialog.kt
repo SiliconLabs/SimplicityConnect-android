@@ -9,29 +9,36 @@ import android.view.ViewGroup
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.bluetooth.ble.ErrorCodes.getATTHTMLFormattedError
 import com.siliconlabs.bledemo.R
-import kotlinx.android.synthetic.main.dialog_error.*
+import com.siliconlabs.bledemo.databinding.DialogErrorBinding
+
 
 class ErrorDialog(
-        private val errorCode: Int,
-        private val otaErrorCallback: OtaErrorCallback
+    private val errorCode: Int,
+    private val otaErrorCallback: OtaErrorCallback
 ) : BaseDialogFragment(
-        hasCustomWidth = true,
-        isCanceledOnTouchOutside = false
+    hasCustomWidth = true,
+    isCanceledOnTouchOutside = false
 ) {
+    private lateinit var binding: DialogErrorBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.dialog_error, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DialogErrorBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        btn_ok.setOnClickListener {
+        binding.btnOk.setOnClickListener {
             dismiss()
             otaErrorCallback.onDismiss()
         }
 
-        error_description.text = Html.fromHtml(getATTHTMLFormattedError(errorCode))
+        binding.errorDescription
+            .text = Html.fromHtml(getATTHTMLFormattedError(errorCode))
     }
 
     override fun onDismiss(dialog: DialogInterface) {

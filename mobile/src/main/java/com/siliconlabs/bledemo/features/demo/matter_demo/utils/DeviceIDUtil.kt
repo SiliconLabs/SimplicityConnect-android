@@ -3,6 +3,9 @@ package com.siliconlabs.bledemo.features.demo.matter_demo.utils
 import android.content.Context
 import android.content.SharedPreferences
 import com.siliconlabs.bledemo.BuildConfig
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object DeviceIDUtil {
 
@@ -19,12 +22,16 @@ object DeviceIDUtil {
         } else {
             deviceID = DEFAULT_DEVICE_ID_PROD_ENV
         }
+        val timestamp = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
         val prefs = getPrefs(context)
+        val updatedDeviceID = "$deviceID$timestamp"
+        println("DeviceID :$updatedDeviceID")
+        println("DeviceID Long :${updatedDeviceID.toLong()}")
         return if (prefs.contains(DEVICE_ID_PREFS_KEY)) {
-            prefs.getLong(DEVICE_ID_PREFS_KEY, deviceID)
+            prefs.getLong(DEVICE_ID_PREFS_KEY, updatedDeviceID.toLong())
         } else {
-            prefs.edit().putLong(DEVICE_ID_PREFS_KEY, deviceID).apply()
-            deviceID
+            prefs.edit().putLong(DEVICE_ID_PREFS_KEY, updatedDeviceID.toLong()).apply()
+            updatedDeviceID.toLong()
         }
     }
 

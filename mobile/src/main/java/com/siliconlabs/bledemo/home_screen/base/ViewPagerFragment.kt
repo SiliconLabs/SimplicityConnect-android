@@ -13,23 +13,28 @@ import com.siliconlabs.bledemo.features.scan.browser.fragments.BrowserFragment
 import com.siliconlabs.bledemo.features.scan.active_connections.fragments.ConnectionsFragment
 import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.FragmentViewPagerBinding
 import com.siliconlabs.bledemo.home_screen.fragments.ScanFragment
 import com.siliconlabs.bledemo.features.scan.rssi_graph.fragments.RssiGraphFragment
-import kotlinx.android.synthetic.main.fragment_view_pager.*
+
 
 class ViewPagerFragment : Fragment() {
 
     private lateinit var viewModel: ScanFragmentViewModel
     private var bluetoothService: BluetoothService? = null
+    private lateinit var binding: FragmentViewPagerBinding //fragment_view_pager
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         viewModel = getScanFragment().viewModel
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_view_pager, null)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentViewPagerBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,11 +51,13 @@ class ViewPagerFragment : Fragment() {
     }
 
     private fun initScanPager() {
-        scan_view_pager2.apply {
+        binding.scanViewPager2
+        .apply {
             adapter = ScanPagerAdapter()
         }
 
-        TabLayoutMediator(scan_tab_layout, scan_view_pager2) { tab, position ->
+
+        TabLayoutMediator(binding.scanTabLayout, binding.scanViewPager2) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.tab_scanner_label)
                 1 -> getString(R.string.tab_rssi_graph_label)
@@ -62,7 +69,7 @@ class ViewPagerFragment : Fragment() {
 
     private fun setupDataObservers() {
         viewModel.numberOfConnectedDevices.observe(viewLifecycleOwner) {
-            scan_tab_layout.getTabAt(2)?.text = getString(R.string.tab_connections_label, it)
+            binding.scanTabLayout.getTabAt(2)?.text = getString(R.string.tab_connections_label, it)
         }
     }
 

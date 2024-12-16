@@ -256,7 +256,7 @@ object Converters {
         }
 
         // prepend the sign up to 64 bits
-        var result = ""
+        var result:String
         val stringPrependExtendSign = StringBuilder(binaryString)
         for (i in 0 until 64 - binaryString.length) {
             stringPrependExtendSign.insert(0, binaryString.substring(0, 1))
@@ -357,7 +357,7 @@ object Converters {
         val minExponent = -8
 
         try {
-            var mantissa = 0
+            var mantissa:Int
             var exponent = 0
 
             if (input.contains('.')) {

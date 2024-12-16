@@ -1,12 +1,10 @@
 package com.siliconlabs.bledemo.features.demo.matter_demo.adapters
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.daimajia.swipe.SimpleSwipeListener
 import com.daimajia.swipe.SwipeLayout
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.MatterScannedListItemBinding
@@ -38,37 +36,38 @@ class MatterScannedResultAdapter(
             holder.itemView.isEnabled = true
             holder.itemView.isClickable = true
 
-            holder.itemView.alpha = 1.0f // Set alpha to 1 for enabled rows
+            holder.binding.root.alpha = 1.0f // Set alpha to 1 for enabled rows
         } else {
-            holder.binding.imageview.setColorFilter(
+            holder.binding.root.alpha = 0.5f
+            holder.binding.imageView.setColorFilter(
                 ContextCompat.getColor(context, R.color.silabs_dark_gray_icon),
                 android.graphics.PorterDuff.Mode.SRC_IN
             )
             holder.itemView.isEnabled = false
             holder.itemView.isClickable = false
-            holder.itemView.alpha = 0.5f // Set alpha to 0.5 for disabled rows
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.silabs_inactive_light));
-            holder.binding.cardView.setBackgroundColor(ContextCompat.getColor(context, R.color.silabs_inactive_light));
-            holder.binding.itemViewHolder.setBackgroundColor(ContextCompat.getColor(context, R.color.silabs_inactive_light));
-            holder.binding.imageview.setBackgroundColor(ContextCompat.getColor(context, R.color.silabs_inactive_light));
-
+             // Set alpha to 0.5 for disabled rows
+//            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.silabs_inactive_light));
+//            holder.binding.cardView.setBackgroundColor(ContextCompat.getColor(context, R.color.silabs_inactive_light));
+//            holder.binding.itemViewHolder.setBackgroundColor(ContextCompat.getColor(context, R.color.silabs_inactive_light));
+//            holder.binding.imageView.setBackgroundColor(ContextCompat.getColor(context, R.color.silabs_inactive_light));
         }
 
-        //   holder.binding.imgDelete.setVisibility(View.GONE);
-        holder.binding.swipe.setShowMode(SwipeLayout.ShowMode.PullOut);
+        holder.binding.swipe.setShowMode(SwipeLayout.ShowMode.LayDown);
         holder.binding.swipe.addDrag(
             SwipeLayout.DragEdge.Right,
             holder.binding.swipe.findViewById(R.id.bottom_wrapper)
         )
-        //viewHolder.swipeLayout.addDrag(SwipeLayout.DragEdge.Right, viewHolder.swipeLayout.findViewById(R.id.bottom_wrapper));
+
         holder.binding.itemViewHolder.setOnClickListener {
-
-            runBlocking {
-                if (onClickListener != null) {
-                    onClickListener!!.onClick(position, matterInfo)
+            if (matterInfo.isDeviceOnline){
+                runBlocking {
+                    if (onClickListener != null) {
+                        onClickListener!!.onClick(position, matterInfo)
+                    }
                 }
+            }else{
+                return@setOnClickListener
             }
-
         }
         holder.binding.imgDelete.setOnClickListener {
             runBlocking {
@@ -89,7 +88,6 @@ class MatterScannedResultAdapter(
 
     interface OnClickListener {
         suspend fun onClick(position: Int, model: MatterScannedResultModel)
-        //  suspend fun simpleCallback(position: Int, model: MatterScannedResultModel)
 
         suspend fun onDelete(position: Int, model: MatterScannedResultModel)
     }

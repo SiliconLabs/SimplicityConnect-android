@@ -3,39 +3,45 @@ package com.siliconlabs.bledemo.features.configure.gatt_configurator.views
 import android.content.Context
 import android.text.Html
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.view.get
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.databinding.ViewGattCharacteristicBinding
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.activities.GattServerActivity
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.dialogs.DescriptorDialog
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Characteristic
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Descriptor
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.models.Property
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.utils.removeAsking
-import kotlinx.android.synthetic.main.view_gatt_characteristic.view.*
+
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.views.GattDescriptorView.DescriptorListener
 
-class GattCharacteristicView(context: Context, attributeSet: AttributeSet? = null) : FrameLayout(context, attributeSet) {
+
+class GattCharacteristicView(context: Context, attributeSet: AttributeSet? = null) :
+    FrameLayout(context, attributeSet) {
     private var characteristic: Characteristic? = null
+    lateinit var gattCharacterBinding: ViewGattCharacteristicBinding
 
     constructor(context: Context, characteristic: Characteristic) : this(context) {
         this.characteristic = characteristic
+       gattCharacterBinding = ViewGattCharacteristicBinding.inflate(LayoutInflater.from(context),this,true)
 
         initView(characteristic)
         handleAddDescriptorClickEvent(characteristic.descriptors)
     }
 
     private fun initView(characteristic: Characteristic) {
-        tv_characteristic_name.text = characteristic.name
+        gattCharacterBinding.tvCharacteristicName.text = characteristic.name
         val uuidHtml = buildString {
             append("<b>")
             append(context.getString(R.string.UUID_colon_space))
             append("</b>")
             append(characteristic.uuid?.getAsFormattedText())
         }
-        tv_characteristic_uuid.text = Html.fromHtml(uuidHtml, Html.FROM_HTML_MODE_LEGACY)
+        gattCharacterBinding.tvCharacteristicUuid.text = Html.fromHtml(uuidHtml, Html.FROM_HTML_MODE_LEGACY)
         showSelectedProperties(characteristic)
         showOrHideDescriptorsLabelWithDivider()
         initDescriptors()
@@ -45,24 +51,28 @@ class GattCharacteristicView(context: Context, attributeSet: AttributeSet? = nul
         characteristic?.let {
             initView(it)
         }
+        gattCharacterBinding.root.invalidate()
     }
 
     private fun hideAllProperties() {
-        tv_property_read.visibility = View.GONE
-        tv_property_write.visibility = View.GONE
-        tv_property_indicate.visibility = View.GONE
-        tv_property_notify.visibility = View.GONE
+
+        gattCharacterBinding.tvPropertyRead.visibility = View.GONE
+        gattCharacterBinding.tvPropertyWrite.visibility = View.GONE
+        gattCharacterBinding.tvPropertyIndicate.visibility = View.GONE
+        gattCharacterBinding.tvPropertyNotify.visibility = View.GONE
     }
 
     private fun showSelectedProperties(characteristic: Characteristic) {
         hideAllProperties()
         characteristic.properties.apply {
-            if (containsKey(Property.READ)) tv_property_read.visibility = View.VISIBLE
-            if (containsKey(Property.WRITE)) tv_property_write.visibility = View.VISIBLE
-            if (containsKey(Property.WRITE_WITHOUT_RESPONSE)) tv_property_write.visibility = View.VISIBLE
-            if (containsKey(Property.RELIABLE_WRITE)) tv_property_write.visibility = View.VISIBLE
-            if (containsKey(Property.INDICATE)) tv_property_indicate.visibility = View.VISIBLE
-            if (containsKey(Property.NOTIFY)) tv_property_notify.visibility = View.VISIBLE
+            if (containsKey(Property.READ)) gattCharacterBinding.tvPropertyRead.visibility = View.VISIBLE
+            if (containsKey(Property.WRITE)) gattCharacterBinding.tvPropertyWrite.visibility = View.VISIBLE
+            if (containsKey(Property.WRITE_WITHOUT_RESPONSE)) gattCharacterBinding.tvPropertyWrite.visibility =
+                View.VISIBLE
+            if (containsKey(Property.RELIABLE_WRITE)) gattCharacterBinding.tvPropertyWrite.visibility =
+                View.VISIBLE
+            if (containsKey(Property.INDICATE)) gattCharacterBinding.tvPropertyIndicate.visibility = View.VISIBLE
+            if (containsKey(Property.NOTIFY)) gattCharacterBinding.tvPropertyNotify.visibility = View.VISIBLE
         }
     }
 
@@ -71,15 +81,18 @@ class GattCharacteristicView(context: Context, attributeSet: AttributeSet? = nul
     }
 
     private fun initDescriptors() {
-        ll_descriptors.removeAllViews()
+        gattCharacterBinding.llDescriptors.removeAllViews()
         for (descriptor in characteristic?.descriptors!!) {
             val view = GattDescriptorView(context, descriptor)
             handleDescriptorClickEvents(view, characteristic?.descriptors!!)
-            ll_descriptors.addView(view)
+            gattCharacterBinding.llDescriptors.addView(view)
         }
     }
 
-    private fun handleDescriptorClickEvents(view: GattDescriptorView, descriptors: ArrayList<Descriptor>) {
+    private fun handleDescriptorClickEvents(
+        view: GattDescriptorView,
+        descriptors: ArrayList<Descriptor>
+    ) {
         view.setDescriptorListener(object : DescriptorListener {
             override fun onCopyDescriptor(descriptor: Descriptor) {
                 copyDescriptor(descriptor, descriptors)
@@ -98,7 +111,8 @@ class GattCharacteristicView(context: Context, attributeSet: AttributeSet? = nul
     }
 
     private fun handleAddDescriptorClickEvent(descriptors: ArrayList<Descriptor>) {
-        btn_add_descriptor.setOnClickListener {
+
+        gattCharacterBinding.btnAddDescriptor.setOnClickListener {
             DescriptorDialog(object : DescriptorDialog.DescriptorChangeListener {
                 override fun onDescriptorChanged(descriptor: Descriptor) {
                     addDescriptor(descriptor, descriptors)
@@ -112,7 +126,7 @@ class GattCharacteristicView(context: Context, attributeSet: AttributeSet? = nul
         handleDescriptorClickEvents(view, descriptors)
 
         descriptors.add(descriptor)
-        ll_descriptors.addView(view)
+        gattCharacterBinding.llDescriptors.addView(view)
         showOrHideDescriptorsLabelWithDivider()
     }
 
@@ -122,21 +136,32 @@ class GattCharacteristicView(context: Context, attributeSet: AttributeSet? = nul
 
         descriptors.add(copiedDescriptor)
         handleDescriptorClickEvents(view, descriptors)
-        ll_descriptors.addView(view)
+        gattCharacterBinding.llDescriptors.addView(view)
     }
 
-    private fun editDescriptor(descriptor: Descriptor, descriptors: ArrayList<Descriptor>) {
+    private fun editDescriptor(
+        descriptor: Descriptor,
+        descriptors: ArrayList<Descriptor>) {
         DescriptorDialog(object : DescriptorDialog.DescriptorChangeListener {
             override fun onDescriptorChanged(descriptor: Descriptor) {
                 val index = descriptors.indexOf(descriptor)
-                (ll_descriptors[index] as GattDescriptorView).refreshView()
+                val view  = gattCharacterBinding.llDescriptors.getChildAt(index)
+                if(view is GattDescriptorView){
+                    view.refreshView()
+                }else{
+                    Log.e("EditDescriptor", "View at index $index is not a GattDescriptorView.")
+                }
+
             }
-        }, descriptor).show((context as GattServerActivity).supportFragmentManager, "dialog_descriptor")
+        }, descriptor).show(
+            (context as GattServerActivity).supportFragmentManager,
+            "dialog_descriptor"
+        )
     }
 
     private fun removeDescriptor(descriptor: Descriptor, descriptors: ArrayList<Descriptor>) {
         val index = descriptors.indexOf(descriptor)
-        ll_descriptors.removeViewAt(index)
+        gattCharacterBinding.llDescriptors.removeViewAt(index)
         descriptors.remove(descriptor)
 
         showOrHideDescriptorsLabelWithDivider()
@@ -144,23 +169,24 @@ class GattCharacteristicView(context: Context, attributeSet: AttributeSet? = nul
 
     private fun showOrHideDescriptorsLabelWithDivider() {
         characteristic?.descriptors?.apply {
-            tv_descriptors.visibility = if (isEmpty()) View.GONE else View.VISIBLE
-            cv_descriptors.visibility = if (isEmpty()) View.GONE else View.VISIBLE
+
+            gattCharacterBinding.tvDescriptors.visibility = if (isEmpty()) View.GONE else View.VISIBLE
+            gattCharacterBinding.cvDescriptors.visibility = if (isEmpty()) View.GONE else View.VISIBLE
         }
     }
 
     fun setCharacteristicListener(listener: CharacteristicListener) {
-        ib_copy.setOnClickListener {
+        gattCharacterBinding.ibCopy.setOnClickListener {
             characteristic?.let {
                 listener.onCopyCharacteristic(it)
             }
         }
-        ib_edit.setOnClickListener {
+        gattCharacterBinding.ibEdit.setOnClickListener {
             characteristic?.let {
                 listener.onEditCharacteristic(it)
             }
         }
-        ib_remove.setOnClickListener {
+        gattCharacterBinding.ibRemove.setOnClickListener {
             characteristic?.let {
                 listener.onRemoveCharacteristic(it)
             }
