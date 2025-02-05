@@ -59,6 +59,29 @@ class ScanFragmentViewModel(private val context: Context) : ScannerViewModel() {
 
     var shouldResetChart = false
 
+    private val _overallProgress = MutableLiveData<Pair<Float, Float>>()
+    val overallProgress: MutableLiveData<Pair<Float, Float>> get() = _overallProgress
+
+    private val _saveStartEndRSSIRange = MutableLiveData<String>("")
+    val saveStartEndRSSIRange : MutableLiveData<String> get() = _saveStartEndRSSIRange
+
+
+    private val _sliderValues: MutableLiveData<Pair<Float, Float>> = MutableLiveData<Pair<Float, Float>>(Pair(-130f, 0f)) // Default values for left and right
+
+    val sliderValues: MutableLiveData<Pair<Float, Float>> get() = _sliderValues
+
+    fun saveRSSISlideRValues(leftValue:Float,rightValue:Float){
+        _sliderValues.value = Pair(leftValue,rightValue)
+    }
+
+    fun updateOverallProgress(leftValue: Float,rightValue:Float) {
+        _overallProgress.value = Pair(leftValue,rightValue)
+    }
+
+    fun saveStartEndRssiRange(rssiRange:String){
+        _saveStartEndRSSIRange.value = rssiRange
+    }
+
     fun getScannerFragmentViewState() : ScannerFragmentViewState {
         return ScannerFragmentViewState(
                 getIsScanningOn(),
@@ -208,7 +231,13 @@ class ScanFragmentViewModel(private val context: Context) : ScannerViewModel() {
 
     fun updateFiltering(activeFilters: FilterDeviceParams?) {
         _activeFilters.value = activeFilters
-        _activeFiltersDescription.value = activeFilters?.buildDescription(context)
+        if (activeFilters!!.isRssiFlag == true && activeFilters!!.rssiValue == Pair(0.0f, 0.0f)) {
+            // Do something
+            _activeFiltersDescription.value = null
+        }else{
+            _activeFiltersDescription.value = activeFilters?.buildDescription(context)
+        }
+
         _filteredDevices.value = _filteredDevices.value?.apply {
             clear()
             scannedDevices.values.forEach {
@@ -283,7 +312,14 @@ class ScanFragmentViewModel(private val context: Context) : ScannerViewModel() {
                             !doesRawDataMatch(filterName, device)) return false
                 }
             }
-            if (it.isRssiFlag && device.rssi < it.rssiValue) return false
+            println("Filter RSSI Value ${device.rssi.toFloat() in it.rssiValue!!.first..it.rssiValue.second}")
+            println("Filter Device RSSI first and second value ${it.rssiValue!!.first}:::${it.rssiValue!!.second}")
+            // Filter by RSSI
+            if (it.isRssiFlag) {
+                val rssiRange = it.rssiValue ?: return@let // If rssiValue is null, skip this filter
+                if (device.rssi !in rssiRange.first.toInt()..rssiRange.second.toInt()) return false
+            }
+
             if (it.bleFormats.isNotEmpty() && !it.bleFormats.contains(device.bleFormat)) return false
             if (it.isOnlyFavourite && !(device.isFavorite)) return false
             if (it.isOnlyBonded && device.device.bondState != BluetoothDevice.BOND_BONDED) return false

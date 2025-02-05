@@ -66,8 +66,8 @@ android {
         create("Si-Connect") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 57
-            versionName = "3.0.0"
+            versionCode = 58
+            versionName = "3.0.1"
         }
     }
 
@@ -189,6 +189,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
 
     implementation ("com.daimajia.swipelayout:library:1.2.0@aar")
+    //Material Design
+    implementation("com.google.android.material:material:1.12.0")
+
 
     //JetPack compose
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")

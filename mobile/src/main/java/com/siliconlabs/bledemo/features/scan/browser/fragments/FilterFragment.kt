@@ -1,9 +1,9 @@
 package com.siliconlabs.bledemo.features.scan.browser.fragments
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.*
-import android.widget.SeekBar
 import androidx.fragment.app.DialogFragment
 import com.siliconlabs.bledemo.bluetooth.beacon_utils.BleFormat
 import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
@@ -17,6 +17,8 @@ import java.util.*
 class FilterFragment : DialogFragment() {
     private lateinit var viewBinding: FragmentFilterBinding
     private lateinit var viewModel: ScanFragmentViewModel
+    // Flag to control if the listener should be active
+    private var isListenerEnabled = true
 
     private var rssiFlag = false
 
@@ -51,6 +53,8 @@ class FilterFragment : DialogFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.filter_reset -> {
+                // Toggle the flag to enable/disable the listener
+                isListenerEnabled = !isListenerEnabled
                 resetFilters()
                 true
             }
@@ -66,6 +70,13 @@ class FilterFragment : DialogFragment() {
             seekControlBar.max = resources.getInteger(R.integer.rssi_value_range)
             seekControlBar.progress = 0
             seekControlText.text = getString(R.string.filter_rssi_not_set)
+
+
+            // Add a label formatter to show the tooltip text with the slider value
+            slider.setLabelFormatter { value ->
+                // Format the value to display RSSI values like "0", "-10", "-20", etc.
+                value.toInt().toString().plus("dB")
+            }
         }
     }
 
@@ -74,8 +85,16 @@ class FilterFragment : DialogFragment() {
             viewBinding.apply {
                 etSearchDeviceName.setText(it.name)
                 if (it.isRssiFlag) {
-                    seekBarRssi.seekControlBar.progress = getSeekbarProgress(it.rssiValue)
-                    seekBarRssi.seekControlText.text = getString(R.string.n_dBm, it.rssiValue)
+                    //seekBarRssi.seekControlBar.progress = getSeekbarProgress(it.rssiValue)
+                    // Observe the left and right slider values from the ViewModel
+                    viewModel.sliderValues.observe(viewLifecycleOwner, androidx.lifecycle.Observer { sliderValues ->
+                        seekBarRssi.slider.setValues(sliderValues.first,sliderValues.second)
+                    })
+
+                    viewModel.saveStartEndRSSIRange.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+                        seekBarRssi.seekControlText.text = it
+                    })
+
                 }
                 if (it.bleFormats.contains(BleFormat.UNSPECIFIED)) beaconTypeUnspecified.isChecked =
                     true
@@ -97,11 +116,25 @@ class FilterFragment : DialogFragment() {
             etSearchDeviceName.text.clear()
             seekBarRssi.seekControlBar.progress = 0
             rssiFlag = false
-            seekBarRssi.seekControlText.text = getString(R.string.filter_rssi_not_set)
+            //SET THE TEXT TO "NOT SET"
+            viewModel.saveStartEndRssiRange(getString(R.string.filter_rssi_not_set))
+            viewModel.saveStartEndRSSIRange.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+                seekBarRssi.seekControlText.text = it
+            })
+
+
             clearCheckBoxes()
             cbOnlyConnectable.isChecked = false
             cbOnlyBonded.isChecked = false
             cbOnlyFavourites.isChecked = false
+            //UPDATE THE OVER ALL PROGRESS TO ZERO
+            viewModel.updateOverallProgress(0f,0f)
+            viewModel.saveRSSISlideRValues(-130f,0f)
+            viewModel.sliderValues.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+                seekBarRssi.slider.setValues(it.first,it.second)
+
+            })
+
         }
     }
 
@@ -116,6 +149,9 @@ class FilterFragment : DialogFragment() {
 
     private fun getScanFragment() = parentFragment as ScanFragment
 
+
+
+    @SuppressLint("SetTextI18n")
     private fun setListeners() {
         viewBinding.apply {
             btnApplyFilters.setOnClickListener {
@@ -125,27 +161,32 @@ class FilterFragment : DialogFragment() {
                 }
             }
 
-            seekBarRssi.seekControlBar.setOnSeekBarChangeListener(object :
-                SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                    rssiFlag = true
-                    val rssi = getRssiValue(progress)
-                    seekBarRssi.seekControlText.text = getString(R.string.n_dBm, rssi)
+
+            // Add a listener to update the text as the slider moves
+            seekBarRssi.slider.addOnChangeListener { slider, value, fromUser ->
+                rssiFlag = true
+                if (isListenerEnabled){
+                    val format = getString(R.string.n_dBm)
+                    seekBarRssi.seekControlText.text = "(${String.format(format, slider.values[0].toInt())}, ${String.format(format, slider.values[1].toInt())})"
+                    viewModel.saveStartEndRssiRange("(${String.format(format, slider.values[0].toInt())}, ${String.format(format, slider.values[1].toInt())})")
+
+                    // Update the overallProgress in the ViewModel
+                    val values = slider.values
+                    val startValue = values[0]
+                    val endValue = values[1]
+
+                    println("startValue${startValue}")
+                    println("endValue${endValue}")
+                    viewModel.saveRSSISlideRValues(startValue,endValue)
+                    viewModel.updateOverallProgress(startValue,endValue)
                 }
 
-                override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar) {}
-            })
+            }
+
         }
     }
 
-    private fun getRssiValue(progress: Int): Int {
-        return progress - requireContext().resources.getInteger(R.integer.rssi_value_range)
-    }
 
-    private fun getSeekbarProgress(rssiValue: Int): Int {
-        return rssiValue + requireContext().resources.getInteger(R.integer.rssi_value_range)
-    }
 
     private val selectedBeacons: List<BleFormat>
         get() {
@@ -160,8 +201,14 @@ class FilterFragment : DialogFragment() {
         }
 
     private fun prepareFilters(): FilterDeviceParams? {
+        var rssiSliderOverallProgressValue:Pair<Float,Float>? = null
+        viewModel.overallProgress.observe(viewLifecycleOwner, androidx.lifecycle.Observer { progress ->
+            rssiSliderOverallProgressValue = progress
+            println("rssiSliderProgressValue${rssiSliderOverallProgressValue}")
+        })
         val name = viewBinding.etSearchDeviceName.text.toString()
-        val rssi = getRssiValue(viewBinding.seekBarRssi.seekControlBar.progress)
+
+        val rssi = rssiSliderOverallProgressValue
         val activeFilter = FilterDeviceParams(
             if (name.isNotBlank()) name else null,
             rssi,

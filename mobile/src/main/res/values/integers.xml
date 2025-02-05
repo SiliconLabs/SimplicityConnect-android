@@ -9,5 +9,7 @@
     <integer name="rssi_value_range">130</integer>
     <integer name="mtu_min_value">23</integer>
     <integer name="mtu_max_value">250</integer>
-
+    <integer name="rssi_value_max_negative_range">-130</integer>
+    <integer name="rssi_step_size">5</integer>
+    <integer name="rssi_min_value">0</integer>
 </resources>

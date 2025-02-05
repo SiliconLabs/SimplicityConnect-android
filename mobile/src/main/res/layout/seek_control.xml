@@ -2,6 +2,7 @@
 
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -14,9 +15,10 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/space_XSS"
         android:fontFamily="sans-serif-medium"
-        tools:text="Value"
         android:textColor="@color/blue_primary"
-        android:textSize="@dimen/filter_rssi_value_text_size" />
+        android:textSize="@dimen/filter_rssi_value_text_size"
+        tools:text="Value" />
+
 
     <SeekBar
         android:id="@+id/seek_control_bar"
@@ -26,21 +28,32 @@
         android:layout_below="@id/seek_control_text"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:max="@integer/rssi_value_range" />
+        android:max="@integer/rssi_value_range"
+        android:visibility="gone" />
 
     <TextView
-        style="@style/seekbar_range_text_views"
         android:id="@+id/textview_seekbar_min"
-        android:layout_below="@id/seek_control_bar"
+        style="@style/seekbar_range_text_views"
+        android:layout_below="@id/slider"
         tools:text="0" />
 
     <TextView
-        style="@style/seekbar_range_text_views"
         android:id="@+id/textview_seekbar_max"
-        android:layout_below="@id/seek_control_bar"
+        style="@style/seekbar_range_text_views"
+        android:layout_below="@id/slider"
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="8dp"
         tools:text="100" />
+
+    <com.google.android.material.slider.RangeSlider
+        android:id="@+id/slider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/seek_control_text"
+        android:stepSize="@integer/rssi_step_size"
+        android:valueFrom="@integer/rssi_value_max_negative_range"
+        android:valueTo="@integer/rssi_min_value"
+        app:values="@array/initial_range_slider_value" />
 
 </RelativeLayout>
 

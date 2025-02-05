@@ -386,6 +386,7 @@
         <item name="android:paddingVertical">@dimen/space_XS</item>
         <item name="android:textSize">@dimen/filter_rssi_min_max_text_size</item>
         <item name="android:textColor">@android:color/black</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:background">@drawable/rssi_min_max_text_border</item>
         <item name="android:gravity">center</item>
     </style>

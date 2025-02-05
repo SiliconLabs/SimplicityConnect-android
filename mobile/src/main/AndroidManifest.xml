@@ -18,11 +18,11 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.NFC"/>
+    <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-feature
@@ -43,7 +43,23 @@
         android:supportsRtl="true"
         android:theme="@style/MainAppTheme"
         android:usesCleartextTraffic="true"
-        tools:replace="android:allowBackup">
+        tools:replace="android:allowBackup"
+        tools:targetApi="tiramisu">
+
+        <service
+            android:name=".bluetooth.services.BluetoothService"
+            android:exported="true"
+            tools:ignore="ExportedService" />
+        <service
+            android:name=".features.configure.advertiser.services.AdvertiserService"
+            android:exported="true"
+            android:foregroundServiceType="connectedDevice"
+            tools:ignore="ExportedService" />
+        <service
+            android:name=".features.scan.browser.services.ShareLogServices"
+            android:exported="true"
+            tools:ignore="ExportedService" />
+
         <activity
             android:name=".features.demo.wifi_throughput.activities.WifiThroughputActivity"
             android:exported="false"
@@ -60,72 +76,75 @@
         <activity
             android:name=".features.demo.health_thermometer.activities.HealthThermometerActivity"
             android:label="@string/title_Health_Thermometer"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.demo.blinky.activities.BlinkyActivity"
             android:label="@string/title_Blinky"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.demo.connected_lighting.activities.ConnectedLightingActivity"
             android:label="@string/title_Connected_Lighting"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.demo.range_test.activities.RangeTestActivity"
             android:label="@string/title_Range_Test"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.demo.throughput.activities.ThroughputActivity"
             android:label="@string/title_Throughput"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.demo.wifi_commissioning.activities.WifiCommissioningActivity"
             android:label="@string/wifi_commissioning_label"
-            android:screenOrientation="portrait" />
-
-        <service
-            android:name=".bluetooth.services.BluetoothService"
-            android:exported="true" />
-        <service
-            android:name=".features.configure.advertiser.services.AdvertiserService"
-            android:foregroundServiceType="connectedDevice"
-            android:exported="true" />
-        <service
-            android:name=".features.scan.browser.services.ShareLogServices"
-            android:exported="true" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
 
         <activity
             android:name=".features.scan.browser.activities.DeviceServicesActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.iop_test.activities.IOPTestActivity"
             android:label="@string/title_Interoperability_Test"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.demo.thunderboard_demos.demos.motion.activities.MotionActivity"
             android:label="@string/motion_demo_title"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.demo.thunderboard_demos.demos.environment.activities.EnvironmentActivity"
             android:label="@string/environment_demo_title"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.demo.thunderboard_demos.demos.blinky_thunderboard.activities.BlinkyThunderboardActivity"
             android:label="@string/title_Blinky"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.demo.esl_demo.activities.EslDemoActivity"
             android:label="@string/esl_demo_bar_title"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.demo.matter_demo.activities.MatterDemoActivity"
             android:label="@string/matter_demo_title"
-            android:screenOrientation="portrait"
-            android:theme="@style/matter_theme" />
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/matter_theme"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".features.demo.devkitsensor917.activities.DevKitSensor917Activity"
             android:label="Dev kitSensor 917"
-            android:screenOrientation="portrait"
-            android:theme="@style/matter_theme" />
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/matter_theme"
+            tools:ignore="DiscouragedApi" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -139,13 +158,15 @@
         <activity
             android:name=".home_screen.activities.MainActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/CustomSplashTheme"></activity>
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/CustomSplashTheme"
+            tools:ignore="DiscouragedApi" />
         <activity
             android:name=".home_screen.activities.SplashActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@style/SystemSplashTheme">
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/SystemSplashTheme"
+            tools:ignore="DiscouragedApi">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -154,8 +175,9 @@
         </activity>
         <activity
             android:name=".features.configure.advertiser.activities.PendingServerConnectionActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/FullscreenTheme"
+            tools:ignore="DiscouragedApi" />
     </application>
 
 </manifest>
