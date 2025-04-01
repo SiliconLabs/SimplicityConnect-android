@@ -67,6 +67,7 @@ import com.siliconlabs.bledemo.features.iop_test.utils.ErrorCodes
 import com.siliconlabs.bledemo.features.scan.browser.dialogs.OtaLoadingDialog
 import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
 import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import com.siliconlabs.bledemo.utils.Notifications
 import com.siliconlabs.bledemo.utils.UuidConsts
 import kotlinx.coroutines.Dispatchers
@@ -213,11 +214,14 @@ class IOPTestActivity : AppCompatActivity() {
                     }
                 }, 1600)
             } else if (state == BluetoothDevice.BOND_BONDING) {
-                Toast.makeText(
+               /* Toast.makeText(
                     this@IOPTestActivity,
                     R.string.iop_test_toast_bonding,
                     Toast.LENGTH_LONG
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    this@IOPTestActivity,getString(R.string.iop_test_toast_bonding),5000
+                )
             }
         }
 
@@ -239,11 +243,14 @@ class IOPTestActivity : AppCompatActivity() {
 
         private fun printVariant(variant: Int): String {
             if (variant == BluetoothDevice.PAIRING_VARIANT_PIN) {
-                Toast.makeText(
+                /*Toast.makeText(
                     this@IOPTestActivity,
                     R.string.iop_test_toast_press_passkey,
                     Toast.LENGTH_LONG
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    this@IOPTestActivity,getString(R.string.iop_test_toast_press_passkey),5000
+                )
                 return "PAIRING_VARIANT_PIN"
             }
             return variant.toString()
@@ -1019,11 +1026,14 @@ class IOPTestActivity : AppCompatActivity() {
 
     private fun checkIfBluetoothIsSupported() {
         if (BluetoothAdapter.getDefaultAdapter() == null) {
-            Toast.makeText(
+            /*Toast.makeText(
                 this,
                 R.string.iop_test_toast_bluetooth_not_supported,
                 Toast.LENGTH_SHORT
-            ).show()
+            ).show()*/
+            CustomToastManager.show(
+                this@IOPTestActivity,getString(R.string.iop_test_toast_bluetooth_not_supported),5000
+            )
             finish()
         }
     }
@@ -1204,14 +1214,20 @@ class IOPTestActivity : AppCompatActivity() {
                         otaFileManager?.readFile(it)
                         otaFileSelectionDialog?.enableUploadButton()
                     } else {
-                        Toast.makeText(this, getString(R.string.incorrect_file), Toast.LENGTH_SHORT)
-                            .show()
+                        /*Toast.makeText(this, getString(R.string.incorrect_file), Toast.LENGTH_SHORT)
+                            .show()*/
+                        CustomToastManager.show(
+                            this@IOPTestActivity,getString(R.string.incorrect_file),5000
+                        )
                     }
-                } ?: Toast.makeText(
+                } ?: /*Toast.makeText(
                     this,
                     getString(R.string.chosen_file_not_found),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    this@IOPTestActivity,getString(R.string.chosen_file_not_found),5000
+                )
             }
 
             SAVE_LOG_REQUEST_CODE -> {
@@ -1224,11 +1240,14 @@ class IOPTestActivity : AppCompatActivity() {
                             }
                         }
                     } ?: run {
-                        Toast.makeText(
+                        /*Toast.makeText(
                             this,
                             getString(R.string.chosen_file_not_found),
                             Toast.LENGTH_SHORT
-                        ).show()
+                        ).show()*/
+                        CustomToastManager.show(
+                            this@IOPTestActivity,getString(R.string.chosen_file_not_found),5000
+                        )
                     }
                 }
             }
@@ -2532,17 +2551,23 @@ class IOPTestActivity : AppCompatActivity() {
                 otaFileSelectionDialog?.dismiss()
                 startOtaProcess()
             } ?: if (otaFileManager?.otaFilename != null) {
-                Toast.makeText(
+                /*Toast.makeText(
                     this@IOPTestActivity,
                     getString(R.string.incorrect_file),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    this@IOPTestActivity,getString(R.string.incorrect_file),5000
+                )
             } else {
-                Toast.makeText(
+                /*Toast.makeText(
                     this@IOPTestActivity,
                     getString(R.string.no_file_chosen),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    this@IOPTestActivity,getString(R.string.no_file_chosen),5000
+                )
             }
         }
 
@@ -3064,11 +3089,14 @@ class IOPTestActivity : AppCompatActivity() {
                                         if (discoverTimeout) {
                                             disconnectGatt(gatt)
                                             runOnUiThread {
-                                                Toast.makeText(
+                                                /*Toast.makeText(
                                                     baseContext,
                                                     "DISCOVER SERVICES TIMEOUT",
                                                     Toast.LENGTH_LONG
-                                                ).show()
+                                                ).show()*/
+                                                CustomToastManager.show(
+                                                    this@IOPTestActivity,"DISCOVER SERVICES TIMEOUT",5000
+                                                )
                                             }
                                         }
                                     }, 25000)
@@ -3160,11 +3188,14 @@ class IOPTestActivity : AppCompatActivity() {
                 discoverTimeout = false
                 if (status != 0) {
                     runOnUiThread {
-                        Toast.makeText(
+                        /*Toast.makeText(
                             baseContext,
                             ErrorCodes.getErrorName(status),
                             Toast.LENGTH_LONG
-                        ).show()
+                        ).show()*/
+                        CustomToastManager.show(
+                            this@IOPTestActivity,ErrorCodes.getErrorName(status),5000
+                        )
                         updateDataTestFailed(mIndexRunning)
                     }
                     handler?.postDelayed({
@@ -3254,11 +3285,14 @@ class IOPTestActivity : AppCompatActivity() {
                         if (value[2] == 0x05.toByte()) {
                             Log.e("homekit_descriptor", "Insecure Connection")
                             runOnUiThread {
-                                Toast.makeText(
+                                /*Toast.makeText(
                                     this@IOPTestActivity,
                                     "Error: Not a Homekit Secure Connection",
                                     Toast.LENGTH_SHORT
-                                ).show()
+                                ).show()*/
+                                CustomToastManager.show(
+                                    this@IOPTestActivity,"Error: Not a Homekit Secure Connection",5000
+                                )
                             }
                         } else if (value[2] == 0x04.toByte()) {
                             Log.e("homekit_descriptor", "Wrong Address")

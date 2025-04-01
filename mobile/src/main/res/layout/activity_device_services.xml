@@ -81,17 +81,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <com.siliconlabs.bledemo.common.views.MainActionButton
-                android:id="@+id/btn_bond_action"
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/btn_disconnect"
+                style="@style/MyExtendedFabStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_margin="@dimen/extended_fab_margin"
-                android:text="@string/create_bond"
-                android:visibility="gone"
-                tools:visibility="visible"
-                tools:text="@string/create_bond" />
+                android:text="@string/details_disconnect"
+                android:visibility="visible"
+                app:backgroundTint="@color/button_red"
+                tools:visibility="visible" />
+
+
         </RelativeLayout>
 
         <com.siliconlabs.bledemo.common.views.FlyInBar

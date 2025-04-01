@@ -561,13 +561,13 @@ class SelectDeviceDialog(
         /* Scanning through this dialog is always indefinite. */
     }
 
-    companion object {
+    companion   object {
         private const val CONN_TYPE_INFO = "_conn_type_info_"
 
         const val MODEL_TYPE_EXTRA = "model_type"
         const val POWER_SOURCE_EXTRA = "power_source"
         const val DEVICE_ADDRESS_EXTRA = "device_address"
-        private const val SCAN_UPDATE_PERIOD = 2000L //ms
+        private const val SCAN_UPDATE_PERIOD = 10L //ms
 
         fun newDialog(
             connectType: GattConnectType?,

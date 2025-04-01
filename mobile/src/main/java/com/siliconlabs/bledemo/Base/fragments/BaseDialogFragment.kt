@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
+import com.siliconlabs.bledemo.utils.CustomToastManager
 
 open class BaseDialogFragment(
     private val hasCustomWidth: Boolean? = null,
@@ -42,7 +43,8 @@ open class BaseDialogFragment(
 
     protected fun showMessage(@StringRes message: Int) {
         activity?.runOnUiThread {
-            Toast.makeText(context, getString(message), Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context, getString(message), Toast.LENGTH_SHORT).show()
+            CustomToastManager.show(requireContext(),getString(message),5000)
         }
     }
 

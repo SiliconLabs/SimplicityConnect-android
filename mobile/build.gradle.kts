@@ -66,8 +66,8 @@ android {
         create("Si-Connect") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 58
-            versionName = "3.0.1"
+            versionCode = 59
+            versionName = "3.0.2"
         }
     }
 

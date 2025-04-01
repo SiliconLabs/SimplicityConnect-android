@@ -13,6 +13,7 @@ import android.widget.Toast
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
+import com.siliconlabs.bledemo.utils.CustomToastManager
 
 abstract class BaseDemoActivity : BaseActivity() {
 
@@ -49,7 +50,8 @@ abstract class BaseDemoActivity : BaseActivity() {
         bluetoothBinding.unbind()
 
         if (isGattConnected) {
-            Toast.makeText(this, getString(R.string.device_has_disconnected), Toast.LENGTH_SHORT).show()
+            //Toast.makeText(this, getString(R.string.device_has_disconnected), Toast.LENGTH_SHORT).show()
+            CustomToastManager.show(this@BaseDemoActivity,getString(R.string.device_has_disconnected),5000)
         }
     }
 

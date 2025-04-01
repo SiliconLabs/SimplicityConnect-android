@@ -59,6 +59,7 @@ import com.siliconlabs.bledemo.databinding.ActivityWifiThroughputBinding
 import com.siliconlabs.bledemo.features.demo.wifi_throughput.fragments.WifiThroughPutDetailScreen
 import com.siliconlabs.bledemo.features.demo.wifi_throughput.utils.ThroughputUtils
 import com.siliconlabs.bledemo.features.iop_test.utils.Utils
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import java.net.InetAddress
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -398,11 +399,14 @@ class WifiThroughputActivity : AppCompatActivity() {
                                         )
                                         isConfirmCalled.value = true
                                     } else {
-                                        Toast.makeText(
+                                        /*Toast.makeText(
                                             context,
                                             getString(R.string.please_enter_valid_port_number),
                                             Toast.LENGTH_LONG
-                                        ).show()
+                                        ).show()*/
+                                        CustomToastManager.show(
+                                            context,getString(R.string.please_enter_valid_port_number),5000
+                                        )
                                     }
                                 },
                                 shape = RoundedCornerShape(8.dp), // Rounded corners with a 16 dp radius

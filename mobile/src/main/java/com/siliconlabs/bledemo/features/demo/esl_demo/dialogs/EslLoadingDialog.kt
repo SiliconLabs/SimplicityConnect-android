@@ -30,10 +30,20 @@ class EslLoadingDialog(private val command: EslCommand, private val customText: 
         binding.dialogMessage.text = customText ?: getTextFromCommand(command)
     }
 
+    fun cancelUploadOperation(callBackESLLoadingDialog: EslLoadingCallBack?) {
+        binding.buttonCancelUpload.visibility = View.VISIBLE
+        binding.buttonCancelUpload.setOnClickListener {
+            callBackESLLoadingDialog?.onUploadingImageCancelledButtonClicked()
+        }
+    }
+
     private fun getTextFromCommand(command: EslCommand) = when (command) {
         EslCommand.CONNECT -> R.string.loading_dialog_connect
         EslCommand.CONFIGURE -> R.string.loading_dialog_configure
-        EslCommand.DISCONNECT -> R.string.loading_dialog_disconnect
+        EslCommand.DISCONNECT ->{
+            binding.buttonCancelUpload.visibility = View.GONE
+            R.string.loading_dialog_disconnect
+        }
         EslCommand.LOAD_INFO -> R.string.loading_dialog_load_tags_info
         EslCommand.PING -> R.string.loading_dialog_ping_tag
         EslCommand.REMOVE -> R.string.loading_dialog_remove_tag
@@ -42,5 +52,11 @@ class EslLoadingDialog(private val command: EslCommand, private val customText: 
 
     companion object {
         const val FRAGMENT_NAME = "loading_dialog"
+    }
+
+    interface EslLoadingCallBack{
+
+        fun onUploadingImageCancelledButtonClicked()
+
     }
 }

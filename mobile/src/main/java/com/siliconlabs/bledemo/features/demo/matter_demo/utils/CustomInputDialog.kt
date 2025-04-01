@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterOTBRInputDialogFragment
+import com.siliconlabs.bledemo.utils.CustomToastManager
 
 
 class CustomInputDialog : DialogFragment() {
@@ -102,15 +103,21 @@ class CustomInputDialog : DialogFragment() {
             dismiss()
         } else {
             if (enteredText.isEmpty()) {
-                Toast.makeText(
+               /* Toast.makeText(
                     requireContext(),
                     getString(R.string.please_enter_device_name), Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    requireContext(),getString(R.string.please_enter_device_name),5000
+                )
             } else {
-                Toast.makeText(
+                /*Toast.makeText(
                     requireContext(),
                     getString(R.string.please_enter_valid_device_name), Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    requireContext(),getString(R.string.please_enter_valid_device_name),5000
+                )
             }
         }
     }

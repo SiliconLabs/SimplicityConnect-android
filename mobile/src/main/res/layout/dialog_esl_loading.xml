@@ -25,7 +25,22 @@
             android:layout_height="wrap_content"
             tools:text="Connecting with ESL tag..." />
 
+        <Button
+            android:layout_gravity="bottom|center_horizontal"
+            android:visibility="gone"
+            style="@style/dialog_button_positive_red"
+            android:textColor="@color/white"
+            android:text="@string/button_cancel"
+            android:layout_margin="@dimen/matter_10dp"
+            android:layout_width="match_parent"
+            android:id="@+id/button_cancel_upload"
+            android:layout_height="wrap_content">
+        </Button>
+
 
     </LinearLayout>
+
+
+
 
 </com.google.android.material.card.MaterialCardView>

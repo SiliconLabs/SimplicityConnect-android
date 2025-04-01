@@ -1017,7 +1017,7 @@
     <string name="remove_tag_error">Error trying to remove ESL Tag</string>
     <string name="image_update_progress">"Transferring image to the tag: %1$d%% done"</string>
     <string name="image_update_success">Finished sending an image to the ESL Tag</string>
-    <string name="image_update_error">Image transfer failed</string>
+    <string name="image_update_error">Image upload failed</string>
     <string name="image_display_error">Display image failed</string>
     <string name="image_display_success">Display image succeeded</string>
     <string name="esl_timeout">ESL operation timeout</string>
@@ -1295,5 +1295,20 @@
     <string name="ensure_right_combination_of_fw_is_flashed">Ensure right combination of FW is flashed.</string>
     <string name="matter_dishwasher_navigating_back">Navigating back will cause the dishwasher to enter the pause state</string>
     <string name="dishwasher_resfresh_text">The Dishwasher energy data will refresh every minute</string>
+    <string name="big_size_image_content">The selected image exceeds 100 KB, which may result in a longer upload time. Do you want to proceed with the upload?
+ </string>
+    <string name="do_you_want_to_cancel_this_image_upload">Do you want to cancel this image upload?</string>
 
+    <!--   Matter Air Quality Sensor -->
+    <string name="matter_air_quality_sensor_list">Air Quality Sensor</string>
+    <string name="matter_air_quality_sensor_cluster">Air Quality Sensor</string>
+    <string name="matter_air_quality_sensor_unknown">Unknown Quality</string>
+    <string name="matter_air_quality_sensor_good">Good Quality</string>
+    <string name="matter_air_quality_sensor_poor">Poor Quality</string>
+    <string name="matter_air_quality_sensor_moderate">Moderate Quality</string>
+    <string name="matter_air_quality_sensor_fair">Fair Quality</string>
+    <string name="matter_air_quality_sensor_v_poor">Very Poor Quality</string>
+    <string name="matter_air_quality_sensor_e_poor">Emergency Poor Quality</string>
+    <string name="matter_init_air_sensor_quality_value">AQI:  0 </string>
+    <string name="matter_init_air_sensor_quality_status">Unknown</string>
 </resources>

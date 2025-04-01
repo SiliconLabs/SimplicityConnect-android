@@ -6,11 +6,13 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattService
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
+import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import java.util.*
 
 @SuppressLint("MissingPermission")
 object BLEUtils {
 
+    var GATT_DEVICE_SELECTED = BluetoothService.GattConnectType.NOTHING
 
     fun setNotificationForCharacteristic(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic?, gattDescriptor: UUID?, value: Notifications): Boolean {
         var written = false

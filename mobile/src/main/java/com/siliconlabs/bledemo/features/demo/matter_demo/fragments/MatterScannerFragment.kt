@@ -48,6 +48,7 @@ import com.siliconlabs.bledemo.databinding.FragmentMatterScannerBinding
 import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoActivity
 import com.siliconlabs.bledemo.features.demo.matter_demo.controller.GenericChipDeviceListener
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ON_OFF_CLUSTER_ENDPOINT
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.AIR_QUALITY_SENSOR_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.CONTACT_SENSOR_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DISHWASHER_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.ENHANCED_COLOR_LIGHT_TYPE
@@ -72,6 +73,7 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.utils.FragmentUtils
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.MessageDialogFragment
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
 import com.siliconlabs.bledemo.features.iop_test.utils.DialogDeviceInfoFragment
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -490,7 +492,10 @@ class MatterScannerFragment : Fragment() {
     @SuppressLint("NewApi")
     private fun validateThreadInput(inputOTBR: String) {
         if (inputOTBR.isBlank()) {
-            Toast.makeText(requireContext(), "input OTBR is empty", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(requireContext(), "input OTBR is empty", Toast.LENGTH_SHORT).show()
+            CustomToastManager.show(
+                requireContext(),"input OTBR is empty",5000
+            )
             return
         }
         val operationalDataset = dataFromHexString(inputOTBR.trim())
@@ -677,7 +682,10 @@ class MatterScannerFragment : Fragment() {
 
     private fun showMessage(msg: String) {
         requireActivity().runOnUiThread {
-            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+         //   Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+            CustomToastManager.show(
+                requireContext(),msg,5000
+            )
         }
     }
 
@@ -890,6 +898,10 @@ class MatterScannerFragment : Fragment() {
                                 DISHWASHER_TYPE -> device =
                                     requireContext().getString(R.string.matter_dishwahser_list)
 
+                                AIR_QUALITY_SENSOR_TYPE ->
+                                    device =
+                                        requireContext().getString(R.string.matter_air_quality_sensor_list)
+
                                 else -> device = matterScanDevice.name
 
 
@@ -1013,6 +1025,7 @@ class MatterScannerFragment : Fragment() {
         private const val DIALOG_NTW_MODE_FRAGMENT = 998
 
         const val SPACE = " "
+        const val AQI = "AQI :"
         const val INPUT_NETWORK_WIFI_TYPE_SELECTED = "wifi"
         const val INPUT_NETWORK_THREAD_TYPE_SELECTED = "thread"
         const val WIFI_INPUT_SSID = "wifi_input_ssid"

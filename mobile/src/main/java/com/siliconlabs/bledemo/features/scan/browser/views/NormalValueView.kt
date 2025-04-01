@@ -12,6 +12,7 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.CharacteristicFieldNormalValueWriteModeBinding
 import com.siliconlabs.bledemo.databinding.CharacteristicFieldReadModeBinding
 import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import java.math.BigInteger
 import java.util.*
 import kotlin.math.*
@@ -95,7 +96,11 @@ class NormalValueView(context: Context?,
 
     private fun isFieldSizeExceeded(inputLength: Int) : Boolean {
         return if (inputLength > fieldValue.size) {
-            Toast.makeText(context, R.string.characteristic_dialog_field_size_exceeded, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context, R.string.characteristic_dialog_field_size_exceeded, Toast.LENGTH_SHORT).show()
+            context?.let {
+                CustomToastManager.show(context,
+                    it.getString(R.string.characteristic_dialog_field_size_exceeded),5000)
+            }
             true
         } else false
     }

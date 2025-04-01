@@ -45,8 +45,12 @@ import com.siliconlabs.bledemo.features.scan.browser.dialogs.ErrorDialog.OtaErro
 import com.siliconlabs.bledemo.features.scan.browser.fragments.*
 import com.siliconlabs.bledemo.features.scan.browser.models.OtaFileType
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
 import com.siliconlabs.bledemo.common.views.FlyInBar
 import com.siliconlabs.bledemo.databinding.ActivityDeviceServicesBinding
+import com.siliconlabs.bledemo.features.scan.browser.fragments.BrowserFragment.Companion.ORIGIN
+import com.siliconlabs.bledemo.features.scan.browser.fragments.BrowserFragment.Companion.RECYCLERVIEW_POSITION
+import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
 import com.siliconlabs.bledemo.utils.*
 import timber.log.Timber
 import java.io.*
@@ -62,7 +66,7 @@ class DeviceServicesActivity : BaseActivity() {
     private var mtuReadType = MtuReadType.VIEW_INITIALIZATION
     private var isLogFragmentOn = false
 
-    private lateinit var menu: Menu
+    private var menu: Menu? = null
 
     private var reliable = true
     private var doubleStepUpload = false
@@ -97,18 +101,21 @@ class DeviceServicesActivity : BaseActivity() {
         private set
 
     private var bluetoothDevice: BluetoothDevice? = null
+    private var devicesAdapterRecyclerViewItemPos :Int = -1
     var bluetoothGatt: BluetoothGatt? = null
 
     private var retryAttempts = 0
 
     private lateinit var binding:ActivityDeviceServicesBinding
 
+    lateinit var scanFragmentViewModel: ScanFragmentViewModel
+
     private val hideFabOnScrollChangeListener =
         OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
             if (scrollY > oldScrollY) {
-                binding.btnBondAction.hide()
+                binding.btnDisconnect.hide()
             } else {
-                binding.btnBondAction.show()
+                binding.btnDisconnect.show()
             }
         }
 
@@ -470,7 +477,7 @@ class DeviceServicesActivity : BaseActivity() {
         setContentView(binding.root)
 
         bluetoothDevice = intent.getParcelableExtra(CONNECTED_DEVICE)
-
+        devicesAdapterRecyclerViewItemPos = intent.getIntExtra(RECYCLERVIEW_POSITION,-1)
         setupBottomNavigation()
         setupActionBar()
         setupUiListeners()
@@ -479,6 +486,7 @@ class DeviceServicesActivity : BaseActivity() {
 
         showCharacteristicLoadingAnimation(getString(R.string.debug_mode_device_loading_gatt_info))
         bindBluetoothService()
+        scanFragmentViewModel = ScanFragmentViewModel(this@DeviceServicesActivity)
     }
 
     private fun setupBottomNavigation() {
@@ -516,9 +524,9 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     private fun toggleRemoteActions(isRemoteFragmentOn: Boolean) {
-        binding.btnBondAction.visibility =
-            if (isRemoteFragmentOn) View.VISIBLE
-            else View.GONE
+        val createBondMenu = menu?.findItem(R.id.menu_create_bond)
+
+        createBondMenu?.isVisible = isRemoteFragmentOn
 
         binding.connectionInfo.visibility =
             if (isRemoteFragmentOn) View.VISIBLE
@@ -527,7 +535,7 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     private fun toggleMenuItemsVisibility(areVisible: Boolean) {
-        menu.children.forEach {
+        menu?.children?.forEach {
             it.isVisible = areVisible
         }
     }
@@ -544,14 +552,25 @@ class DeviceServicesActivity : BaseActivity() {
         binding.tvOtaFirmware.setOnClickListener {
             if (isUiCreated) checkForOtaCharacteristic()
         }
-        binding.btnBondAction.setOnClickListener {
-            bluetoothGatt?.device?.let {
-                when (it.bondState) {
-                    BluetoothDevice.BOND_BONDED -> askUnbondDevice(it)
-                    BluetoothDevice.BOND_NONE -> it.createBond()
-                    else -> {}
+        binding.btnDisconnect.setOnClickListener {
+
+            if(null != intent && intent.getStringExtra(ORIGIN).equals("BrowserFragment",true)){
+                if(devicesAdapterRecyclerViewItemPos >= 0){
+                    if(null != scanFragmentViewModel){
+                        scanFragmentViewModel.setDeviceConnectionState(devicesAdapterRecyclerViewItemPos, connectionState = BluetoothDeviceInfo.ConnectionState.DISCONNECTED)
+                    }
+                    if(null != bluetoothDevice){
+                        bluetoothService?.disconnectGatt(bluetoothDevice!!.address)
+                    }
+                }else{
+                    println("Error: Invalid devicesAdapterRecyclerViewItemPos in setupUiListeners")
+                    Log.e("Error: ", "Invalid devicesAdapterRecyclerViewItemPos in setupUiListeners")
+
                 }
+            }else{
+                bluetoothService?.disconnectGatt(bluetoothDevice!!.address)
             }
+
         }
     }
 
@@ -574,34 +593,31 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     private fun displayBondState(newState: Int? = null) {
-        val state = newState ?: bluetoothGatt?.device?.bondState ?: BluetoothDevice.BOND_NONE
 
+        val state = newState ?: bluetoothGatt?.device?.bondState ?: BluetoothDevice.BOND_NONE
+        val createBondMenu = menu?.findItem(R.id.menu_create_bond)
         when (state) {
             BluetoothDevice.BOND_BONDED -> {
 
                 binding.tvBondState.text = getString(R.string.bonded)
-                binding.btnBondAction.apply {
-                    isEnabled = true
-                    text = getString(R.string.delete_bond)
-                    setIsActionOn(true)
-                }
+
+                createBondMenu?.isEnabled = true
+                createBondMenu?.title = getString(R.string.delete_bond)
+
             }
 
             BluetoothDevice.BOND_BONDING -> {
                 binding.tvBondState.text = getString(R.string.bonding)
-                binding.btnBondAction.apply {
-                    isEnabled = false
-                    text = getString(R.string.bonding)
-                }
+
+                createBondMenu?.isEnabled = false
+                createBondMenu?.title = getString(R.string.bonding)
             }
 
             BluetoothDevice.BOND_NONE -> {
                 binding.tvBondState.text = getString(R.string.not_bonded)
-                binding.btnBondAction.apply {
-                    isEnabled = true
-                    text = getString(R.string.create_bond)
-                    setIsActionOn(false)
-                }
+
+                createBondMenu?.isEnabled = true
+                createBondMenu?.title = getString(R.string.create_bond)
 
             }
 
@@ -673,9 +689,15 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        this.menu = menu
         menuInflater.inflate(R.menu.menu_device_services, menu)
+        this.menu = menu
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        // Now it's safe to call displayBondState because the menu is ready
+        displayBondState()
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -689,6 +711,16 @@ class DeviceServicesActivity : BaseActivity() {
             R.id.request_mtu -> {
                 mtuRequestDialog = MtuRequestDialog(MTU, mtuRequestCallback).also {
                     it.show(supportFragmentManager, MTU_REQUEST_DIALOG_FRAGMENT)
+                }
+            }
+
+            R.id.menu_create_bond -> {
+                bluetoothGatt?.device?.let {
+                    when (it.bondState) {
+                        BluetoothDevice.BOND_BONDED -> askUnbondDevice(it)
+                        BluetoothDevice.BOND_NONE -> it.createBond()
+                        else -> {}
+                    }
                 }
             }
 
@@ -1158,8 +1190,7 @@ class DeviceServicesActivity : BaseActivity() {
 
     private fun showCharacteristicLoadingAnimation(barLabel: String) {
         runOnUiThread {
-            binding.btnBondAction.visibility = View.GONE
-
+            binding.btnDisconnect.visibility = View.GONE
             binding.tvBondStateWithRssi.visibility = View.GONE
             binding.flyInBar.apply {
                 setOnClickListener { /* this onclicklistener prevents services and characteristics from user interaction before ui is loaded*/ }
@@ -1175,7 +1206,7 @@ class DeviceServicesActivity : BaseActivity() {
             binding.flyInBar.startFlyOutAnimation(object : FlyInBar.Callback {
                 override fun onFlyOutAnimationEnded() {
                     binding.flyInBar.visibility = View.GONE
-                    binding.btnBondAction.visibility = View.VISIBLE
+                    binding.btnDisconnect.visibility = View.VISIBLE
                     binding.tvBondStateWithRssi.visibility = View.VISIBLE
                 }
             })
@@ -1346,6 +1377,7 @@ class DeviceServicesActivity : BaseActivity() {
         fun startActivity(context: Context, device: BluetoothDevice) {
             Intent(context, DeviceServicesActivity::class.java).apply {
                 putExtra(CONNECTED_DEVICE, device)
+                putExtra(ORIGIN,"ConnectionsFragment")
             }.also {
                 startActivity(context, it, null)
             }

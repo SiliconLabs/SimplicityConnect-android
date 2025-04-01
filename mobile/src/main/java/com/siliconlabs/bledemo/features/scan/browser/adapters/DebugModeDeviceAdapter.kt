@@ -10,23 +10,26 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.beacon_utils.BleFormat
 import com.siliconlabs.bledemo.bluetooth.beacon_utils.altbeacon.AltBeacon
-import com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone.*
+import com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone.Beacon
+import com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone.Constants
+import com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone.TlmValidator
+import com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone.UidValidator
+import com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone.UrlValidator
 import com.siliconlabs.bledemo.bluetooth.beacon_utils.ibeacon.IBeaconInfo
 import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
 import com.siliconlabs.bledemo.bluetooth.ble.ScanResultCompat
 import com.siliconlabs.bledemo.bluetooth.parsing.ScanRecordParser
-import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.common.views.DetailsRow
-import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
 import com.siliconlabs.bledemo.databinding.AdapterBrowserDeviceBinding
+import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
 import com.siliconlabs.bledemo.utils.RecyclerViewUtils
-import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToLong
 
@@ -34,6 +37,8 @@ class DebugModeDeviceAdapter(
     private var chosenDevices: MutableList<ScanFragmentViewModel.BluetoothInfoViewState>,
     private val debugModeCallback: DebugModeCallback
 ) : RecyclerView.Adapter<DebugModeDeviceAdapter.ViewHolder>() {
+
+    private var itemPosition  = -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val viewBinding = AdapterBrowserDeviceBinding.inflate(LayoutInflater.from(parent.context))
@@ -43,6 +48,7 @@ class DebugModeDeviceAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        itemPosition = position
         if (payloads.isEmpty()) {
             super.onBindViewHolder(holder, position, payloads)
         } else {
@@ -51,10 +57,12 @@ class DebugModeDeviceAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        itemPosition = position
         holder.bind(chosenDevices[position])
     }
 
     override fun getItemCount() = chosenDevices.size
+
 
 
     private fun setupUiListeners(holder: ViewHolder, viewBinding: AdapterBrowserDeviceBinding) {
@@ -97,6 +105,8 @@ class DebugModeDeviceAdapter(
         chosenDevices.add(newDevice)
         notifyItemInserted(itemCount - 1)
     }
+
+    fun getItemPosition() = itemPosition
 
     fun updateDevices(
         newList: List<ScanFragmentViewModel.BluetoothInfoViewState>,

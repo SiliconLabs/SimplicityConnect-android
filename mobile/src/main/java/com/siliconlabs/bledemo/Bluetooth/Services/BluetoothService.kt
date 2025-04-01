@@ -33,6 +33,7 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import androidx.core.location.LocationManagerCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.ble.BleScanCallback
 import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
@@ -52,6 +53,11 @@ import com.siliconlabs.bledemo.features.scan.browser.models.logs.GattOperationWi
 import com.siliconlabs.bledemo.features.scan.browser.models.logs.Log
 import com.siliconlabs.bledemo.features.scan.browser.models.logs.TimeoutLog
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity
+import com.siliconlabs.bledemo.home_screen.activities.MainActivity.Companion.ACTION_SHOW_CUSTOM_TOAST
+import com.siliconlabs.bledemo.home_screen.activities.MainActivity.Companion.EXTRA_TOAST_MESSAGE
+import com.siliconlabs.bledemo.home_screen.menu_items.HealthThermometer
+import com.siliconlabs.bledemo.utils.BLEUtils
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import com.siliconlabs.bledemo.utils.LocalService
 import com.siliconlabs.bledemo.utils.Notifications
 import com.siliconlabs.bledemo.utils.UuidConsts
@@ -67,6 +73,8 @@ import java.util.UUID
 @SuppressWarnings("LogNotTimber")
 @SuppressLint("MissingPermission")
 class BluetoothService : LocalService<BluetoothService>() {
+
+    var bluetoothContext:Context? = null
 
     companion object {
         private const val RECONNECTION_RETRIES = 3
@@ -106,7 +114,8 @@ class BluetoothService : LocalService<BluetoothService>() {
         MATTER_DEMO,
         WIFI_OTA_UPDATE,
         DEV_KIT_SENSOR,
-        WIFI_THROUGHPUT_TEST
+        WIFI_THROUGHPUT_TEST,
+        NOTHING
     }
 
     interface ScanListener {
@@ -190,7 +199,14 @@ class BluetoothService : LocalService<BluetoothService>() {
     private val scanTimeoutRunnable = Runnable {
         stopDiscovery()
         scanListeners.onDiscoveryTimeout()
-        Toast.makeText(this, getString(R.string.toast_scan_timeout), Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, getString(R.string.toast_scan_timeout), Toast.LENGTH_SHORT).show()
+        /*handler.post {
+            this.let { CustomToastManager.show(it,getString(R.string.toast_scan_timeout)) }
+        }*/
+        val intent = Intent(ACTION_SHOW_CUSTOM_TOAST).apply {
+            putExtra(EXTRA_TOAST_MESSAGE, getString(R.string.toast_scan_timeout))
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     private var reconnectionRunnable: ReconnectionRunnable? = null
@@ -242,6 +258,7 @@ class BluetoothService : LocalService<BluetoothService>() {
     private val bluetoothReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
+            bluetoothContext = context
             if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
                 val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
                 when (state) {
@@ -355,11 +372,11 @@ class BluetoothService : LocalService<BluetoothService>() {
             if (useBLE) {
                 bleScannerCallback = BleScanCallback(this)
                 val settings = ScanSettings.Builder()
-                        .setLegacy(false)
-                        .setReportDelay(0)
-                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
+                    .setLegacy(false)
+                    .setReportDelay(getReportDelay())
+                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
                 adapter.bluetoothLeScanner?.startScan(filters, settings, bleScannerCallback)
-                        ?: onDiscoveryFailed(ScanError.LeScannerUnavailable)
+                    ?: onDiscoveryFailed(ScanError.LeScannerUnavailable)
             } else {
                 if (!adapter.startDiscovery()) onDiscoveryFailed(ScanError.BluetoothAdapterUnavailable)
                 else timeoutInSeconds?.let {
@@ -367,6 +384,44 @@ class BluetoothService : LocalService<BluetoothService>() {
                 }
             }
         } ?: onDiscoveryFailed(ScanError.BluetoothAdapterUnavailable)
+    }
+
+    /**
+     * Determines the report delay for BLE scanning based on the GATT connection type.
+     *
+     * The report delay is set to 0 milliseconds for specific GATT connection types,
+     * including:
+     * - IOP_TEST
+     * - THERMOMETER
+     * - LIGHT
+     * - RANGE_TEST
+     * - BLINKY
+     * - THROUGHPUT_TEST
+     * - MOTION
+     * - ENVIRONMENT
+     * - WIFI_COMMISSIONING
+     * - ESL_DEMO
+     * - DEV_KIT_SENSOR
+     *
+     * For all other GATT connection types, the report delay is set to 1000 milliseconds.
+     *
+     * @return The report delay in milliseconds.
+     */
+    fun getReportDelay(): Long {
+        return when (BLEUtils.GATT_DEVICE_SELECTED) {
+            GattConnectType.IOP_TEST,
+            GattConnectType.THERMOMETER,
+            GattConnectType.LIGHT,
+            GattConnectType.RANGE_TEST,
+            GattConnectType.BLINKY,
+            GattConnectType.THROUGHPUT_TEST,
+            GattConnectType.MOTION,
+            GattConnectType.ENVIRONMENT,
+            GattConnectType.WIFI_COMMISSIONING,
+            GattConnectType.ESL_DEMO,
+            GattConnectType.DEV_KIT_SENSOR -> 0L
+            else -> 1000L
+        }
     }
 
     fun onDiscoveryFailed(scanError: ScanError, errorCode: Int? = null) {
@@ -382,7 +437,11 @@ class BluetoothService : LocalService<BluetoothService>() {
             ScanError.BluetoothAdapterUnavailable -> getString(R.string.scan_failed_bluetooth_adapter_unavailable)
         }
         scanListeners.onDiscoveryFailed()
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        //Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        val intent = Intent(ACTION_SHOW_CUSTOM_TOAST).apply {
+            putExtra(EXTRA_TOAST_MESSAGE, message)
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
     fun stopDiscovery() {

@@ -29,6 +29,7 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ChipClient
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.FragmentUtils
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.RecyclerViewMargin
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
@@ -78,7 +79,10 @@ class MatterScannedResultFragment : Fragment() {
     private fun showMessages(msgId: Int) {
         requireActivity().runOnUiThread {
             val resString = requireContext().getString(msgId)
-            Toast.makeText(requireContext(), resString, Toast.LENGTH_SHORT).show()
+           // Toast.makeText(requireContext(), resString, Toast.LENGTH_SHORT).show()
+            CustomToastManager.show(
+                requireContext(),resString,5000
+            )
         }
     }
 
@@ -265,6 +269,15 @@ class MatterScannedResultFragment : Fragment() {
                     Callback::class.java
                 ).navigateToDemo(matterDishwasherFragment, model)
             }
+
+            AIR_QUALITY_SENSOR_TYPE ->{
+                val matterAirQualitySensorFragment = MatterAirQualitySensorFragment.newInstance()
+                FragmentUtils.getHost(
+                    this@MatterScannedResultFragment,
+                    Callback::class.java
+                ).navigateToDemo(matterAirQualitySensorFragment, model)
+            }
+
 
             else -> {
                 println("Unhandled Operation....")

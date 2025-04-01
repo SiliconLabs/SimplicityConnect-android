@@ -70,6 +70,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
+                android:id="@+id/container_more_less_info"
                 android:layout_height="wrap_content" >
 
                 <com.google.android.material.textview.MaterialTextView

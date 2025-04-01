@@ -11,6 +11,7 @@ import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
 import com.siliconlabs.bledemo.databinding.ActivityEslDemoBinding
 import com.siliconlabs.bledemo.features.demo.esl_demo.fragments.TagDataFragment
 import com.siliconlabs.bledemo.features.demo.esl_demo.model.QrCodeData
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
 import io.github.g00fy2.quickie.config.BarcodeFormat
@@ -107,7 +108,10 @@ class EslDemoActivity : BaseDemoActivity() {
     }
 
     private fun showLongToast(message: String) {
-        runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_LONG).show() }
+        runOnUiThread {
+            //Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+            CustomToastManager.show(this@EslDemoActivity,message,5000)
+        }
     }
 
     override fun onRequestPermissionsResult(

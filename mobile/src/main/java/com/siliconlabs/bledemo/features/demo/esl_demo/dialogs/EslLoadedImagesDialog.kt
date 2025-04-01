@@ -15,7 +15,7 @@ import com.siliconlabs.bledemo.databinding.DialogEslLoadedImagesBinding
 import com.siliconlabs.bledemo.features.demo.esl_demo.adapters.LoadedImagesAdapter
 
 abstract class EslLoadedImagesDialog(
-    private val imageArray: Array<Uri?>,
+    val imageArray: Array<Uri?>,
     protected val callback: Callback,
 ) : BaseDialogFragment() {
 
@@ -95,6 +95,7 @@ abstract class EslLoadedImagesDialog(
         fun onUploadButtonClicked(slotIndex: Int, uri: Uri, displayAfterUpload: Boolean)
         fun onDisplayButtonClicked(slotIndex: Int)
         fun onCancelButtonClicked()
+        fun onShowingUploadDialogAgain()
     }
 
 }

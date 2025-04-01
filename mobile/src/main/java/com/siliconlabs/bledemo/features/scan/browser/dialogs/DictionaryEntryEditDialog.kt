@@ -10,6 +10,7 @@ import com.siliconlabs.bledemo.features.scan.browser.adapters.MappingCallback
 import com.siliconlabs.bledemo.features.scan.browser.models.Mapping
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.DialogDictionaryEntryEditBinding
+import com.siliconlabs.bledemo.utils.CustomToastManager
 
 class DictionaryEntryEditDialog(
         private val name: String,
@@ -44,7 +45,9 @@ class DictionaryEntryEditDialog(
                     callback.onNameChanged(Mapping(UUID, newName))
                     dismiss()
                 } else {
-                    Toast.makeText(context, getString(R.string.name_field_cannot_be_empty), Toast.LENGTH_SHORT).show()
+                   // Toast.makeText(context, getString(R.string.name_field_cannot_be_empty), Toast.LENGTH_SHORT).show()
+                    CustomToastManager.show(requireContext(), getString(
+                        R.string.name_field_cannot_be_empty),5000)
                 }
             }
         }

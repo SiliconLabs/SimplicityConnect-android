@@ -22,6 +22,7 @@ import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.Accelerometer
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.LEDResponse
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.LEDStatusResponse
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.model.SensorsResponse
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -784,11 +785,15 @@ open class DevKitSensorControl(
                     btnGreenStatus = false
                     setOffBtnBackground()
                     imageForLightOn(view, false, false, false)
-                    Toast.makeText(
+                    /*Toast.makeText(
                         context,
                         "Failed to connect. Check your Wi-Fi connection",
                         Toast.LENGTH_SHORT
-                    ).show()
+                    ).show()*/
+                    CustomToastManager.show(
+                        context,"Failed to connect. Check your Wi-Fi connection",
+                        5000
+                    )
                 }
 
             })
@@ -837,11 +842,16 @@ open class DevKitSensorControl(
                     btnGreenStatus = false
                     setOffBtnBackground()
                     imageForLightOn(view, false, false, false)
-                    Toast.makeText(
+                   /* Toast.makeText(
                         context,
                         "Failed to connect. Check your Wi-Fi connection",
                         Toast.LENGTH_SHORT
-                    ).show()
+                    ).show()*/
+                    CustomToastManager.show(
+                        context,"Failed to connect. Check your Wi-Fi connection",
+                        5000
+                    )
+
                 }
 
             })
@@ -902,11 +912,15 @@ open class DevKitSensorControl(
                     btnGreenStatus = false
                     setOffBtnBackground()
                     imageForLightOn(view, btnRedStatus, btnBlueStatus, btnGreenStatus)
-                    Toast.makeText(
+                    /*Toast.makeText(
                         context,
                         "Failed to connect. Check your Wi-Fi connection",
                         Toast.LENGTH_SHORT
-                    ).show()
+                    ).show()*/
+                    CustomToastManager.show(
+                        context,"Failed to connect. Check your Wi-Fi connection",
+                        5000
+                    )
                 }
 
             })
@@ -971,11 +985,16 @@ open class DevKitSensorControl(
                     btnGreenStatus = false
                     setOffBtnBackground()
                     imageForLightOn(view, false, false, false)
-                    Toast.makeText(
+                    /*Toast.makeText(
                         context,
                         "Failed to connect. Check your Wi-Fi connection",
                         Toast.LENGTH_SHORT
                     ).show()
+           */
+                    CustomToastManager.show(
+                        context,"Failed to connect. Check your Wi-Fi connection",
+                        5000
+                    )
                 }
 
             })

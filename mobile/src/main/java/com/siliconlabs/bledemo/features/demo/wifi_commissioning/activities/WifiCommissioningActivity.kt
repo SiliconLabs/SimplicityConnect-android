@@ -28,6 +28,7 @@ import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.AccessPoi
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.BoardCommand
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.SecurityMode
 import com.siliconlabs.bledemo.utils.Constants
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import timber.log.Timber
 import java.util.*
 
@@ -117,7 +118,12 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     }
 
     private fun showToastOnUi(message: String) {
-        runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_SHORT).show() }
+        runOnUiThread {
+          //  Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            CustomToastManager.show(
+                this@WifiCommissioningActivity,message,5000
+            )
+        }
     }
 
     fun onAccessPointScanned(accessPoint: AccessPoint) {

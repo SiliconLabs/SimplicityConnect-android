@@ -26,6 +26,7 @@ import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPres
 import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPresenter.RangeTestView
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import com.siliconlabs.bledemo.utils.Notifications
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -336,11 +337,14 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
 
     private fun handleConnectionError() {
         runOnUiThread {
-            Toast.makeText(
+            /*Toast.makeText(
                 this@RangeTestActivity,
                 R.string.demo_range_toast_error,
                 Toast.LENGTH_SHORT
-            ).show()
+            ).show()*/
+            CustomToastManager.show(
+                this@RangeTestActivity,getString(R.string.demo_range_toast_error),5000
+            )
             finish()
         }
     }

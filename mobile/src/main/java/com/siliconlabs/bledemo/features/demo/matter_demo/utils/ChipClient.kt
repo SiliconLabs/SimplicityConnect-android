@@ -14,6 +14,7 @@ import chip.platform.NsdManagerServiceResolver
 import chip.platform.PreferencesConfigurationManager
 import chip.platform.PreferencesKeyValueStoreManager
 import com.siliconlabs.bledemo.features.demo.matter_demo.attestation.ExampleAttestationTrustStoreDelegate
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import kotlin.coroutines.resume
@@ -62,7 +63,10 @@ object ChipClient {
     }
 
     private fun showMessage(msg: String, context: Context) {
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+      //  Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        CustomToastManager.show(
+            context,msg,5000
+        )
     }
 
     /* suspend fun getConnectedDevicePointer(context: Context, nodeId: Long): Long {

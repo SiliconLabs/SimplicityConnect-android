@@ -26,6 +26,7 @@ import com.siliconlabs.bledemo.features.scan.rssi_graph.views.ChartView
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 import com.siliconlabs.bledemo.home_screen.base.LocationDependent
 import com.siliconlabs.bledemo.home_screen.base.NotificationDependent
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.ScheduledThreadPoolExecutor
@@ -249,8 +250,9 @@ class RssiGraphFragment : BaseServiceDependentMainMenuFragment() {
                 viewModel.sortDevices()
                 labelAdapter.updateLabels(viewModel.getLabelViewsState())
                 _binding.rssiLabelWithDevices.smoothScrollTo(0, 0)
-                Toast.makeText(requireContext(), getString(R.string.rssi_labels_sorted_by_descending_rssi),
-                        Toast.LENGTH_SHORT).show()
+                /*Toast.makeText(requireContext(), getString(R.string.rssi_labels_sorted_by_descending_rssi),
+                        Toast.LENGTH_SHORT).show()*/
+                CustomToastManager.show(requireContext(),getString(R.string.rssi_labels_sorted_by_descending_rssi),5000)
                 true
             }
             R.id.rssi_csv_export -> {
@@ -301,11 +303,15 @@ class RssiGraphFragment : BaseServiceDependentMainMenuFragment() {
     }
 
     private fun showLongToast(@StringRes message: Int) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+       // Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+        CustomToastManager.show(requireContext(), getString(message),5000)
+
     }
 
     private fun showShortToast(@StringRes message: Int) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+       // Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        CustomToastManager.show(requireContext(), getString(message),5000)
+
     }
 
 

@@ -34,6 +34,7 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDia
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.FragmentUtils
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.MessageDialogFragment
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -315,7 +316,10 @@ class MatterTemperatureSensorFragment : Fragment() {
 
     private fun showMessage(msg: String) {
         requireActivity().runOnUiThread {
-            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+           // Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+            CustomToastManager.show(
+                requireContext(),msg,5000
+            )
         }
     }
 

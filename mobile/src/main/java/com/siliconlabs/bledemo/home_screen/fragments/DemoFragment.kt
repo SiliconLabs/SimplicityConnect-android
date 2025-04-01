@@ -47,6 +47,8 @@ import com.siliconlabs.bledemo.home_screen.menu_items.RangeTest
 import com.siliconlabs.bledemo.home_screen.menu_items.Throughput
 import com.siliconlabs.bledemo.home_screen.menu_items.WiFiThroughput
 import com.siliconlabs.bledemo.home_screen.menu_items.WifiCommissioning
+import com.siliconlabs.bledemo.utils.BLEUtils
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -270,6 +272,7 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
         if (demoItem.connectType == BluetoothService.GattConnectType.MATTER_DEMO) {
             requireContext().startActivity(Intent(requireContext(), MatterDemoActivity::class.java))
         } else if (demoItem.connectType == BluetoothService.GattConnectType.RANGE_TEST) {
+            BLEUtils.GATT_DEVICE_SELECTED = BluetoothService.GattConnectType.RANGE_TEST
             startActivity(Intent(requireContext(), RangeTestActivity::class.java))
         } else if (demoItem.connectType == BluetoothService.GattConnectType.WIFI_OTA_UPDATE) {
             if (isNetworkAvailable(context)) {
@@ -285,11 +288,12 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                     it.show(childFragmentManager, "ota_file_selection_dialog")
                 }
             } else {
-                Toast.makeText(
+                /*Toast.makeText(
                     requireContext(),
                     getString(R.string.turn_on_wifi),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(requireContext(),getString(R.string.turn_on_wifi),5000)
             }
         } else if(demoItem.connectType == BluetoothService.GattConnectType.WIFI_THROUGHPUT_TEST){
             if (isNetworkAvailable(context)) {
@@ -305,14 +309,17 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                     )
                 )
             }else {
-                Toast.makeText(
+                /*Toast.makeText(
                     requireContext(),
                     getString(R.string.turn_on_wifi),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(requireContext(),getString(R.string.turn_on_wifi),5000)
+
             }
         } else {
             println("BLE_PROV demoItem:${demoItem.connectType}")
+            BLEUtils.GATT_DEVICE_SELECTED = demoItem.connectType
             selectDeviceDialog = SelectDeviceDialog.newDialog(demoItem.connectType)
             selectDeviceDialog?.show(childFragmentManager, "select_device_dialog")
         }
@@ -377,24 +384,30 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                 otaFileManager?.otaFile?.let {
                     startOtaProcess()
                 } ?: if (otaFileManager?.otaFilename != null) {
-                    Toast.makeText(
+                    /*Toast.makeText(
                         requireContext(),
                         getString(R.string.incorrect_file),
                         Toast.LENGTH_SHORT
-                    ).show()
+                    ).show()*/
+                    CustomToastManager.show(requireContext(), getString(R.string.incorrect_file),5000)
+
                 } else {
-                    Toast.makeText(
+                    /*Toast.makeText(
                         requireContext(),
                         getString(R.string.no_file_chosen),
                         Toast.LENGTH_SHORT
-                    ).show()
+                    ).show()*/
+                    CustomToastManager.show(requireContext(), getString(R.string.no_file_chosen),5000)
+
                 }
             } else {
-                Toast.makeText(
+                /*Toast.makeText(
                     requireContext(),
                     getString(R.string.port_id_validation),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(requireContext(), getString(R.string.port_id_validation),5000)
+
             }
         }
 
@@ -694,17 +707,20 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                         otaFileManager?.readFile(it).toString()
                         otaFileSelectionDialog?.enableUploadButton()
                     } else {
-                        Toast.makeText(
+                        /*Toast.makeText(
                             requireContext(),
                             getString(R.string.incorrect_file),
                             Toast.LENGTH_SHORT
-                        ).show()
+                        ).show()*/
+                        CustomToastManager.show(requireContext(),getString(R.string.incorrect_file),5000)
                     }
-                } ?: Toast.makeText(
+                } ?: /*Toast.makeText(
                     requireContext(),
                     getString(R.string.chosen_file_not_found),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(requireContext(),getString(R.string.chosen_file_not_found),5000)
+
             }
         }
     }

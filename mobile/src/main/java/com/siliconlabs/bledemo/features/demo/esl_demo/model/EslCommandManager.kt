@@ -41,6 +41,14 @@ class EslCommandManager(
         sendWriteCommand(message)
     }
 
+    fun terminateLoading() {
+        val message = buildString {
+            //append(EslCommand.CONFIGURE)
+            append("0x01")
+        }
+        sendWriteCommand(message)
+    }
+
     fun loadTagsInfo() {
         val message = EslCommand.LOAD_INFO.message
         sendWriteCommand(message)

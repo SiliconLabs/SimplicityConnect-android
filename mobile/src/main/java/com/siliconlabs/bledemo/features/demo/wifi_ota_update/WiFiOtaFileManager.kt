@@ -5,6 +5,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.widget.Toast
 import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import java.util.*
 
 class WiFiOtaFileManager(private val context: Context) {
@@ -41,8 +42,11 @@ class WiFiOtaFileManager(private val context: Context) {
         context.contentResolver.openInputStream(uri)?.let {
             otaFile = ByteArray(it.available())
             it.read(otaFile)
-        } ?: Toast.makeText(context, context.getString(R.string.problem_while_preparing_the_file),
-                Toast.LENGTH_LONG).show()
+        } ?: /*Toast.makeText(context, context.getString(R.string.problem_while_preparing_the_file),
+                Toast.LENGTH_LONG).show()*/
+        CustomToastManager.show(
+            context,context.getString(R.string.problem_while_preparing_the_file),5000
+        )
     }
 
     enum class UploadMode {

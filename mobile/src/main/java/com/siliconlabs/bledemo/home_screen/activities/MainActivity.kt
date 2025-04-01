@@ -2,6 +2,10 @@ package com.siliconlabs.bledemo.home_screen.activities
 
 import android.Manifest
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -9,6 +13,7 @@ import android.view.*
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.siliconlabs.bledemo.base.activities.BaseActivity
@@ -18,6 +23,7 @@ import com.siliconlabs.bledemo.databinding.ActivityMainBinding
 import com.siliconlabs.bledemo.home_screen.dialogs.PermissionsDialog
 import com.siliconlabs.bledemo.home_screen.viewmodels.MainActivityViewModel
 import com.siliconlabs.bledemo.home_screen.views.HidableBottomNavigationView
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -42,6 +48,16 @@ open class MainActivity : BaseActivity(),
         Manifest.permission.BLUETOOTH_CONNECT
     )
 
+    private val toastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == ACTION_SHOW_CUSTOM_TOAST) {
+                val message = intent.getStringExtra(EXTRA_TOAST_MESSAGE)
+                message?.let {
+                    CustomToastManager.show(this@MainActivity, it)
+                }
+            }
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.MainAppTheme)
 
@@ -55,6 +71,12 @@ open class MainActivity : BaseActivity(),
 
         handlePermissions()
         setupMainNavigationListener()
+
+
+
+        // Register the receiver
+        val filter = IntentFilter(ACTION_SHOW_CUSTOM_TOAST)
+        LocalBroadcastManager.getInstance(this).registerReceiver(toastReceiver, filter)
     }
 
     override fun onResume() {
@@ -188,9 +210,17 @@ open class MainActivity : BaseActivity(),
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister the receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(toastReceiver)
+    }
+
     companion object {
         private const val PERMISSIONS_REQUEST_CODE = 400
         // private const val IMPORT_EXPORT_CODE_VERSION = 20
+        const val ACTION_SHOW_CUSTOM_TOAST = "com.example.ACTION_SHOW_CUSTOM_TOAST"
+        const val EXTRA_TOAST_MESSAGE = "com.example.EXTRA_TOAST_MESSAGE"
     }
 //TODO: handle migration. See BTAPP-1285 for clarification.
 /*

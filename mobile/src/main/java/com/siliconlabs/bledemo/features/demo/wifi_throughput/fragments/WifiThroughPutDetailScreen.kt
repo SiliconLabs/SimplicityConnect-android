@@ -23,6 +23,7 @@ import com.siliconlabs.bledemo.features.demo.wifi_throughput.activities.WifiThro
 import com.siliconlabs.bledemo.features.demo.wifi_throughput.adapter.WifiThroughputAdapter
 import com.siliconlabs.bledemo.features.demo.wifi_throughput.utils.ThroughputUtils
 import com.siliconlabs.bledemo.features.demo.wifi_throughput.viewmodel.WifiThroughputViewModel
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -133,8 +134,11 @@ class WifiThroughPutDetailScreen : Fragment() {
                 binding.start.isEnabled = true
                 recyclerView.visibility = View.GONE
                // binding.finalResultLl.visibility = View.GONE
-                Toast.makeText(context,
-                    getString(R.string.connection_couldn_t_be_established), Toast.LENGTH_LONG).show()
+                /*Toast.makeText(context,
+                    getString(R.string.connection_couldn_t_be_established), Toast.LENGTH_LONG).show()*/
+                CustomToastManager.show(
+                    requireContext(),getString(R.string.connection_couldn_t_be_established),5000
+                )
                 viewModel.stop()
                 requireActivity().supportFragmentManager.popBackStack()
                 (activity as? WifiThroughputActivity)?.updateActionBarTitle(requireContext().getString(R.string.wifi_title_Throughput))
@@ -146,8 +150,11 @@ class WifiThroughPutDetailScreen : Fragment() {
                 binding.start.isEnabled = true
                 recyclerView.visibility = View.GONE
                 // binding.finalResultLl.visibility = View.GONE
-                Toast.makeText(context,
-                    getString(R.string.ensure_right_combination_of_fw_is_flashed), Toast.LENGTH_LONG).show()
+                /*Toast.makeText(context,
+                    getString(R.string.ensure_right_combination_of_fw_is_flashed), Toast.LENGTH_LONG).show()*/
+                CustomToastManager.show(
+                    requireContext(),getString(R.string.ensure_right_combination_of_fw_is_flashed),5000
+                )
                 viewModel.stop()
                 requireActivity().supportFragmentManager.popBackStack()
                 (activity as? WifiThroughputActivity)?.updateActionBarTitle(requireContext().getString(R.string.wifi_title_Throughput))

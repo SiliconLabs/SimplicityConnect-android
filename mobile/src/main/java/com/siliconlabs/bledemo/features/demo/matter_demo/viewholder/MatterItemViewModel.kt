@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.MatterScannedListItemBinding
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.AIR_QUALITY_SENSOR_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.CONTACT_SENSOR_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DISHWASHER_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.ENHANCED_COLOR_LIGHT_TYPE
@@ -28,7 +29,9 @@ class MatterItemViewModel(
         binding.textViewHeader.text = get.matterName
 
         when (get.deviceType) {
-            DIMMABLE_LIGHT_TYPE, ENHANCED_COLOR_LIGHT_TYPE, ON_OFF_LIGHT_TYPE, COLOR_TEMPERATURE_LIGHT_TYPE -> binding.imageView.setImageResource(R.drawable.matter_light_list)
+            DIMMABLE_LIGHT_TYPE, ENHANCED_COLOR_LIGHT_TYPE, ON_OFF_LIGHT_TYPE, COLOR_TEMPERATURE_LIGHT_TYPE
+                -> binding.imageView.setImageResource(R.drawable.matter_light_list)
+
             THERMOSTAT_TYPE -> binding.imageView.setImageResource(R.drawable.matter_thermostat)
             WINDOW_COVERING_TYPE -> binding.imageView.setImageResource(R.drawable.matter_window_close)
             DOOR_LOCK_TYPE -> binding.imageView.setImageResource(R.drawable.matter_door_lock)
@@ -37,6 +40,7 @@ class MatterItemViewModel(
             TEMPERATURE_SENSOR_TYPE -> binding.imageView.setImageResource(R.drawable.matter_thermometer_list)
             DIMMABLE_PLUG_IN_UNIT_TYPE -> binding.imageView.setImageResource(R.drawable.matter_plug_off)
             DISHWASHER_TYPE -> binding.imageView.setImageResource(R.drawable.matter_dishwasher_list)
+            AIR_QUALITY_SENSOR_TYPE -> binding.imageView.setImageResource(R.drawable.matter_air_quality_sensor)
 
             else -> println("To Be Implemented...")
         }

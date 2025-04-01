@@ -30,6 +30,7 @@ import android.view.View.*
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
@@ -53,6 +54,7 @@ import com.siliconlabs.bledemo.features.scan.browser.adapters.DebugModeCallback
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 import com.siliconlabs.bledemo.home_screen.base.LocationDependent
 import com.siliconlabs.bledemo.home_screen.base.NotificationDependent
+import com.siliconlabs.bledemo.utils.CustomToastManager
 
 
 class BrowserFragment : BaseServiceDependentMainMenuFragment(),
@@ -329,8 +331,7 @@ class BrowserFragment : BaseServiceDependentMainMenuFragment(),
                         model.sortDevices()
                         adapter.updateDevices(model.getBluetoothInfoViewsState(), withMoves = true)
                         viewBinding.rvDebugDevices.scrollToPosition(0)
-                        Toast.makeText(requireContext(), getString(R.string.devices_sorted_by_descending_rssi),
-                                Toast.LENGTH_SHORT).show()
+                        CustomToastManager.show(requireContext(),getString(R.string.devices_sorted_by_descending_rssi),5000)
                     }
                 }
                 true
@@ -361,11 +362,17 @@ class BrowserFragment : BaseServiceDependentMainMenuFragment(),
             handler.postDelayed(refreshScanRunnable, RESTART_SCAN_TIMEOUT)
         } else {
             if (activityViewModel?.getIsBluetoothOn() != true) {
-                Toast.makeText(requireContext(), getString(R.string.bluetooth_disabled), Toast.LENGTH_SHORT).show()
+                //Toast.makeText(requireContext(), getString(R.string.bluetooth_disabled), Toast.LENGTH_SHORT).show()
+                CustomToastManager.show(requireContext(),getString(R.string.bluetooth_disabled),5000)
+
             } else if (activityViewModel?.getAreBluetoothPermissionsGranted() != true) {
-                Toast.makeText(requireContext(), getString(R.string.bluetooth_permissions_denied), Toast.LENGTH_SHORT).show()
+                //Toast.makeText(requireContext(), getString(R.string.bluetooth_permissions_denied), Toast.LENGTH_SHORT).show()
+                CustomToastManager.show(requireContext(),getString(R.string.bluetooth_permissions_denied),5000)
+
             } else if (activityViewModel?.getIsLocationPermissionGranted() != true) {
-                Toast.makeText(requireContext(), getString(R.string.location_permission_denied), Toast.LENGTH_SHORT).show()
+               // Toast.makeText(requireContext(), getString(R.string.location_permission_denied), Toast.LENGTH_SHORT).show()
+                CustomToastManager.show(requireContext(),getString(R.string.location_permission_denied),5000)
+
             }
         }
         viewBinding.swipeRefreshContainer.post { viewBinding.swipeRefreshContainer.isRefreshing = false }
@@ -415,7 +422,9 @@ class BrowserFragment : BaseServiceDependentMainMenuFragment(),
 
     private val gattCallback = object : TimeoutGattCallback() {
         override fun onTimeout() {
-            Toast.makeText(requireContext(), getString(R.string.toast_connection_timed_out), Toast.LENGTH_SHORT).show()
+           /* Toast.makeText(requireContext(), getString(R.string.toast_connection_timed_out), Toast.LENGTH_SHORT).show()*/
+            CustomToastManager.show(requireContext(), getString(
+                R.string.toast_connection_timed_out),5000)
             hideConnectingAnimation()
             deviceToConnect = null
         }
@@ -468,7 +477,8 @@ class BrowserFragment : BaseServiceDependentMainMenuFragment(),
             val deviceName = if (TextUtils.isEmpty(gatt.device.name)) getString(R.string.not_advertising_shortcut) else gatt.device.name
             if (deviceToConnect != null && deviceToConnect?.address!! == gatt.device.address) {
                 deviceToConnect = null
-                Toast.makeText(requireContext(), getFailedConnectingToDeviceMessage(deviceName, status), Toast.LENGTH_LONG).show()
+             // Toast.makeText(requireContext(), getFailedConnectingToDeviceMessage(deviceName, status), Toast.LENGTH_LONG).show()
+                CustomToastManager.show(requireContext(),getFailedConnectingToDeviceMessage(deviceName, status),5000)
             } else {
                 (activity as MainActivity).showLongMessage(
                         if (status == 0) getString(R.string.device_disconnected_successfully, getDeviceName(gatt))
@@ -482,6 +492,8 @@ class BrowserFragment : BaseServiceDependentMainMenuFragment(),
         deviceToConnect?.let {
             Intent(requireContext(), DeviceServicesActivity::class.java).apply {
                 putExtra(DeviceServicesActivity.CONNECTED_DEVICE, it.device)
+                putExtra(RECYCLERVIEW_POSITION, devicesAdapter?.getItemPosition())
+                putExtra(ORIGIN,"BrowserFragment")
             }.also {
                 activityResultCallback.launch(it)
             }
@@ -517,7 +529,7 @@ class BrowserFragment : BaseServiceDependentMainMenuFragment(),
         }
     }
 
-    private val debugModeCallback = object : DebugModeCallback {
+     var debugModeCallback = object : DebugModeCallback {
         override fun connectToDevice(position: Int, deviceInfo: BluetoothDeviceInfo) {
             if (viewModel.getIsScanningOn()) {
                 viewModel.setIsScanningOn(false)
@@ -567,5 +579,8 @@ class BrowserFragment : BaseServiceDependentMainMenuFragment(),
         private const val SCAN_UPDATE_PERIOD = 1000L //ms
         private const val START_ACTIVITY_DELAY = 250L
         private const val ANIMATION_DELAY = 1000L // give time to display animation
+        const val RECYCLERVIEW_POSITION = "rv_position"
+        const val ORIGIN = "origin"
+
     }
 }

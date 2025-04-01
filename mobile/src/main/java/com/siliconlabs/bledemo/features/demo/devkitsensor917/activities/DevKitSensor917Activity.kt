@@ -24,6 +24,7 @@ import com.siliconlabs.bledemo.features.demo.devkitsensor917.utils.DevKitSensorC
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.utils.DevKitSensorControl
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.utils.DevKitSensorSharedData
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -70,7 +71,11 @@ class DevKitSensor917Activity : AppCompatActivity() {
             binding.envGridPlace.visibility = View.GONE
             binding.envGrid.visibility = View.GONE
             binding.placeholder.visibility = View.VISIBLE
-            Toast.makeText(this, "Please turn the WiFi Setting", Toast.LENGTH_SHORT).show()
+          //  Toast.makeText(this, "Please turn the WiFi Setting", Toast.LENGTH_SHORT).show()
+              CustomToastManager.show(
+                  this@DevKitSensor917Activity,"Please turn the WiFi Setting",
+                  5000
+              )
         }
     }
 
@@ -98,11 +103,16 @@ class DevKitSensor917Activity : AppCompatActivity() {
                 } else {
                     removeProgress()
                     runOnUiThread {
-                        Toast.makeText(
+                        /*Toast.makeText(
                             baseContext,
                             "API All Sensors Response failed",
                             Toast.LENGTH_SHORT
-                        ).show()
+                        ).show()*/
+                        CustomToastManager.show(
+                            this@DevKitSensor917Activity,
+                            "API All Sensors Response failed",
+                            5000
+                        )
                     }
 
                     Timber.tag(TAG).e("API All Sensors Response failed:${response.message()}")

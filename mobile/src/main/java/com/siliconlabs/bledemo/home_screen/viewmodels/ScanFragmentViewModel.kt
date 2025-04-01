@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGatt
 import android.content.Context
 import android.graphics.Color
 import android.os.SystemClock
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -282,10 +283,15 @@ class ScanFragmentViewModel(private val context: Context) : ScannerViewModel() {
     }
 
     fun setDeviceConnectionState(position: Int, connectionState: BluetoothDeviceInfo.ConnectionState) {
-        _filteredDevices.postValue(_filteredDevices.value?.apply {
-            val newInfo = this[position].bluetoothInfo.apply { this.connectionState = connectionState }
-            set(position, this[position].copy(bluetoothInfo = newInfo))
-        })
+        val currentList = _filteredDevices.value
+        if (currentList != null && position >= 0 && position < currentList.size) {
+            _filteredDevices.postValue(currentList.apply {
+                val newInfo = this[position].bluetoothInfo.apply { this.connectionState = connectionState }
+                set(position, this[position].copy(bluetoothInfo = newInfo))
+            })
+        } else {
+            Log.e("ScanFragmentViewModel","Error: Invalid position or empty list in setDeviceConnectionState")
+        }
     }
 
     fun setDeviceConnectionState(address: String, connectionState: BluetoothDeviceInfo.ConnectionState) {

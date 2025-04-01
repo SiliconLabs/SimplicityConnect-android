@@ -17,6 +17,7 @@ import com.siliconlabs.bledemo.features.scan.browser.utils.GlucoseManagement
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.DialogCharacteristicWriteBinding
 import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import com.siliconlabs.bledemo.utils.UuidUtils
 import kotlin.collections.ArrayList
 
@@ -208,11 +209,13 @@ class CharacteristicWriteDialog(
         for ((_, value1) in fieldsValidMap) {
             validField = value1
             if (!validField) {
-                Toast.makeText(
+                /*Toast.makeText(
                     context,
                     R.string.characteristic_dialog_invalid_input,
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(requireContext(), getString(R.string.characteristic_dialog_invalid_input), 5000)
+
                 return true
             }
         }
@@ -221,11 +224,13 @@ class CharacteristicWriteDialog(
         for ((_, value1) in fieldsInRangeMap) {
             entryInRange = value1
             if (!entryInRange) {
-                Toast.makeText(
+                /*Toast.makeText(
                     context,
                     R.string.characteristic_dialog_invalid_out_of_range,
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(requireContext(), getString(R.string.characteristic_dialog_invalid_out_of_range), 5000)
+
                 return true
             }
         }
@@ -345,11 +350,13 @@ class CharacteristicWriteDialog(
     private fun isAnyWriteFieldEmpty(): Boolean {
         editableFields.forEach {
             if (it.text.toString().isEmpty()) {
-                Toast.makeText(
+                /*Toast.makeText(
                     context,
                     R.string.You_cannot_send_empty_value_to_charac,
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(requireContext(), getString(R.string.You_cannot_send_empty_value_to_charac), 5000)
+
                 return true
             }
         }

@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -19,14 +18,13 @@ import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.GetConnectedDeviceCallbackJni
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone.Constants
-import com.siliconlabs.bledemo.databinding.FragmentMatterThermostatBinding
+import com.siliconlabs.bledemo.databinding.FragmentMatterAirQualitySensorBinding
 import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoActivity
 import com.siliconlabs.bledemo.features.demo.matter_demo.controller.GenericChipDeviceListener
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ARG_DEVICE_MODEL
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.INIT
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ON_OFF_CLUSTER_ENDPOINT
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannerFragment.Companion.SPACE
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterTemperatureSensorFragment.Companion.TEMPERATURE_UNIT
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannerFragment.Companion.AQI
 import com.siliconlabs.bledemo.features.demo.matter_demo.model.MatterScannedResultModel
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ChipClient
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
@@ -42,7 +40,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
-class MatterThermostatFragment : Fragment() {
+class MatterAirQualitySensorFragment : Fragment() {
     private lateinit var dialog: MessageDialogFragment
     val dialogTag = "MessageDialog"
     private lateinit var mPrefs: SharedPreferences
@@ -50,7 +48,7 @@ class MatterThermostatFragment : Fragment() {
         get() = ChipClient.getDeviceController(requireContext())
 
     private lateinit var scope: CoroutineScope
-    private lateinit var binding: FragmentMatterThermostatBinding
+    private lateinit var binding: FragmentMatterAirQualitySensorBinding
     private var deviceId: Long = INIT
     private var endpointId: Int = ON_OFF_CLUSTER_ENDPOINT
     private lateinit var model: MatterScannedResultModel
@@ -58,7 +56,7 @@ class MatterThermostatFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPrefs = requireContext().getSharedPreferences(
-            MatterDemoActivity.MATTER_PREF,
+            "your_preference_name",
             AppCompatActivity.MODE_PRIVATE
         )
         if (requireArguments() != null) {
@@ -125,7 +123,7 @@ class MatterThermostatFragment : Fragment() {
                                 requireActivity().supportFragmentManager.popBackStack()
                             } else {
                                 FragmentUtils.getHost(
-                                    this@MatterThermostatFragment,
+                                    this@MatterAirQualitySensorFragment,
                                     MatterDoorFragment.CallBackHandler::class.java
                                 ).onBackHandler()
                             }
@@ -166,7 +164,7 @@ class MatterThermostatFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        binding = FragmentMatterThermostatBinding.inflate(inflater, container, false)
+        binding = FragmentMatterAirQualitySensorBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -174,13 +172,17 @@ class MatterThermostatFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         (activity as MatterDemoActivity).hideQRScanner()
         scope = viewLifecycleOwner.lifecycleScope
-        deviceController.setCompletionListener(DoorChipControllerCallback())
+        deviceController
+            .setCompletionListener(AirQualitySensorChipControllerCallback())
 
         binding.btnReadValue.isLongClickable = false
         binding.btnReadValue.text = requireContext().getText(R.string.matter_temp_refresh)
 
         binding.btnReadValue.setOnClickListener {
             scope.launch { sendReadValueCommandClick() }
+        }
+        scope.launch {
+            readSensorValue()
         }
     }
 
@@ -190,7 +192,10 @@ class MatterThermostatFragment : Fragment() {
             if (requireActivity().supportFragmentManager.backStackEntryCount > 0) {
                 requireActivity().supportFragmentManager.popBackStack()
             } else {
-                FragmentUtils.getHost(this@MatterThermostatFragment, CallBackHandler::class.java)
+                FragmentUtils.getHost(
+                    this@MatterAirQualitySensorFragment,
+                    CallBackHandler::class.java
+                )
                     .onBackHandler()
             }
 
@@ -198,8 +203,8 @@ class MatterThermostatFragment : Fragment() {
         }
     }
 
-    private suspend fun getThermostatClusterForDevice(): ChipClusters.ThermostatCluster {
-        return ChipClusters.ThermostatCluster(
+    private suspend fun getAirQualitySensorClusterForDevice(): ChipClusters.AirQualityCluster {
+        return ChipClusters.AirQualityCluster(
             ChipClient.getConnectedDevicePointer(requireContext(), deviceId),
             endpointId
         )
@@ -226,37 +231,64 @@ class MatterThermostatFragment : Fragment() {
         return resultString.toDouble()
     }
 
-    private suspend fun sendReadValueCommandClick() {
-        getThermostatClusterForDevice().readLocalTemperatureAttribute(object :
-            ChipClusters.ThermostatCluster.LocalTemperatureAttributeCallback {
-            @SuppressLint("SetTextI18n")
-            override fun onSuccess(value: Int?) {
-                SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, true)
-                requireActivity().runOnUiThread {
-
-                    val resValue = roundDoubleToInt(addDecimalPointToInteger(value))
-                    Timber.tag(TAG).e(
-                        "read local temp command Success:  ${addDecimalPointToInteger(value)}"
-                    )
-                    binding.txtValue.setText(SPACE + (resValue) + TEMPERATURE_UNIT)
+    private suspend fun readSensorValue() {
+        getAirQualitySensorClusterForDevice()
+            .subscribeAirQualityAttribute(object : ChipClusters.IntegerAttributeCallback {
+                override fun onError(error: java.lang.Exception?) {
+                    SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
+                    showMessageDialog()
+                    Timber.tag(TAG).e("read local temp command failure:$error")
                 }
 
+                @SuppressLint("SetTextI18n")
+                override fun onSuccess(value: Int) {
+                    requireActivity().runOnUiThread {
+                        displayAQIValue(value)
+                    }
+                }
+            }, 0, 10)
+    }
 
-            }
+    private fun displayAQIValue(value: Int) {
+        println("Sensor VAlue: $value")
+        binding.txtValue.setText(AQI + value)
+        var status: String = "-"
+        when (value) {
+            0 -> status = getString(R.string.matter_air_quality_sensor_unknown)//UNKNOWN
+            1 -> status = getString(R.string.matter_air_quality_sensor_good) //GOOD
+            2 -> status = getString(R.string.matter_air_quality_sensor_fair) //FAIR
 
-            override fun onError(exe: Exception?) {
-                // removeProgress()
+            3 -> status = getString(R.string.matter_air_quality_sensor_moderate) //MODERATE
+            4 -> status = getString(R.string.matter_air_quality_sensor_poor) //POOR
+            5 -> status = getString(R.string.matter_air_quality_sensor_v_poor) //V_POOR
+            6 -> status = getString(R.string.matter_air_quality_sensor_e_poor) //E_POOR
+        }
+        binding.txtStatus.setText(status)
+    }
+
+    private suspend fun sendReadValueCommandClick() {
+        getAirQualitySensorClusterForDevice().readAirQualityAttribute(object :
+            ChipClusters.IntegerAttributeCallback {
+            override fun onError(error: java.lang.Exception?) {
                 SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
                 showMessageDialog()
-                Timber.tag(TAG).e("read local temp command failure:$exe")
+                Timber.tag(TAG).e("read local temp command failure:$error")
             }
+
+            @SuppressLint("SetTextI18n")
+            override fun onSuccess(value: Int) {
+                requireActivity().runOnUiThread {
+                    displayAQIValue(value)
+                }
+            }
+
         })
+
     }
 
 
     private fun showMessage(msg: String) {
         requireActivity().runOnUiThread {
-           // Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
             CustomToastManager.show(
                 requireContext(),msg,5000
             )
@@ -264,12 +296,12 @@ class MatterThermostatFragment : Fragment() {
     }
 
 
-    inner class DoorChipControllerCallback : GenericChipDeviceListener() {
+    inner class AirQualitySensorChipControllerCallback : GenericChipDeviceListener() {
         override fun onConnectDeviceComplete() {}
 
         override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
             Timber.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
-            //showMessage("Address update complete for nodeId $nodeId with code $errorCode")
+            showMessage("Address update complete for nodeId $nodeId with code $errorCode")
         }
 
         override fun onNotifyChipConnectionClosed() {
@@ -292,8 +324,7 @@ class MatterThermostatFragment : Fragment() {
 
     companion object {
         private val TAG = Companion::class.java.simpleName.toString()
-
-        fun newInstance(): MatterThermostatFragment = MatterThermostatFragment()
+        fun newInstance(): MatterAirQualitySensorFragment = MatterAirQualitySensorFragment()
     }
 
 

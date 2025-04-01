@@ -26,6 +26,7 @@ import com.siliconlabs.bledemo.features.scan.browser.views.*
 import com.siliconlabs.bledemo.features.scan.browser.utils.GlucoseManagement
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
@@ -135,18 +136,21 @@ open class FragmentCharacteristicDetail : Fragment() {
         }
         activity?.runOnUiThread {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Toast.makeText(
+                /*Toast.makeText(
                     activity,
                     getText(R.string.characteristic_write_success),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(requireContext(),getString(R.string.characteristic_write_success),5000)
                 editableFieldsDialog?.dismiss()
             } else {
-                Toast.makeText(
+                /*Toast.makeText(
                     activity,
                     getText(R.string.characteristic_write_fail),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(requireContext(),getString(R.string.characteristic_write_fail),5000)
+
             }
         }
     }

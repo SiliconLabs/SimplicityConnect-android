@@ -14,6 +14,7 @@ import android.widget.Toast
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.*
 import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import com.siliconlabs.bledemo.utils.StringUtils
 
 open class RawValueView(
@@ -118,7 +119,11 @@ open class RawValueView(
             )
             if (clipboardManager != null) {
                 clipboardManager.setPrimaryClip(clip)
-                Toast.makeText(context, R.string.Copied_to_clipboard, Toast.LENGTH_SHORT).show()
+                /*Toast.makeText(context, R.string.Copied_to_clipboard, Toast.LENGTH_SHORT).show()*/
+                context?.let {
+                    CustomToastManager.show(context,
+                        it.getString(R.string.Copied_to_clipboard),5000)
+                }
             }
         }
     }
@@ -186,8 +191,12 @@ open class RawValueView(
                                 )
                             )
                             decimalEdit.setSelection(decimalEdit.text.length)
-                            Toast.makeText(context, R.string.invalid_dec_value, Toast.LENGTH_SHORT)
-                                .show()
+                            /*Toast.makeText(context, R.string.invalid_dec_value, Toast.LENGTH_SHORT)
+                                .show()*/
+                            context?.let {
+                                CustomToastManager.show(context,
+                                    it.getString(R.string.invalid_dec_value),5000)
+                            }
                         }
                     }
                 }
@@ -264,21 +273,29 @@ open class RawValueView(
                         text = StringUtils.getStringWithoutWhitespaces(text)
                         if (isHexStringCorrect(text)) {
                             _binding.etCharValueWriteMode.setText(text)
-                        } else Toast.makeText(
+                        } else /*Toast.makeText(
                             context,
                             R.string.Incorrect_data_format,
                             Toast.LENGTH_SHORT
-                        ).show()
+                        ).show()*/
+                            context?.let {
+                                CustomToastManager.show(context,
+                                    it.getString(R.string.Incorrect_data_format),5000)
+                            }
                     }
 
                     ASCII_ID -> _binding.etCharValueWriteMode.setText(text)
                     DECIMAL_ID -> if (isDecimalCorrect(text.trim())) {
                         _binding.etCharValueWriteMode.setText(text)
-                    } else Toast.makeText(
+                    } else /*Toast.makeText(
                         context,
                         R.string.Incorrect_data_format,
                         Toast.LENGTH_SHORT
-                    ).show()
+                    ).show()*/
+                        context?.let {
+                            CustomToastManager.show(context,
+                                it.getString(R.string.Incorrect_data_format),5000)
+                        }
                 }
             }
         }

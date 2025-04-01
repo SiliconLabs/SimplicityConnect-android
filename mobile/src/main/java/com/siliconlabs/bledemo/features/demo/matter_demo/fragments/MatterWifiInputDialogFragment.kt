@@ -17,6 +17,7 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.DialogConfigureWifiMatterBinding
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterOTBRInputDialogFragment.Companion.WINDOW_SIZE
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.FragmentUtils
+import com.siliconlabs.bledemo.utils.CustomToastManager
 
 class MatterWifiInputDialogFragment : DialogFragment() {
 
@@ -66,18 +67,24 @@ class MatterWifiInputDialogFragment : DialogFragment() {
             val wifiSSID = binding.editNetworkSSID.text.toString().trim()
             val wifiPassword = binding.editWiFiPassword.text.toString().trim()
             if (wifiSSID.isBlank() || wifiPassword.isBlank()) {
-                Toast.makeText(
+                /*Toast.makeText(
                     requireContext(),
                     getString(R.string.ssid_and_password_required), Toast.LENGTH_SHORT
                 )
-                    .show()
+                    .show()*/
+                CustomToastManager.show(
+                    requireContext(),getString(R.string.ssid_and_password_required),5000
+                )
                 return@setOnClickListener
             }
             if (!FragmentUtils.isPasswordValid(wifiPassword)) {
-                Toast.makeText(
+                /*Toast.makeText(
                     requireContext(),
                     getString(R.string.password_must_be_min_8_characters), Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    requireContext(),getString(R.string.password_must_be_min_8_characters),5000
+                )
                 return@setOnClickListener
             }
             val intent = Intent()

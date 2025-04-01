@@ -1,7 +1,9 @@
 package com.siliconlabs.bledemo.features.demo.esl_demo.viewmodels
 
 import android.bluetooth.BluetoothGattCharacteristic
+import android.content.Context
 import android.net.Uri
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -433,4 +435,26 @@ class EslDemoViewModel : ViewModel() {
         private val TIMEOUT = 10.seconds
     }
 
+    fun showImageUpdateCanceledDialog(context: Context){
+        val builder = AlertDialog.Builder(context)
+        builder.setMessage("image update canceled")
+            .setPositiveButton("OK") { dialog, id ->
+                // User clicked Yes
+                dialog.dismiss()
+            }
+
+        // Create and show the AlertDialog
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+
+    fun handleCancelUploadImage(context: Context){
+       // eslCommandManager?.terminateLoading()
+        _viewState.postValue(ViewState.IdleState(null))
+        _actionState.postValue(ActionState.CommandError(EslCommand.UPDATE_IMAGE))
+        cleanupImageUpload()
+        disconnectTag()
+        showImageUpdateCanceledDialog(context)
+    }
 }

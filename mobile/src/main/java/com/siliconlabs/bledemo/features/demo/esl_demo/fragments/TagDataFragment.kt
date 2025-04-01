@@ -4,11 +4,14 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
+import android.content.Context
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.webkit.MimeTypeMap
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -43,7 +46,7 @@ import com.siliconlabs.bledemo.utils.showOnce
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
+class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data),EslLoadingDialog.EslLoadingCallBack {
 
     private val binding by viewBinding(FragmentEslTagDataBinding::bind)
     private val viewModel by viewModels<EslDemoViewModel>()
@@ -53,6 +56,8 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
     private var eslLoadingDialog: EslLoadingDialog? = null
     private var chunkSize: Int = with(Constants) { MIN_ALLOWED_MTU - ATT_HEADER_SIZE }
 
+    private var callBackESLLoadingDialog:EslLoadingDialog.EslLoadingCallBack? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -60,6 +65,15 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
         setupUiListeners()
         setupRecyclerView()
         setupDataObservers()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            callBackESLLoadingDialog = this
+        }catch (e:Exception){
+            Log.e("TAG_DATA_FRAGMENT","${e.message}")
+        }
     }
 
     private fun setupUiListeners() {
@@ -191,6 +205,7 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
     private fun showLoadingDialog(command: EslCommand, customTextData: Int? = null) {
         val customText = customTextData?.let { getCustomText(command, it) }
 
+        eslLoadingDialog?.cancelUploadOperation(callBackESLLoadingDialog)
         eslLoadingDialog?.setText(command, customText) ?: run {
             eslLoadingDialog = EslLoadingDialog(command, customText).also {
                 it.showOnce(childFragmentManager, EslLoadingDialog.FRAGMENT_NAME)
@@ -261,6 +276,13 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
         }
 
         override fun onCancelButtonClicked() = Unit
+        override fun onShowingUploadDialogAgain() {
+
+            showImageUploadDialog(
+                arrayOfNulls(3),
+                this
+            )
+        }
     }
 
     private fun getTagLoadedImagesDialogCallback(tagIndex: Int) = object : EslLoadedImagesDialog.Callback {
@@ -273,6 +295,13 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
         }
 
         override fun onCancelButtonClicked() = Unit
+        override fun onShowingUploadDialogAgain() {
+
+            showImageUploadDialog(
+                arrayOfNulls(3),
+                this
+            )
+        }
     }
 
     private fun uploadImageAfterTagConfigureCallback(tagIndex: Int) = object : EslLoadedImagesDialog.Callback {
@@ -286,6 +315,15 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
 
         override fun onCancelButtonClicked() {
             viewModel.disconnectTag()
+        }
+
+        override fun onShowingUploadDialogAgain() {
+
+            showImageUploadDialog(
+                arrayOfNulls(3),
+                this
+            )
+
         }
     }
 
@@ -372,7 +410,8 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
     ) {
         val dialog = EslUploadImageDialog(
             imageArray,
-            callback,
+            callback
+
         )
 
         showDialogFragment(dialog)
@@ -392,7 +431,7 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
         showDialogFragment(dialog)
     }
 
-    private fun showDialogFragment(dialog: DialogFragment, tag: String = ESL_DIALOG_TAG) {
+    fun showDialogFragment(dialog: DialogFragment, tag: String = ESL_DIALOG_TAG) {
         dialog.showOnce(childFragmentManager, tag)
     }
 
@@ -508,6 +547,24 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data) {
     }
     companion object {
         private const val GROUP_DISPLAY_SLOTS_COUNT = 2
-        private const val ESL_DIALOG_TAG = "esl_dialog_tag"
+        const val ESL_DIALOG_TAG = "esl_dialog_tag"
     }
+
+    override fun onUploadingImageCancelledButtonClicked() {
+
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setMessage(getString(R.string.do_you_want_to_cancel_this_image_upload))
+            .setPositiveButton(getString(R.string.button_yes)) { dialog, id ->
+                // User clicked Yes
+                viewModel.handleCancelUploadImage(requireContext())
+                dialog.dismiss()
+            }
+            .setNegativeButton(getString(R.string.button_cancel)) { dialog, id ->
+                // User clicked Cancel
+                dialog.dismiss()
+            }
+        val dialog = builder.create()
+        dialog.show()
+    }
+
 }
