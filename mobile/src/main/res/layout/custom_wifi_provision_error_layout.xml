@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@drawable/matter_popup_background"
+    android:orientation="vertical"
+    android:padding="@dimen/matter_5dp">
+
+    <TextView
+        style="@style/ErrorAlertTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/wifi_provisioning_provisioning_error_alert_tile" />
+
+    <TextView
+        android:id="@+id/tvBody"
+        style="@style/ErrorAlertBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/matter_10dp"
+        android:layout_marginBottom="@dimen/matter_10dp"
+        android:text="@string/button_ok" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black" />
+
+    <TextView
+        android:id="@+id/noBtn"
+        style="@style/SensorText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/matter_10dp"
+        android:layout_marginBottom="@dimen/matter_10dp"
+        android:padding="@dimen/matter_5dp"
+        android:text="@string/button_ok" />
+</LinearLayout>

@@ -14,7 +14,7 @@ data class Value(
 
     fun getAsFormattedText(): String {
         return when (type) {
-            Type.HEX -> "0x".plus(value.toUpperCase(Locale.ROOT))
+            Type.HEX -> "0x".plus(value.uppercase(Locale.ROOT))
             else -> value
         }
     }

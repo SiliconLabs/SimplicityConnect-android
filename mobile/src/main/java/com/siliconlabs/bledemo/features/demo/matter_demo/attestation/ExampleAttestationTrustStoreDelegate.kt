@@ -3,6 +3,7 @@ package com.siliconlabs.bledemo.features.demo.matter_demo.attestation
 import android.util.Base64
 import chip.devicecontroller.AttestationTrustStoreDelegate
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.DeviceAttestation
 import java.util.Arrays
 
 class ExampleAttestationTrustStoreDelegate(val chipDeviceController: ChipDeviceController) :
@@ -15,7 +16,7 @@ class ExampleAttestationTrustStoreDelegate(val chipDeviceController: ChipDeviceC
             .map { Base64.decode(it, Base64.DEFAULT) }
             .firstOrNull { cert ->
                 Arrays.equals(
-                    chipDeviceController.extractSkidFromPaaCert(cert),
+                   DeviceAttestation.extractSkidFromPaaCert(cert),
                     skid
                 )
             }

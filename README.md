@@ -31,7 +31,9 @@ Simplicity Connect includes many demos to test sample apps in the Silicon Labs G
 - **Matter**: Commission and control of the Matter devices over Thread and Wi-Fi.
 - **Wi-Fi OTA Firmware Update**: The Wi-Fi OTA firmware update demo demonstrates how to update the SiWx91x user application firmware over Wi-Fi connection, by downloading the image from the mobile phone.
 - **Wi-Fi 917 Sensors**: The Wi-Fi 917 Sensor demo demonstrates to read and display sensor data from 917 Dev Kit.
-- **Wi-Fi Throughput**: Wi-Fi demo feature for measuring data throughput between SiWx91x device and the mobile phone.
+- **Wi-Fi Throughput**: Wi-Fi demo feature for measuring data throughput between Si917/915 device and the mobile phone.
+- **Wi-Fi Provisioning**: Commission a Wi-Fi device via Access Point.
+- **AWS Demo**: This Demo showcases a system where sensor data is sent to AWS IoT Core using the MQTT protocol. A mobile app subscribes to specific MQTT topics to receive this sensor data in real-time. The app can also publish messages to AWS IoT Core, which are then received by the sensor device's firmware, enabling two-way communication.
 
 ## Development Features
 Simplicity Connect helps developers create and troubleshoot Bluetooth applications running on Silicon Labs’ BLE hardware. Here’s a rundown of some example functionalities.

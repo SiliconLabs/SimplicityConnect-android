@@ -9,10 +9,10 @@ data class Uuid(val uuid: String) : Parcelable {
 
     fun getAsFormattedText(withHexPrefix: Boolean = true): String {
         return if (uuid.matches(UUID_16BIT_PATTERN.toRegex())) {
-            if (withHexPrefix) "0x".plus(uuid.toUpperCase(Locale.ROOT))
-            else uuid.toUpperCase(Locale.ROOT)
+            if (withHexPrefix) "0x".plus(uuid.uppercase(Locale.ROOT))
+            else uuid.uppercase(Locale.ROOT)
         } else {
-            uuid.toLowerCase(Locale.ROOT)
+            uuid.lowercase(Locale.ROOT)
         }
     }
 

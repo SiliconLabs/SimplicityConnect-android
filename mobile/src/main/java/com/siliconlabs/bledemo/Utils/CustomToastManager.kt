@@ -2,6 +2,8 @@ package com.siliconlabs.bledemo.utils
 
 
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Service
 import android.content.Context
 import android.graphics.PixelFormat
@@ -14,44 +16,48 @@ import com.siliconlabs.bledemo.R
 import timber.log.Timber
 import java.util.logging.Logger
 
+@SuppressLint("StaticFieldLeak")
 object CustomToastManager {
     private var toastView: View? = null
     private var windowManager: WindowManager? = null
 
-    fun show(context: Context, message: String, duration: Long = 5000,showStandardToast: Boolean = true) {
+    fun show(context: Context, message: String, duration: Long = 5000) {
         val handler = Handler(Looper.getMainLooper())
-
         handler.post {
-            // Use standard Toast for non-activity contexts
-            //Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            if (context !is Activity || context.isFinishing || context.isDestroyed) {
+                return@post  // Prevent adding toast if activity is not valid
+            }
 
-            // Inflate custom layout
             val inflater = LayoutInflater.from(context)
             val customToastView = inflater.inflate(R.layout.custom_toast, null)
             val textView: TextView = customToastView.findViewById(R.id.custom_toast_text)
             textView.text = message
 
+            dismiss()  // Remove any existing toast
 
-
-            // Remove any existing toast
-            dismiss()
-
-            // Display custom toast for longer duration (only for Activity-based context)
             windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
             val params = WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_APPLICATION_PANEL,  // No special permission needed
+                WindowManager.LayoutParams.TYPE_APPLICATION_PANEL,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 PixelFormat.TRANSLUCENT
             )
+
             params.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-            params.y = 200  // Adjust position from bottom
+            params.y = 200
 
-            windowManager?.addView(customToastView, params)
-            toastView = customToastView
+            if (context.window != null) {
+                params.token = context.window.decorView.windowToken  // Set token from valid Activity window
+            }
 
-            // Auto-dismiss after duration
+            if (!context.isFinishing && !context.isDestroyed) {
+                windowManager?.addView(customToastView, params)
+                toastView = customToastView
+            }
+
+
+
             handler.postDelayed({ dismiss() }, duration)
         }
     }

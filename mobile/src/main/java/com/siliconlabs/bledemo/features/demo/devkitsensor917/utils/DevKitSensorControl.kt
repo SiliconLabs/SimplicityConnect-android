@@ -3,7 +3,11 @@ package com.siliconlabs.bledemo.features.demo.devkitsensor917.utils
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +15,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.gridlayout.widget.GridLayout
 import com.siliconlabs.bledemo.R
@@ -29,6 +33,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -41,7 +47,8 @@ open class DevKitSensorControl(
     context: Context,
     description: String?,
     icon: Drawable?
-) : LinearLayout(context, null, 0), DevKitSensor917Activity.ResponseListener {
+) :
+    LinearLayout(context, null, 0), DevKitSensor917Activity.ResponseListener {
     private var btnRedStatus = false
     private var btnGreenStatus = false
     private var btnBlueStatus = false
@@ -62,6 +69,88 @@ open class DevKitSensorControl(
 
     var sensorDemoGridItemBinding: SensorDemoGridItemBinding =
         SensorDemoGridItemBinding.inflate(LayoutInflater.from(context))
+
+    init {
+
+        val densityDpi = Resources.getSystem().displayMetrics.densityDpi
+        val cardView: CardView = sensorDemoGridItemBinding.cardviewEnvTile
+
+
+        if(densityDpi < 240){
+            Log.e("DevKitSensorDisplay","1")
+            //small
+            // Desired width in dp
+            val desiredWidthDp = 150
+
+            // Convert dp to pixels
+            val desiredWidthPx = (desiredWidthDp * Resources.getSystem().displayMetrics.density).toInt()
+
+            // Get the current layout parameters
+            val layoutParams = cardView.layoutParams as LinearLayout.LayoutParams
+
+            // Set the new width
+            layoutParams.width = desiredWidthPx
+
+            // Apply the updated layout parameters
+            cardView.layoutParams = layoutParams
+        }
+        else if(densityDpi in 240..319){
+            Log.e("DevKitSensorDisplay","2")
+
+            // Desired width in dp
+            val desiredWidthDp = 125
+
+            // Convert dp to pixels
+            val desiredWidthPx = (desiredWidthDp * Resources.getSystem().displayMetrics.density).toInt()
+
+            // Get the current layout parameters
+            val layoutParams = cardView.layoutParams as LinearLayout.LayoutParams
+
+            // Set the new width
+            layoutParams.width = desiredWidthPx
+
+            // Apply the updated layout parameters
+            cardView.layoutParams = layoutParams
+
+        }
+        else if(densityDpi in 320 .. 479){
+            // Desired width in dp
+            Log.e("DevKitSensorDisplay","3")
+
+            val desiredWidthDp = 115
+
+            // Convert dp to pixels
+            val desiredWidthPx = (desiredWidthDp * Resources.getSystem().displayMetrics.density).toInt()
+
+            // Get the current layout parameters
+            val layoutParams = cardView.layoutParams as LinearLayout.LayoutParams
+
+            // Set the new width
+            layoutParams.width = desiredWidthPx
+
+            // Apply the updated layout parameters
+            cardView.layoutParams = layoutParams
+        }
+        else{
+            // Desired width in dp
+            Log.e("DevKitSensorDisplay","4")
+
+            val desiredWidthDp = 100
+
+            // Convert dp to pixels
+            val desiredWidthPx = (desiredWidthDp * Resources.getSystem().displayMetrics.density).toInt()
+
+            // Get the current layout parameters
+            val layoutParams = cardView.layoutParams as LinearLayout.LayoutParams
+
+            // Set the new width
+            layoutParams.width = desiredWidthPx
+
+            // Apply the updated layout parameters
+            cardView.layoutParams = layoutParams
+        }
+
+    }
 
     fun setListener(tag: Any, ipAddress: String) {
         val code = tag.toString()
@@ -231,19 +320,28 @@ open class DevKitSensorControl(
                     }
                 } else {
                     //df
-                    Timber.tag(TAG)
-                        .e("MotionOrientation API Response failed: ${response.message()}")
-                    btn.isClickable = true
-                    btn.isEnabled = true
+                    withContext(Dispatchers.Main){
+                        Timber.tag(TAG)
+                            .e("MotionOrientation API Response failed: ${response.message()}")
+                        btn.isClickable = true
+                        btn.isEnabled = true
+                    }
+
                 }
             } catch (e: Exception) {
                 // Handle the exception
-                Timber.tag(TAG).e("MotionOrientation API Exception occurred ${e.message}")
-                btn.isClickable = true
-                btn.isEnabled = true
+                withContext(Dispatchers.Main){
+                    Timber.tag(TAG).e("MotionOrientation API Exception occurred ${e.message}")
+                    btn.isClickable = true
+                    btn.isEnabled = true
+                }
+
             } finally {
-                btn.isClickable = true
-                btn.isEnabled = true
+                withContext(Dispatchers.Main){
+                    btn.isClickable = true
+                    btn.isEnabled = true
+                }
+
             }
         }
     }
@@ -298,6 +396,11 @@ open class DevKitSensorControl(
 
     @SuppressLint("SetTextI18n")
     private suspend fun doInAmbientBackground(view: TextView, btn: TextView, ipAddress: String) {
+        // Disable the button immediately on the main thread
+        withContext(Dispatchers.Main) {
+            btn.isClickable = false
+            btn.isEnabled = false
+        }
         withContext(Dispatchers.IO) {
             try {
                 val url = "http://$ipAddress"
@@ -318,17 +421,18 @@ open class DevKitSensorControl(
                 } else {
                     //df
                     Timber.tag(TAG).e("API Ambient Response failed: ${response.message()}")
-                    btn.isClickable = true
-                    btn.isEnabled = true
+                    withContext(Dispatchers.Main) {
+                        btn.isClickable = true
+                        btn.isEnabled = true
+                    }
                 }
             } catch (e: Exception) {
                 // Handle the exception
                 Timber.tag(TAG).e("API Ambient Exception occurred :${e.message}")
-                btn.isClickable = true
-                btn.isEnabled = true
-            } finally {
-                btn.isClickable = true
-                btn.isEnabled = true
+                withContext(Dispatchers.Main) {
+                    btn.isClickable = true
+                    btn.isEnabled = true
+                }
             }
         }
     }
@@ -381,55 +485,69 @@ open class DevKitSensorControl(
                         btn.isClickable = true
                     }
                 } else {
-                    btn.isEnabled = true
-                    btn.isClickable = true
+                    withContext(Dispatchers.Main){
+                        btn.isEnabled = true
+                        btn.isClickable = true
+                    }
+
                     //df
                     Timber.tag(TAG).e("API Humidity Response failed:${response.message()}")
                 }
             } catch (e: Exception) {
-                btn.isEnabled = true
-                btn.isClickable = true
+                withContext(Dispatchers.Main){
+                    btn.isEnabled = true
+                    btn.isClickable = true
+                }
+
                 // Handle the exception
                 Timber.tag(TAG).e("API Humidity Exception occurred ${e.message} ")
             } finally {
-                btn.isEnabled = true
-                btn.isClickable = true
+                withContext(Dispatchers.Main){
+                    btn.isEnabled = true
+                    btn.isClickable = true
+                }
+
             }
         }
     }
 
     @SuppressLint("SetTextI18n")
     private suspend fun doInTempBackground(view: TextView, btn: TextView, ipAddress: String) {
+        // Disable the button immediately on the main thread
+        withContext(Dispatchers.Main) {
+            btn.isClickable = false
+            btn.isEnabled = false
+        }
         withContext(Dispatchers.IO) {
             try {
                 val url = "http://$ipAddress"
                 val retro = Retrofit.Builder().baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create()).build()
-                val response = retro.create(APIInterface::class.java).getTempStatus()
-
+                val response = retro.create(APIInterface::class.java).getTempStatus() // Assuming you have a getTempStatus() method
                 println("Response: $response")
                 if (response.isSuccessful) {
                     val data = response.body()
                     println("data: $data")
                     withContext(Dispatchers.Main) {
                         if (data != null) {
-                            view.text = data.temperature_celcius + " ℃"
+                            view.text = data.temperature_celcius + " °C" // Assuming you have a temperature field
                         }
                         btn.isClickable = true
                         btn.isEnabled = true
                     }
                 } else {
-                    btn.isClickable = true
-                    btn.isEnabled = true
-                    Timber.tag(TAG).e("API Temperature Response failed:${response.message()}")
+                    Timber.tag(TAG).e("API Temp Response failed: ${response.message()}")
+                    withContext(Dispatchers.Main) {
+                        btn.isClickable = true
+                        btn.isEnabled = true
+                    }
                 }
             } catch (e: Exception) {
-                btn.isClickable = true
-                btn.isEnabled = true
-                Timber.tag(TAG).e("API Temperature Exception occurred ${e.message}")
-            } finally {
-                btn.isClickable = true
-                btn.isEnabled = true
+                Timber.tag(TAG).e("API Temp Exception occurred :${e.message}")
+                withContext(Dispatchers.Main) {
+                    btn.isClickable = true
+                    btn.isEnabled = true
+                }
             }
         }
     }
@@ -619,7 +737,7 @@ open class DevKitSensorControl(
 
         offLEDBtn.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
-                setAllLEDOff(ledImageStatus, ipAddress)
+                setAllLEDOff(ledImageStatus, ipAddress,context)
             }
         }
 
@@ -800,9 +918,48 @@ open class DevKitSensorControl(
         }
     }
 
-    private suspend fun setAllLEDOff(view: ImageView, ipAddress: String) {
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
+    private suspend fun setAllLEDOff(view: ImageView, ipAddress: String, context: Context) {
         withContext(Dispatchers.IO) {
-            val url = "http://$ipAddress"
+            // 1. Validate ipAddress
+            if (ipAddress.isBlank()) {
+                // Handle the case where ipAddress is empty
+                CustomToastManager.show(
+                    context,
+                    "IP address is empty",
+                    5000
+                )
+                return@withContext
+            }
+
+            // Check if the device is connected to the internet
+            if (!isNetworkAvailable(context)) {
+                CustomToastManager.show(
+                    context,
+                    "No internet connection",
+                    5000
+                )
+                return@withContext
+            }
+
+            // 2. Use HttpUrl.parse() for robustness
+            val url = "http://$ipAddress".toHttpUrlOrNull()
+            if (url == null) {
+                // Handle the case where the URL is invalid
+                CustomToastManager.show(
+                    context,
+                    "Invalid IP address format",
+                    5000
+                )
+                return@withContext
+            }
+
             val retro = Retrofit.Builder().baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create()).build()
             val ledStatus = retro.create(APIInterface::class.java)
@@ -842,13 +999,9 @@ open class DevKitSensorControl(
                     btnGreenStatus = false
                     setOffBtnBackground()
                     imageForLightOn(view, false, false, false)
-                   /* Toast.makeText(
+                    CustomToastManager.show(
                         context,
                         "Failed to connect. Check your Wi-Fi connection",
-                        Toast.LENGTH_SHORT
-                    ).show()*/
-                    CustomToastManager.show(
-                        context,"Failed to connect. Check your Wi-Fi connection",
                         5000
                     )
 
@@ -862,68 +1015,72 @@ open class DevKitSensorControl(
     private suspend fun setAllLEDOn(view: ImageView, ipAddress: String) {
         withContext(Dispatchers.IO) {
             val url = "http://$ipAddress"
-            val retro = Retrofit.Builder().baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create()).build()
-            val ledStatus = retro.create(APIInterface::class.java)
-            val body = mapOf(
-                RED to ON,
-                GREEN to ON,
-                BLUE to ON
-            )
-            ledStatus.setAllLEdsOnOff(body).enqueue(object : Callback<LEDResponse> {
-                override fun onResponse(call: Call<LEDResponse>, response: Response<LEDResponse>) {
-                    println("Response: $response")
-                    if (response.isSuccessful) {
-                        val data = response.body()
-                        println("data: $data")
-                        if (data != null) {
-                            if (data.red.equals(OFF) && data.green.equals(OFF)
-                                && data.blue.equals(OFF)
-                            ) {
-                                btnRedStatus = false
-                                btnBlueStatus = false
-                                btnGreenStatus = false
-                                setOffBtnBackground()
-                                imageForLightOn(
-                                    view,
-                                    btnRedStatus,
-                                    btnBlueStatus,
-                                    btnGreenStatus
-                                )
-                            } else {
-                                btnRedStatus = true
-                                btnBlueStatus = true
-                                btnGreenStatus = true
-                                setOnBtnBackground()
-                                imageForLightOn(
-                                    view,
-                                    btnRedStatus,
-                                    btnBlueStatus,
-                                    btnGreenStatus
-                                )
+            if(null != url){
+                val retro = Retrofit.Builder().baseUrl(url)
+                    .addConverterFactory(GsonConverterFactory.create()).build()
+                val ledStatus = retro.create(APIInterface::class.java)
+                val body = mapOf(
+                    RED to ON,
+                    GREEN to ON,
+                    BLUE to ON
+                )
+                ledStatus.setAllLEdsOnOff(body).enqueue(object : Callback<LEDResponse> {
+                    override fun onResponse(call: Call<LEDResponse>, response: Response<LEDResponse>) {
+                        println("Response: $response")
+                        if (response.isSuccessful) {
+                            val data = response.body()
+                            println("data: $data")
+                            if (data != null) {
+                                if (data.red.equals(OFF) && data.green.equals(OFF)
+                                    && data.blue.equals(OFF)
+                                ) {
+                                    btnRedStatus = false
+                                    btnBlueStatus = false
+                                    btnGreenStatus = false
+                                    setOffBtnBackground()
+                                    imageForLightOn(
+                                        view,
+                                        btnRedStatus,
+                                        btnBlueStatus,
+                                        btnGreenStatus
+                                    )
+                                } else {
+                                    btnRedStatus = true
+                                    btnBlueStatus = true
+                                    btnGreenStatus = true
+                                    setOnBtnBackground()
+                                    imageForLightOn(
+                                        view,
+                                        btnRedStatus,
+                                        btnBlueStatus,
+                                        btnGreenStatus
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                override fun onFailure(call: Call<LEDResponse>, t: Throwable) {
-                    btnRedStatus = false
-                    btnBlueStatus = false
-                    btnGreenStatus = false
-                    setOffBtnBackground()
-                    imageForLightOn(view, btnRedStatus, btnBlueStatus, btnGreenStatus)
-                    /*Toast.makeText(
-                        context,
-                        "Failed to connect. Check your Wi-Fi connection",
-                        Toast.LENGTH_SHORT
-                    ).show()*/
-                    CustomToastManager.show(
-                        context,"Failed to connect. Check your Wi-Fi connection",
-                        5000
-                    )
-                }
+                    override fun onFailure(call: Call<LEDResponse>, t: Throwable) {
+                        btnRedStatus = false
+                        btnBlueStatus = false
+                        btnGreenStatus = false
+                        setOffBtnBackground()
+                        imageForLightOn(view, btnRedStatus, btnBlueStatus, btnGreenStatus)
+                        /*Toast.makeText(
+                            context,
+                            "Failed to connect. Check your Wi-Fi connection",
+                            Toast.LENGTH_SHORT
+                        ).show()*/
+                        CustomToastManager.show(
+                            context,"Failed to connect. Check your Wi-Fi connection",
+                            5000
+                        )
+                    }
 
-            })
+                })
+            }
+
+
         }
     }
 

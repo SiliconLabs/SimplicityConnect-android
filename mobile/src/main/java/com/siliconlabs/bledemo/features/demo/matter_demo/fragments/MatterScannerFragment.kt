@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,6 +38,9 @@ import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ChipStructs
+import chip.devicecontroller.ICDClientInfo
+import chip.devicecontroller.ICDDeviceInfo
+import chip.devicecontroller.ICDRegistrationInfo
 import chip.devicecontroller.NetworkCredentials
 import chip.setuppayload.SetupPayloadParser
 import com.google.mlkit.vision.barcode.BarcodeScanner
@@ -49,15 +53,19 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoAc
 import com.siliconlabs.bledemo.features.demo.matter_demo.controller.GenericChipDeviceListener
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ON_OFF_CLUSTER_ENDPOINT
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.AIR_QUALITY_SENSOR_TYPE
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.CONTACT_SENSOR_TYPE
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DISHWASHER_TYPE
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.ENHANCED_COLOR_LIGHT_TYPE
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DIMMABLE_LIGHT_TYPE
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DOOR_LOCK_TYPE
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.OCCUPANCY_SENSOR_TYPE
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.ON_OFF_LIGHT_TYPE
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DIMMABLE_PLUG_IN_UNIT_TYPE
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.COLOR_DIMMER_SWITCH
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.COLOR_TEMPERATURE_LIGHT_TYPE
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.CONTACT_SENSOR_TYPE
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DIMMABLE_Light_TYPE
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DIMMABLE_PLUG_IN_UNIT_TYPE
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DIMMER_SWITCH
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DISHWASHER_TYPE
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DOOR_LOCK_TYPE
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.ENHANCED_COLOR_LIGHT_TYPE
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.GENERIC_SWITCH
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.OCCUPANCY_SENSOR_TYPE
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.ON_OFF_LIGHT_SWITCH
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.ON_OFF_LIGHT_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.TEMPERATURE_SENSOR_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.THERMOSTAT_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.WINDOW_COVERING_TYPE
@@ -70,9 +78,11 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomInputDialog
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.DeviceIDUtil
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.FragmentUtils
+import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ICDCheckInCallback
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.MessageDialogFragment
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
 import com.siliconlabs.bledemo.features.iop_test.utils.DialogDeviceInfoFragment
+import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.utils.CustomToastManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -86,7 +96,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class MatterScannerFragment : Fragment() {
+class MatterScannerFragment : ICDCheckInCallback, Fragment() {
 
 
     private var customProgressDialog: CustomProgressDialog? = null
@@ -117,15 +127,15 @@ class MatterScannerFragment : Fragment() {
     private lateinit var qrCodeManualInput: String
     private var scannedDeviceList = ArrayList<MatterScannedResultModel>()
     private lateinit var mPrefs: SharedPreferences
+    private var externalICDCheckInMessageCallback: ICDCheckInMessageCallback? = null
 
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         deviceController = ChipClient.getDeviceController(requireContext())
-        mPrefs = requireContext().getSharedPreferences(
-            MatterDemoActivity.MATTER_PREF, MODE_PRIVATE
-        )
+        ChipClient.setICDCheckInCallback(this)
+        mPrefs = requireContext().getSharedPreferences("your_preference_name", MODE_PRIVATE)
         if (!hasLocationPermission()) {
             requestLocationPermission()
         }
@@ -154,7 +164,9 @@ class MatterScannerFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = FragmentMatterScannerBinding.inflate(inflater, container, false)
@@ -170,14 +182,18 @@ class MatterScannerFragment : Fragment() {
             val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
 
             if (binding.cameraView.display.rotation != null) {
-                val preview: Preview = Preview.Builder().setTargetAspectRatio(screenAspectRatio)
-                    .setTargetRotation(binding.cameraView.display.rotation).build()
+                val preview: Preview = Preview.Builder()
+                    .setTargetAspectRatio(screenAspectRatio)
+                    .setTargetRotation(binding.cameraView.display.rotation)
+                    .build()
 
                 preview.setSurfaceProvider(binding.cameraView.surfaceProvider)
 
                 // Setup barcode scanner
-                val imageAnalysis = ImageAnalysis.Builder().setTargetAspectRatio(screenAspectRatio)
-                    .setTargetRotation(binding.cameraView.display.rotation).build()
+                val imageAnalysis = ImageAnalysis.Builder()
+                    .setTargetAspectRatio(screenAspectRatio)
+                    .setTargetRotation(binding.cameraView.display.rotation)
+                    .build()
                 val cameraExecutor = Executors.newSingleThreadExecutor()
                 val barcodeScanner: BarcodeScanner = BarcodeScanning.getClient()
                 imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
@@ -201,20 +217,24 @@ class MatterScannerFragment : Fragment() {
 
     @SuppressLint("UnsafeOptInUsageError")
     private fun processImageProxy(
-        barcodeScanner: BarcodeScanner, imageProxy: ImageProxy
+        barcodeScanner: BarcodeScanner,
+        imageProxy: ImageProxy
     ) {
         val inputImage =
             InputImage.fromMediaImage(imageProxy.image!!, imageProxy.imageInfo.rotationDegrees)
-        barcodeScanner.process(inputImage).addOnSuccessListener { barcode ->
-            //Timber.tag(TAG).e("Barcodes: $barcode")
-            barcode.forEach {
-                handleScannedQrCode(it)
+        barcodeScanner.process(inputImage)
+            .addOnSuccessListener { barcode ->
+                //Timber.tag(TAG).e("Barcodes: $barcode")
+                barcode.forEach {
+                    handleScannedQrCode(it)
+                }
             }
-        }.addOnFailureListener {
-            Timber.tag(TAG).e(it.message ?: it.toString())
-        }.addOnCompleteListener {
-            imageProxy.close()
-        }
+            .addOnFailureListener {
+                Timber.tag(TAG).e(it.message ?: it.toString())
+            }
+            .addOnCompleteListener {
+                imageProxy.close()
+            }
     }
 
     private fun handleManualInput(qrCode: String) {
@@ -231,9 +251,10 @@ class MatterScannerFragment : Fragment() {
             println("Payload : $payload")
 
             if (networkSelectionDialog == null) {
-                val prev = requireActivity().supportFragmentManager.findFragmentByTag(
-                    ALERT_NTW_MODE_DIALOG_TAG
-                )
+                val prev =
+                    requireActivity().supportFragmentManager.findFragmentByTag(
+                        ALERT_NTW_MODE_DIALOG_TAG
+                    )
                 if (prev == null) {
                     val chipDeviceInfo = """
     Version: ${payload.version}
@@ -282,15 +303,17 @@ class MatterScannerFragment : Fragment() {
         Handler(Looper.getMainLooper()).post {
 
             try {
-                payload = OnboardingPayloadParser().parseQrCode(barcode.displayValue!!)
+                payload =
+                    OnboardingPayloadParser().parseQrCode(barcode.displayValue!!)
 
                 isShortDiscriminator = true
 
 
                 if (networkSelectionDialog == null) {
-                    val prev = requireActivity().supportFragmentManager.findFragmentByTag(
-                        ALERT_NTW_MODE_DIALOG_TAG
-                    )
+                    val prev =
+                        requireActivity().supportFragmentManager.findFragmentByTag(
+                            ALERT_NTW_MODE_DIALOG_TAG
+                        )
                     if (prev == null) {
                         val chipDeviceInfo = """
     Version: ${payload.version}
@@ -367,7 +390,8 @@ class MatterScannerFragment : Fragment() {
 
     private fun hasCameraPermission(): Boolean {
         return (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(
-            requireContext(), Manifest.permission.CAMERA
+            requireContext(),
+            Manifest.permission.CAMERA
         ))
     }
 
@@ -387,16 +411,20 @@ class MatterScannerFragment : Fragment() {
     }
 
     private fun hasLocationPermission(): Boolean {
-        val locationPermissionGranted = ContextCompat.checkSelfPermission(
-            requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+        val locationPermissionGranted =
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
 
         // Android 12 new permission
         var bleScanPermissionGranted = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            bleScanPermissionGranted = ContextCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.BLUETOOTH_SCAN
-            ) == PackageManager.PERMISSION_GRANTED
+            bleScanPermissionGranted =
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.BLUETOOTH_SCAN
+                ) == PackageManager.PERMISSION_GRANTED
         }
 
         return locationPermissionGranted && bleScanPermissionGranted
@@ -404,7 +432,9 @@ class MatterScannerFragment : Fragment() {
 
     @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
     ) {
         if (requestCode == REQUEST_CODE_CAMERA_PERMISSION) {
             if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
@@ -426,7 +456,9 @@ class MatterScannerFragment : Fragment() {
             .setMessage(R.string.matter_camera_unavailable_alert_subtitle)
             .setPositiveButton(R.string.matter_camera_unavailable_alert_exit) { _, _ ->
                 requireActivity().finish()
-            }.setCancelable(false).create().show()
+            }
+            .setCancelable(false)
+            .create().show()
     }
 
     private fun showLocationPermissionAlert() {
@@ -435,7 +467,9 @@ class MatterScannerFragment : Fragment() {
             .setMessage(R.string.matter_location_unavailable_alert_subtitle)
             .setPositiveButton(R.string.matter_camera_unavailable_alert_exit) { _, _ ->
                 requireActivity().finish()
-            }.setCancelable(false).create().show()
+            }
+            .setCancelable(false)
+            .create().show()
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -444,7 +478,8 @@ class MatterScannerFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
 
         deviceInfo = CHIPDeviceInfo.fromSetupPayload(
-            payload, isShortDiscriminator
+            payload,
+            isShortDiscriminator
         )
         if (resultCode == WIFI_REQ_CODE) {
             println("Matter Wifi Selected")
@@ -494,25 +529,25 @@ class MatterScannerFragment : Fragment() {
         if (inputOTBR.isBlank()) {
             //Toast.makeText(requireContext(), "input OTBR is empty", Toast.LENGTH_SHORT).show()
             CustomToastManager.show(
-                requireContext(),"input OTBR is empty",5000
+                requireContext(), "input OTBR is empty", 5000
             )
             return
         }
         val operationalDataset = dataFromHexString(inputOTBR.trim())
 
-        networkCredential = NetworkCredentialsParcelable.forThread(
-            NetworkCredentialsParcelable.ThreadCredentials(operationalDataset)
-        )
+        networkCredential = NetworkCredentialsParcelable
+            .forThread(NetworkCredentialsParcelable.ThreadCredentials(operationalDataset))
         startConnectingToDevice()
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun validateWiFiInput(wifiSSID: String, wifiPassword: String) {
-        networkCredential = NetworkCredentialsParcelable.forWiFi(
-            NetworkCredentialsParcelable.WiFiCredentials(
-                wifiSSID, wifiPassword
+        networkCredential = NetworkCredentialsParcelable
+            .forWiFi(
+                NetworkCredentialsParcelable.WiFiCredentials(
+                    wifiSSID, wifiPassword
+                )
             )
-        )
         startConnectingToDevice()
     }
 
@@ -563,10 +598,12 @@ class MatterScannerFragment : Fragment() {
             val devInfo = deviceInfo.discriminator.toString()
             showMessage(strId, devInfo)
             showMatterProgressDialog(
-                getString(R.string.matter_network_selection_alert_title), true
+                getString(R.string.matter_network_selection_alert_title),
+                true
             )
             val device = bluetoothManager.getBluetoothDevice(
-                requireContext(), deviceInfo.discriminator, deviceInfo.isShortDiscriminator
+                requireContext(),
+                deviceInfo.discriminator, deviceInfo.isShortDiscriminator
             ) ?: kotlin.run {
                 requireActivity().supportFragmentManager.popBackStack()
                 requireActivity().supportFragmentManager.popBackStack()
@@ -590,7 +627,8 @@ class MatterScannerFragment : Fragment() {
                 }
             }
             showMatterProgressDialog(
-                getString(R.string.matter_commissioning_message), true
+                getString(R.string.matter_commissioning_message),
+                true
             )
             showMessage(
                 R.string.rendezvous_over_ble_connecting_text,
@@ -606,61 +644,74 @@ class MatterScannerFragment : Fragment() {
 
             val thread = networkCredential.threadCredentials
             if (thread != null) {
-                network = NetworkCredentials.forThread(
-                    NetworkCredentials.ThreadCredentials(thread.operationalDataset)
-                )
+                network =
+                    NetworkCredentials.forThread(
+                        NetworkCredentials.ThreadCredentials(thread.operationalDataset)
+                    )
             }
             val wifi = networkCredential.wiFiCredentials
             if (wifi != null) {
-                network = NetworkCredentials.forWiFi(
-                    NetworkCredentials.WiFiCredentials(wifi.ssid, wifi.password)
-                )
+                network =
+                    NetworkCredentials.forWiFi(
+                        NetworkCredentials.WiFiCredentials(wifi.ssid, wifi.password)
+                    )
             }
 
             setAttestationDelegate()
 
             deviceController.pairDevice(
-                gatt, connId, deviceId, deviceInfo.setupPinCode, network
+                gatt,
+                connId,
+                deviceId,
+                deviceInfo.setupPinCode,
+                network
             )
             DeviceIDUtil.setNextAvailableId(requireContext(), deviceId + 1)
         }
     }
 
     private fun setAttestationDelegate() {
-        deviceController.setDeviceAttestationDelegate(DEVICE_ATTESTATION_FAILED_TIMEOUT) { devicePtr, _, errorCode ->
-            Timber.tag(TAG).e(
-                "Device attestation errorCode: $errorCode, \nLook at 'src/credentials/attestation_verifier/DeviceAttestationVerifier.h' \nAttestationVerificationResult enum to understand the errors"
-            )
+        deviceController
+            .setDeviceAttestationDelegate(DEVICE_ATTESTATION_FAILED_TIMEOUT)
+            { devicePtr, _,
+              errorCode ->
+                Timber.tag(TAG)
+                    .e(
+                        "Device attestation errorCode: $errorCode, \nLook at 'src/credentials/attestation_verifier/DeviceAttestationVerifier.h' \nAttestationVerificationResult enum to understand the errors"
+                    )
 
-            val activity = requireActivity()
-            Timber.tag(TAG).e("setAttestationDelegate()--errorCode: $errorCode")
-            if (errorCode == STATUS_PAIRING_SUCCESS) {
-                Timber.tag(TAG).e("setAttestationDelegate() In--errorCode: $errorCode")
-                activity.runOnUiThread {
-                    deviceController.continueCommissioning(devicePtr, true)
+                val activity = requireActivity()
+                Timber.tag(TAG).e("setAttestationDelegate()--errorCode: $errorCode")
+                if (errorCode == STATUS_PAIRING_SUCCESS) {
+                    Timber.tag(TAG).e("setAttestationDelegate() In--errorCode: $errorCode")
+                    activity.runOnUiThread {
+                        deviceController.continueCommissioning(devicePtr, true)
+                    }
+
+                    return@setDeviceAttestationDelegate
                 }
+                activity.runOnUiThread(Runnable {
+                    if (alertDialog != null && alertDialog?.isShowing == true) {
+                        Timber.tag(TAG).e("Dialog is already showing...")
+                        return@Runnable
+                    }
+                    alertDialog = android.app.AlertDialog.Builder(activity)
+                        .setPositiveButton(
+                            "Continue"
+                        ) { alertDialog, id ->
+                            deviceController.continueCommissioning(devicePtr, true)
+                        }
+                        .setNegativeButton(
+                            "No"
+                        ) { alertDialog, id ->
+                            deviceController.continueCommissioning(devicePtr, false)
+                        }
+                        .setTitle("Device Attestation")
+                        .setMessage("Device Attestation failed for device under commissioning. Do you wish to continue pairing?")
+                        .show()
+                })
 
-                return@setDeviceAttestationDelegate
             }
-            activity.runOnUiThread(Runnable {
-                if (alertDialog != null && alertDialog?.isShowing == true) {
-                    Timber.tag(TAG).e("Dialog is already showing...")
-                    return@Runnable
-                }
-                alertDialog = android.app.AlertDialog.Builder(activity).setPositiveButton(
-                    "Continue"
-                ) { alertDialog, id ->
-                    deviceController.continueCommissioning(devicePtr, true)
-                }.setNegativeButton(
-                    "No"
-                ) { alertDialog, id ->
-                    deviceController.continueCommissioning(devicePtr, false)
-                }.setTitle("Device Attestation")
-                    .setMessage("Device Attestation failed for device under commissioning. Do you wish to continue pairing?")
-                    .show()
-            })
-
-        }
     }
 
     private fun cancelNetworkInputDialog() {
@@ -682,9 +733,9 @@ class MatterScannerFragment : Fragment() {
 
     private fun showMessage(msg: String) {
         requireActivity().runOnUiThread {
-         //   Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+            //   Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
             CustomToastManager.show(
-                requireContext(),msg,5000
+                requireContext(), msg, 5000
             )
         }
     }
@@ -694,7 +745,11 @@ class MatterScannerFragment : Fragment() {
             val context = requireContext()
             val msg = context.getString(msgResId, stringArgs)
             Timber.tag(TAG).e("showMessage:$msg")
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            /*Toast.makeText(context, msg, Toast.LENGTH_SHORT)
+                .show()*/
+            CustomToastManager.show(
+                requireContext(), msg, 5000
+            )
         }
     }
 
@@ -705,24 +760,28 @@ class MatterScannerFragment : Fragment() {
                     if (!deviceInfoDialogShown && (deviceDialog == null || !deviceDialog!!.isShowing())) {
                         deviceInfoDialogShown = true
                         deviceDialog = DialogDeviceInfoFragment.Builder()
-                            .setTitle(getString(R.string.qr_code_info)).setMessage(message)
+                            .setTitle(getString(R.string.qr_code_info))
+                            .setMessage(message)
                             .setPositiveButton(getString(R.string.start_commissioning)) { dialog, which ->
                                 // Positive button click logic
                                 networkSelectionDialog =
                                     MatterNetworkSelectionInputDialogFragment.newInstance()
 
                                 networkSelectionDialog!!.setTargetFragment(
-                                    this, DIALOG_NTW_MODE_FRAGMENT
+                                    this,
+                                    DIALOG_NTW_MODE_FRAGMENT
                                 )
                                 networkSelectionDialog!!.show(
                                     requireActivity().supportFragmentManager,
                                     ALERT_NTW_MODE_DIALOG_TAG
                                 )
                                 deviceInfoDialogShown = false
-                            }.setNegativeButton("Cancel") { dialog, which ->
+                            }
+                            .setNegativeButton("Cancel") { dialog, which ->
                                 deviceDialog?.dismiss()
                                 deviceInfoDialogShown = false
-                            }.build()
+                            }
+                            .build()
 
                         deviceDialog?.show(parentFragmentManager, "DialogDeviceInfoFragment")
                     }
@@ -739,14 +798,16 @@ class MatterScannerFragment : Fragment() {
         when (typeNtw) {
             INPUT_NETWORK_WIFI_TYPE_SELECTED /* ProvisionNetworkType.WIFI */ -> {
                 if (wifiEntryDialog == null) {
-                    val prev = requireActivity().supportFragmentManager.findFragmentByTag(
-                        DIALOG_WIFI_INPUT_TAG
-                    )
+                    val prev =
+                        requireActivity().supportFragmentManager.findFragmentByTag(
+                            DIALOG_WIFI_INPUT_TAG
+                        )
                     if (prev == null) {
                         wifiEntryDialog = MatterWifiInputDialogFragment.newInstance()
                         wifiEntryDialog!!.setTargetFragment(this, DIALOG_WIFI_FRAGMENT)
                         wifiEntryDialog!!.show(
-                            requireActivity().supportFragmentManager, DIALOG_WIFI_INPUT_TAG
+                            requireActivity().supportFragmentManager,
+                            DIALOG_WIFI_INPUT_TAG
                         )
                     }
                 }
@@ -754,15 +815,17 @@ class MatterScannerFragment : Fragment() {
 
             INPUT_NETWORK_THREAD_TYPE_SELECTED  /*  ProvisionNetworkType.THREAD*/ -> {
                 if (otbrEntryDialog == null) {
-                    val prev = requireActivity().supportFragmentManager.findFragmentByTag(
-                        DIALOG_THREAD_INPUT_TAG
-                    )
+                    val prev =
+                        requireActivity().supportFragmentManager.findFragmentByTag(
+                            DIALOG_THREAD_INPUT_TAG
+                        )
                     if (prev == null) {
                         otbrEntryDialog = MatterOTBRInputDialogFragment.newInstance()
 
                         otbrEntryDialog!!.setTargetFragment(this, DIALOG_THREAD_FRAGMENT)
                         otbrEntryDialog!!.show(
-                            requireActivity().supportFragmentManager, DIALOG_THREAD_INPUT_TAG
+                            requireActivity().supportFragmentManager,
+                            DIALOG_THREAD_INPUT_TAG
                         )
                     }
                 }
@@ -783,7 +846,8 @@ class MatterScannerFragment : Fragment() {
         customProgressDialog!!.setCustomButtonVisible(showCancelButton) {
             deviceController.close()
             requireActivity().supportFragmentManager.popBackStack(
-                null, FragmentManager.POP_BACK_STACK_INCLUSIVE
+                null,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
             )
             sendToScanResultFragment()
 
@@ -801,9 +865,11 @@ class MatterScannerFragment : Fragment() {
         val fragment = MatterScannedResultFragment.newInstance()
         fragment.arguments = bundle
 
-        parentFragmentManager.beginTransaction().replace(
-            R.id.matter_container, fragment
-        )  // R.id.matterContainer should be the container in the activity or fragment layout where the new fragment will be placed
+        parentFragmentManager.beginTransaction()
+            .replace(
+                R.id.matter_container,
+                fragment
+            )  // R.id.matterContainer should be the container in the activity or fragment layout where the new fragment will be placed
             .addToBackStack(null)  // Add to back stack if you want the user to be able to navigate back
             .commit()
     }
@@ -822,28 +888,74 @@ class MatterScannerFragment : Fragment() {
         }
     }
 
+    private suspend fun getDescriptorClusterForDevice(): ChipClusters.DescriptorCluster {
+        return ChipClusters.DescriptorCluster(
+
+            ChipClient.getConnectedDevicePointer(requireContext(), deviceId),
+            ON_OFF_CLUSTER_ENDPOINT
+        )
+    }
+
     inner class ConnectionCallback : GenericChipDeviceListener() {
         override fun onConnectDeviceComplete() {
-            super.onConnectDeviceComplete()
+           // super.onConnectDeviceComplete()
             Timber.tag(TAG).e("onConnectDeviceComplete")
         }
 
         override fun onStatusUpdate(status: Int) {
-            super.onStatusUpdate(status)
+           // super.onStatusUpdate(status)
             Timber.tag(TAG).e("onStatusUpdate : $status.toString()")
         }
 
-        private suspend fun getDescriptorClusterForDevice(): ChipClusters.DescriptorCluster {
-            return ChipClusters.DescriptorCluster(
+        override fun onPairingComplete(errorCode: Long) {
+            Timber.tag(TAG).e("onPairingComplete: $errorCode")
+            if (errorCode != STATUS_PAIRING_SUCCESS) {
+                showMessage(R.string.rendezvous_over_ble_pairing_failure_text)
+            }
+        }
 
-                ChipClient.getConnectedDevicePointer(requireContext(), deviceId),
-                ON_OFF_CLUSTER_ENDPOINT
+        override fun onOpCSRGenerationComplete(csr: ByteArray?) {
+            Timber.tag(TAG).e("onOpCSRGenerationComplete: $String(csr)")
+        }
+
+        override fun onCloseBleComplete() {
+            Timber.tag(TAG).e("onCloseBleComplete")
+        }
+
+        override fun onError(error: Throwable?) {
+            Timber.tag(TAG).e("onError: $error")
+        }
+
+        override fun onICDRegistrationInfoRequired() {
+            Timber.tag(TAG).e("onICDRegistrationInfoRequired")
+            deviceController.updateCommissioningICDRegistrationInfo(
+                ICDRegistrationInfo.newBuilder()
+                    .setICDStayActiveDurationMsec(30000L).build()
             )
+        }
+
+        @SuppressLint("StringFormatMatches")
+        override fun onICDRegistrationComplete(
+            errorCode: Long,
+            icdDeviceInfo: ICDDeviceInfo?
+        ) {
+            requireActivity().runOnUiThread {
+                val message = getString(
+                    R.string.icd_registration_completed,
+                    icdDeviceInfo?.userActiveModeTriggerHint.toString(),
+                    icdDeviceInfo?.userActiveModeTriggerInstruction,
+                    icdDeviceInfo?.idleModeDuration.toString(),
+                    icdDeviceInfo?.activeModeDuration.toString(),
+                    icdDeviceInfo?.activeModeThreshold.toString()
+                )
+                Timber.tag(TAG).e("onICDRegistrationComplete:$message ")
+                CustomToastManager.show(requireContext(), message, 5000)
+            }
         }
 
         @SuppressLint("MissingPermission")
         override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
-            super.onCommissioningComplete(nodeId, errorCode)
+          //  super.onCommissioningComplete(nodeId, errorCode)
             Timber.tag(TAG).e("onCommissioningComplete : NodeID:  $nodeId.toString()")
             Timber.tag(TAG).e("%s%s", "onCommissioningComplete : errorCode: ", errorCode.toString())
             removeAlert()
@@ -871,36 +983,50 @@ class MatterScannerFragment : Fragment() {
                             var device = ""
 
                             when (deviceType) {
-                                DOOR_LOCK_TYPE -> device =
-                                    requireContext().getString(R.string.matter_lock_list)
+                                DOOR_LOCK_TYPE ->
+                                    device =
+                                        requireContext().getString(R.string.matter_lock_list)
 
-                                DIMMABLE_PLUG_IN_UNIT_TYPE -> device =
-                                    requireContext().getString(R.string.matter_plug_list)
+                                DIMMABLE_PLUG_IN_UNIT_TYPE ->
+                                    device =
+                                        requireContext().getString(R.string.matter_plug_list)
 
-                                OCCUPANCY_SENSOR_TYPE -> device =
-                                    requireContext().getString(R.string.matter_occupancy_sensor_list)
+                                OCCUPANCY_SENSOR_TYPE ->
+                                    device =
+                                        requireContext().getString(R.string.matter_occupancy_sensor_list)
 
-                                TEMPERATURE_SENSOR_TYPE -> device =
-                                    requireContext().getString(R.string.matter_temperature_sensor_list)
+                                TEMPERATURE_SENSOR_TYPE ->
+                                    device =
+                                        requireContext().getString(R.string.matter_temperature_sensor_list)
 
-                                CONTACT_SENSOR_TYPE -> device =
-                                    requireContext().getString(R.string.matter_contact_sensor_list)
+                                CONTACT_SENSOR_TYPE ->
+                                    device =
+                                        requireContext().getString(R.string.matter_contact_sensor_list)
 
-                                THERMOSTAT_TYPE -> device =
-                                    requireContext().getString(R.string.matter_thermostat_list)
+                                THERMOSTAT_TYPE ->
+                                    device =
+                                        requireContext().getString(R.string.matter_thermostat_list)
 
-                                DIMMABLE_LIGHT_TYPE, ENHANCED_COLOR_LIGHT_TYPE, ON_OFF_LIGHT_TYPE, COLOR_TEMPERATURE_LIGHT_TYPE -> device =
-                                    requireContext().getString(R.string.matter_light_list)
+                                DIMMABLE_Light_TYPE, ENHANCED_COLOR_LIGHT_TYPE, ON_OFF_LIGHT_TYPE, COLOR_TEMPERATURE_LIGHT_TYPE ->
+                                    device =
+                                        requireContext().getString(R.string.matter_light_list)
 
-                                WINDOW_COVERING_TYPE -> device =
-                                    requireContext().getString(R.string.matter_window_list)
+                                WINDOW_COVERING_TYPE ->
+                                    device =
+                                        requireContext().getString(R.string.matter_window_list)
 
-                                DISHWASHER_TYPE -> device =
-                                    requireContext().getString(R.string.matter_dishwahser_list)
+                                DISHWASHER_TYPE ->
+                                    device =
+                                        requireContext().getString(R.string.matter_dish_washer_list)
 
                                 AIR_QUALITY_SENSOR_TYPE ->
                                     device =
                                         requireContext().getString(R.string.matter_air_quality_sensor_list)
+
+                                GENERIC_SWITCH, DIMMER_SWITCH, COLOR_DIMMER_SWITCH,
+                                    ON_OFF_LIGHT_SWITCH ->
+                                        device =
+                                            requireContext().getString(R.string.matter_light_switch)
 
                                 else -> device = matterScanDevice.name
 
@@ -910,7 +1036,9 @@ class MatterScannerFragment : Fragment() {
 
                             val deviceName = device + COLON_WITH_SPACE + deviceId
                             println("device Info: ${deviceName}  DeviceId: ${deviceId}")
-
+                            BLEUtils.MATTER_DEVICE_ID = "$deviceId"
+                            BLEUtils.MATTER_DEVICE_NAME = deviceName
+                            BLEUtils.MATTER_DEVICE_TYPE = deviceType
                             showEditDeviceNameDialog(device, valueList)
 
 
@@ -922,9 +1050,7 @@ class MatterScannerFragment : Fragment() {
                         ) {
 
                             val customInputDialog = CustomInputDialog.newInstance(
-                                requireContext(),
-                                device,
-                                getString(R.string.add_device_name),
+                                requireContext(), device, getString(R.string.add_device_name),
                                 getString(
                                     R.string.add_device_subtitle
                                 )
@@ -940,7 +1066,8 @@ class MatterScannerFragment : Fragment() {
                                     isDeviceOnline = true
                                 )
                                 FragmentUtils.getHost(
-                                    this@MatterScannerFragment, CallBack::class.java
+                                    this@MatterScannerFragment,
+                                    CallBack::class.java
                                 ).onCommissionCompleteLoadData(matterInfo)
                             }
 
@@ -997,13 +1124,21 @@ class MatterScannerFragment : Fragment() {
         stopCamera()
     }
 
+    override fun notifyCheckInMessage(info: ICDClientInfo) {
+        externalICDCheckInMessageCallback?.notifyCheckInMessage()
+    }
+
 
     interface CallBack {
         fun onCommissionCompleteLoadData(
-            matterScannedResultModel: MatterScannedResultModel
+            matterScannedResultModel:
+            MatterScannedResultModel
         )
     }
 
+    interface ICDCheckInMessageCallback {
+        fun notifyCheckInMessage()
+    }
 
     companion object {
         private val TAG = MatterScannerFragment::class.java.classes.toString()
@@ -1048,4 +1183,6 @@ class MatterScannerFragment : Fragment() {
             return fragment
         }
     }
+
+
 }

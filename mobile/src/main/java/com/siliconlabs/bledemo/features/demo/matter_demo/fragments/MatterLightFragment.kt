@@ -51,6 +51,8 @@ class MatterLightFragment : Fragment() {
     private var currLightStatus: Boolean = false
     private lateinit var matterLightFragmentJob: Job
     private val matterLightFragmentScope = CoroutineScope(Dispatchers.Main)
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPrefs = requireContext().getSharedPreferences(

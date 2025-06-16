@@ -1,9 +1,12 @@
 package com.siliconlabs.bledemo.home_screen.adapters
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.os.ParcelUuid
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.siliconlabs.bledemo.bluetooth.ble.BluetoothDeviceInfo
@@ -14,9 +17,12 @@ import com.siliconlabs.bledemo.utils.RecyclerViewUtils
 import kotlin.math.max
 
 class ScannedDevicesAdapter(
-        private var scannedDemoDevices: MutableList<BluetoothDeviceInfo>,
-        private val demoDeviceCallback: DemoDeviceCallback
-) : RecyclerView.Adapter<ScannedDevicesAdapter.ViewHolder>() {
+    private var scannedDemoDevices: MutableList<BluetoothDeviceInfo>,
+    private val demoDeviceCallback: DemoDeviceCallback
+) : RecyclerView.Adapter<ScannedDevicesAdapter.ViewHolder>()
+{
+
+    var localParentContext: Context? = null
 
     override fun getItemCount(): Int {
         return scannedDemoDevices.size
@@ -29,7 +35,8 @@ class ScannedDevicesAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val viewBinding = AdapterScannedDeviceBinding.inflate(LayoutInflater.from(parent.context))
-        return ViewHolder(viewBinding).apply {
+        localParentContext = parent.context
+        return ViewHolder(viewBinding,localParentContext!!).apply {
             viewBinding.root.setOnClickListener {
                 RecyclerViewUtils.withProperAdapterPosition(this) { pos ->
                     demoDeviceCallback.onDemoDeviceClicked(scannedDemoDevices[pos])
@@ -57,8 +64,8 @@ class ScannedDevicesAdapter(
 
     fun updateList(newList: MutableList<BluetoothDeviceInfo>) {
         val listDiff = DiffUtil.calculateDiff(DiffCallback(
-                scannedDemoDevices.toList(),
-                newList.toList()
+            scannedDemoDevices.toList(),
+            newList.toList()
         ), false)
 
         scannedDemoDevices = getDeepCopyList(newList).toMutableList()
@@ -72,8 +79,8 @@ class ScannedDevicesAdapter(
     }
 
     private class DiffCallback(
-            private val oldList: List<BluetoothDeviceInfo>,
-            private val newList: List<BluetoothDeviceInfo>
+        private val oldList: List<BluetoothDeviceInfo>,
+        private val newList: List<BluetoothDeviceInfo>
     ) : DiffUtil.Callback() {
 
         override fun getOldListSize(): Int {
@@ -112,12 +119,17 @@ class ScannedDevicesAdapter(
         fun onDemoDeviceClicked(deviceInfo: BluetoothDeviceInfo)
     }
 
-    class ViewHolder(private val viewBinding: AdapterScannedDeviceBinding) : RecyclerView.ViewHolder(viewBinding
-            .root) {
+    class ViewHolder(private val viewBinding: AdapterScannedDeviceBinding,val context: Context) : RecyclerView.ViewHolder(viewBinding
+        .root) {
 
+        @SuppressLint("SetTextI18n")
         fun bind(info: BluetoothDeviceInfo) {
             viewBinding.apply {
                 title.text = info.scanInfo?.getDisplayName()
+                address.text = info.scanInfo?.device?.address
+                tvRssiLabel.text = String.format(getString(context,R.string.unit_value_dbm), info.scanInfo?.rssi)
+
+
                 icon.setImageLevel(getRssiIconValue(info.rssi))
 
                 info.scanInfo?.scanRecord?.serviceUuids?.let {
@@ -146,11 +158,13 @@ class ScannedDevicesAdapter(
             }
         }
 
+        @SuppressLint("SetTextI18n")
         fun showChanges(payloads: List<Any>) {
             val oldState = (payloads.first() as PayloadChange).oldItem
             val newState = (payloads.last() as PayloadChange).newItem
 
             if (!isRssiIconLevelSame(getRssiIconValue(oldState.rssi), getRssiIconValue(newState.rssi))) {
+                viewBinding.tvRssiLabel.text = String.format(getString(context,R.string.unit_value_dbm), newState.rssi)
                 viewBinding.icon.setImageLevel(getRssiIconValue(newState.rssi))
             }
         }

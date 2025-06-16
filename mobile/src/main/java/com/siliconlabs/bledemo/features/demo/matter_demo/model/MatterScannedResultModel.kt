@@ -13,7 +13,13 @@ data class MatterScannedResultModel(
     var deviceId: Long,
     var deviceType: Int,
     var isDeviceOnline: Boolean=false,
- // val isDeleteIconVisible:Boolean
+    var isLightAndLightSwitchItemSelected: Boolean = false,
+    var isBindingInProgress:Boolean = false,
+    var isBindingSuccessful:Boolean = false,
+    var isAclWriteInProgress: Boolean = false,
+    var isUnbindingInProgress: Boolean = false
+
+    // val isDeleteIconVisible:Boolean
 ) : Parcelable {
 
 /*    fun setDeleteIconVisible(b: Boolean) {

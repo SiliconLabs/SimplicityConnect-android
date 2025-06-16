@@ -22,7 +22,7 @@ class IBeaconInfo(val uuid: String, val major: Int, val minor: Int, val power: I
                 //Convert to hex String
                 val uuidBytes = ByteArray(16)
                 System.arraycopy(scanRecord, startByte + 4, uuidBytes, 0, 16)
-                val hexString = Converters.bytesToHex(uuidBytes).toUpperCase(Locale.getDefault())
+                val hexString = Converters.bytesToHex(uuidBytes).uppercase(Locale.getDefault())
 
                 // the iBeacon uuid
                 val uuid = hexString.substring(0, 8) + "-" +

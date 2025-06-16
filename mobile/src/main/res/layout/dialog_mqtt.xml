@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        style="@style/dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:text="@string/enter_topic_for_publish_n_subscribe"
+        android:textColor="@color/silabs_black"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/subTopicTextInputLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/matter_10dp"
+        android:gravity="right|center"
+        app:boxStrokeColor="@color/splash_screen_start_gradient"
+        app:boxStrokeWidth="@dimen/matter_2dp"
+        app:cursorColor="@color/splash_screen_start_gradient"
+        app:hintEnabled="true"
+        app:hintTextColor="@color/splash_screen_start_gradient">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editSubTopic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center|left"
+            android:hint="Subscriber Topic"
+            android:inputType="text"
+            android:lines="1"
+            android:textSize="@dimen/text_size_SM" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/pubTopicTextInputLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="right|center"
+        app:boxStrokeColor="@color/splash_screen_start_gradient"
+        app:boxStrokeWidth="@dimen/matter_2dp"
+        app:cursorColor="@color/splash_screen_start_gradient"
+        app:hintEnabled="true"
+        app:hintTextColor="@color/splash_screen_start_gradient">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editPubTopic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center|left"
+            android:hint="Publisher Topic"
+            android:inputType="text"
+            android:lines="1"
+            android:textSize="@dimen/text_size_SM" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <TextView
+        style="@style/dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:text="Click on the connect button\nto connect your phone to\nAWS Iot."
+        android:textColor="@color/silabs_black"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal|center"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="@dimen/matter_20dp">
+
+        <TextView
+            android:id="@+id/submitMqttCancelButton"
+            style="@style/SwitchText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingHorizontal="@dimen/matter_20dp"
+            android:text="Cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/silabs_blue" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/submitMqttButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="@color/silabs_dark_blue"
+            android:text="Connect"
+            android:textAllCaps="false"
+            android:textSize="15sp"
+            app:cornerRadius="24dp"
+            app:rippleColor="@color/silabs_dark_blue" />
+    </LinearLayout>
+
+
+</LinearLayout>

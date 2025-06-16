@@ -3,137 +3,165 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="1">
 
-    <TextView
-        style="@style/settings_subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/settings_subtitle_margin"
-        android:layout_marginTop="@dimen/settings_subtitle_margin"
-        android:layout_marginBottom="16dp"
-        android:text="@string/configuration_subtitle" />
-
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="0.25"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            style="@style/settings_subtitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/settings_subtitle_margin"
-            android:orientation="vertical">
+            android:layout_marginStart="@dimen/settings_subtitle_margin"
+            android:layout_marginTop="@dimen/settings_subtitle_margin"
+            android:layout_marginBottom="16dp"
+            android:text="@string/device_subtitle" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/scan_timeout_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="8dp"
-                    android:text="@string/scan_timeout"
-                    android:textColor="@android:color/black" />
-
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/scan_timeout_help_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/scan_timeout_label"
-                    android:background="?attr/selectableItemBackground"
-                    android:contentDescription="@string/content_desc_settings_config_help"
-                    android:src="@drawable/ic_configuration_help" />
-
-                <androidx.appcompat.widget.AppCompatSpinner
-                    android:id="@+id/spinner_scan_timeout_setting"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:entries="@array/scan_timeout_options"
-                    android:gravity="end|center_vertical" />
-
-            </RelativeLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_report_issue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/report_issue"
-                android:textAllCaps="false" />
-
-        </LinearLayout>
-
-    </ScrollView>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_device_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/settings_subtitle_margin"
+            android:text="@string/device_information"
+            android:textAllCaps="false" />
+    </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.25"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/settings_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/settings_subtitle_margin"
+            android:layout_marginTop="@dimen/settings_subtitle_margin"
+            android:layout_marginBottom="16dp"
+            android:text="@string/configuration_subtitle" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/settings_subtitle_margin"
+            android:layout_marginBottom="12dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/scan_timeout_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="8dp"
+                android:text="@string/scan_timeout"
+                android:textColor="@android:color/black" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/scan_timeout_help_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/scan_timeout_label"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/content_desc_settings_config_help"
+                android:src="@drawable/ic_configuration_help" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/spinner_scan_timeout_setting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:entries="@array/scan_timeout_options"
+                android:gravity="end|center_vertical" />
+        </RelativeLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_report_issue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/settings_subtitle_margin"
+            android:text="@string/report_issue"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+
     <TextView
         style="@style/settings_subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/settings_subtitle_margin"
         android:layout_marginTop="@dimen/settings_subtitle_margin"
-        android:layout_marginBottom="16dp"
         android:text="@string/links_subtitle" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="0.5">
 
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/useful_links_grid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:flexWrap="wrap"
-                app:justifyContent="center">
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/useful_links_grid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:flexWrap="wrap"
+            app:justifyContent="center">
 
-                <Button
-                    android:id="@+id/silabs_products_wireless"
-                    style="@style/settings_link_button"
-                    android:text="@string/settings_link_more_information" />
-                <Button
-                    android:id="@+id/silabs_support"
-                    style="@style/settings_link_button"
-                    android:text="@string/settings_link_support" />
-                <Button
-                    android:id="@+id/github_siliconlabs_efrconnect"
-                    style="@style/settings_link_button"
-                    android:text="@string/settings_link_source_code"/>
-                <Button
-                    android:id="@+id/users_guide_efrconnect"
-                    style="@style/settings_link_button"
-                    android:text="@string/settings_link_users_guide" />
-                <Button
-                    android:id="@+id/docs_silabs_release_notes"
-                    style="@style/settings_link_button"
-                    android:text="@string/settings_link_release_notes" />
-                <Button
-                    android:id="@+id/docs_silabs_bluetooth_latest"
-                    style="@style/settings_link_button"
-                    android:text="@string/settings_link_additional_documentation" />
-                <Button
-                    android:id="@+id/help_text_playstore"
-                    style="@style/settings_link_button"
-                    android:text="@string/settings_link_other_silabs_apps" />
-                <Button
-                    android:id="@+id/log_text_share"
-                    style="@style/settings_link_button"
-                    android:text="@string/settings_link_export_logger"
-                    />
+            <Button
+                android:id="@+id/silabs_products_wireless"
+                style="@style/settings_link_button"
+                android:text="@string/settings_link_more_information" />
 
+            <Button
+                android:id="@+id/silabs_support"
+                style="@style/settings_link_button"
+                android:text="@string/settings_link_support" />
+
+            <Button
+                android:id="@+id/github_siliconlabs_efrconnect"
+                style="@style/settings_link_button"
+                android:text="@string/settings_link_source_code" />
+
+            <Button
+                android:id="@+id/users_guide_efrconnect"
+                style="@style/settings_link_button"
+                android:text="@string/settings_link_users_guide" />
+
+            <Button
+                android:id="@+id/docs_silabs_release_notes"
+                style="@style/settings_link_button"
+                android:text="@string/settings_link_release_notes" />
+
+            <Button
+                android:id="@+id/docs_silabs_bluetooth_latest"
+                style="@style/settings_link_button"
+                android:text="@string/settings_link_additional_documentation" />
+
+            <Button
+                android:id="@+id/help_text_playstore"
+                style="@style/settings_link_button"
+                android:text="@string/settings_link_other_silabs_apps" />
+
+            <Button
+                android:visibility="gone"
+                android:id="@+id/log_text_share"
+                style="@style/settings_link_button"
+                android:text="@string/settings_link_export_logger" />
         </com.google.android.flexbox.FlexboxLayout>
-
     </ScrollView>
 
     <TextView
@@ -145,8 +173,7 @@
         android:layout_marginVertical="@dimen/settings_version_margin"
         android:fontFamily="sans-serif"
         android:textColor="@android:color/black"
-        android:textStyle="bold"
         android:textSize="@dimen/help_text_size"
+        android:textStyle="bold"
         tools:text="Version X.X.X" />
-
 </LinearLayout>

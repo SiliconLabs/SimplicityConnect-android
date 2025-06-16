@@ -48,8 +48,11 @@ import timber.log.Timber
 
 class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data),EslLoadingDialog.EslLoadingCallBack {
 
+    private var saveImageIndex: Int? = null
+    private var groupImageUri: Array<Uri>? = null
     private val binding by viewBinding(FragmentEslTagDataBinding::bind)
     private val viewModel by viewModels<EslDemoViewModel>()
+
 
     private lateinit var tagInfoAdapter: TagInfoAdapter
 
@@ -88,6 +91,15 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data),EslLoadingDialo
                 )
             }
             ibEslDisplayImage.setOnClickListener {
+
+                /*saveImageIndex?.let { it1 -> viewModel.getImageArray(it1) }?.let { it2 ->
+                    saveImageIndex?.let { it1 -> getTagLoadedImagesDialogCallback(it1) }?.let { it3 ->
+                        showImageDisplayDialog(
+                            it2,
+                            it3,
+                        )
+                    }
+                }*/
                 showImageDisplayDialog(
                     arrayOfNulls(GROUP_DISPLAY_SLOTS_COUNT),
                     loadedImagesDialogGroupCallback,
@@ -328,6 +340,7 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data),EslLoadingDialo
     }
 
     private fun startFileUpload(uri: Uri, slotIndex: Int, tagIndex: Int, displayAfterUpload: Boolean) {
+        groupImageUri = arrayOf(uri)
         val imageFileData = readImage(uri)
 
         imageFileData?.let {
@@ -466,6 +479,7 @@ class TagDataFragment : Fragment(R.layout.fragment_esl_tag_data),EslLoadingDialo
         }
 
         override fun onDisplayImageClicked(index: Int) {
+            saveImageIndex = index
             showImageDisplayDialog(
                 viewModel.getImageArray(index),
                 getTagLoadedImagesDialogCallback(index),

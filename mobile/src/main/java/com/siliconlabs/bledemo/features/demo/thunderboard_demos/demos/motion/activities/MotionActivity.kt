@@ -122,7 +122,7 @@ class MotionActivity : GdxActivity() {
     private fun popupCalibratingDialog() {
         AlertDialog.Builder(this).apply {
             setTitle(R.string.motion_calibrating)
-            setCancelable(false)
+            setCancelable(true)
             setMessage(R.string.motion_calibrating_message)
             calibratingDialog = this.create()
         }

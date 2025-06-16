@@ -29,7 +29,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 open class MainActivity : BaseActivity(),
-        BluetoothService.ServicesStateListener
+    BluetoothService.ServicesStateListener
 {
     private lateinit var _binding:ActivityMainBinding
     private lateinit var viewModel: MainActivityViewModel
@@ -38,8 +38,8 @@ open class MainActivity : BaseActivity(),
         private set
 
     private val neededPermissions = mutableListOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-        )
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    )
 
     @RequiresApi(Build.VERSION_CODES.S)
     private val android12Permissions = listOf(
@@ -63,7 +63,7 @@ open class MainActivity : BaseActivity(),
 
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(LayoutInflater.from(this))
-       // setContentView(R.layout.activity_main)
+        // setContentView(R.layout.activity_main)
         setContentView(_binding.root)
         supportActionBar?.show()
 
@@ -223,12 +223,12 @@ open class MainActivity : BaseActivity(),
         const val EXTRA_TOAST_MESSAGE = "com.example.EXTRA_TOAST_MESSAGE"
     }
 //TODO: handle migration. See BTAPP-1285 for clarification.
-/*
-    private fun migrateGattDatabaseIfNeeded() {
-        if (BuildConfig.VERSION_CODE <= IMPORT_EXPORT_CODE_VERSION - 1) {
-            Migrator(this).migrate()
+    /*
+        private fun migrateGattDatabaseIfNeeded() {
+            if (BuildConfig.VERSION_CODE <= IMPORT_EXPORT_CODE_VERSION - 1) {
+                Migrator(this).migrate()
+            }
         }
-    }
-*/
+    */
 
 }

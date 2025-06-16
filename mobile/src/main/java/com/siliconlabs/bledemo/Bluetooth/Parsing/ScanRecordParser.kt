@@ -889,7 +889,7 @@ object ScanRecordParser {
             var lineCounter = 0
             for (j in i * 16 - 1 downTo (i - 1) * 16) {
                 lineCounter++
-                builder.append(Converters.getHexValue(data[j]).toLowerCase(Locale.getDefault()))
+                builder.append(Converters.getHexValue(data[j]).lowercase(Locale.getDefault()))
                 if (lineCounter == 4 || lineCounter == 6 || lineCounter == 8 || lineCounter == 10) builder.append("-")
             }
             if (i != addressess) builder.append(", ")
@@ -916,7 +916,7 @@ object ScanRecordParser {
         if (data.size >= 16) {
             builder.append("UUID: ")
             for (i in 15 downTo 0) {
-                builder.append(Converters.getHexValue(data[i]).toLowerCase(Locale.getDefault()))
+                builder.append(Converters.getHexValue(data[i]).lowercase(Locale.getDefault()))
                 if (i == 6 || i == 8 || i == 10 || i == 12) builder.append("-")
             }
             builder.append(" Data: ")

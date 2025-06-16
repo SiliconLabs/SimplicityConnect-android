@@ -3,16 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:background="@android:color/white"
-        android:foreground="?android:attr/selectableItemBackground"
         android:layout_marginHorizontal="@dimen/access_pt_item_margin_horizontal"
         android:layout_marginVertical="@dimen/access_pt_item_margin_vertical"
+        android:background="@android:color/white"
+        android:foreground="?android:attr/selectableItemBackground"
         app:cardCornerRadius="16dp">
 
         <LinearLayout
@@ -22,54 +22,57 @@
             android:paddingVertical="@dimen/access_pt_padding_vertical">
 
             <ImageView
+                android:id="@+id/access_pt_image"
                 android:layout_width="@dimen/access_pt_wifi_image_width"
                 android:layout_height="@dimen/access_pt_item_height"
                 android:layout_gravity="center"
-                android:id="@+id/access_pt_image"
-                android:src="@drawable/icon_wifi"
-                android:contentDescription="@string/empty_description" />
+                android:contentDescription="@string/empty_description"
+                android:src="@drawable/icon_wifi" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.6"
-                android:orientation="vertical"
                 android:layout_gravity="center_vertical"
+                android:layout_marginVertical="@dimen/access_pt_text_layout_margin_vertical"
                 android:layout_marginStart="@dimen/access_pt_text_layout_margin_left"
-                android:layout_marginVertical="@dimen/access_pt_text_layout_margin_vertical" >
+                android:layout_weight="0.6"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/access_pt_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/app_name"
-                    android:textSize="@dimen/access_pt_name_size"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/access_pt_name_size" />
+
                 <TextView
                     android:id="@+id/access_pt_type"
-                    android:textSize="@dimen/access_pt_type_size"
-                    android:textColor="@color/grey"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:text="@string/app_name"
-                    android:layout_height="wrap_content" />
+                    android:textColor="@color/grey"
+                    android:textSize="@dimen/access_pt_type_size" />
+
                 <TextView
                     android:id="@+id/access_mac_address"
-                    android:textSize="@dimen/access_pt_type_size"
-                    android:textColor="@color/grey"
                     android:layout_width="match_parent"
-                    android:text="@string/app_name"
                     android:layout_height="wrap_content"
+                    android:text="@string/app_name"
+                    android:textColor="@color/grey"
+                    android:textSize="@dimen/access_pt_type_size"
                     android:visibility="gone"
-                    tools:visibility="visible"/>
+                    tools:visibility="visible" />
+
                 <TextView
                     android:id="@+id/access_pt_ip_address"
-                    android:textSize="@dimen/access_pt_type_size"
-                    android:textColor="@color/grey"
                     android:layout_width="match_parent"
-                    android:text="@string/app_name"
                     android:layout_height="wrap_content"
+                    android:text="@string/app_name"
+                    android:textColor="@color/grey"
+                    android:textSize="@dimen/access_pt_type_size"
                     android:visibility="gone"
-                    tools:visibility="visible"/>
+                    tools:visibility="visible" />
             </LinearLayout>
 
             <ImageView
@@ -77,8 +80,8 @@
                 android:layout_width="@dimen/access_pt_image_width"
                 android:layout_height="@dimen/access_pt_image_width"
                 android:layout_gravity="center"
-                android:src="@drawable/icon_disconnect"
-                android:contentDescription="@string/empty_description" />
+                android:contentDescription="@string/empty_description"
+                android:src="@drawable/icon_disconnect" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -26,7 +26,6 @@ import com.siliconlabs.bledemo.features.configure.gatt_configurator.viewmodels.G
 import com.siliconlabs.bledemo.features.configure.gatt_configurator.viewmodels.GattServerViewModel.Validation
 import com.siliconlabs.bledemo.common.other.EqualVerticalItemDecoration
 import com.siliconlabs.bledemo.databinding.ActivityGattServerBinding
-import com.siliconlabs.bledemo.utils.CustomToastManager
 
 //import kotlinx.android.synthetic.main.activity_gatt_server.*
 
@@ -68,14 +67,11 @@ class GattServerActivity : BaseActivity(), ServiceListener, AddServiceListener {
 
         viewModel.validation.observe(this, Observer {
             when (it) {
-                Validation.INVALID_NAME ->
-                    CustomToastManager.show(this@GattServerActivity,
-                        getString(R.string.gatt_configurator_toast_invalid_gatt_server_name),5000)
-                    /*Toast.makeText(
+                Validation.INVALID_NAME -> Toast.makeText(
                     this,
                     R.string.gatt_configurator_toast_invalid_gatt_server_name,
                     Toast.LENGTH_SHORT
-                ).show()*/
+                ).show()
 
                 else -> saveGattServer()
             }

@@ -3,6 +3,7 @@ package com.siliconlabs.bledemo.features.demo.matter_demo.utils
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.siliconlabs.bledemo.features.demo.matter_demo.dishwasher_demo.utils.DishWasherEnumConstants
 import com.siliconlabs.bledemo.features.demo.matter_demo.model.MatterScannedResultModel
 
 object SharedPrefsUtils {
@@ -21,8 +22,11 @@ object SharedPrefsUtils {
         scannedDeviceList: ArrayList<MatterScannedResultModel>
     ) {
         val prefsEditor: SharedPreferences.Editor = mPrefs.edit()
+        val cleanedList = scannedDeviceList.map {
+            it.copy(isAclWriteInProgress = false, isBindingInProgress = false)
+        }
         val gson = Gson()
-        val json = gson.toJson(scannedDeviceList)
+        val json = gson.toJson(cleanedList)
         prefsEditor.putString(ARG_ADDED_DEVICE_INFO_LIST, json)
         prefsEditor.apply()
     }
@@ -74,7 +78,7 @@ object SharedPrefsUtils {
         return mPrefs.getFloat(TOTAL_ENERGY_DISHWASHER, 0f)
     }
 
-    //average energy
+    //average ener
     fun saveDishwasherAverageEnergyPerCycle(
         mPrefs: SharedPreferences,
         averageEnergyPerCycleConsumed: Float
@@ -140,20 +144,24 @@ object SharedPrefsUtils {
         return mPrefs.getLong(DISHWASHER_TOTAL_TIME_LEFT, 600000)
     }
 
-    fun saveDishwasherAppliedCycleStates(mPrefs: SharedPreferences, cycleStates: String) {
+    fun saveDishwasherAppliedCycleStates(mPrefs: SharedPreferences, cycleStates: DishWasherEnumConstants) {
         val prefsEditor: SharedPreferences.Editor = mPrefs.edit()
         prefsEditor.apply {
             putString(
                 DISHWASHER_CYCLE_STATES,
-                cycleStates
+                cycleStates.toString()
             )
             apply()
         }
     }
 
-    fun getDishwasherAppliedCycleStates(mPrefs: SharedPreferences): String? {
-
-        return mPrefs.getString(DISHWASHER_CYCLE_STATES, null)
+    fun getDishwasherAppliedCycleStates(mPrefs: SharedPreferences): DishWasherEnumConstants? {
+        val cycleStateString = mPrefs.getString(DISHWASHER_CYCLE_STATES, null)
+        return if(null != cycleStateString){
+            DishWasherEnumConstants.valueOf(cycleStateString)
+        }else{
+            null
+        }
     }
 
 
@@ -180,21 +188,7 @@ object SharedPrefsUtils {
         }
     }
 
-    fun saveTheDishwasherStateIfTheUserIsInPauseState(mPrefs: SharedPreferences, savePauseOrStopState: Boolean): Boolean {
-        val prefsEditor: SharedPreferences.Editor = mPrefs.edit()
 
-        // Save the state and apply the changes
-        prefsEditor.putBoolean(DISHWASHER_ON_CYCLE_PAUSE_RESUME_STATE, savePauseOrStopState)
-        prefsEditor.apply()
-
-        // Return true if the operation was successful (SharedPreferences doesn't give an explicit success/failure status)
-        return true
-    }
-
-    fun getDishwasherStateIfUserIsInPauseState(mPrefs: SharedPreferences): Boolean {
-        // Retrieve the state using the same key, with a default value of false if not found
-        return mPrefs.getBoolean(DISHWASHER_ON_CYCLE_PAUSE_RESUME_STATE, false)
-    }
 
 
     const val ARG_ADDED_DEVICE_INFO_LIST = "addedDeviceInfoList"

@@ -69,7 +69,7 @@ class Field {
     }
 
     fun isStringFormat(): Boolean {
-        return when (format?.toLowerCase(Locale.getDefault())) {
+        return when (format?.lowercase(Locale.getDefault())) {
             "utf8s", "utf16s" -> true
             else -> false
         }

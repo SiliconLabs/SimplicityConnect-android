@@ -18,7 +18,7 @@ class Validator {
         }
 
         fun isHexValid(text: String): Boolean {
-            val result = text.toUpperCase(Locale.ROOT).filter { it in 'A'..'F' || it in '0'..'9' }
+            val result = text.uppercase(Locale.ROOT).filter { it in 'A'..'F' || it in '0'..'9' }
             return result.isNotEmpty() && result.length % 2 == 0
         }
     }

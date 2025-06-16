@@ -32,7 +32,6 @@ import com.siliconlabs.bledemo.common.other.CardViewListDecoration
 import com.siliconlabs.bledemo.common.other.LinearLayoutManagerWithHidingUIElements
 import com.siliconlabs.bledemo.common.other.WithHidableUIElements
 import com.siliconlabs.bledemo.home_screen.base.BaseMainMenuFragment
-import com.siliconlabs.bledemo.utils.CustomToastManager
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.*
 import java.util.*
@@ -161,14 +160,10 @@ class GattConfiguratorFragment : BaseMainMenuFragment(), OnClickListener {
         viewBinding.bottomBarExport.init(object : ExportBar.Listener {
             override fun onExportClick() {
                 openLocationChooser()
-                /*Toast.makeText(
+                Toast.makeText(
                         activity,
                         getString(R.string.gatt_configurator_toast_export_location_choice),
-                        Toast.LENGTH_SHORT).show()*/
-                CustomToastManager.show(
-                    requireContext(),getString(R.string.gatt_configurator_toast_export_location_choice),
-                    5000
-                )
+                        Toast.LENGTH_SHORT).show()
             }
 
             override fun onCancelClick() {
@@ -285,13 +280,8 @@ class GattConfiguratorFragment : BaseMainMenuFragment(), OnClickListener {
                         }
                     }
                 }
-                /*Toast.makeText(activity, getString(R.string
-                        .gatt_configurator_toast_export_successful), Toast.LENGTH_LONG).show()*/
-                CustomToastManager.show(
-                    requireContext(),getString(R.string
-                        .gatt_configurator_toast_export_successful),
-                    5000
-                )
+                Toast.makeText(activity, getString(R.string
+                        .gatt_configurator_toast_export_successful), Toast.LENGTH_LONG).show()
             } ?: showWrongLocationToast()
         } ?: showWrongLocationToast()
 
@@ -299,16 +289,13 @@ class GattConfiguratorFragment : BaseMainMenuFragment(), OnClickListener {
     }
 
     private fun showFileNotFoundToast() {
-        /*Toast.makeText(activity, getString(R.string.gatt_configurator_toast_import_file_not_found),
-                Toast.LENGTH_LONG).show()*/
-        CustomToastManager.show(requireContext(),getString(R.string.gatt_configurator_toast_import_file_not_found),5000)
+        Toast.makeText(activity, getString(R.string.gatt_configurator_toast_import_file_not_found),
+                Toast.LENGTH_LONG).show()
     }
 
     private fun showWrongLocationToast() {
-        /*Toast.makeText(activity, getString(R.string
-                .toast_export_wrong_location_chosen), Toast.LENGTH_LONG).show()*/
-        CustomToastManager.show(requireContext(),getString(R.string
-            .toast_export_wrong_location_chosen),5000)
+        Toast.makeText(activity, getString(R.string
+                .toast_export_wrong_location_chosen), Toast.LENGTH_LONG).show()
     }
 
     private fun getFileDescriptorFromIntent(intent: Intent?) : FileDescriptor? {
@@ -352,7 +339,7 @@ class GattConfiguratorFragment : BaseMainMenuFragment(), OnClickListener {
         val message = StringBuffer()
         message.append(err?.errorType.toString().first())
         message.append(err?.errorType.toString().substring(1)
-                .toLowerCase(Locale.getDefault()).replace("_", " "))
+                .lowercase(Locale.getDefault()).replace("_", " "))
         message.append(". ")
 
         when (err?.errorType) {

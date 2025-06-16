@@ -17,7 +17,7 @@ class GattOperationWithDataLog(
         return StringBuilder().apply {
             append(parseType())
             status?.let { append(", status: ${parseStatus(it)}") }
-            append("\nUUID: ${uuid.toString().toLowerCase(Locale.getDefault())}")
+            append("\nUUID: ${uuid.toString().lowercase(Locale.getDefault())}")
             append(", ${getGattDataInfo()}")
         }.toString()
     }
@@ -25,7 +25,7 @@ class GattOperationWithDataLog(
     private fun getGattDataInfo(): String {
         return if (value.isEmpty()) "data: Empty data."
         else {
-            val hexData = "0x".plus(Converters.bytesToHex(value).toUpperCase(Locale.getDefault())).plus(" (hex)")
+            val hexData = "0x".plus(Converters.bytesToHex(value).uppercase(Locale.getDefault())).plus(" (hex)")
             val asciiData = Converters.getAsciiValue(value).plus(" (ascii)")
             val decimalData = Converters.getDecimalValue(value).plus("(dec)")
 

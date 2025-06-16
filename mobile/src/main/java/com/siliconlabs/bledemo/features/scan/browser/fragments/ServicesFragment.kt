@@ -314,19 +314,6 @@ abstract class ServicesFragment(private val isRemote: Boolean) :
                 }
             }
 
-            Property.WRITE_WITHOUT_RESPONSE -> {
-                val writeType =
-                    if (this is RemoteServicesFragment) FragmentCharacteristicDetail.WriteType.REMOTE_WRITE
-                    else FragmentCharacteristicDetail.WriteType.LOCAL_WRITE
-                openWriteDialog(
-                    bluetoothGattCharacteristic,
-                    service,
-                    characteristicExpansion,
-                    writeType
-                )
-
-            }
-
             else -> {}
         }
     }

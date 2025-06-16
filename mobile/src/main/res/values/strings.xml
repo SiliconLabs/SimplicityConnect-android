@@ -60,7 +60,7 @@
     <string name="throughput_test_service_name">Throughput Test Service</string>
     <string name="throughput_information_service_name">Throughput Information Service</string>
 
-    <string name="ota_control_attribute_characteristic_name">OTA Control Attribute</string>
+    <string name="ota_control_attribute_characteristic_name" formatted="false">OTA Control Attribute</string>
     <string name="ota_data_characteristic_name">OTA Data</string>
     <string name="fw_version_characteristic_name">Fw version</string>
     <string name="ota_version_characteristic_name">OTA Version</string>
@@ -226,6 +226,7 @@
     <string name="button_stop">Stop</string>
     <string name="button_ok">@android:string/ok</string>
     <string name="button_proceed">Proceed</string>
+    <string name="button_close">Close</string>
     <string name="button_yes">Yes</string>
     <string name="button_no">No</string>
     <string name="button_run_test">Run Test</string>
@@ -237,6 +238,7 @@
     <string name="button_add_descriptor">Add Descriptor</string>
     <string name="button_add_service">Add Service</string>
     <string name="button_bluetooth_sig">Bluetooth SIG</string>
+    <string name="button_provision">Provision</string>
 
     <!-- Beacon types -->
     <string name="unspecified">Unspecified</string>
@@ -556,11 +558,11 @@
     <string name="iop_test_toast_press_passkey">Press passkey: 123456. Pull down the notification bar to pair if no Dialog is shown</string>
     <string name="iop_test_label_fw_name">Firmware Name: %1s</string>
     <string name="iop_test_label_device_name">Device Name: %1s</string>
-    <string name="iop_test_label_progress_count_test">Total: %1s/%2s Test cases</string>
+    <string name="iop_test_label_progress_count_test" formatted="false">Total: %1s/%2s Test cases</string>
     <string name="iop_test_message_stop_test">Are you sure you want to stop the test?</string>
     <string name="iop_test_toast_bluetooth_not_supported">Bluetooth is not supported</string>
     <string name="iop_test_n_percent">%d %%</string>
-    <string name="iop_test_n_bytes">%d bytes</string>
+    <string name="iop_test_n_bytes" formatted="false">%d bytes</string>
     <string name="iop_test_label_resetting">Resetting…</string>
     <string name="iop_test_label_1_of_1">1 OF 1</string>
     <string name="iop_test_note_device_name_dialog">This feature will execute a set of Bluetooth
@@ -611,11 +613,11 @@
     <string name="gatt_configurator_toast_import_file_not_found">File not found</string>
     <string name="gatt_configurator_choose_file_for_import">Choose file for import</string>
     <string name="gatt_configurator_popup_import_successful_title">Successful import</string>
-    <string name="gatt_configurator_popup_import_successful_content">Created 1 configuration from the XML file</string>
+    <string name="gatt_configurator_popup_import_successful_content" formatted="false">Created 1 configuration from the XML file</string>
     <string name="gatt_configurator_popup_import_unsuccessful_title">Import with error</string>
     <string name="gatt_configurator_popup_import_unsuccessful_content_forbidden_value" formatted="false">Provided: \"%s\", expected: %s. </string>
     <string name="gatt_configurator_popup_import_unsuccessful_content_occurrence_error">Specifically: \"%s\".</string>
-    <string name="gatt_configurator_popup_import_unsuccessful_content_regex_mismatch">Provided: \"%s\", expected regex pattern: %s.</string>
+    <string name="gatt_configurator_popup_import_unsuccessful_content_regex_mismatch" formatted="false">Provided: \"%s\", expected regex pattern: %s.</string>
 
     <string-array name="gatt_configurator_initial_value">
         <item>Empty</item>
@@ -947,7 +949,10 @@
     <string name="links_subtitle">Useful links</string>
 
     <string name="scan_timeout">Scan timeout</string>
+    <string name="device_subtitle">Device</string>
     <string name="report_issue">Report an issue</string>
+
+    <string name="device_information">Device Information</string>
     <string name="scan_timeout_value_in_seconds">Timeout value [s]: </string>
 
     <string name="settings_link_more_information">More \ninformation</string>
@@ -1091,7 +1096,7 @@
     <string name="matter_location_unavailable_alert_title">Location unavailable</string>
     <string name="matter_location_unavailable_alert_subtitle">Error location to scan the QR code.</string>
     <string name="matter_invalid_manual_qr_code">Manual QR code payload ID is invalid! Please enter a valid QR code payload ID.</string>
-
+    <string name="rendezvous_over_ble_pairing_text">Pairing</string>
     <!--    <string name="extPanID">19:19:11:11:22:22:42:22</string>-->
     <!--    <string name="matMasterKey">00:FF:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:AF</string>-->
     <string name="matter_quick_starter_guide_link">A circuit board (SoC) must be connected and running "matter" firmware and a Matter hub. See Quick-Start Guide for more information</string>
@@ -1132,6 +1137,8 @@
     <string name="matter_contact_sensor_cluster">Contact Sensor</string>
     <string name="matter_init_value">00.00 ℃</string>
     <string name="matter_init_thermostat_value">00 ℃</string>
+    <string name="matter_init_air_sensor_quality_value">AQI:  0 </string>
+    <string name="matter_init_air_sensor_quality_status">Unknown</string>
     <string name="matter_ok">Send</string>
     <string name="matter_cancel">Cancel</string>
     <string name="matter_alert_title">Thread Configuration</string>
@@ -1163,7 +1170,7 @@
     <string name="matter_thermostat_list">Thermostat</string>
     <string name="matter_light_list">Light</string>
     <string name="matter_window_list">Window Cover</string>
-    <string name="matter_dishwahser_list">Dishwasher</string>
+    <string name="matter_dish_washer_list">Dishwasher</string>
     <string name="please_wait">Please wait while the work is in progress..</string>
     <string name="temp_note_message">Please press BTN1 button to change sensor value on the Baseboard to test the Temprature Sensor</string>
     <string name="matter_tile">Matter Devices</string>
@@ -1205,6 +1212,7 @@
     <string name="matter_completed_cycle">Completed Cycle:</string>
 
 
+
     <!--    Wi-Fi OTA Firmware Update Demo-->
     <string name="ota_demo_title">Wi-Fi OTA Demo</string>
     <string name="ota_demo_title_desc">Control OTA Firmware update over Wi-Fi.</string>
@@ -1213,7 +1221,7 @@
     <string name="port">Server Port:</string>
     <string name="heading_ota_choose_file">Select firmware file for updating SiWx91x</string>
     <string name="select_rps_file">Select *.rps file</string>
-    <string name="ota_count_test_label">%d OF %d</string>
+    <string name="ota_count_test_label" formatted="false">%d OF %d</string>
     <string name="configure_wi_fi_ota_server">Configure Wi-Fi OTA Server</string>
     <string name="select_file">Select file:</string>
     <string name="turn_on_wifi">Turn ON your Wi-Fi connection</string>
@@ -1228,7 +1236,7 @@
     <string name="alert">Alert</string>
 
 
-<!--    917 DevKit Sensor Demo-->
+    <!--    917 DevKit Sensor Demo-->
     <string name="dev_kit_sensor_917_title">Wi-Fi Sensors</string>
     <string name="dev_kit_sensor_917_desc">Read and display sensor data from the dev kit sensors.</string>
     <string name="dev_kit_sensor_917_demo_title">917 Dev Kit Sensor Demo</string>
@@ -1256,7 +1264,7 @@
     <string name="enter_valid_lift_value_error">Please enter value between 1 – 100 to perform Lift Window Curtain.</string>
     <string name="enter_valid_tilt_value_error">Please enter value between 1 – 100 to perform Tilt Window Curtain.</string>
     <string name="enter_tilt_value_error">Enter Tilt Value</string>
-    <string name="matter_zero_prefix">0.00 kWh</string>
+    <string name="matter_zero_prefix">0.000 kWh</string>
 
     <!-- Wi-Fi Throughput -->
     <string name="wifi_title_Throughput">Wi-Fi Throughput</string>
@@ -1274,7 +1282,7 @@
     <string name="dialog_udp_upload_sub_title">Ensure to flash UDP_RX on the FW and enter the below details  to perform UDP throughput.</string>
     <string name="dialog_tls_download_sub_title">Ensure to flash TLS_TX on the FW and enter the below details  to perform TLS throughput.</string>
     <string name="dialog_sub_title_tls_upload">Ensure to flash TLS_RX on the FW and enter the below details  to perform TLS throughput.</string>
-    <string name="wifi_throughput_connecting_status">Connecting to server...</string>
+    <string name="wifi_throughput_connecting_status">Connecting to server…</string>
     <string name="interval">Interval</string>
     <string name="transfer">Transfer</string>
     <string name="bandwidth">Bandwidth</string>
@@ -1299,6 +1307,29 @@
  </string>
     <string name="do_you_want_to_cancel_this_image_upload">Do you want to cancel this image upload?</string>
 
+    <!-- Wi-Fi Provisioning -->
+    <string name="wifi_provisioning_label">Wi-Fi Provisioning</string>
+    <string name="wifi_provisioning_description">Provisioning over Wi-Fi</string>
+    <string name="wifi_provisioning_title">Wi-Fi Provisioning</string>
+    <string name="wifi_provisioning_scan_error">API Scan Response failed</string>
+    <string name="wifi_provisioning_wifi_setting_on">Please turn on the WiFi Setting</string>
+    <string name="wifi_provisioning_scanner_holder_description">Choose and select an available Wi-Fi network from the list below to do the Wi-Fi provisioning with the Devkit.</string>
+    <string name="wifi_provisioning_security_label">Security Type :</string>
+    <string name="wifi_provisioning_bssid_label">BSSID :</string>
+    <string name="wifi_provisioning_rssi_label">RSSI :</string>
+    <string name="wifi_provisioning_password_label">Password :</string>
+    <string name="wifi_provisioning_password_hint">Enter WI-FI Password</string>
+    <string name="wifi_provisioning_password_required">Password required.</string>
+    <string name="wifi_provisioning_provisioning_success_title">Provisioning data sent successfully</string>
+    <string name="wifi_provisioning_provisioning_success_body">The white light is continuous and blinks slowly, indicating the device is connected to the Wi-Fi network.</string>
+    <string name="wifi_provisioning_provisioning_success_submit_button">OK</string>
+    <string name="wifi_provisioning_provisioning_error_alert_tile">Error!</string>
+    <string name="wifi_provisioning_error_message_unable_connect_to_server">Could not connect to the server.</string>
+    <string name="wifi_provisioning_error_404">When a request to an unknown URI is received</string>
+    <string name="wifi_provisioning_error_405">Operation not allowed i.e. typically an unsupported method for a particular URI is received.</string>
+    <string name="wifi_provisioning_error_400">Request received is incomplete or can\'t be parsed successfully.</string>
+    <string name="wifi_provisioning_error_unknown">Could not connect to the server.</string>
+
     <!--   Matter Air Quality Sensor -->
     <string name="matter_air_quality_sensor_list">Air Quality Sensor</string>
     <string name="matter_air_quality_sensor_cluster">Air Quality Sensor</string>
@@ -1309,6 +1340,114 @@
     <string name="matter_air_quality_sensor_fair">Fair Quality</string>
     <string name="matter_air_quality_sensor_v_poor">Very Poor Quality</string>
     <string name="matter_air_quality_sensor_e_poor">Emergency Poor Quality</string>
-    <string name="matter_init_air_sensor_quality_value">AQI:  0 </string>
-    <string name="matter_init_air_sensor_quality_status">Unknown</string>
+
+    <string name="time_out_access_point_failed">Timeout expired</string>
+
+
+    <!--    AWS IOP Demo-->
+    <string name="aws_title">AWS IoT</string>
+    <string name="aws_desc">Add / commission a device and read or control it over AWS IoT Cloud.</string>
+    <string name="enter_topic_for_publish_n_subscribe">Enter Topic for Publish\n &amp; Subscribe</string>
+    <string name="aws_iot_selection_ble_title">"1. The SoC and evaluation board (EVK) must be connected and running the correct firmware.\n\&#10;2. The Wi-Fi network must have internet access to be used for the sensor device's commissioning."</string>
+    <string name="aws_dashboard">AWS Dashboard</string>
+    <string name="connecting_to_aws">Connecting to AWS</string>
+    <string name="connection_successful">Connection successful</string>
+    <string name="publish_failed">Publish failed</string>
+    <string name="subscription_failed">Subscription failed</string>
+    <string name="loading_data">Loading Data...</string>
+    <string name="subscribing_to_the_entered_topic">Subscribing to the entered topic</string>
+    <string name="disconnecting_from_aws_iot">Disconnecting from AWS IOT...</string>
+    <string name="subscription_timeout">Subscription Timeout</string>
+    <string name="no_mess_received_within_thirtysec">No messages received within 30 seconds. Please re-enter publish and subscribe topics.</string>
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
+    <string name="aws_temperature">temperature</string>
+    <string name="aws_humidity">humidity</string>
+    <string name="aws_ambient_light">ambient_light</string>
+    <string name="aws_white_light">white_light</string>
+    <string name="aws_accelerometer">accelerometer</string>
+    <string name="aws_gyro">gyro</string>
+    <string name="aws_led">LED</string>
+    <string name="subscribe_and_publish_topics_should_not_be_empty">Subscribe and publish topics should not be empty</string>
+    <string name="subscribe_topic_should_not_be_empty">Subscribe topic should not be empty</string>
+    <string name="publish_topic_should_not_be_empty">Publish topic should not be empty</string>
+    <string name="icd_registration_completed">ICD device registration completed, How to trigger to switch to Active Mode : %1$s</string>
+    <string name="matter_light_switch">Light Switch</string>
+    <string name="matter_light_switch_control">Light Switch Binding</string>
+    <string name="matter_ligth_switch_control_acl_control">ACL Control</string>
+    <string name="matter_ligth_switch_control_binding_control">Binding Control</string>
+    <string name="matter_light_switch_control_node_light_id">Light Node Id :</string>
+    <string name="matter_light_switch_control_node_switch_id">Switch Node Id :</string>
+    <string name="matter_light_switch_control_acl_status">ACL Status :</string>
+    <string name="matter_light_switch_control_group_list_status">Group List :</string>
+    <string name="matter_light_switch_control_key_list_status">Key List :</string>
+    <string name="matter_light_switch_control_binding_status">Binding Status :</string>
+    <string name="matter_binded">Binded </string>
+    <string name="binded_to_nothing">Binded to Nothing</string>
+
+    <!--    Device Information-->
+    <string name="device_information_title">Device Information</string>
+    <string name="device_information_device_information_label">Device Information :</string>
+    <string name="device_information_header_one">Hardware</string>
+    <string name="device_information_device_name_label">Device Name</string>
+    <string name="device_information_android_version_label">Android version :</string>
+    <string name="device_information_manufacturer_label">Manufacturer :</string>
+    <string name="device_information_model_label">Model</string>
+    <string name="device_information_build_version_label">Build version</string>
+    <string name="device_information_board_label">Board</string>
+    <string name="device_information_product_label">Product</string>
+    <string name="device_information_header_two">Bluetooth Low Energy</string>
+    <string name="device_information_header_three">Screen</string>
+    <string name="device_information_resolution_label">Resolution</string>
+    <string name="device_information_dimension_px_label">Dimensions (px)</string>
+    <string name="device_information_dimension_dip_label">Dimensions (dip)</string>
+    <string name="device_information_wide_color_gamut_label">Wide color gamut</string>
+    <string name="device_information_high_dynamic_range_label">High Dynamic Range (HDR)</string>
+    <string name="device_information_size_label">Size</string>
+    <string name="device_information_aspect_label">Aspect</string>
+    <string name="device_information_ldpi">ldpi</string>
+    <string name="device_information_mdpi">mdpi</string>
+    <string name="device_information_hdpi">hdpi</string>
+    <string name="device_information_xhdpi">xhdpi</string>
+    <string name="device_information_xxhdpi">xxhdpi</string>
+    <string name="device_information_xxxhdpi">xxxhdpi</string>
+    <string name="device_information_unknown">Unknown</string>
+    <string name="device_information_supported">Supported</string>
+    <string name="device_information_unsupported">Unsupported</string>
+    <string name="device_information_screen_size_1_33">Older Tablet</string>
+    <string name="device_information_screen_size_1_6">Tablet</string>
+    <string name="device_information_screen_size_small">Small</string>
+    <string name="device_information_screen_size_normal">Normal</string>
+    <string name="device_information_screen_size_large">Large</string>
+    <string name="device_information_screen_size_xlarge">XLarge</string>
+    <string name="device_information_screen_size_unknown">Unknown Size</string>
+    <string name="device_information_aspect_ratio_wide">Long</string>
+    <string name="device_informaiton_aspect_ratio_standard">Standard</string>
+    <string name="device_information_aspect_ratio_narrow">Narrow</string>
+    <string name="device_information_header_five">Bluetooth Audio</string>
+    <string name="device_information_max_connect_audio_device_label">Maximum connected audio devices</string>
+    <string name="device_information_max_connect_audio_device_info">Maximum connected audio devices</string>
+    <string name="le_audio_supported_label">LE Audio Supported</string>
+    <string name="le_audio_supported_info">LE Audio</string>
+    <string name="le_audio_supported_no">No</string>
+    <string name="le_audio_supported_yes">Yes</string>
+    <string name="le_audio_broadcast_source_supported_label">LE Audio Broadcast Source Supported</string>
+    <string name="le_audio_broadcast_source_supported_no">No</string>
+    <string name="le_audio_broadcast_source_supported_yes">Yes</string>
+    <string name="le_audio_broadcast_assist_supported_label">LE Audio Broadcast Assist Supported</string>
+    <string name="le_audio_broadcast_assist_supported_yes">Yes</string>
+    <string name="le_audio_broadcast_assist_supported_no">No</string>
+    <string name="bluetooth_low_energy_supported">Bluetooth Low Energy supported</string>
+    <string name="native_hid_supported">Native HID Supported</string>
+    <string name="lollipop_scanner_api_supported">Lollipop scanner API supported</string>
+    <string name="offloaded_filtering_supported">Offloaded filtering supported</string>
+    <string name="maximum_advertising_data">Maximum advertising data length</string>
+    <string name="offload_scan_batch_support">Offloaded scan batching supported</string>
+    <string name="peripheral_mode">Peripheral mode supported</string>
+    <string name="multiple_mode_adv">multiple advertisement supported</string>
+    <string name="high_speed_supported">High Speed (PHY 2M) Supported</string>
+    <string name="long_range_supported">Long Range (PHY Coded) Supported</string>
+    <string name="periodic_adv_supported">Periodic Advertisement Supported</string>
+    <string name="extended_adv_supported">Extended Advertisement Supported</string>
+    <string name="max_data_length">Maximum advertising data length</string>
 </resources>

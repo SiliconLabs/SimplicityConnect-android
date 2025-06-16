@@ -1,10 +1,11 @@
 package com.siliconlabs.bledemo.features.demo.matter_demo.utils
 
 import android.content.Context
-import android.widget.Toast
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ControllerParams
-import chip.devicecontroller.GetConnectedDeviceCallbackJni
+import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
+import chip.devicecontroller.ICDCheckInDelegate
+import chip.devicecontroller.ICDClientInfo
 import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
 import chip.platform.ChipMdnsCallbackImpl
@@ -26,6 +27,7 @@ object ChipClient {
     private lateinit var chipDeviceController: ChipDeviceController
     private lateinit var androidPlatform: AndroidChipPlatform
     private const val VENDOR_ID = 0xFFF4
+    private var icdCheckInCallback: ICDCheckInCallback? = null
 
     fun getDeviceController(context: Context): ChipDeviceController {
         getAndroidChipPlatform(context)
@@ -40,8 +42,44 @@ object ChipClient {
             chipDeviceController.setAttestationTrustStoreDelegate(
                 ExampleAttestationTrustStoreDelegate(chipDeviceController)
             )
+            chipDeviceController.setICDCheckInDelegate(object : ICDCheckInDelegate {
+                override fun onCheckInComplete(info: ICDClientInfo) {
+                    Timber.tag(TAG).d("onCheckInComplete : $info")
+                    icdCheckInCallback?.notifyCheckInMessage(info)
+                }
+
+                override fun onKeyRefreshNeeded(info: ICDClientInfo): ByteArray? {
+                    Timber.tag(TAG).d("onKeyRefreshNeeded : $info")
+                    return null
+                }
+
+                override fun onKeyRefreshDone(errorCode: Long) {
+                    Timber.tag(TAG).d("onKeyRefreshDone : $errorCode")
+                }
+
+            })
         }
         return chipDeviceController
+    }
+
+    fun setICDCheckInCallback(callback: ICDCheckInCallback) {
+        icdCheckInCallback = callback
+    }
+
+
+    fun startDnssd(context: Context) {
+        if (!this::chipDeviceController.isInitialized) {
+            getDeviceController(context)
+        } else {
+            chipDeviceController.startDnssd()
+        }
+    }
+
+    fun stopDnssd(context: Context) {
+        if (!this::chipDeviceController.isInitialized) {
+            getDeviceController(context)
+        }
+        chipDeviceController.stopDnssd()
     }
 
     fun getAndroidChipPlatform(context: Context?): AndroidChipPlatform {
@@ -63,9 +101,9 @@ object ChipClient {
     }
 
     private fun showMessage(msg: String, context: Context) {
-      //  Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        //  Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         CustomToastManager.show(
-            context,msg,5000
+            context, msg, 5000
         )
     }
 
@@ -100,7 +138,7 @@ object ChipClient {
             try {
                 getDeviceController(context).getConnectedDevicePointer(
                     nodeId,
-                    object : GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback {
+                    object : GetConnectedDeviceCallback {
                         override fun onDeviceConnected(devicePointer: Long) {
                             Timber.tag(TAG).d("Got connected device pointer")
                             continuation.resume(devicePointer)

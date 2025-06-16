@@ -11,7 +11,6 @@ import com.siliconlabs.bledemo.features.configure.advertiser.utils.Translator
 import com.siliconlabs.bledemo.features.configure.advertiser.views.AdvertiserDetails
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.AdapterAdvertiserBinding
-import com.siliconlabs.bledemo.utils.CustomToastManager
 
 class AdvertiserAdapter(
         private val items: ArrayList<Advertiser>,
@@ -86,9 +85,7 @@ class AdvertiserAdapter(
                     if (isChecked) clickListener.switchItemOn(adapterPosition)
                     else clickListener.switchItemOff(adapterPosition)
                 } else {
-                    //Toast.makeText(itemView.context, R.string.toast_bluetooth_not_enabled, Toast.LENGTH_SHORT).show()
-                    val message = itemView.context.getString(R.string.toast_bluetooth_not_enabled)
-                    CustomToastManager.show(itemView.context,message,5000)
+                    Toast.makeText(itemView.context, R.string.toast_bluetooth_not_enabled, Toast.LENGTH_SHORT).show()
                     if (isChecked) viewBinding.swAdvertiser.isChecked = false
                 }
             }

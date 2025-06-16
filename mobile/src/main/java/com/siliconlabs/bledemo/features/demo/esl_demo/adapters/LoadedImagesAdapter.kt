@@ -2,6 +2,7 @@ package com.siliconlabs.bledemo.features.demo.esl_demo.adapters
 
 import android.net.Uri
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -29,7 +30,7 @@ class LoadedImagesAdapter(
     }
 
     override fun getItemCount(): Int {
-        return imageUris.size
+        return 2
     }
 
     override fun onBindViewHolder(holder: LoadedImageViewHolder, position: Int) {
@@ -56,6 +57,7 @@ class LoadedImagesAdapter(
 
             _binding.apply {
                 imageInfo?.let {
+                    tvImageNoSpecifiers.visibility = View.GONE
                     eslImageLoaded.load(it) {
                         scale(Scale.FILL)
                         transformations(RoundedCornersTransformation())
@@ -64,6 +66,7 @@ class LoadedImagesAdapter(
                     eslImageLoaded.dispose()
                     eslImageLoaded.load(R.color.silabs_click_grey)
                     eslImageLoaded.setBackgroundColor(ContextCompat.getColor(eslImageLoading.context, R.color.silabs_click_grey))
+                    tvImageNoSpecifiers.text = "Image ${position + 1}"
                 }
 
                 root.strokeWidth =

@@ -1296,7 +1296,7 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     private fun hasOtaFileCorrectExtension(filename: String?): Boolean {
-        return filename?.toUpperCase(Locale.getDefault())?.contains(".GBL")!!
+        return filename?.uppercase(Locale.getDefault())?.contains(".GBL")!!
     }
 
     private fun getDeviceName(): String {

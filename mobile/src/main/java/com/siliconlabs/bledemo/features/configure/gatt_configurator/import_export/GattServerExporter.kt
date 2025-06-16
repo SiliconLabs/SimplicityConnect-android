@@ -31,7 +31,7 @@ class GattServerExporter(private val serializer: XmlSerializer = Xml.newSerializ
 
     private fun convertNames(servers: List<GattServer>) : List<String> {
         return servers.map { server ->
-            server.name.toLowerCase(Locale.getDefault()).replace(" ", "_")
+            server.name.lowercase(Locale.getDefault()).replace(" ", "_")
         }.toMutableList().apply {
             while (this.size != this.distinct().size) {
                 this.groupingBy { it }.eachCount().filter { it.value > 1 }.forEach { repeated ->

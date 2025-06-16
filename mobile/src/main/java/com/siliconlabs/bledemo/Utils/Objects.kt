@@ -15,6 +15,12 @@
  */
 package com.siliconlabs.bledemo.utils
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import androidx.compose.ui.input.key.type
+import androidx.core.content.getSystemService
 import java.util.*
 
 /**
@@ -86,4 +92,25 @@ object Objects {
     fun toString(o: Any?, nullString: String): String {
         return o?.toString() ?: nullString
     }
+
+     fun isNetworkAvailable(context: Context?): Boolean {
+         if (context == null) return false
+         val connectivityManager =
+             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+             val capabilities =
+                 connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+             if (capabilities != null) {
+                 return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                         capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+             }
+         } else {
+             val activeNetworkInfo = connectivityManager.activeNetworkInfo
+             if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
+                 return activeNetworkInfo.type == ConnectivityManager.TYPE_WIFI ||
+                         activeNetworkInfo.type == ConnectivityManager.TYPE_MOBILE
+             }
+         }
+         return false
+         }
 }

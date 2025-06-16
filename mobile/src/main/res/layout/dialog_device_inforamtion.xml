@@ -1,0 +1,922 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/rounded_dialog_background"
+        android:orientation="vertical"
+        android:padding="@dimen/matter_10dp">
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/settings_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/device_information_title" />
+
+        <TextView
+            android:id="@+id/hardware_header_title"
+            style="@style/settings_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:text="@string/device_information_header_one" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/matter_1dp"
+            android:background="@color/black" />
+
+        <LinearLayout
+            android:id="@+id/device_name_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/device_name_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_device_name_label" />
+
+            <TextView
+                android:id="@+id/device_name_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_device_name_label" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/android_version_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/android_version_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_android_version_label" />
+
+            <TextView
+                android:id="@+id/android_version_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_title" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/manufacturer_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/manufacturer_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_manufacturer_label" />
+
+            <TextView
+                android:id="@+id/manufacturer_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/model_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/model_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_model_label" />
+
+            <TextView
+                android:id="@+id/model_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_model_label" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/build_version_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/build_version_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_build_version_label" />
+
+            <TextView
+                android:id="@+id/build_version_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_build_version_label" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/board_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/board_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_board_label" />
+
+            <TextView
+                android:id="@+id/board_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_board_label" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/product_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/product_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_product_label" />
+
+            <TextView
+                android:id="@+id/product_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_product_label" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:id="@+id/bluetooth_header"
+            style="@style/settings_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:text="@string/device_information_header_two" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/matter_1dp"
+            android:background="@color/black" />
+        <!--        BLE Supported-->
+        <LinearLayout
+            android:id="@+id/bluetooth_low_energy_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/bluetooth_low_energy_supported_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/bluetooth_low_energy_supported" />
+
+            <TextView
+                android:id="@+id/bluetooth_low_energy_supported_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <!--        HID-->
+        <LinearLayout
+            android:id="@+id/native_hid_supported_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/native_hid_supported_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/native_hid_supported" />
+
+            <TextView
+                android:id="@+id/native_hid_supported_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <!--        HID-->
+        <LinearLayout
+            android:id="@+id/lollipop_scanner_api_supported_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/lollipop_scanner_api_supported_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/lollipop_scanner_api_supported" />
+
+            <TextView
+                android:id="@+id/lollipop_scanner_api_supported_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <!-- Offloaded filtering supported -->
+        <LinearLayout
+            android:id="@+id/offloadingSupportContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/offloaded_filtering_supported" />
+
+            <TextView
+                android:id="@+id/tv_show_offload_filter"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/offloadingScanBatchingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/offload_scan_batch_support" />
+
+            <TextView
+                android:id="@+id/tv_show_offload_scan_batch"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/peripheralModeContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/peripheral_mode" />
+
+            <TextView
+                android:id="@+id/tv_show_per_mode_supp"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/multipleModeAdvContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/multiple_mode_adv" />
+
+            <TextView
+                android:id="@+id/tv_show_mult_mode_adv"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="0dp">
+
+            <LinearLayout
+                android:id="@+id/highSpeedContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="2.5"
+                    android:text="@string/high_speed_supported"
+                    android:gravity="start"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_show_high_speed"
+                    style="@style/settings_header"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    tools:text="Not Supported" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/longRangeContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="2.5"
+                    android:text="@string/long_range_supported"
+                    android:gravity="start"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_show_long_range"
+                    style="@style/settings_header"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    tools:text="Not Supported" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/periodicAdvContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="2.5"
+                    android:text="@string/periodic_adv_supported"
+                    android:gravity="start"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_show_periodic_adv"
+                    style="@style/settings_header"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    tools:text="Not Supported" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/extendedAdvContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="2.5"
+                    android:text="@string/extended_adv_supported"
+                    android:gravity="start"
+                    />
+
+                <TextView
+                    android:id="@+id/tv_show_extended_adv"
+                    style="@style/settings_header"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    tools:text="Not Supported" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+<!--        Maximum advertising data lenght-->
+        <LinearLayout
+            android:id="@+id/maximum_advertising_data_length_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/maximum_advertising_data_length_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/maximum_advertising_data" />
+
+            <TextView
+                android:id="@+id/maximum_advertising_data_length_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start" />
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/bluetooth_audio_header"
+            style="@style/settings_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:text="@string/device_information_header_five" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/matter_1dp"
+            android:background="@color/black" />
+
+        <LinearLayout
+            android:id="@+id/le_audio_supported_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/le_audio_supported_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/le_audio_supported_label" />
+
+            <TextView
+                android:id="@+id/le_audio_supported_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+
+                android:text="@string/le_audio_supported_info" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/le_audio_broadcast_source_supported_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/le_audio_broadcast_source_supported_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/le_audio_broadcast_source_supported_label" />
+
+            <TextView
+                android:id="@+id/le_audio_broadcast_source_supported_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/le_audio_broadcast_source_supported_yes" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/le_audio_broadcast_assist_supported_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/le_audio_broadcast_assist_supported_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/le_audio_broadcast_assist_supported_label" />
+
+            <TextView
+                android:id="@+id/le_audio_broadcast_assist_supported_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/le_audio_broadcast_assist_supported_yes" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/max_connect_audio_device_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/max_connect_audio_device_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="start"
+                android:text="@string/device_information_max_connect_audio_device_label" />
+
+            <TextView
+                android:id="@+id/max_connect_audio_device_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_max_connect_audio_device_info" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+
+        <TextView
+            android:id="@+id/screen_header"
+            style="@style/settings_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:text="@string/device_information_header_three" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/matter_1dp"
+            android:background="@color/black" />
+
+        <LinearLayout
+            android:id="@+id/resolution_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/resolution_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_resolution_label" />
+
+            <TextView
+                android:id="@+id/resolution_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_resolution_label" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dimension_px_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/dimension_px_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_dimension_px_label" />
+
+            <TextView
+                android:id="@+id/dimension_px_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_title" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dimension_dip_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/dimension_dip_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_dimension_dip_label" />
+
+            <TextView
+                android:id="@+id/dimension_dip_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_manufacturer_label" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/wide_color_gamut_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/wide_color_gamut_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_wide_color_gamut_label" />
+
+            <TextView
+                android:id="@+id/wide_color_gamut_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_model_label" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/high_dynamic_range_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/high_dynamic_range_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_high_dynamic_range_label" />
+
+            <TextView
+                android:id="@+id/high_dynamic_range_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_build_version_label" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/size_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/size_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_size_label" />
+
+            <TextView
+                android:id="@+id/size_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_board_label" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/aspect_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/aspect_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_aspect_label" />
+
+            <TextView
+                android:id="@+id/aspect_info"
+                style="@style/settings_header"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/device_information_product_label" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp" />
+
+        <Button
+            android:id="@+id/button_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/button_close" />
+    </LinearLayout>
+</ScrollView>

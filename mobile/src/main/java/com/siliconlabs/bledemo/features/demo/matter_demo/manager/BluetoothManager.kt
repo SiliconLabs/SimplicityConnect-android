@@ -30,7 +30,7 @@ import kotlin.coroutines.resume
 class BluetoothManager : BleCallback {
     private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
     private var bleGatt: BluetoothGatt? = null
-    private val TIME_OUT =  7000
+
 
     var connectionId = 0
         private set
@@ -72,7 +72,7 @@ class BluetoothManager : BleCallback {
         }
 
 
-        return withTimeoutOrNull(7000) {
+        return withTimeoutOrNull(10000) {
             callbackFlow {
                 val scanCallback = object : ScanCallback() {
                     override fun onScanResult(callbackType: Int, result: ScanResult) {

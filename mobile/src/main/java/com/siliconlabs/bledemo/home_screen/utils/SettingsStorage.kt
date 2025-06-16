@@ -5,7 +5,7 @@ import android.content.Context
 class SettingsStorage(context: Context) {
     private val preferences = context.getSharedPreferences(PREFS_SETTINGS_STORAGE, Context.MODE_PRIVATE)
 
-    fun loadScanSetting() = preferences.getInt(KEY_SCAN_TIMEOUT, SCAN_SETTING_MINUTE)
+    fun loadScanSetting() = preferences.getInt(KEY_SCAN_TIMEOUT, SCAN_SETTING_INFINITE)
 
     fun saveScanSetting(secondsToTimeout: Int) {
         with (preferences.edit()) {

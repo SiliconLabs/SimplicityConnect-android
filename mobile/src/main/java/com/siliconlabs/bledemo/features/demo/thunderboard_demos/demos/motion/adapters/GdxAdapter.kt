@@ -129,7 +129,7 @@ class GdxAdapter(private val backgroundColor: Int, modelType: String?) :
             for (child in node.children) {
                 for (part in child.parts) {
                     if (part.material.id != null && materialIds.contains(part.material.id
-                                    .toLowerCase())) {
+                                    .lowercase())) {
                         val material = part.material
                         lightMaterials?.add(material)
                     }

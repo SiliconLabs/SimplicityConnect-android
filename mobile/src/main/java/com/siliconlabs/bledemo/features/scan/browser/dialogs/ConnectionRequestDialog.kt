@@ -10,7 +10,6 @@ import android.widget.Toast
 import com.siliconlabs.bledemo.base.fragments.BaseDialogFragment
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.DialogRequestPriorityBinding
-import com.siliconlabs.bledemo.utils.CustomToastManager
 
 class ConnectionRequestDialog(
         private val currentPriority: Int,
@@ -66,10 +65,8 @@ class ConnectionRequestDialog(
                 getPriority()?.let { priority ->
                     callback.onConnectionPriorityRequested(priority)
                     dismiss()
-                } ?: CustomToastManager.show(requireContext(), getString(
-                    R.string.no_priority_chosen),5000)
-                /*Toast.makeText(requireContext(), getString(
-                        R.string.no_priority_chosen), Toast.LENGTH_SHORT).show()*/
+                } ?: Toast.makeText(requireContext(), getString(
+                        R.string.no_priority_chosen), Toast.LENGTH_SHORT).show()
             }
             cancelRequest.setOnClickListener { dismiss() }
         }

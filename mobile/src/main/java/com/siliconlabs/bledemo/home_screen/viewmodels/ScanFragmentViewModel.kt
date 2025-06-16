@@ -350,7 +350,7 @@ class ScanFragmentViewModel(private val context: Context) : ScannerViewModel() {
         } ?: false
     }
 
-    private fun getLowerCase(text: String) = text.toLowerCase(Locale.getDefault())
+    private fun getLowerCase(text: String) = text.lowercase(Locale.getDefault())
 
     private fun generateDataColor() : Int {
         return Color.rgb(

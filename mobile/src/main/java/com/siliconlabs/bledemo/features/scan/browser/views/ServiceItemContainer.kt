@@ -63,17 +63,6 @@ class ServiceItemContainer(
     private fun setupUiListeners() {
         _binding.apply {
             tvRenameService.setOnClickListener { callback.onRenameClicked(this@ServiceItemContainer) }
-            containerMoreLessInfo.setOnClickListener {
-                if (serviceCharacteristicsContainer.visibility == View.VISIBLE) {
-                    tvMoreInfo.text = resources.getString(R.string.more_info)
-                    serviceCharacteristicsContainer.visibility = View.GONE
-                    expandArrow.setState(shouldShowDetails = false)
-                } else {
-                    tvMoreInfo.text = resources.getString(R.string.Less_Info)
-                    expandArrow.setState(shouldShowDetails = true)
-                    animateCharacteristicExpansion()
-                }
-            }
             expandArrow.setOnClickListener {
                 if (serviceCharacteristicsContainer.visibility == View.VISIBLE) {
                     tvMoreInfo.text = resources.getString(R.string.more_info)

@@ -19,20 +19,20 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.databinding.FragmentDemoBinding
-import com.siliconlabs.bledemo.features.demo.devkitsensor917.activities.DevKitSensor917Activity
 import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoActivity
 import com.siliconlabs.bledemo.features.demo.range_test.activities.RangeTestActivity
 import com.siliconlabs.bledemo.features.demo.wifi_ota_update.AlertErrorDialog
 import com.siliconlabs.bledemo.features.demo.wifi_ota_update.WiFiOtaFileManager
 import com.siliconlabs.bledemo.features.demo.wifi_ota_update.WiFiOtaFileSelectionDialog
 import com.siliconlabs.bledemo.features.demo.wifi_ota_update.WiFiOtaProgressDialog
+import com.siliconlabs.bledemo.features.demo.wifi_provisioning.activities.WiFiProvisioningActivity
 import com.siliconlabs.bledemo.features.demo.wifi_throughput.activities.WifiThroughputActivity
 import com.siliconlabs.bledemo.home_screen.adapters.DemoAdapter
 import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 import com.siliconlabs.bledemo.home_screen.base.LocationDependent
-import com.siliconlabs.bledemo.home_screen.base.NotificationDependent
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
+import com.siliconlabs.bledemo.home_screen.menu_items.AWSIOTDemo
 import com.siliconlabs.bledemo.home_screen.menu_items.Blinky
 import com.siliconlabs.bledemo.home_screen.menu_items.ConnectedLighting
 import com.siliconlabs.bledemo.home_screen.menu_items.DemoMenuItem
@@ -45,6 +45,7 @@ import com.siliconlabs.bledemo.home_screen.menu_items.Motion
 import com.siliconlabs.bledemo.home_screen.menu_items.OTADemo
 import com.siliconlabs.bledemo.home_screen.menu_items.RangeTest
 import com.siliconlabs.bledemo.home_screen.menu_items.Throughput
+import com.siliconlabs.bledemo.home_screen.menu_items.WiFiProvisioning
 import com.siliconlabs.bledemo.home_screen.menu_items.WiFiThroughput
 import com.siliconlabs.bledemo.home_screen.menu_items.WifiCommissioning
 import com.siliconlabs.bledemo.utils.BLEUtils
@@ -175,7 +176,6 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                     getString(R.string.dev_kit_sensor_917_desc)
                 )
             )
-
             add(
                 WiFiThroughput(
                     R.drawable.redesign_ic_demo_wifi_throughput,
@@ -183,6 +183,21 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                     getString(R.string.wifi_main_menu_description_wifi_throughput)
                 )
             )
+            add(
+                WiFiProvisioning(
+                    R.drawable.redesign_ic_demo_wifi_provisioning,
+                    getString(R.string.wifi_provisioning_label),
+                    getString(R.string.wifi_provisioning_description)
+                )
+            )
+            add(
+                AWSIOTDemo(
+                    R.drawable.ic_aws_iot_icon,
+                    getString(R.string.aws_title),
+                    getString(R.string.aws_desc)
+                )
+            )
+
         }
     }
 
@@ -253,22 +268,6 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
 
 
     override fun onDemoItemClicked(demoItem: DemoMenuItem) {
-        /* if (demoItem.connectType == BluetoothService.GattConnectType.DEV_KIT_SENSOR) {
-             if (isNetworkAvailable(context)) {
-                 requireContext().startActivity(
-                     Intent(
-                         requireContext(),
-                         DevKitSensor917Activity::class.java
-                     )
-                 )
-             }else{
-                 Toast.makeText(
-                     requireContext(),
-                     getString(R.string.turn_on_wifi),
-                     Toast.LENGTH_SHORT
-                 ).show()
-             }
-         } else */
         if (demoItem.connectType == BluetoothService.GattConnectType.MATTER_DEMO) {
             requireContext().startActivity(Intent(requireContext(), MatterDemoActivity::class.java))
         } else if (demoItem.connectType == BluetoothService.GattConnectType.RANGE_TEST) {
@@ -288,34 +287,29 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                     it.show(childFragmentManager, "ota_file_selection_dialog")
                 }
             } else {
-                /*Toast.makeText(
-                    requireContext(),
-                    getString(R.string.turn_on_wifi),
-                    Toast.LENGTH_SHORT
-                ).show()*/
-                CustomToastManager.show(requireContext(),getString(R.string.turn_on_wifi),5000)
+                CustomToastManager.show(requireContext(), getString(R.string.turn_on_wifi), 5000)
             }
-        } else if(demoItem.connectType == BluetoothService.GattConnectType.WIFI_THROUGHPUT_TEST){
+        } else if (demoItem.connectType == BluetoothService.GattConnectType.WIFI_THROUGHPUT_TEST) {
             if (isNetworkAvailable(context)) {
-                /*GlobalScope.launch(Dispatchers.Main) {
-                    val result = withContext(Dispatchers.IO) {
-                        ThroughputUtils.sendEvent()
-                    }
-                }*/
                 requireContext().startActivity(
                     Intent(
                         requireContext(),
                         WifiThroughputActivity::class.java
                     )
                 )
-            }else {
-                /*Toast.makeText(
-                    requireContext(),
-                    getString(R.string.turn_on_wifi),
-                    Toast.LENGTH_SHORT
-                ).show()*/
-                CustomToastManager.show(requireContext(),getString(R.string.turn_on_wifi),5000)
-
+            } else {
+                CustomToastManager.show(requireContext(), getString(R.string.turn_on_wifi), 5000)
+            }
+        } else if (demoItem.connectType == BluetoothService.GattConnectType.WIFI_PROVISIONING) {
+            if (isNetworkAvailable(context)) {
+                requireContext().startActivity(
+                    Intent(
+                        requireContext(),
+                        WiFiProvisioningActivity::class.java
+                    )
+                )
+            } else {
+                CustomToastManager.show(requireContext(), getString(R.string.turn_on_wifi), 5000)
             }
         } else {
             println("BLE_PROV demoItem:${demoItem.connectType}")
@@ -389,7 +383,11 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                         getString(R.string.incorrect_file),
                         Toast.LENGTH_SHORT
                     ).show()*/
-                    CustomToastManager.show(requireContext(), getString(R.string.incorrect_file),5000)
+                    CustomToastManager.show(
+                        requireContext(),
+                        getString(R.string.incorrect_file),
+                        5000
+                    )
 
                 } else {
                     /*Toast.makeText(
@@ -397,7 +395,11 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                         getString(R.string.no_file_chosen),
                         Toast.LENGTH_SHORT
                     ).show()*/
-                    CustomToastManager.show(requireContext(), getString(R.string.no_file_chosen),5000)
+                    CustomToastManager.show(
+                        requireContext(),
+                        getString(R.string.no_file_chosen),
+                        5000
+                    )
 
                 }
             } else {
@@ -406,7 +408,11 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                     getString(R.string.port_id_validation),
                     Toast.LENGTH_SHORT
                 ).show()*/
-                CustomToastManager.show(requireContext(), getString(R.string.port_id_validation),5000)
+                CustomToastManager.show(
+                    requireContext(),
+                    getString(R.string.port_id_validation),
+                    5000
+                )
 
             }
         }
@@ -712,14 +718,22 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                             getString(R.string.incorrect_file),
                             Toast.LENGTH_SHORT
                         ).show()*/
-                        CustomToastManager.show(requireContext(),getString(R.string.incorrect_file),5000)
+                        CustomToastManager.show(
+                            requireContext(),
+                            getString(R.string.incorrect_file),
+                            5000
+                        )
                     }
                 } ?: /*Toast.makeText(
                     requireContext(),
                     getString(R.string.chosen_file_not_found),
                     Toast.LENGTH_SHORT
                 ).show()*/
-                CustomToastManager.show(requireContext(),getString(R.string.chosen_file_not_found),5000)
+                CustomToastManager.show(
+                    requireContext(),
+                    getString(R.string.chosen_file_not_found),
+                    5000
+                )
 
             }
         }

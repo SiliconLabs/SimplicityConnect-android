@@ -36,9 +36,9 @@ class Service16BitAdapter(context: Context, services: List<Service16Bit>) : Arra
             if (constraint == null || constraint.isEmpty()) {
                 suggestions.addAll(serviceListFull)
             } else {
-                val filterPattern = constraint.toString().toLowerCase(Locale.getDefault()).trim()
+                val filterPattern = constraint.toString().lowercase(Locale.getDefault()).trim()
                 for (item in serviceListFull) {
-                    if (item.name.toLowerCase(Locale.getDefault()).contains(filterPattern) || item.identifier.toString(16).startsWith(filterPattern)) {
+                    if (item.name.lowercase(Locale.getDefault()).contains(filterPattern) || item.identifier.toString(16).startsWith(filterPattern)) {
                         suggestions.add(item)
                     }
                 }

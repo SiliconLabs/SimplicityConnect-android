@@ -5,6 +5,7 @@
     android:weightSum="1">
 
     <EditText
+        android:drawableEnd="@drawable/visibility_off"
         android:id="@+id/password_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

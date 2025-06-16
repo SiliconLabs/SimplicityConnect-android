@@ -12,7 +12,6 @@ import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFrag
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 import com.siliconlabs.bledemo.home_screen.base.LocationDependent
 import com.siliconlabs.bledemo.home_screen.base.NotificationDependent
-import com.siliconlabs.bledemo.utils.BLEUtils
 
 class TestFragment : BaseServiceDependentMainMenuFragment(), DialogInterface.OnDismissListener {
 
@@ -47,7 +46,6 @@ class TestFragment : BaseServiceDependentMainMenuFragment(), DialogInterface.OnD
 
     private fun setupUiListeners() {
         viewBinding.fragmentMainView.extendedFabMainView.setOnClickListener {
-            BLEUtils.GATT_DEVICE_SELECTED = BluetoothService.GattConnectType.IOP_TEST
             selectDeviceDialog = SelectDeviceDialog.newDialog(BluetoothService.GattConnectType.IOP_TEST)
             selectDeviceDialog?.show(childFragmentManager, "select_device_dialog")
         }

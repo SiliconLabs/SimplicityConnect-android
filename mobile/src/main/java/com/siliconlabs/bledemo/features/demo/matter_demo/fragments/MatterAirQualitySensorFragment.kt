@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -19,12 +20,15 @@ import chip.devicecontroller.GetConnectedDeviceCallbackJni
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.beacon_utils.eddystone.Constants
 import com.siliconlabs.bledemo.databinding.FragmentMatterAirQualitySensorBinding
+import com.siliconlabs.bledemo.databinding.FragmentMatterThermostatBinding
 import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoActivity
 import com.siliconlabs.bledemo.features.demo.matter_demo.controller.GenericChipDeviceListener
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ARG_DEVICE_MODEL
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.INIT
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment.Companion.ON_OFF_CLUSTER_ENDPOINT
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannerFragment.Companion.AQI
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannerFragment.Companion.SPACE
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterTemperatureSensorFragment.Companion.TEMPERATURE_UNIT
 import com.siliconlabs.bledemo.features.demo.matter_demo.model.MatterScannedResultModel
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ChipClient
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
@@ -289,6 +293,7 @@ class MatterAirQualitySensorFragment : Fragment() {
 
     private fun showMessage(msg: String) {
         requireActivity().runOnUiThread {
+            //Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
             CustomToastManager.show(
                 requireContext(),msg,5000
             )

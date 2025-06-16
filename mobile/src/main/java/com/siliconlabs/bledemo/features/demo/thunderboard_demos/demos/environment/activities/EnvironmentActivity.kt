@@ -5,16 +5,20 @@ import android.app.AlertDialog
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
-import android.view.LayoutInflater
+import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -27,7 +31,8 @@ import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.activities.
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models.ThunderBoardDevice
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.utils.SensorChecker
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.utils.SensorChecker.ThunderboardSensor
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.control.*
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.control.EnvironmentControl
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.control.HallStateControl
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.dialogs.SettingsDialog
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.model.HallState
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.model.TemperatureScale
@@ -210,7 +215,7 @@ class EnvironmentActivity : ThunderboardActivity() {
                         getString(getTileDescription(it.key)),
                         ContextCompat.getDrawable(this@EnvironmentActivity, getTileIcon(it.key))
                     ).also {
-                        runOnUiThread { addView(it.tileView.root) }
+                        runOnUiThread { addView(it.tileView?.root) }
                     }
                 } else {
 
@@ -219,7 +224,7 @@ class EnvironmentActivity : ThunderboardActivity() {
                         getString(getTileDescription(it.key)),
                         ContextCompat.getDrawable(this@EnvironmentActivity, getTileIcon(it.key))
                     ).also {
-                        runOnUiThread { addView(it.tileView.root) }
+                        runOnUiThread { addView(it.tileView?.root) }
                     }
                 }
             }

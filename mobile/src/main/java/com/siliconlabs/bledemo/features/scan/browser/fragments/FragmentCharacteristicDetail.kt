@@ -26,7 +26,6 @@ import com.siliconlabs.bledemo.features.scan.browser.views.*
 import com.siliconlabs.bledemo.features.scan.browser.utils.GlucoseManagement
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.utils.Converters
-import com.siliconlabs.bledemo.utils.CustomToastManager
 import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
@@ -69,11 +68,7 @@ open class FragmentCharacteristicDetail : Fragment() {
     private var fieldViewHelper: FieldViewHelper? = null
 
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_characteristic_details, container, false)
     }
 
@@ -136,21 +131,14 @@ open class FragmentCharacteristicDetail : Fragment() {
         }
         activity?.runOnUiThread {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                /*Toast.makeText(
-                    activity,
-                    getText(R.string.characteristic_write_success),
-                    Toast.LENGTH_SHORT
-                ).show()*/
-                CustomToastManager.show(requireContext(),getString(R.string.characteristic_write_success),5000)
+                Toast.makeText(activity, getText(R.string.characteristic_write_success), Toast.LENGTH_SHORT).show()
                 editableFieldsDialog?.dismiss()
             } else {
-                /*Toast.makeText(
-                    activity,
-                    getText(R.string.characteristic_write_fail),
-                    Toast.LENGTH_SHORT
-                ).show()*/
-                CustomToastManager.show(requireContext(),getString(R.string.characteristic_write_fail),5000)
-
+                Toast.makeText(
+                        activity,
+                        getText(R.string.characteristic_write_fail),
+                        Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -175,7 +163,8 @@ open class FragmentCharacteristicDetail : Fragment() {
             } else {
                 if (value.isNotEmpty()) previousValue = value.clone()
             }
-        } else {
+        }
+        else {
             if (currRefreshInterval >= REFRESH_INTERVAL) {
                 currRefreshInterval = 0
                 offset = 0
@@ -213,17 +202,8 @@ open class FragmentCharacteristicDetail : Fragment() {
 
         if (isRemote) {
             mBluetoothCharact?.let {
-                it.writeType = editableFieldsDialog?.getChosenWriteMethod()
-                    ?: BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                it.writeType = editableFieldsDialog?.getChosenWriteMethod() ?: BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
                 (activity as DeviceServicesActivity).bluetoothGatt?.writeCharacteristic(it)
-                println("statusPropertyDetail :${it.writeType}")
-                if(it.writeType != 1){
-                    //UPDATE ONLY FOR WRITE PROPERTY
-                    //DO NOT UPDATE FOR WRITE WITHOUT RESPONSE PROPERTY
-                    updateValueView(false)
-                }
-
-
             }
         } else {
             updateValueView(false)
@@ -236,19 +216,17 @@ open class FragmentCharacteristicDetail : Fragment() {
         (activity as DeviceServicesActivity).bluetoothService?.let {
             getClients(it, characteristic, confirm).forEach { device ->
                 it.bluetoothGattServer?.notifyCharacteristicChanged(
-                    device,
-                    characteristic,
-                    confirm
-                )
+                        device,
+                        characteristic,
+                        confirm)
             }
         }
     }
 
-    private fun getClients(
-        service: BluetoothService,
-        characteristic: BluetoothGattCharacteristic,
-        confirm: Boolean
-    ): Collection<BluetoothDevice> {
+    private fun getClients(service: BluetoothService,
+                           characteristic: BluetoothGattCharacteristic,
+                           confirm: Boolean
+    ) : Collection<BluetoothDevice> {
         return if (confirm)
             service.getClientsToIndicate(characteristic.uuid)
         else service.getClientsToNotify(characteristic.uuid)
@@ -307,16 +285,12 @@ open class FragmentCharacteristicDetail : Fragment() {
             try {
                 if (GlucoseManagement.isRecordAccessControlPoint(mCharact) && it.name == "Operand") {
                     it.format =
-                        if (GlucoseManagement.isNumberOfRecordsResponse(
-                                mBluetoothCharact,
-                                value
-                            )
-                        ) "16bit"
+                        if (GlucoseManagement.isNumberOfRecordsResponse(mBluetoothCharact, value)) "16bit"
                         else "variable"
                 }
                 addField(it)
                 if (GlucoseManagement.isCgmSpecificOpsControlPoint(mCharact) && it.name == "Operand") {
-                    return true
+                   return true
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
@@ -350,9 +324,9 @@ open class FragmentCharacteristicDetail : Fragment() {
             val readBits = readSize * 8
 
             builder.append("Reason: expected data length is ")
-                .append(expectedBits)
-                .append("-bit (")
-                .append(expectedBytes)
+                    .append(expectedBits)
+                    .append("-bit (")
+                    .append(expectedBytes)
 
             if (expectedBytes == 1) {
                 builder.append(" byte), ")
@@ -361,10 +335,10 @@ open class FragmentCharacteristicDetail : Fragment() {
             }
 
             builder.append("\n")
-                .append("read data length is ")
-                .append(readBits)
-                .append("-bit (")
-                .append(readSize)
+                    .append("read data length is ")
+                    .append(readBits)
+                    .append("-bit (")
+                    .append(readSize)
 
             if (readSize == 1) {
                 builder.append(" byte).")
@@ -383,10 +357,7 @@ open class FragmentCharacteristicDetail : Fragment() {
             }
         }
 
-        override fun handleRawValueViews(
-            rawValuesContainer: View,
-            rawValueViews: ArrayList<EditText>
-        ) {
+        override fun handleRawValueViews(rawValuesContainer: View, rawValueViews: ArrayList<EditText>) {
             valuesLayout.addView(rawValuesContainer)
             this@FragmentCharacteristicDetail.rawValueViews.addAll(rawValueViews)
         }
@@ -404,41 +375,27 @@ open class FragmentCharacteristicDetail : Fragment() {
                     val currentValue = value
                     val currentOffset = offset
                     val fieldSize = calculateFieldSize(field)
-                    val currentRange =
-                        currentValue.copyOfRange(currentOffset, currentOffset + fieldSize)
+                    val currentRange = currentValue.copyOfRange(currentOffset, currentOffset + fieldSize)
 
-                    if (GlucoseManagement.isNumberOfRecordsResponse(
-                            mBluetoothCharact,
-                            value
-                        ) && field.name == "Operand"
-                    ) {
+                    if (GlucoseManagement.isNumberOfRecordsResponse(mBluetoothCharact, value) && field.name == "Operand") {
                         handleNumberOfRecordsView(field, fieldSize, currentRange.copyOfRange(0, 1))
                         return
                     }
 
                     if (field.bitfield != null) {
-                        BitFieldView(context, field, currentRange).createViewForRead(
-                            !parseProblem,
-                            viewHandler
-                        )
+                        BitFieldView(context, field, currentRange).createViewForRead(!parseProblem, viewHandler)
                         offset += field.getSizeInBytes()
-                    } else if (field.enumerations != null && field.enumerations?.size!! > 0) {
+                    }
+                    else if (field.enumerations != null && field.enumerations?.size!! > 0) {
                         if (field.isNibbleFormat()) {
                             handleNibbleRead(field, currentRange[0])
                         } else {
-                            EnumerationView(
-                                context,
-                                field,
-                                currentRange
-                            ).createViewForRead(!parseProblem, viewHandler)
+                            EnumerationView(context, field, currentRange).createViewForRead(!parseProblem, viewHandler)
                             offset += field.getSizeInBytes()
                         }
-                    } else {
-                        NormalValueView(
-                            context,
-                            field,
-                            currentRange
-                        ).createViewForRead(!parseProblem, viewHandler)
+                    }
+                    else {
+                        NormalValueView(context, field, currentRange).createViewForRead(!parseProblem, viewHandler)
                         offset += fieldSize
                     }
                 }
@@ -455,21 +412,18 @@ open class FragmentCharacteristicDetail : Fragment() {
 
     private fun handleNibbleRead(field: Field, data: Byte) {
         val value =
-            if (field.isMostSignificantNibble()) Converters.byteToUnsignedInt(data) shr 4
-            else Converters.byteToUnsignedInt(data) and 0x0f
-        EnumerationView(
-            context,
-            field,
-            byteArrayOf(value.toByte())
-        ).createViewForRead(!parseProblem, viewHandler)
+                if (field.isMostSignificantNibble()) Converters.byteToUnsignedInt(data) shr 4
+                else Converters.byteToUnsignedInt(data) and 0x0f
+        EnumerationView(context, field, byteArrayOf(value.toByte())).createViewForRead(!parseProblem, viewHandler)
 
         if (!field.isFirstNibbleInSchema()) offset += field.getSizeInBytes()
     }
 
-    private fun calculateFieldSize(field: Field): Int {
+    private fun calculateFieldSize(field: Field) : Int {
         return if (field.getSizeInBytes() != 0) {
             field.getSizeInBytes()
-        } else when (field.format) {
+        }
+        else when (field.format) {
             "utf8s", "utf16s" -> value.size - offset
             "variable" -> field.getVariableFieldLength(mCharact, value)
             else -> 0
@@ -506,15 +460,9 @@ open class FragmentCharacteristicDetail : Fragment() {
     // Called when characteristic parsing error occurred
     private fun addProblemInfoView() {
         val problemTextView = TextView(context).apply {
-            setTextSize(
-                TypedValue.COMPLEX_UNIT_PX,
-                resources.getDimension(R.dimen.characteristic_list_item_value_text_size)
-            )
+            setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.characteristic_list_item_value_text_size))
             context?.let { setBackgroundColor(ContextCompat.getColor(it, R.color.silabs_white)) }
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             typeface = Typeface.DEFAULT_BOLD
             text = parsingProblemInfo
             setTextColor(Color.RED)
@@ -529,7 +477,7 @@ open class FragmentCharacteristicDetail : Fragment() {
             when (writeType) {
                 WriteType.LOCAL_INDICATE -> notifyClients(mBluetoothCharact!!, true)
                 WriteType.LOCAL_NOTIFY -> notifyClients(mBluetoothCharact!!, false)
-                else -> {}
+                else -> { }
             }
         }
     }
@@ -544,8 +492,7 @@ open class FragmentCharacteristicDetail : Fragment() {
     companion object {
         private const val REFRESH_INTERVAL = 500
         private const val MIN_NOTIFICATION_UPDATE_INTERVAL = 200
-        private const val REG_CERT_DATA_LIST_NAME =
-            "IEEE 11073-20601 Regulatory Certification Data List"
+        private const val REG_CERT_DATA_LIST_NAME = "IEEE 11073-20601 Regulatory Certification Data List"
         const val CGM_SPECIFIC_OPS_CONTROL_POINT_UUID = "2aac"
     }
 }

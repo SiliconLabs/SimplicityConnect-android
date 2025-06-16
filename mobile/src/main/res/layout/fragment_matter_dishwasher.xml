@@ -219,7 +219,7 @@
 
                             <TextView
                                 android:layout_marginStart="@dimen/matter_5dp"
-                                android:id="@+id/tv_energy_meter_reading"
+                                android:id="@+id/tv_average_energy_per_cycle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="@dimen/matter_5dp"
@@ -308,7 +308,6 @@
             android:text="@string/dishwasher_resfresh_text"
             android:layout_height="wrap_content">
         </TextView>
-
     </LinearLayout>
 </RelativeLayout>
 

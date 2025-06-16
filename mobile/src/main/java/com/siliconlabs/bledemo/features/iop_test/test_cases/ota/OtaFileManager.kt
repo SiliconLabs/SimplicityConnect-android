@@ -6,7 +6,6 @@ import android.provider.OpenableColumns
 import android.widget.Toast
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.features.iop_test.models.IopBoard
-import com.siliconlabs.bledemo.utils.CustomToastManager
 import java.util.*
 
 class OtaFileManager(private val context: Context) {
@@ -24,7 +23,7 @@ class OtaFileManager(private val context: Context) {
     }
 
     fun hasCorrectFileExtension(): Boolean {
-        return otaFilename?.toUpperCase(Locale.ROOT)?.contains(".GBL")!!
+        return otaFilename?.uppercase(Locale.ROOT)?.contains(".GBL")!!
     }
 
     fun readFilename(uri: Uri) {
@@ -52,11 +51,8 @@ class OtaFileManager(private val context: Context) {
         context.contentResolver.openInputStream(uri)?.let {
             otaFile = ByteArray(it.available())
             it.read(otaFile)
-        } ?: /*Toast.makeText(context, context.getString(R.string.problem_while_preparing_the_file),
-                Toast.LENGTH_LONG).show()*/
-        CustomToastManager.show(
-            context,context.getString(R.string.problem_while_preparing_the_file),5000
-        )
+        } ?: Toast.makeText(context, context.getString(R.string.problem_while_preparing_the_file),
+                Toast.LENGTH_LONG).show()
     }
 
     enum class UploadMode {

@@ -13,7 +13,7 @@ class Manufacturer(val identifier: Int, val data: ByteArray) : Parcelable {
     }
 
     private fun getCompanyDataAsString(): String {
-        return "0x".plus(Converters.bytesToHex(data).toUpperCase(Locale.getDefault()))
+        return "0x".plus(Converters.bytesToHex(data).uppercase(Locale.getDefault()))
     }
 
     fun getAsDescriptiveText(): String {

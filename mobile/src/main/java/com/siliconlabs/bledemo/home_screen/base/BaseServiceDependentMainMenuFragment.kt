@@ -11,7 +11,6 @@ import com.siliconlabs.bledemo.home_screen.views.BluetoothEnableBar
 import com.siliconlabs.bledemo.home_screen.views.LocationEnableBar
 import com.siliconlabs.bledemo.home_screen.views.LocationPermissionBar
 import com.siliconlabs.bledemo.home_screen.views.BluetoothPermissionsBar
-import com.siliconlabs.bledemo.utils.CustomToastManager
 
 abstract class BaseServiceDependentMainMenuFragment : BaseMainMenuFragment() {
 
@@ -91,19 +90,11 @@ abstract class BaseServiceDependentMainMenuFragment : BaseMainMenuFragment() {
     }
 
     fun showToastLengthShort(message: String) {
-        activity?.runOnUiThread {
-            //Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-            CustomToastManager.show(requireContext(), message,5000)
-
-        }
+        activity?.runOnUiThread { Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show() }
     }
 
     fun showToastLengthLong(message: String) {
-        activity?.runOnUiThread {
-           // Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
-            CustomToastManager.show(requireContext(), message,5000)
-
-        }
+        activity?.runOnUiThread { Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show() }
     }
 
     protected fun isBluetoothOperationPossible() : Boolean {

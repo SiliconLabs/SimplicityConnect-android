@@ -91,7 +91,7 @@ class EnumerationView(
     private fun calculateFieldValue() : Int {
         var calculatedValue: Int
 
-        if (field.format?.toLowerCase(Locale.getDefault()) == "16bit") {
+        if (field.format?.lowercase(Locale.getDefault()) == "16bit") {
             // for field "Category", last 6 bits of payload are used for sub categories
             if (field.name == "Category") {
                 val byte1: Int = fieldValue[0].toInt().and(0xff)

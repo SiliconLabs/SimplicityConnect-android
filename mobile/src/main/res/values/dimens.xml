@@ -334,6 +334,6 @@
     <dimen name="splash_si_connect_logo">-40dp</dimen>
     <dimen name="splash_si_labs_logo">40dp</dimen>
     <!-- wifi sensors -->
-    <dimen name="wifi_sensor_grid_width">118dp</dimen>
-    <dimen name="wifi_sensor_grid_height">118dp</dimen>
+    <dimen name="wifi_sensor_grid_width">100dp</dimen>
+    <dimen name="wifi_sensor_grid_height">125dp</dimen>
 </resources>

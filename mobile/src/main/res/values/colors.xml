@@ -129,4 +129,11 @@
     <color name="button_red">#FF0000</color>
     <color name="button_green">#00FF00</color>
     <color name="button_blue">#0000FF</color>
+    <color name="button_black">#000000</color>
+
+<!--    Device Info-->
+    <color name="red_text">#BD0909</color>
+    <color name="green_text">#18A918</color>
+    <color name="blue_text">#0000FF</color>
+    <color name="black_text">#000000</color>
 </resources>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/sl_light_grey">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/matter_15dp"
+        android:gravity="top|center_vertical"
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="@dimen/matter_5dp"
+            android:gravity="center"
+            android:text="@string/matter_light_switch_control"
+            android:textSize="@dimen/text_size_XL"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/lightNodeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/matter_10dp"
+            android:text="@string/matter_light_switch_control_node_light_id"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/lightNodeInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+
+        <TextView
+            android:id="@+id/switchNodeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/matter_10dp"
+            android:text="@string/matter_light_switch_control_node_switch_id"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/switchNodeInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/statusLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/matter_10dp"
+            android:text="@string/matter_light_switch_control_acl_status"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/statusACLInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/aclCtrlButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/matter_light_switch_control_acl_status"
+            android:visibility="gone" />
+
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/statusInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/groupListLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/matter_10dp"
+            android:text="@string/matter_light_switch_control_group_list_status"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/groupListInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+
+        <TextView
+            android:id="@+id/keyListLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/matter_10dp"
+            android:text="@string/matter_light_switch_control_key_list_status"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/statusBindingLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/matter_10dp"
+            android:text="@string/matter_light_switch_control_binding_status"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/statusBindingInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/keysListInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/bindingButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/matter_ligth_switch_control_binding_control"
+            android:visibility="gone" />
+
+        <!--Switch And Bind Button Row-->
+
+        <LinearLayout
+            android:id="@+id/layout_switch_bind"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/btn_rounded_white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/icon_switch"
+                android:layout_width="@dimen/matter_45dp"
+                android:layout_height="@dimen/matter_45dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="mattter switch icon"
+                android:src="@drawable/ic_matter_switch_off" />
+
+            <TextView
+                android:id="@+id/tv_switch_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Switch"
+                android:textColor="@color/silabs_black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!--<Button
+                android:id="@+id/btn_bind"
+                android:enabled="false"
+                android:clickable="false"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_background_grey_box"
+                android:text="Bind" />-->
+
+            <TextView
+                android:textColor="@color/white"
+                android:id="@+id/tv_show_bind_info"
+                android:paddingVertical="5dp"
+                android:paddingHorizontal="5dp"
+                android:background="@drawable/button_background_grey_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </TextView>
+
+
+
+        </LinearLayout>
+
+
+
+
+        <!-- No Device Message -->
+        <LinearLayout
+            android:visibility="visible"
+            android:id="@+id/layout_no_device"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_rounded_white"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_no_device_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="No active light device detected."
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_no_device_subtext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Please commission the light device to\nenable control operations."
+                android:textColor="#444444"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+
+
+
+        <!--UI Light Switch -->
+
+        <include
+            android:id="@+id/layout_view_light_bind"
+            android:visibility="gone"
+            layout="@layout/layout_light_binding"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </include>
+
+    </LinearLayout>
+</RelativeLayout>

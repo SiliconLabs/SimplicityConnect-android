@@ -14,7 +14,7 @@ class WiFiOtaFileManager(private val context: Context) {
     var otaFile: ByteArray? = null
 
     fun hasCorrectFileExtensionRPS(): Boolean {
-        return otaFilename?.toUpperCase(Locale.ROOT)?.contains(".RPS")!!
+        return otaFilename?.uppercase(Locale.ROOT)?.contains(".RPS")!!
     }
 
     fun readFilename(uri: Uri) {

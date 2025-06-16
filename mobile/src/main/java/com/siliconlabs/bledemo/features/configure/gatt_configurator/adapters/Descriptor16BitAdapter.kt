@@ -37,10 +37,10 @@ class Descriptor16BitAdapter(context: Context, descriptors: List<Descriptor16Bit
             if (constraint == null || constraint.isEmpty()) {
                 suggestions.addAll(descriptorsListFull)
             } else {
-                val filterPattern = constraint.toString().toLowerCase(Locale.ROOT).trim()
+                val filterPattern = constraint.toString().lowercase(Locale.ROOT).trim()
                 for (item in descriptorsListFull) {
                     if (searchMode == SearchMode.BY_NAME) {
-                        if (item.name.toLowerCase(Locale.ROOT).contains(filterPattern)) {
+                        if (item.name.lowercase(Locale.ROOT).contains(filterPattern)) {
                             suggestions.add(item)
                         }
                     } else {

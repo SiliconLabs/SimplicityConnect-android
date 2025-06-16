@@ -18,6 +18,6 @@ enum class Notifications(
     INDICATE(true, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
 
     override fun toString(): String {
-        return name.toLowerCase(Locale.ROOT)
+        return name.lowercase(Locale.ROOT)
     }
 }

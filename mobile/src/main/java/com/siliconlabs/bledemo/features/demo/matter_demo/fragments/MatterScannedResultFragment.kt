@@ -11,11 +11,12 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
@@ -24,6 +25,8 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.FragmentMatterScannedResultsBinding
 import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoActivity
 import com.siliconlabs.bledemo.features.demo.matter_demo.adapters.MatterScannedResultAdapter
+import com.siliconlabs.bledemo.features.demo.matter_demo.dishwasher_demo.view.MatterDishwasherFragment
+import com.siliconlabs.bledemo.features.demo.matter_demo.dishwasher_demo.view.MatterDishwasherFragment.Companion.DISHWASHER_PREF
 import com.siliconlabs.bledemo.features.demo.matter_demo.model.MatterScannedResultModel
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ChipClient
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.FragmentUtils
@@ -31,6 +34,7 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.utils.RecyclerViewMargi
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
 import com.siliconlabs.bledemo.utils.CustomToastManager
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
@@ -45,12 +49,15 @@ class MatterScannedResultFragment : Fragment() {
     private var pos: Int = 0
     private lateinit var matterAdapter: MatterScannedResultAdapter
     private lateinit var mPrefs: SharedPreferences
-
+    private lateinit var dishwasherPref: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mPrefs = requireContext().getSharedPreferences("your_preference_name", MODE_PRIVATE)
-
+        dishwasherPref = requireContext().getSharedPreferences(
+            DISHWASHER_PREF,
+            AppCompatActivity.MODE_PRIVATE
+        )
         deviceList = requireArguments().getParcelableArrayList(ARG_DEVICE_LIST)!!
     }
 
@@ -77,12 +84,17 @@ class MatterScannedResultFragment : Fragment() {
     }
 
     private fun showMessages(msgId: Int) {
-        requireActivity().runOnUiThread {
-            val resString = requireContext().getString(msgId)
-           // Toast.makeText(requireContext(), resString, Toast.LENGTH_SHORT).show()
-            CustomToastManager.show(
-                requireContext(),resString,5000
-            )
+        if (isAdded) { // Check if the Fragment is attached
+            requireActivity().runOnUiThread {
+                if(isAdded){
+                    val resString = requireContext().getString(msgId)
+                    if (resString.isNotEmpty()) { // Check for an empty string
+                        CustomToastManager.show(
+                            requireActivity(), resString, 5000
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -129,13 +141,18 @@ class MatterScannedResultFragment : Fragment() {
         deviceList = SharedPrefsUtils.retrieveSavedDevices(mPrefs)
         if (deviceList.size !== 0) {
             Timber.tag(TAG).e("+ deviceList $deviceList")
+            val uniqueDevices = deviceList.distinctBy { it.matterName } // WORKAROUND
+
+            deviceList.clear()
+            deviceList.addAll(uniqueDevices)
+            Timber.tag(TAG).e("+ deviceList $deviceList")
             matterAdapter = MatterScannedResultAdapter(deviceList)
             binding.recyclerViewScannedDevices.scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
             binding.recyclerViewScannedDevices.adapter = matterAdapter
             binding.recyclerViewScannedDevices.addItemDecoration(
                 RecyclerViewMargin(resources.getDimensionPixelSize(R.dimen.matter_margin))
             )
-
+            matterAdapter.notifyDataSetChanged()
             matterAdapter.setOnClickListener(object : MatterScannedResultAdapter.OnClickListener {
                 override suspend fun onClick(position: Int, model: MatterScannedResultModel) {
                     deviceId = model.deviceId
@@ -177,10 +194,15 @@ class MatterScannedResultFragment : Fragment() {
                     deviceList.removeAt(pos)
                     binding.recyclerViewScannedDevices.adapter?.notifyItemRemoved(pos)
                     Timber.tag(TAG).d("deviceList removed elem $deviceList")
+                    scope.launch {
+                        deviceController.unpairDeviceCallback(deviceId, ChipUnpairDeviceCallback())
+                    }
 
-                    deviceController.unpairDeviceCallback(deviceId, ChipUnpairDeviceCallback())
                     matterAdapter.notifyDataSetChanged()
                     SharedPrefsUtils.saveDevicesToPref(mPrefs, deviceList)
+                    if(null != dishwasherPref){
+                        SharedPrefsUtils.clearDishwasherSharedPreferences(dishwasherPref)
+                    }
                     if (deviceList.isEmpty()) {
                         requireActivity().finish()
                     }
@@ -196,6 +218,7 @@ class MatterScannedResultFragment : Fragment() {
 
     private fun navigateToDemos(model: MatterScannedResultModel) {
         deviceType = model.deviceType
+        Log.e("MATTER_SCANNED_RESULT","MODEL DEVICE TYPE::--${model.deviceType}")
         when (deviceType) {
 
             THERMOSTAT_TYPE -> {
@@ -206,8 +229,8 @@ class MatterScannedResultFragment : Fragment() {
                 ).navigateToDemo(matterThermostatFragment, model)
             }
 
-            DIMMABLE_LIGHT_TYPE, ENHANCED_COLOR_LIGHT_TYPE, ON_OFF_LIGHT_TYPE, COLOR_TEMPERATURE_LIGHT_TYPE -> {
-                val matterLightFragment = MatterLightFragment.newInstance()
+            DIMMABLE_Light_TYPE, ENHANCED_COLOR_LIGHT_TYPE, ON_OFF_LIGHT_TYPE, COLOR_TEMPERATURE_LIGHT_TYPE -> {
+             val matterLightFragment = MatterLightFragment.newInstance()
                 FragmentUtils.getHost(
                     this@MatterScannedResultFragment,
                     Callback::class.java
@@ -278,6 +301,15 @@ class MatterScannedResultFragment : Fragment() {
                 ).navigateToDemo(matterAirQualitySensorFragment, model)
             }
 
+            GENERIC_SWITCH, ON_OFF_LIGHT_SWITCH, DIMMER_SWITCH,
+                COLOR_DIMMER_SWITCH ->{
+                    val matterLightControlSwitch = MatterLightControlSwitchFragment.newInstance()
+                    FragmentUtils.getHost(
+                        this@MatterScannedResultFragment,
+                        Callback::class.java
+                    ).navigateToDemo(matterLightControlSwitch,model)
+                }
+
 
             else -> {
                 println("Unhandled Operation....")
@@ -310,7 +342,7 @@ class MatterScannedResultFragment : Fragment() {
 
         //Lighting Type
         const val ON_OFF_LIGHT_TYPE = 256
-        const val DIMMABLE_LIGHT_TYPE = 257
+        const val DIMMABLE_Light_TYPE = 257
         const val COLOR_TEMPERATURE_LIGHT_TYPE = 268
         const val ENHANCED_COLOR_LIGHT_TYPE = 269
 

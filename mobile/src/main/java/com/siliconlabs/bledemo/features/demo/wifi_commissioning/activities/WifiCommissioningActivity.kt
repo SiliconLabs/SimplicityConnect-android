@@ -3,15 +3,28 @@ package com.siliconlabs.bledemo.features.demo.wifi_commissioning.activities
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.ProgressDialog
-import android.bluetooth.*
-import android.content.*
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
+import android.bluetooth.BluetoothProfile
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.InputType
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import androidx.lifecycle.lifecycleScope
+import android.widget.EditText
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
@@ -20,6 +33,7 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.databinding.ActivityWifiCommissioningBinding
+import com.siliconlabs.bledemo.features.demo.awsiot.AWSIOTDemoActivity
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.activities.DevKitSensor917Activity
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.activities.DevKitSensor917Activity.Companion.IP_ADDRESS
 import com.siliconlabs.bledemo.utils.Converters
@@ -27,10 +41,20 @@ import com.siliconlabs.bledemo.features.demo.wifi_commissioning.adapters.AccessP
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.AccessPoint
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.BoardCommand
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.SecurityMode
+import com.siliconlabs.bledemo.home_screen.activities.MainActivity.Companion.ACTION_SHOW_CUSTOM_TOAST
+import com.siliconlabs.bledemo.home_screen.activities.MainActivity.Companion.EXTRA_TOAST_MESSAGE
 import com.siliconlabs.bledemo.utils.Constants
 import com.siliconlabs.bledemo.utils.CustomToastManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
+import java.util.Arrays
+import java.util.UUID
 
 /**
  * Created by harika on 18-04-2016.
@@ -62,6 +86,17 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     private lateinit var sharedPref: SharedPreferences
 
     var connectType = BluetoothService.GattConnectType.WIFI_COMMISSIONING;
+    private val twentySeconds = 20000L // 20 seconds in milliseconds
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val timeoutRunnable = Runnable {
+        showToastOnUi("Timeout Expired")
+        lifecycleScope.launch {
+            delay(5000)
+            finish() // Exit the screen
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -161,6 +196,29 @@ class WifiCommissioningActivity : BaseDemoActivity() {
 
                 }
 
+                BluetoothService.GattConnectType.AWS_DEMO -> {
+
+                    showToastOnUi(getString(R.string.ap_connect))
+                    connectedAccessPoint = clickedAccessPoint
+                    connectedAccessPoint?.status = true
+                    runOnUiThread { accessPointsAdapter?.notifyDataSetChanged() }
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        val devKitIntent = Intent(
+                            this,
+                            AWSIOTDemoActivity::class.java
+                        ).apply {
+                            putExtra(IP_ADDRESS, clickedAccessPoint?.ipAddress)
+                        }
+                        storeInfo(clickedAccessPoint!!.ipAddress!!)
+                        println("BLE_PROV ipAddress:${clickedAccessPoint!!.ipAddress}")
+                        startActivity(devKitIntent)
+                        this.finish()
+                    },5000)
+
+
+
+                }
+
                 else -> null
             }
         } else {
@@ -186,8 +244,16 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                     showToastOnUi(getString(R.string.ap_disconnect_success))
                 }
 
+                BluetoothService.GattConnectType.AWS_DEMO -> {
+                    connectedAccessPoint = null
+                    scanForAccessPoints()
+                    toggleMainView(isAccessPointConnected = false)
+                    showToastOnUi(getString(R.string.ap_disconnect_success))
+                }
+
                 else -> null
             }
+            handler.removeCallbacks(timeoutRunnable) // Remove timeout callback if success
         } else {
             showToastOnUi(getString(R.string.ap_disconnect_fail))
         }
@@ -211,6 +277,20 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                     val devKitIntent = Intent(
                         this,
                         DevKitSensor917Activity::class.java
+                    ).apply {
+                        putExtra(IP_ADDRESS, getInfo())
+                    }
+                    println("BLE_PROV ipAddress:${getInfo()}")
+                    startActivity(devKitIntent)
+                    this.finish()
+                }
+
+                BluetoothService.GattConnectType.AWS_DEMO -> {
+                    // println("--------------Connected${connectedAccessPoint!!.ipAddress}")
+                    // println("--------------Connected${clickedAccessPoint!!.ipAddress}")
+                    val devKitIntent = Intent(
+                        this,
+                        AWSIOTDemoActivity::class.java
                     ).apply {
                         putExtra(IP_ADDRESS, getInfo())
                     }
@@ -257,8 +337,19 @@ class WifiCommissioningActivity : BaseDemoActivity() {
             setMessage(dialogMessage)
             setPositiveButton(getString(R.string.yes)) { dialog: DialogInterface, _: Int ->
                 showProgressDialog(getString(R.string.disconnect_ap))
-                writeCommand(BoardCommand.Send.DISCONNECTION)
-                dialog.cancel()
+                if(connectType == BluetoothService.GattConnectType.AWS_DEMO){
+                    handler.postDelayed(timeoutRunnable, twentySeconds) // Schedule timeout
+                    // handler.postDelayed({
+                    writeCommand(BoardCommand.Send.DISCONNECTION)
+                    dialog.cancel()
+                    /*if (!isFinishing) {
+                        showTimeOutMessageAndFinish()
+                    }*/
+                    //}, twentySeconds)
+                }else{
+                    writeCommand(BoardCommand.Send.DISCONNECTION)
+                    dialog.cancel()
+                }
             }
             setNegativeButton(getString(R.string.no)) { dialog: DialogInterface, _: Int ->
                 isItemClicked = false
@@ -271,10 +362,36 @@ class WifiCommissioningActivity : BaseDemoActivity() {
         }
     }
 
+
+
     private fun showPasswordDialog() {
         val dialogView = layoutInflater.inflate(R.layout.secured_ap_connect_dialog, null)
         val password = dialogView.findViewById<EditText>(R.id.password_et)
-
+        //functionality for Hide and Un-hide the password
+        password.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                // Check if the touch is on the drawable end (right side)
+                val drawableEnd = password.compoundDrawablesRelative[2]
+                if (drawableEnd != null && event.rawX >= (password.right - drawableEnd.bounds.width())) {
+                    // Toggle password visibility
+                    val isPasswordVisible = password.inputType == InputType.TYPE_CLASS_TEXT
+                    if (isPasswordVisible) {
+                        password.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                        password.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.visibility_off, 0)
+                    } else {
+                        password.inputType = InputType.TYPE_CLASS_TEXT
+                        password.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.baseline_remove_red_eye_24, 0)
+                    }
+                    // Move cursor to end after changing input type
+                    password.setSelection(password.text.length)
+                    true
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        }
         AlertDialog.Builder(this).apply {
             setView(dialogView)
             setTitle(clickedAccessPoint?.name)
@@ -583,6 +700,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     override fun onDestroy() {
         super.onDestroy()
         progressDialog?.dismiss()
+        handler.removeCallbacksAndMessages(null)
     }
 
     private fun storeInfo(info: String) {

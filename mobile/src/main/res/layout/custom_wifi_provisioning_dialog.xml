@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@drawable/matter_popup_background"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/matter_2dp">
+
+    <TextView
+        android:id="@+id/ssid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_M"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/security_type_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/matter_10dp"
+        android:layout_marginTop="@dimen/matter_10dp"
+        android:layout_marginEnd="@dimen/matter_10dp"
+        android:weightSum="3"
+        android:padding="3dp">
+
+        <TextView
+            android:id="@+id/security_type_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:singleLine="true"
+            android:gravity="start"
+            android:text="@string/wifi_provisioning_security_label"
+            android:textSize="@dimen/text_size_M"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/security_type_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:gravity="start"
+            android:text="@string/wifi_provisioning_security_label"
+            android:textSize="@dimen/text_size_M" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bssid_type_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/matter_10dp"
+        android:layout_marginTop="@dimen/matter_10dp"
+        android:layout_marginEnd="@dimen/matter_10dp"
+        android:weightSum="3"
+        android:padding="3dp">
+
+        <TextView
+            android:id="@+id/bssid_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:gravity="start"
+            android:text="@string/wifi_provisioning_bssid_label"
+            android:textSize="@dimen/text_size_M"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/bssid_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:gravity="start"
+            android:text="@string/wifi_provisioning_bssid_label"
+            android:textSize="@dimen/text_size_M" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/rssid_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/matter_10dp"
+        android:layout_marginTop="@dimen/matter_10dp"
+        android:layout_marginEnd="@dimen/matter_10dp"
+        android:weightSum="3"
+        android:padding="3dp">
+
+        <TextView
+            android:id="@+id/rssid_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:gravity="start"
+            android:text="@string/wifi_provisioning_rssi_label"
+            android:textSize="@dimen/text_size_M"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/rssid_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:gravity="start"
+            android:text="@string/wifi_provisioning_rssi_label"
+            android:textSize="@dimen/text_size_M" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvPasswordLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/matter_10dp"
+        android:layout_marginTop="@dimen/matter_10dp"
+        android:gravity="start"
+        android:text="@string/wifi_provisioning_password_label"
+        android:textSize="@dimen/text_size_M"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/matter_15dp"
+        android:layout_marginTop="@dimen/matter_5dp"
+        android:layout_marginEnd="@dimen/matter_15dp"
+        android:background="@drawable/stroke_box"
+        android:padding="@dimen/matter_0dp">
+
+        <LinearLayout
+            android:id="@+id/ll_thread"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/matter_5dp"
+            android:background="@drawable/rounded_background"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/matter_8dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/passwordTextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right|center"
+                app:hintEnabled="false"
+                app:passwordToggleContentDescription="@string/password_toggle_content_description"
+                app:passwordToggleDrawable="@drawable/baseline_remove_red_eye_24"
+                app:passwordToggleEnabled="true">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editWiFiProvPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="34dp"
+                    android:layout_gravity="center"
+                    android:autofillHints=""
+                    android:background="@drawable/rounded_background"
+                    android:gravity="center|left"
+                    android:hint="@string/wifi_provisioning_password_hint"
+                    android:inputType="textPassword"
+                    android:lines="1"
+                    android:textSize="@dimen/text_size_SM" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/negativeBtn"
+            style="@style/WifiButtonWhite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/matter_10dp"
+            android:text="@string/matter_cancel" />
+
+        <Button
+            android:id="@+id/positiveBtn"
+            style="@style/MatterButtonBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/matter_10dp"
+            android:text="@string/button_provision" />
+
+    </LinearLayout>
+</LinearLayout>

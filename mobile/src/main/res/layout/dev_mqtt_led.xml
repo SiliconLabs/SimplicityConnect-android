@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/matter_10dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/header"
+        style="@style/settings_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/matter_10dp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/subTitle"
+            style="@style/SubTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="start"
+            android:textSize="18sp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/imageLight"
+            android:layout_width="@dimen/led_light_icon_height"
+            android:layout_height="@dimen/led_light_icon_height"
+            android:layout_below="@+id/subTitle"
+            android:layout_alignParentStart="true"
+            android:adjustViewBounds="true"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="50dp"
+            android:background="@color/silabs_transparent"
+            android:scaleType="fitCenter" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_marginTop="@dimen/matter_10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/onButton"
+            style="@style/DevKitButtonBlack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_background_grey_box"
+            android:text="@string/blinky_tb_on"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/offButton"
+            style="@style/DevKitButtonBlack"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_background_soft_black_box"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="@string/blinky_tb_off"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/redButton"
+            android:backgroundTint="@color/button_red"
+            android:textColor="@color/white"
+            android:text="RED"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </com.google.android.material.button.MaterialButton>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/greenButton"
+            android:layout_weight="1"
+            android:backgroundTint="@color/grey"
+            android:textColor="@color/white"
+            android:text="GREEN"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </com.google.android.material.button.MaterialButton>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/blueButton"
+            android:layout_weight="1"
+            android:backgroundTint="@color/silabs_dark_blue"
+            android:textColor="@color/white"
+            android:text="BLUE"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </com.google.android.material.button.MaterialButton>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/matter_50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/yes_opt"
+            style="@style/SensorText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="20dp"
+            android:padding="20dp"
+            android:text="@string/refresh"
+            android:textAllCaps="false" />
+
+
+        <TextView
+            android:id="@+id/no_opt"
+            style="@style/SensorText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="20dp"
+            android:padding="20dp"
+            android:text="@string/close"
+            android:textAllCaps="false" />
+    </RelativeLayout>
+
+</LinearLayout>

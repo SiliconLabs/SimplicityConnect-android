@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/matter_18dp"
+    android:background="@drawable/matter_popup_background"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/matter_5dp"
+        android:text="@string/wifi_provisioning_provisioning_success_title"
+        android:textColor="@color/adapter_item_title_color"
+        android:textSize="@dimen/text_size_ML" />
+
+    <TextView
+        android:id="@+id/tvBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/matter_5dp"
+        android:text="@string/wifi_provisioning_provisioning_success_body"
+        android:textSize="@dimen/text_size_S" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/matter_1dp"
+        android:background="@color/silabs_divider" />
+
+    <Button
+        android:id="@+id/btnSubmit"
+        style="@style/MatterButtonBlue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/matter_18dp"
+        android:text="@string/button_ok" />
+
+</LinearLayout>

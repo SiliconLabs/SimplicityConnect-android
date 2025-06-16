@@ -12,7 +12,7 @@ import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.GetConnectedDeviceCallbackJni
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.ActivityMatterDemoBinding
-import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterDishwasherFragment
+import com.siliconlabs.bledemo.features.demo.matter_demo.dishwasher_demo.view.MatterDishwasherFragment
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterDoorFragment
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterLightFragment
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterOccupancySensorFragment
@@ -26,16 +26,17 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.model.ProvisionNetworkT
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ChipClient
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+@AndroidEntryPoint
 class MatterDemoActivity : AppCompatActivity(),
     MatterScannerFragment.CallBack,
     MatterScannedResultFragment.Callback,
@@ -67,6 +68,7 @@ class MatterDemoActivity : AppCompatActivity(),
         setContentView(binding.root)
 
         deviceController = ChipClient.getDeviceController(this)
+
         val actionBar = supportActionBar
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.matter_back)
@@ -96,8 +98,6 @@ class MatterDemoActivity : AppCompatActivity(),
         }
         startPeriodictFunction()
         sendToScanResultFragment()
-
-
     }
 
     private fun startPeriodictFunction() {
@@ -142,8 +142,15 @@ class MatterDemoActivity : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
-        Timber.tag(TAG).e(" on resume")
+        Timber.tag(TAG).e(" onResume")
+        ChipClient.startDnssd(this)
         count = 0
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Timber.tag(TAG).e(" onPause")
+        ChipClient.stopDnssd(this)
     }
 
     override fun onStart() {

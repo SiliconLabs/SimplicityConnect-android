@@ -12,7 +12,6 @@ import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.CharacteristicFieldNormalValueWriteModeBinding
 import com.siliconlabs.bledemo.databinding.CharacteristicFieldReadModeBinding
 import com.siliconlabs.bledemo.utils.Converters
-import com.siliconlabs.bledemo.utils.CustomToastManager
 import java.math.BigInteger
 import java.util.*
 import kotlin.math.*
@@ -96,11 +95,7 @@ class NormalValueView(context: Context?,
 
     private fun isFieldSizeExceeded(inputLength: Int) : Boolean {
         return if (inputLength > fieldValue.size) {
-            //Toast.makeText(context, R.string.characteristic_dialog_field_size_exceeded, Toast.LENGTH_SHORT).show()
-            context?.let {
-                CustomToastManager.show(context,
-                    it.getString(R.string.characteristic_dialog_field_size_exceeded),5000)
-            }
+            Toast.makeText(context, R.string.characteristic_dialog_field_size_exceeded, Toast.LENGTH_SHORT).show()
             true
         } else false
     }
@@ -119,8 +114,8 @@ class NormalValueView(context: Context?,
         val unit = Engine.getUnit(field.unit)
         if (unit != null) {
             return if (!TextUtils.isEmpty(unit.symbol)) {
-                if (unit.fullName.toLowerCase(Locale.getDefault()) == "celsius"
-                        || unit.fullName.toLowerCase(Locale.getDefault()) == "fahrenheit") {
+                if (unit.fullName.lowercase(Locale.getDefault()) == "celsius"
+                        || unit.fullName.lowercase(Locale.getDefault()) == "fahrenheit") {
                     // displays degrees symbol correctly
                         val symbol = Html.fromHtml(unit.symbol, Html.FROM_HTML_MODE_LEGACY)
                         context!!.getString(R.string.unit_with_whitespace, symbol)
@@ -189,7 +184,7 @@ class NormalValueView(context: Context?,
         val formatLength = Engine.getFormat(format)
 
         if (formatLength == 0) {
-            return if (format.toLowerCase(Locale.getDefault()) == "reg-cert-data-list") {
+            return if (format.lowercase(Locale.getDefault()) == "reg-cert-data-list") {
                 val result = StringBuilder(
                         "0x" + Converters.bytesToHexWhitespaceDelimited(fieldValue))
                 StringBuilder(result.toString().replace(" ", "")).toString()

@@ -36,7 +36,7 @@ object Converters {
     }
 
     fun isHexCorrect(text: String): Boolean {
-        for (letter in text.toUpperCase(Locale.getDefault())) if (!HEX_CHARS.contains(letter)) return false
+        for (letter in text.uppercase(Locale.getDefault())) if (!HEX_CHARS.contains(letter)) return false
         return true
     }
 
