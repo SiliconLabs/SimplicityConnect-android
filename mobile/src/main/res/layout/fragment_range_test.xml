@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
     android:id="@+id/range_root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -462,7 +463,7 @@
                         android:text="@string/range_config_uart_log_enable"
                         android:textColor="@color/silabs_subtle_text" />
 
-                    <CheckBox
+                    <androidx.appcompat.widget.AppCompatCheckBox
                         android:id="@+id/range_check_uart_log"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
@@ -479,7 +480,7 @@
         android:layout_alignParentBottom="true"
         android:background="@color/silabs_white">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/range_test_start_stop"
             style="@style/ButtonBlue"
             android:layout_width="wrap_content"

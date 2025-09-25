@@ -7,10 +7,12 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
@@ -22,7 +24,9 @@ import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thu
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.model.LedRGBState
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.viewmodels.BlinkyThunderboardViewModel
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
-import java.util.*
+import com.siliconlabs.bledemo.utils.AppUtil
+import java.util.UUID
+
 
 class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListener {
 
@@ -49,8 +53,26 @@ class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListen
 
         setupDataListeners(modelNumberIntent)
         setupUiListeners()
+        prepareToolBar()
     }
 
+    private fun prepareToolBar() {
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(binding.toolbar)
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.matter_back)
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.title = this.getString(R.string.title_Blinky)
+        }
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == android.R.id.home) {
+            gatt?.disconnect()
+            onBackPressed()
+            true
+        } else super.onOptionsItemSelected(item)
+    }
     private fun setupUiListeners() {
 
         binding.led0.setOnCheckedChangeListener { _, isChecked ->

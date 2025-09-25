@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             tools:text="Connecting with ESL tag..." />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:layout_gravity="bottom|center_horizontal"
             android:visibility="gone"
             style="@style/dialog_button_positive_red"
@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:id="@+id/button_cancel_upload"
             android:layout_height="wrap_content">
-        </Button>
+        </androidx.appcompat.widget.AppCompatButton>
 
 
     </LinearLayout>

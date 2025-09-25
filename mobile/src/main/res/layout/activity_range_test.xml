@@ -1,21 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <!-- Fake status bar: gets real height at runtime and paints blue -->
+    <View
+        android:id="@+id/fakeStatusBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/blue_primary" />
+
+    <!-- Toolbar that becomes supportActionBar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fakeStatusBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/blue_primary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:titleTextColor="#ffff"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="0dp" />
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
         android:id="@+id/tabs_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="16dp">
+        android:layout_below="@id/appBarLayout"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal">
 
         <TextView
             android:id="@+id/tv_device1_tab"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:background="@drawable/btn_rounded_white"
             android:layout_marginEnd="8dp"
+            android:background="@drawable/btn_rounded_white"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
             android:minWidth="140dp"

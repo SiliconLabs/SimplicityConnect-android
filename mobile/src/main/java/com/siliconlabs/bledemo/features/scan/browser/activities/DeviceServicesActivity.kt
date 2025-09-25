@@ -22,6 +22,7 @@ import android.bluetooth.*
 import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -32,6 +33,7 @@ import android.util.Log
 import android.view.*
 import android.view.View.OnScrollChangeListener
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
@@ -233,6 +235,9 @@ class DeviceServicesActivity : BaseActivity() {
 
                         ViewState.UPLOADING -> showErrorDialog(status)
                         ViewState.REBOOTING_NEW_FIRMWARE -> { /* Do nothing */
+                            Log.d("BLE_DEBUG","reboot completed")
+                            BLEUtils.IS_FIRMWARE_REBOOTED = true
+                            BLEUtils.REBOOTED_FIRMWARE_GATT_ADDRESS = gatt.device.address
                         }
 
                         else -> {
@@ -541,6 +546,9 @@ class DeviceServicesActivity : BaseActivity() {
     }
 
     private fun setupActionBar() {
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(binding.toolbar)
+        binding.toolbar.popupTheme = androidx.appcompat.R.style.ThemeOverlay_AppCompat_Light
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
@@ -664,16 +672,37 @@ class DeviceServicesActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        try {
+            if (!isFinishing && !isDestroyed) {
+                runOnUiThread {
+                    if (mtuRequestDialog?.isVisible == true && mtuRequestDialog?.isShowing() == true) {
+                        mtuRequestDialog?.dismiss()
+                    }
+                    if(otaConfigDialog?.isVisible == true && otaConfigDialog?.isShowing() == true){
+                        otaConfigDialog?.dismiss()
+                    }
+                }
+                hideOtaProgressDialog()
+                hideOtaLoadingDialog()
+                runOnUiThread {
+                    if(errorDialog?.isVisible == true && errorDialog?.isShowing() == true){
+                        errorDialog?.dismiss()
+                    }
 
-        mtuRequestDialog?.dismiss()
-        otaConfigDialog?.dismiss()
-        hideOtaProgressDialog()
-        hideOtaLoadingDialog()
-        errorDialog?.dismiss()
+                }
+            }
+            unregisterReceivers()
+            bluetoothService?.isNotificationEnabled = true
+            bluetoothBinding?.unbind()
+        } catch (e: Exception) {
+            if(e is IllegalStateException){
+                Log.e("Devices Services Activity","Illegal State Exception")
+            }else{
+                Log.e("Devices Services Activity","Exception"+e.message)
+            }
+        }
 
-        unregisterReceivers()
-        bluetoothService?.isNotificationEnabled = true
-        bluetoothBinding?.unbind()
+
     }
 
     override fun finish() {
@@ -788,16 +817,34 @@ class DeviceServicesActivity : BaseActivity() {
         if (SharedPrefUtils(this@DeviceServicesActivity).shouldDisplayUnbondDeviceDialog()) {
             val dialog = UnbondDeviceDialog(object : UnbondDeviceDialog.Callback {
                 override fun onOkClicked() {
-                    unbondDevice(device)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
+                        unbondDevice(device)
+                    } else {
+                        removeBond(device)
+                    }
                 }
             })
             dialog.show(supportFragmentManager, "dialog_unbond_device")
         } else {
-            unbondDevice(device)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
+                unbondDevice(device)
+            } else {
+                removeBond(device)
+            }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.BAKLAVA)
     private fun unbondDevice(device: BluetoothDevice) {
+        // Try to use CompanionDeviceManager-based bond removal if available and associated
+        if (bluetoothService != null) {
+            val associationId = bluetoothService?.getAssociationIdForDevice(device.address)
+            if (associationId != null) {
+                bluetoothService?.removeBluetoothBond(associationId)
+                return
+            }
+        }
+        // Fallback to reflection-based removeBond
         if (!removeBond(device)) {
             if (SharedPrefUtils(this@DeviceServicesActivity).shouldDisplayManualUnbondDeviceDialog()) {
                 val dialog = ManualUnbondDeviceDialog(object : ManualUnbondDeviceDialog.Callback {
@@ -900,8 +947,10 @@ class DeviceServicesActivity : BaseActivity() {
 
     private fun hideOtaProgressDialog() {
         runOnUiThread {
-            otaProgressDialog?.dismiss()
-            otaProgressDialog = null
+            if(otaProgressDialog?.isVisible == true && otaProgressDialog?.isShowing() == true){
+                otaProgressDialog?.dismiss()
+                otaProgressDialog = null
+            }
         }
     }
 
@@ -936,8 +985,10 @@ class DeviceServicesActivity : BaseActivity() {
 
     private fun hideOtaLoadingDialog() {
         runOnUiThread {
-            otaLoadingDialog?.dismiss()
-            otaLoadingDialog = null
+            if (otaLoadingDialog?.isShowing() == true && otaLoadingDialog?.isVisible == true){
+                otaLoadingDialog?.dismiss()
+                otaLoadingDialog = null
+            }
         }
     }
 

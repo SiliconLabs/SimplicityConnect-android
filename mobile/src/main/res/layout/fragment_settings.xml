@@ -121,42 +121,42 @@
             app:flexWrap="wrap"
             app:justifyContent="center">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/silabs_products_wireless"
                 style="@style/settings_link_button"
                 android:text="@string/settings_link_more_information" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/silabs_support"
                 style="@style/settings_link_button"
                 android:text="@string/settings_link_support" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/github_siliconlabs_efrconnect"
                 style="@style/settings_link_button"
                 android:text="@string/settings_link_source_code" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/users_guide_efrconnect"
                 style="@style/settings_link_button"
                 android:text="@string/settings_link_users_guide" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/docs_silabs_release_notes"
                 style="@style/settings_link_button"
                 android:text="@string/settings_link_release_notes" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/docs_silabs_bluetooth_latest"
                 style="@style/settings_link_button"
                 android:text="@string/settings_link_additional_documentation" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/help_text_playstore"
                 style="@style/settings_link_button"
                 android:text="@string/settings_link_other_silabs_apps" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:visibility="gone"
                 android:id="@+id/log_text_share"
                 style="@style/settings_link_button"

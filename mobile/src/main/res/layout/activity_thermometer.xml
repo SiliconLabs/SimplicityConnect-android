@@ -1,21 +1,46 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
+
+    <!-- Fake status bar: gets real height at runtime and paints blue -->
+    <View
+        android:id="@+id/fakeStatusBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/blue_primary" />
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/blue_primary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextColor="#ffff"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
+
 
     <TextView
         android:id="@+id/connection_bar_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/demo_connected_to"
         android:background="@color/bar_with_additional_info"
-        android:paddingVertical="16dp"
-        android:textColor="@color/blue_primary"
-        android:paddingHorizontal="24dp"
+        android:ellipsize="end"
         android:maxLines="1"
-        android:ellipsize="end" />
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp"
+        android:text="@string/demo_connected_to"
+        android:textColor="@color/blue_primary" />
 
     <com.google.android.material.card.MaterialCardView
         style="@style/list_item_card_view_box"
@@ -26,44 +51,44 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <LinearLayout
                 style="@style/list_item_card_view_container_margins"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="@dimen/card_view_margin_vertical">
+                android:layout_marginBottom="@dimen/card_view_margin_vertical"
+                android:gravity="center_vertical">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/redesign_ic_demo_health_thermometer"
-                    android:contentDescription="@string/content_desc_demo_item_icon" />
+                    android:contentDescription="@string/content_desc_demo_item_icon"
+                    android:src="@drawable/redesign_ic_demo_health_thermometer" />
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/list_item_card_view_title"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="16dp">
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/temperature" />
 
-                        <TextView
-                            style="@style/list_item_card_view_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="4dp"
-                            android:text="@string/temperature" />
+                    <TextView
+                        android:id="@+id/thermo_type_value"
+                        style="@style/list_item_card_view_text_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/temperature_type" />
 
-                        <TextView
-                            android:id="@+id/thermo_type_value"
-                            style="@style/list_item_card_view_text_info"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/temperature_type"/>
-
-                    </LinearLayout>
+                </LinearLayout>
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/type_switch"
@@ -86,9 +111,9 @@
                 android:background="@color/silabs_divider" />
 
             <LinearLayout
+                style="@style/list_item_card_view_container_margins"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/list_item_card_view_container_margins"
                 android:layout_marginBottom="@dimen/card_view_margin_vertical"
                 android:orientation="horizontal">
 

@@ -3,9 +3,12 @@ package com.siliconlabs.bledemo.features.configure.advertiser.activities
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseActivity
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
@@ -23,6 +26,13 @@ class PendingServerConnectionActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window,false)
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+        WindowInsetsControllerCompat(window,window.decorView).apply {
+            isAppearanceLightStatusBars = true // adjust for dark/light icons
+            isAppearanceLightNavigationBars = true
+        }
         setContentView(R.layout.activity_pending_server_connection)
 
         deviceToConnect = intent?.getParcelableExtra(BluetoothService.EXTRA_BLUETOOTH_DEVICE)

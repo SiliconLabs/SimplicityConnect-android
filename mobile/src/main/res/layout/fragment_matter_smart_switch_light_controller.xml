@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/aclCtrlButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -130,7 +130,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/bindingButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -166,7 +166,7 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <!--<Button
+            <!--<androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_bind"
                 android:enabled="false"
                 android:clickable="false"

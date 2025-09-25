@@ -24,6 +24,7 @@ import com.siliconlabs.bledemo.features.demo.devkitsensor917.utils.DevKitSensorC
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.utils.DevKitSensorControl
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.utils.DevKitSensorSharedData
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.CustomToastManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -47,13 +48,14 @@ class DevKitSensor917Activity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = Activity917DevKitSensorLayoutBinding.inflate(layoutInflater)
-        setSupportActionBar(binding.toolbar)
         setContentView(binding.root)
+        AppUtil.setEdgeToEdge(window,this)
+        setSupportActionBar(binding.toolbar)
         val actionBar = supportActionBar
         actionBar!!.setHomeAsUpIndicator(R.drawable.matter_back)
         actionBar.setDisplayHomeAsUpEnabled(true)
+        actionBar.title = "Dev Kit Sensor 917"
         val ipAddress = intent.getStringExtra(IP_ADDRESS)
         if (isNetworkAvailable(this)) {
             if (ipAddress != null) {

@@ -37,6 +37,7 @@ import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environmen
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.model.HallState
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.model.TemperatureScale
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.viewmodels.EnvironmentViewModel
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.utils.Converters
 import timber.log.Timber
@@ -60,7 +61,20 @@ class EnvironmentActivity : ThunderboardActivity() {
             EnvironmentViewModel.Factory(this)
         ).get(EnvironmentViewModel::class.java)
         setupDataListeners()
+        prepareToolBar()
     }
+
+    private fun prepareToolBar() {
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(binding.toolbar)
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.matter_back)
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.title = this.getString(R.string.environment_demo_title)
+        }
+    }
+
 
     public override fun onResume() {
         super.onResume()
@@ -165,6 +179,7 @@ class EnvironmentActivity : ThunderboardActivity() {
         return when (item.itemId) {
             android.R.id.home -> {
                 gatt?.disconnect()
+                onBackPressed()
                 true
             }
 

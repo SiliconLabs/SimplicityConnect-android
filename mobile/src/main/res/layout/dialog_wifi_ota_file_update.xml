@@ -102,7 +102,7 @@
                     android:fontFamily="sans-serif"
                     android:text="@string/select_file" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/select_app_file_btn"
                     style="@style/button_external_link"
                     android:layout_width="0dp"
@@ -120,7 +120,7 @@
             android:layout_marginHorizontal="@dimen/dialog_button_margin_end"
             android:gravity="end">
 
-            <Button android:id="@+id/ota_cancel"
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/ota_cancel"
                 style="@style/dialog_button_negative_action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -128,7 +128,7 @@
                 android:layout_marginEnd="@dimen/dialog_margin_between_buttons"
                 android:text="@string/button_cancel" />
 
-            <Button android:id="@+id/ota_proceed"
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/ota_proceed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:enabled="false"

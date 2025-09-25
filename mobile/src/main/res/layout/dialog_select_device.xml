@@ -93,7 +93,7 @@
 
         </LinearLayout>
 
-        <Button android:id="@+id/button_cancel"
+        <androidx.appcompat.widget.AppCompatButton android:id="@+id/button_cancel"
             style="@style/dialog_button_negative_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

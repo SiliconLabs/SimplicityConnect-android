@@ -28,7 +28,7 @@
             android:fontFamily="sans-serif"
             tools:text="@string/location_service_info" />
 
-        <Button android:id="@+id/btn_ok"
+        <androidx.appcompat.widget.AppCompatButton android:id="@+id/btn_ok"
             style="@style/dialog_button_neutral_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

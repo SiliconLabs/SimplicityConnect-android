@@ -11,12 +11,15 @@ import java.util.*
 
 @SuppressLint("MissingPermission")
 object BLEUtils {
+
     var IS_FIRMWARE_REBOOTED:Boolean? = false
+
     var GATT_DEVICE_SELECTED = BluetoothService.GattConnectType.NOTHING
-    var MATTER_IS_LIGHT_SWITCH_BIND_SUCCESSFUL:Boolean = false
+
     var MATTER_DEVICE_NAME  = ""
     var MATTER_DEVICE_ID = ""
     var MATTER_DEVICE_TYPE:Int? = -1
+    var MATTER_IS_LIGHT_SWITCH_BIND_SUCCESSFUL:Boolean = false
     var REBOOTED_FIRMWARE_GATT_ADDRESS = ""
 
     fun setNotificationForCharacteristic(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic?, gattDescriptor: UUID?, value: Notifications): Boolean {

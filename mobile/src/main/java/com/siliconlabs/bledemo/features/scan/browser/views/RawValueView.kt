@@ -14,10 +14,12 @@ import android.widget.Toast
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.*
 import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import com.siliconlabs.bledemo.utils.StringUtils
 
-open class RawValueView(context: Context?,
-                        fieldValue: ByteArray
+open class RawValueView(
+    context: Context?,
+    fieldValue: ByteArray
 ) : ValueView(context, fieldValue) {
 
     private lateinit var _writableFieldsBinding: CharacteristicRawValuesWriteModeBinding
@@ -29,27 +31,36 @@ open class RawValueView(context: Context?,
     override fun createViewForRead(isParsedSuccessfully: Boolean, viewHandler: ViewHandler) {
         CharacteristicRawValuesReadModeBinding.inflate(LayoutInflater.from(context)).apply {
             hexReadonly.etCharValueReadMode.apply {
+                println("HEX VALUE ${Converters.bytesToHexWhitespaceDelimited(fieldValue)}")
                 setText(Converters.bytesToHexWhitespaceDelimited(fieldValue))
                 hint = context?.getString(R.string.hex)
+                isEnabled = false
             }
             asciiReadonly.etCharValueReadMode.apply {
+                println("ASCII VALUE ${Converters.getAsciiValue(fieldValue)}")
+
                 setText(Converters.getAsciiValue(fieldValue))
                 hint = context?.getString(R.string.ascii)
+                isEnabled = false
             }
             decimalReadonly.etCharValueReadMode.apply {
+                println("DECIMAL VALUE ${Converters.getDecimalValue(fieldValue)}")
                 setText(Converters.getDecimalValue(fieldValue))
                 hint = context?.getString(R.string.decimal)
+                isEnabled = false
             }
 
             setCopyListener(hexReadonly)
             setCopyListener(asciiReadonly)
             setCopyListener(decimalReadonly)
 
-            viewHandler.handleRawValueViews(root, arrayListOf(
+            viewHandler.handleRawValueViews(
+                root, arrayListOf(
                     hexReadonly.etCharValueReadMode,
                     asciiReadonly.etCharValueReadMode,
                     decimalReadonly.etCharValueReadMode
-            ))
+                )
+            )
         }
     }
 
@@ -57,50 +68,62 @@ open class RawValueView(context: Context?,
         this.valueListener = valueListener
 
         _writableFieldsBinding =
-                CharacteristicRawValuesWriteModeBinding.inflate(LayoutInflater.from(context)).apply {
+            CharacteristicRawValuesWriteModeBinding.inflate(LayoutInflater.from(context)).apply {
 
-            hexWrite.etCharValueWriteMode.apply {
-                onFocusChangeListener = hexFocusChangeListener
-                setOnEditorActionListener(onEditorActionListener)
-                addTextChangedListener(hexTextWatcher)
-                keyListener = DigitsKeyListener.getInstance("0123456789ABCDEFabcdef")
-                setRawInputType(InputType.TYPE_CLASS_TEXT)
-                hint = context?.getString(R.string.hex)
-            }
-            asciiWrite.etCharValueWriteMode.apply {
-                setOnEditorActionListener(onEditorActionListener)
-                addTextChangedListener(asciiTextWatcher)
-                hint = context?.getString(R.string.ascii)
-            }
-            decimalWrite.etCharValueWriteMode.apply {
-                setOnEditorActionListener(onEditorActionListener)
-                addTextChangedListener(decTextWatcher)
-                keyListener = DigitsKeyListener.getInstance("0123456789 ")
-                setRawInputType(InputType.TYPE_CLASS_TEXT)
-                hint = context?.getString(R.string.decimal)
-            }
+                hexWrite.etCharValueWriteMode.apply {
+                    onFocusChangeListener = hexFocusChangeListener
+                    setOnEditorActionListener(onEditorActionListener)
+                    addTextChangedListener(hexTextWatcher)
+                    keyListener = DigitsKeyListener.getInstance("0123456789ABCDEFabcdef")
+                    setRawInputType(InputType.TYPE_CLASS_TEXT)
+                    hint = context?.getString(R.string.hex)
+                    isEnabled = true
 
-            setPasteListener(hexWrite, HEX_ID)
-            setPasteListener(asciiWrite, ASCII_ID)
-            setPasteListener(decimalWrite, DECIMAL_ID)
+                }
+                asciiWrite.etCharValueWriteMode.apply {
+                    setOnEditorActionListener(onEditorActionListener)
+                    addTextChangedListener(asciiTextWatcher)
+                    hint = context?.getString(R.string.ascii)
+                    isEnabled = true
 
-            valueListener.addEditTexts(arrayListOf(
-                    hexWrite.etCharValueWriteMode,
-                    asciiWrite.etCharValueWriteMode,
-                    decimalWrite.etCharValueWriteMode
-            ))
-            valueListener.handleFieldView(root)
-        }
+                }
+                decimalWrite.etCharValueWriteMode.apply {
+                    setOnEditorActionListener(onEditorActionListener)
+                    addTextChangedListener(decTextWatcher)
+                    keyListener = DigitsKeyListener.getInstance("0123456789 ")
+                    setRawInputType(InputType.TYPE_CLASS_TEXT)
+                    hint = context?.getString(R.string.decimal)
+                    isEnabled = true
+                }
+
+                setPasteListener(hexWrite, HEX_ID)
+                setPasteListener(asciiWrite, ASCII_ID)
+                setPasteListener(decimalWrite, DECIMAL_ID)
+
+                valueListener.addEditTexts(
+                    arrayListOf(
+                        hexWrite.etCharValueWriteMode,
+                        asciiWrite.etCharValueWriteMode,
+                        decimalWrite.etCharValueWriteMode
+                    )
+                )
+                valueListener.handleFieldView(root)
+            }
     }
 
     private fun setCopyListener(binding: CharacteristicRawValueReadModeBinding) {
         binding.ivCopyCharValueReadMode.setOnClickListener {
             val clipboardManager = context?.getSystemService(ClipboardManager::class.java)
             val clip = ClipData.newPlainText(
-                    "characteristic-value", binding.etCharValueReadMode.text.toString())
+                "characteristic-value", binding.etCharValueReadMode.text.toString()
+            )
             if (clipboardManager != null) {
                 clipboardManager.setPrimaryClip(clip)
-                Toast.makeText(context, R.string.Copied_to_clipboard, Toast.LENGTH_SHORT).show()
+                /*Toast.makeText(context, R.string.Copied_to_clipboard, Toast.LENGTH_SHORT).show()*/
+                context?.let {
+                    CustomToastManager.show(context,
+                        it.getString(R.string.Copied_to_clipboard),5000)
+                }
             }
         }
     }
@@ -119,10 +142,16 @@ open class RawValueView(context: Context?,
                             temp = temp.substring(0, textLength - 1) + "0" + temp[textLength - 1]
                             newValue = Converters.hexToByteArray(temp.replace("\\s+".toRegex(), ""))
                         } else {
-                            newValue = Converters.hexToByteArray(hexEdit.text.toString().replace("\\s+".toRegex(), ""))
+                            newValue = Converters.hexToByteArray(
+                                hexEdit.text.toString().replace("\\s+".toRegex(), "")
+                            )
                         }
                         asciiWrite.etCharValueWriteMode.setText(Converters.getAsciiValue(newValue))
-                        decimalWrite.etCharValueWriteMode.setText(Converters.getDecimalValue(newValue))
+                        decimalWrite.etCharValueWriteMode.setText(
+                            Converters.getDecimalValue(
+                                newValue
+                            )
+                        )
 
                         valueListener?.onRawValueChanged(newValue)
                     }
@@ -143,15 +172,31 @@ open class RawValueView(context: Context?,
                     if (decimalEdit.hasFocus()) {
                         if (isDecValueValid(decimalEdit.text.toString())) {
                             val newValue = Converters.decToByteArray(decimalEdit.text.toString())
-                            hexWrite.etCharValueWriteMode.setText(Converters.bytesToHexWhitespaceDelimited(newValue))
-                            asciiWrite.etCharValueWriteMode.setText(Converters.getAsciiValue(newValue))
+                            hexWrite.etCharValueWriteMode.setText(
+                                Converters.bytesToHexWhitespaceDelimited(
+                                    newValue
+                                )
+                            )
+                            asciiWrite.etCharValueWriteMode.setText(
+                                Converters.getAsciiValue(
+                                    newValue
+                                )
+                            )
                             valueListener?.onRawValueChanged(newValue)
                         } else {
-                            decimalEdit.setText(decimalEdit.text.toString().substring(0,
-                                    decimalEdit.text.length - 1))
+                            decimalEdit.setText(
+                                decimalEdit.text.toString().substring(
+                                    0,
+                                    decimalEdit.text.length - 1
+                                )
+                            )
                             decimalEdit.setSelection(decimalEdit.text.length)
-                            Toast.makeText(context, R.string.invalid_dec_value, Toast.LENGTH_SHORT)
-                                    .show()
+                            /*Toast.makeText(context, R.string.invalid_dec_value, Toast.LENGTH_SHORT)
+                                .show()*/
+                            context?.let {
+                                CustomToastManager.show(context,
+                                    it.getString(R.string.invalid_dec_value),5000)
+                            }
                         }
                     }
                 }
@@ -170,8 +215,16 @@ open class RawValueView(context: Context?,
 
                     if (asciiEdit.hasFocus()) {
                         val newValue = asciiEdit.text.toString().toByteArray()
-                        hexWrite.etCharValueWriteMode.setText(Converters.bytesToHexWhitespaceDelimited(newValue))
-                        decimalWrite.etCharValueWriteMode.setText(Converters.getDecimalValue(newValue))
+                        hexWrite.etCharValueWriteMode.setText(
+                            Converters.bytesToHexWhitespaceDelimited(
+                                newValue
+                            )
+                        )
+                        decimalWrite.etCharValueWriteMode.setText(
+                            Converters.getDecimalValue(
+                                newValue
+                            )
+                        )
 
                         valueListener?.onRawValueChanged(newValue)
                     }
@@ -205,7 +258,10 @@ open class RawValueView(context: Context?,
             }
         }
 
-    private fun setPasteListener(_binding: CharacteristicRawValueWriteModeBinding, expectedPasteType: String) {
+    private fun setPasteListener(
+        _binding: CharacteristicRawValueWriteModeBinding,
+        expectedPasteType: String
+    ) {
         _binding.ivPasteCharValue.setOnClickListener {
             val clipboardManager = context?.getSystemService(ClipboardManager::class.java)
             if (clipboardManager != null && clipboardManager.primaryClip != null) {
@@ -217,12 +273,29 @@ open class RawValueView(context: Context?,
                         text = StringUtils.getStringWithoutWhitespaces(text)
                         if (isHexStringCorrect(text)) {
                             _binding.etCharValueWriteMode.setText(text)
-                        } else Toast.makeText(context, R.string.Incorrect_data_format, Toast.LENGTH_SHORT).show()
+                        } else /*Toast.makeText(
+                            context,
+                            R.string.Incorrect_data_format,
+                            Toast.LENGTH_SHORT
+                        ).show()*/
+                            context?.let {
+                                CustomToastManager.show(context,
+                                    it.getString(R.string.Incorrect_data_format),5000)
+                            }
                     }
+
                     ASCII_ID -> _binding.etCharValueWriteMode.setText(text)
                     DECIMAL_ID -> if (isDecimalCorrect(text.trim())) {
                         _binding.etCharValueWriteMode.setText(text)
-                    } else Toast.makeText(context, R.string.Incorrect_data_format, Toast.LENGTH_SHORT).show()
+                    } else /*Toast.makeText(
+                        context,
+                        R.string.Incorrect_data_format,
+                        Toast.LENGTH_SHORT
+                    ).show()*/
+                        context?.let {
+                            CustomToastManager.show(context,
+                                it.getString(R.string.Incorrect_data_format),5000)
+                        }
                 }
             }
         }

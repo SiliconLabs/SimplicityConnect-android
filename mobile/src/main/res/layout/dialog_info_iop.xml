@@ -26,14 +26,14 @@
             android:layout_marginBottom="16dp"
             android:text="@string/iop_test_note_device_name_dialog" />
 
-        <Button android:id="@+id/btn_interoperability_test"
+        <androidx.appcompat.widget.AppCompatButton android:id="@+id/btn_interoperability_test"
             style="@style/button_external_link"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/iop_test_label_interoperability_test" />
 
 
-        <Button android:id="@+id/btn_ok"
+        <androidx.appcompat.widget.AppCompatButton android:id="@+id/btn_ok"
             style="@style/dialog_button_neutral_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

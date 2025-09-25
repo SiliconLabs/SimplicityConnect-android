@@ -369,13 +369,17 @@ class SelectDeviceDialog(
 
 
     private fun startDiscovery() {
+        viewModel.clearDevices() // Clear previous scan results before starting a new scan
         bluetoothService?.let {
             it.removeListener(this)
             it.addListener(this)
-            it.startDiscovery(applyDemoFilters())
+            //it.startDiscovery(applyDemoFilters())
         }
+        // Add a short delay before starting scan to allow BLE stack to recover
+        handler.postDelayed({
+            bluetoothService?.startDiscovery(applyDemoFilters())
+        }, 300)
     }
-
     private fun stopDiscovery() {
         bluetoothService?.let {
             it.removeListener(this)

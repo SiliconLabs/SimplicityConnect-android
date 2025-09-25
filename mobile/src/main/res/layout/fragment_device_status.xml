@@ -2,6 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:fitsSystemWindows="true"
+    android:layout_marginBottom="@dimen/matter_50dp"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/sl_white">
 

@@ -22,6 +22,7 @@ import android.bluetooth.le.ScanCallback.SCAN_FAILED_FEATURE_UNSUPPORTED
 import android.bluetooth.le.ScanCallback.SCAN_FAILED_INTERNAL_ERROR
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanSettings
+import android.companion.CompanionDeviceManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -31,6 +32,8 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.core.location.LocationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.siliconlabs.bledemo.R
@@ -80,8 +83,11 @@ class BluetoothService : LocalService<BluetoothService>() {
         private const val RSSI_UPDATE_FREQUENCY = 2000L
         private const val REFRESH_SERVICES_DELAY = 500L // give device time refresh cache
 
-        private const val ACTION_GATT_SERVER_DEBUG_CONNECTION = "com.siliconlabs.bledemo.action.GATT_SERVER_DEBUG_CONNECTION"
-        private const val ACTION_GATT_SERVER_REMOVE_NOTIFICATION = "com.siliconlabs.bledemo.action.GATT_SERVER_REMOVE_NOTIFICATION"
+        private const val ACTION_GATT_SERVER_DEBUG_CONNECTION =
+            "com.siliconlabs.bledemo.action.GATT_SERVER_DEBUG_CONNECTION"
+        private const val ACTION_GATT_SERVER_REMOVE_NOTIFICATION =
+            "com.siliconlabs.bledemo.action.GATT_SERVER_REMOVE_NOTIFICATION"
+        const val ACTION_SHOW_BOND_LOSS_DIALOG = "com.siliconlabs.bledemo.action.SHOW_BOND_LOSS_DIALOG"
         private const val GATT_SERVER_REMOVE_NOTIFICATION_REQUEST_CODE = 666
         private const val GATT_SERVER_DEBUG_CONNECTION_REQUEST_CODE = 888
         private const val GATT_SERVER_OPEN_CONNECTION_REQUEST_CODE = 777
@@ -198,10 +204,6 @@ class BluetoothService : LocalService<BluetoothService>() {
     private val scanTimeoutRunnable = Runnable {
         stopDiscovery()
         scanListeners.onDiscoveryTimeout()
-        //Toast.makeText(this, getString(R.string.toast_scan_timeout), Toast.LENGTH_SHORT).show()
-        /*handler.post {
-            this.let { CustomToastManager.show(it,getString(R.string.toast_scan_timeout)) }
-        }*/
         val intent = Intent(ACTION_SHOW_CUSTOM_TOAST).apply {
             putExtra(EXTRA_TOAST_MESSAGE, getString(R.string.toast_scan_timeout))
         }
@@ -265,6 +267,7 @@ class BluetoothService : LocalService<BluetoothService>() {
                         initGattServer()
                         servicesStateListener?.onBluetoothStateChanged(true)
                     }
+
                     BluetoothAdapter.STATE_OFF -> {
                         /* All connections are terminated and closed already by system at this
                         point. Only clearing model is necessary for UI purposes. */
@@ -286,14 +289,15 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
     }
 
-    fun isBluetoothOn() = BluetoothAdapter.getDefaultAdapter() != null && BluetoothAdapter.getDefaultAdapter().isEnabled
+    fun isBluetoothOn() =
+        BluetoothAdapter.getDefaultAdapter() != null && BluetoothAdapter.getDefaultAdapter().isEnabled
 
-    fun isLocationOn() : Boolean {
+    fun isLocationOn(): Boolean {
         val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         return LocationManagerCompat.isLocationEnabled(locationManager)
     }
 
-    fun areNotificationOn() : Boolean {
+    fun areNotificationOn(): Boolean {
         return (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).areNotificationsEnabled()
     }
 
@@ -317,7 +321,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         gattServer?.let { server ->
             gattServerServicesToAdd = BluetoothGattServicesCreator.getBluetoothGattServices(server)
             gattServerServicesToAdd?.let { services ->
-                if(services.isNotEmpty()) bluetoothGattServer?.addService(services.pop())
+                if (services.isNotEmpty()) bluetoothGattServer?.addService(services.pop())
             }
         }
     }
@@ -340,10 +344,24 @@ class BluetoothService : LocalService<BluetoothService>() {
         stopDiscovery()
         disconnectAllGatts()
         AdvertiserService.stopService(applicationContext)
-        unregisterReceiver(scanReceiver)
-        unregisterReceiver(gattServerBroadcastReceiver)
-        unregisterReceiver(bluetoothReceiver)
-        unregisterReceiver(locationReceiver)
+        try {
+            unregisterReceiver(scanReceiver)
+        } catch (_: IllegalArgumentException) {}
+        try {
+            unregisterReceiver(gattServerBroadcastReceiver)
+        } catch (_: IllegalArgumentException) {}
+        try {
+            unregisterReceiver(bluetoothReceiver)
+        } catch (_: IllegalArgumentException) {}
+        try {
+            unregisterReceiver(locationReceiver)
+        } catch (_: IllegalArgumentException) {}
+        try {
+            unregisterReceiver(keyMissingAndEncryptionChangeReceiver)
+        } catch (_: IllegalArgumentException) {}
+        try {
+            unregisterReceiver(bondStateReceiver)
+        } catch (_: IllegalArgumentException) {}
         bluetoothGattServer?.close()
 
         super.onDestroy()
@@ -364,7 +382,75 @@ class BluetoothService : LocalService<BluetoothService>() {
     }
 
 
-       fun startDiscovery(filters: List<ScanFilter>, timeoutInSeconds: Int? = null) {
+    /*fun startDiscovery(filters: List<ScanFilter>, timeoutInSeconds: Int? = null) {
+        bluetoothAdapter?.let { adapter ->
+            if (useBLE) {
+                val skipFastScan = when (BLEUtils.GATT_DEVICE_SELECTED) {
+                    GattConnectType.IOP_TEST,
+                    GattConnectType.THERMOMETER,
+                    GattConnectType.LIGHT,
+                    GattConnectType.RANGE_TEST,
+                    GattConnectType.BLINKY,
+                    GattConnectType.THROUGHPUT_TEST,
+                    GattConnectType.MOTION,
+                    GattConnectType.ENVIRONMENT,
+                    GattConnectType.WIFI_COMMISSIONING,
+                    GattConnectType.ESL_DEMO,
+                    GattConnectType.DEV_KIT_SENSOR,
+                    GattConnectType.AWS_DEMO -> true
+                    else -> false
+                }
+
+                if (skipFastScan) {
+                    timeoutInSeconds?.let {
+                        handler.postDelayed(scanTimeoutRunnable, it.toLong() * 1000)
+                    }
+                    bleScannerCallback = BleScanCallback(this)
+                    val settings = ScanSettings.Builder()
+                        .setLegacy(false)
+                        .setReportDelay(getReportDelay())
+                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                        .build()
+                    adapter.bluetoothLeScanner?.startScan(filters, settings, bleScannerCallback)
+                        ?: onDiscoveryFailed(ScanError.LeScannerUnavailable)
+
+                } else {
+                    // --- Fast scan for 3 seconds with reportDelay = 0L to detect extended advertisers ---
+                    val fastScanCallback = BleScanCallback(this)
+                    val fastScanSettings = ScanSettings.Builder()
+                        .setLegacy(false)
+                        .setReportDelay(0L)
+                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                        .build()
+                    adapter.bluetoothLeScanner?.startScan(filters, fastScanSettings, fastScanCallback)
+                        ?: onDiscoveryFailed(ScanError.LeScannerUnavailable)
+
+                    handler.postDelayed({
+                        adapter.bluetoothLeScanner?.stopScan(fastScanCallback)
+                        // --- Start original scan after fast scan ---
+                        bleScannerCallback = BleScanCallback(this)
+                        val settings = ScanSettings.Builder()
+                            .setLegacy(false)
+                            .setReportDelay(getReportDelay())
+                            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                            .build()
+                        adapter.bluetoothLeScanner?.startScan(filters, settings, bleScannerCallback)
+                            ?: onDiscoveryFailed(ScanError.LeScannerUnavailable)
+                        timeoutInSeconds?.let {
+                            handler.postDelayed(scanTimeoutRunnable, it.toLong() * 1000)
+                        }
+                    }, 3000)
+                }
+            } else {
+                if (!adapter.startDiscovery()) onDiscoveryFailed(ScanError.BluetoothAdapterUnavailable)
+                else timeoutInSeconds?.let {
+                    handler.postDelayed(scanTimeoutRunnable, it.toLong() * 1000)
+                }
+            }
+        } ?: onDiscoveryFailed(ScanError.BluetoothAdapterUnavailable)
+    }*/
+
+    fun startDiscovery(filters: List<ScanFilter>, timeoutInSeconds: Int? = null) {
         val skipFastScan = when (BLEUtils.GATT_DEVICE_SELECTED) {
             GattConnectType.IOP_TEST,
             GattConnectType.THERMOMETER,
@@ -378,11 +464,12 @@ class BluetoothService : LocalService<BluetoothService>() {
             GattConnectType.ESL_DEMO,
             GattConnectType.DEV_KIT_SENSOR,
             GattConnectType.AWS_DEMO -> true
+
             else -> false
         }
-        if (skipFastScan){
+        if (skipFastScan) {
             startDiscoveryForDemoTiles(filters, timeoutInSeconds)
-        }else{
+        } else {
             bluetoothAdapter?.let { adapter ->
                 if (useBLE) {
                     // --- Fast scan for 3 seconds with reportDelay = 0L to detect extended advertisers ---
@@ -392,7 +479,11 @@ class BluetoothService : LocalService<BluetoothService>() {
                         .setReportDelay(0L)
                         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                         .build()
-                    adapter.bluetoothLeScanner?.startScan(filters, fastScanSettings, fastScanCallback)
+                    adapter.bluetoothLeScanner?.startScan(
+                        filters,
+                        fastScanSettings,
+                        fastScanCallback
+                    )
                         ?: onDiscoveryFailed(ScanError.LeScannerUnavailable)
 
                     handler.postDelayed({
@@ -420,7 +511,11 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
 
     }
-    private fun startDiscoveryForDemoTiles(filters: List<ScanFilter>, timeoutInSeconds: Int? = null) {
+
+    private fun startDiscoveryForDemoTiles(
+        filters: List<ScanFilter>,
+        timeoutInSeconds: Int? = null
+    ) {
         timeoutInSeconds?.let {
             handler.postDelayed(scanTimeoutRunnable, it.toLong() * 1000)
         }
@@ -491,6 +586,7 @@ class BluetoothService : LocalService<BluetoothService>() {
                 SCAN_FAILED_INTERNAL_ERROR -> getString(R.string.scan_failed_internal_error)
                 else -> getString(R.string.scan_failed_error_code, errorCode)
             }
+
             ScanError.LeScannerUnavailable -> getString(R.string.scan_failed_le_scanner_unavailable)
             ScanError.BluetoothAdapterUnavailable -> getString(R.string.scan_failed_bluetooth_adapter_unavailable)
         }
@@ -507,6 +603,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         bluetoothAdapter?.let {
             if (useBLE) {
                 it.bluetoothLeScanner?.stopScan(bleScannerCallback as ScanCallback?)
+                bleScannerCallback = null // Clear BLE scanner callback after stopping scan
             } else {
                 if (it.isDiscovering) it.cancelDiscovery()
                 else { /* added to satisfy lambda */ }
@@ -562,14 +659,16 @@ class BluetoothService : LocalService<BluetoothService>() {
         return connectedGatt?.let {
             activeConnections.containsKey(it.device?.address!!)
                     && bluetoothManager.getConnectionState(
-                it.device, BluetoothProfile.GATT) == BluetoothProfile.STATE_CONNECTED
+                it.device, BluetoothProfile.GATT
+            ) == BluetoothProfile.STATE_CONNECTED
         } ?: false
     }
 
     fun isGattConnected(deviceAddress: String?): Boolean {
         return deviceAddress?.let {
             activeConnections.containsKey(deviceAddress)
-                    && bluetoothManager.getConnectedDevices(BluetoothProfile.GATT).any { it.address == deviceAddress }
+                    && bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+                .any { it.address == deviceAddress }
         } ?: false
     }
 
@@ -641,7 +740,8 @@ class BluetoothService : LocalService<BluetoothService>() {
     fun updateConnectionRssi(gatt: BluetoothGatt, rssi: Int) {
         activeConnections.values.apply {
             synchronized(this) {
-                val connectedDevice = find { it.connection.gatt!!.device.address == gatt.device.address }
+                val connectedDevice =
+                    find { it.connection.gatt!!.device.address == gatt.device.address }
                 connectedDevice?.bluetoothInfo?.rssi = rssi
             }
         }
@@ -683,7 +783,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
     }
 
-    fun getLogsForDevice(address: String) : List<Log> {
+    fun getLogsForDevice(address: String): List<Log> {
         return synchronized(connectionLogs) {
             connectionLogs.filter { it.deviceAddress == address }
         }
@@ -722,6 +822,7 @@ class BluetoothService : LocalService<BluetoothService>() {
                         retryAttempts = 0
                     }
                 }
+
                 BluetoothProfile.STATE_DISCONNECTED ->
                     when (status) {
                         133 -> handleReconnection(gatt)
@@ -741,72 +842,141 @@ class BluetoothService : LocalService<BluetoothService>() {
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             super.onServicesDiscovered(gatt, status)
             Timber.d("onServicesDiscovered(): gatt device = ${gatt.device.address}, status = $status")
-            addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.SERVICES_DISCOVERED,
-                status))
+            addDeviceLog(
+                GattOperationWithParameterLog(
+                    gatt, GattOperationLog.Type.SERVICES_DISCOVERED,
+                    status
+                )
+            )
+            gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
             extraGattCallback?.onServicesDiscovered(gatt, status)
         }
 
         @Deprecated("Deprecated in Java")
-        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             super.onCharacteristicRead(gatt, characteristic, status)
-            Timber.d("onCharacteristicRead(): gatt device = ${gatt.device.address}, uuid = ${
-                characteristic.uuid}, value = ${characteristic.value?.contentToString()}")
-            addDeviceLog(GattOperationWithDataLog(gatt, GattOperationLog.Type.READ_CHARACTERISTIC,
-                status, characteristic.uuid, characteristic.value))
+            Timber.d(
+                "onCharacteristicRead(): gatt device = ${gatt.device.address}, uuid = ${
+                    characteristic.uuid
+                }, value = ${characteristic.value?.contentToString()}"
+            )
+            addDeviceLog(
+                GattOperationWithDataLog(
+                    gatt, GattOperationLog.Type.READ_CHARACTERISTIC,
+                    status, characteristic.uuid, characteristic.value
+                )
+            )
             extraGattCallback?.onCharacteristicRead(gatt, characteristic, status)
         }
 
-        override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
-            Timber.d("onCharacteristicWrite(): gatt device = ${gatt.device.address}, uuid = ${
-                characteristic.uuid}, status = $status, value = ${characteristic.value?.contentToString()}")
-            addDeviceLog(GattOperationWithDataLog(gatt, GattOperationLog.Type.WRITE_CHARACTERISTIC,
-                status, characteristic.uuid, characteristic.value))
+            Timber.d(
+                "onCharacteristicWrite(): gatt device = ${gatt.device.address}, uuid = ${
+                    characteristic.uuid
+                }, status = $status, value = ${characteristic.value?.contentToString()}"
+            )
+            addDeviceLog(
+                GattOperationWithDataLog(
+                    gatt, GattOperationLog.Type.WRITE_CHARACTERISTIC,
+                    status, characteristic.uuid, characteristic.value
+                )
+            )
             extraGattCallback?.onCharacteristicWrite(gatt, characteristic, status)
         }
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic
+        ) {
             super.onCharacteristicChanged(gatt, characteristic)
-            Timber.d("onCharacteristicChanged(): gatt device = ${gatt.device.address}, uuid = ${
-                characteristic.uuid}, value = ${characteristic.value?.contentToString()}")
-            addDeviceLog(GattOperationWithDataLog(gatt, GattOperationLog.Type.CHARACTERISTIC_CHANGED,
-                null, characteristic.uuid, characteristic.value))
+            Timber.d(
+                "onCharacteristicChanged(): gatt device = ${gatt.device.address}, uuid = ${
+                    characteristic.uuid
+                }, value = ${characteristic.value?.contentToString()}"
+            )
+            addDeviceLog(
+                GattOperationWithDataLog(
+                    gatt, GattOperationLog.Type.CHARACTERISTIC_CHANGED,
+                    null, characteristic.uuid, characteristic.value
+                )
+            )
             extraGattCallback?.onCharacteristicChanged(gatt, characteristic)
         }
 
-        override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+        override fun onDescriptorRead(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
             super.onDescriptorRead(gatt, descriptor, status)
-            Timber.d("onDescriptorRead(): gatt device = ${gatt.device.address}, uuid = ${
-                descriptor.uuid}, descriptor's characteristic = ${
-                descriptor.characteristic.uuid}, value = ${descriptor.value?.contentToString()}")
-            addDeviceLog(GattOperationWithDataLog(gatt, GattOperationLog.Type.READ_DESCRIPTOR,
-                status, descriptor.uuid, descriptor.value))
+            Timber.d(
+                "onDescriptorRead(): gatt device = ${gatt.device.address}, uuid = ${
+                    descriptor.uuid
+                }, descriptor's characteristic = ${
+                    descriptor.characteristic.uuid
+                }, value = ${descriptor.value?.contentToString()}"
+            )
+            addDeviceLog(
+                GattOperationWithDataLog(
+                    gatt, GattOperationLog.Type.READ_DESCRIPTOR,
+                    status, descriptor.uuid, descriptor.value
+                )
+            )
             extraGattCallback?.onDescriptorRead(gatt, descriptor, status)
         }
 
-        override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt,
+            descriptor: BluetoothGattDescriptor,
+            status: Int
+        ) {
             super.onDescriptorWrite(gatt, descriptor, status)
-            Timber.d("onDescriptorWrite(): gatt device = ${gatt.device.address}, uuid = ${
-                descriptor.uuid}, descriptor's characteristic = ${
-                descriptor.characteristic.uuid}, value = ${descriptor.value?.contentToString()}")
-            addDeviceLog(GattOperationWithDataLog(gatt, GattOperationLog.Type.WRITE_DESCRIPTOR,
-                status, descriptor.uuid, descriptor.value))
+            Timber.d(
+                "onDescriptorWrite(): gatt device = ${gatt.device.address}, uuid = ${
+                    descriptor.uuid
+                }, descriptor's characteristic = ${
+                    descriptor.characteristic.uuid
+                }, value = ${descriptor.value?.contentToString()}"
+            )
+            addDeviceLog(
+                GattOperationWithDataLog(
+                    gatt, GattOperationLog.Type.WRITE_DESCRIPTOR,
+                    status, descriptor.uuid, descriptor.value
+                )
+            )
             extraGattCallback?.onDescriptorWrite(gatt, descriptor, status)
         }
 
         override fun onReliableWriteCompleted(gatt: BluetoothGatt, status: Int) {
             super.onReliableWriteCompleted(gatt, status)
             Timber.d("onReliableWriteCompleted(): gatt device = ${gatt.device.address}, status = $status")
-            addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.RELIABLE_WRITE_COMPLETED,
-                status))
+            addDeviceLog(
+                GattOperationWithParameterLog(
+                    gatt, GattOperationLog.Type.RELIABLE_WRITE_COMPLETED,
+                    status
+                )
+            )
             extraGattCallback?.onReliableWriteCompleted(gatt, status)
         }
 
         override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {
             super.onReadRemoteRssi(gatt, rssi, status)
             Timber.d("onReadRemoteRssi(): gatt device = ${gatt.device.address}, rssi = $rssi, status = $status")
-            addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.READ_RSSI,
-                status, "rssi = $rssi"))
+            addDeviceLog(
+                GattOperationWithParameterLog(
+                    gatt, GattOperationLog.Type.READ_RSSI,
+                    status, "rssi = $rssi"
+                )
+            )
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 updateConnectionRssi(gatt, rssi)
                 extraGattCallback?.onReadRemoteRssi(gatt, rssi, status)
@@ -817,8 +987,12 @@ class BluetoothService : LocalService<BluetoothService>() {
             super.onMtuChanged(gatt, mtu, status)
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Timber.d("onMtuChanged(): gatt device =${gatt.device.address}, mtu = $mtu")
-                addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.MTU_CHANGED,
-                    status, "mtu = $mtu"))
+                addDeviceLog(
+                    GattOperationWithParameterLog(
+                        gatt, GattOperationLog.Type.MTU_CHANGED,
+                        status, "mtu = $mtu"
+                    )
+                )
                 extraGattCallback?.onMtuChanged(gatt, mtu, status)
             }
 
@@ -826,10 +1000,17 @@ class BluetoothService : LocalService<BluetoothService>() {
 
         override fun onPhyUpdate(gatt: BluetoothGatt, txPhy: Int, rxPhy: Int, status: Int) {
             super.onPhyUpdate(gatt, txPhy, rxPhy, status)
-            Timber.d("onPhyUpdate(): gatt device = ${gatt.device?.address}, txPhy = ${
-                txPhy}, rxPhy = $rxPhy, status = $status")
-            addDeviceLog(GattOperationWithParameterLog(gatt, GattOperationLog.Type.PHY_UPDATED,
-                status, "txPhy = $txPhy, rxPhy = $rxPhy"))
+            Timber.d(
+                "onPhyUpdate(): gatt device = ${gatt.device?.address}, txPhy = ${
+                    txPhy
+                }, rxPhy = $rxPhy, status = $status"
+            )
+            addDeviceLog(
+                GattOperationWithParameterLog(
+                    gatt, GattOperationLog.Type.PHY_UPDATED,
+                    status, "txPhy = $txPhy, rxPhy = $rxPhy"
+                )
+            )
             extraGattCallback?.onPhyUpdate(gatt, txPhy, rxPhy, status)
         }
     }
@@ -846,8 +1027,10 @@ class BluetoothService : LocalService<BluetoothService>() {
         @SuppressLint("BinaryOperationInTimber")
         override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
             super.onConnectionStateChange(device, status, newState)
-            Timber.d("onServerConnectionStateChange(): device = ${device.address}," +
-                    "status = $status, newState = $newState")
+            Timber.d(
+                "onServerConnectionStateChange(): device = ${device.address}," +
+                        "status = $status, newState = $newState"
+            )
 
             when (newState) {
                 BluetoothGatt.STATE_CONNECTED -> if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -865,26 +1048,78 @@ class BluetoothService : LocalService<BluetoothService>() {
             }
         }
 
-        override fun onCharacteristicReadRequest(device: BluetoothDevice?, requestId: Int, offset: Int, characteristic: BluetoothGattCharacteristic?) {
+        override fun onCharacteristicReadRequest(
+            device: BluetoothDevice?,
+            requestId: Int,
+            offset: Int,
+            characteristic: BluetoothGattCharacteristic?
+        ) {
             super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
-            bluetoothGattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, characteristic?.value)
+            bluetoothGattServer?.sendResponse(
+                device,
+                requestId,
+                BluetoothGatt.GATT_SUCCESS,
+                offset,
+                characteristic?.value
+            )
         }
 
-        override fun onDescriptorReadRequest(device: BluetoothDevice?, requestId: Int, offset: Int, descriptor: BluetoothGattDescriptor?) {
+        override fun onDescriptorReadRequest(
+            device: BluetoothDevice?,
+            requestId: Int,
+            offset: Int,
+            descriptor: BluetoothGattDescriptor?
+        ) {
             super.onDescriptorReadRequest(device, requestId, offset, descriptor)
-            bluetoothGattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, descriptor?.value)
+            bluetoothGattServer?.sendResponse(
+                device,
+                requestId,
+                BluetoothGatt.GATT_SUCCESS,
+                offset,
+                descriptor?.value
+            )
         }
 
-        override fun onCharacteristicWriteRequest(device: BluetoothDevice?, requestId: Int, characteristic: BluetoothGattCharacteristic?, preparedWrite: Boolean, responseNeeded: Boolean, offset: Int, value: ByteArray?) {
-            super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite, responseNeeded, offset, value)
+        override fun onCharacteristicWriteRequest(
+            device: BluetoothDevice?,
+            requestId: Int,
+            characteristic: BluetoothGattCharacteristic?,
+            preparedWrite: Boolean,
+            responseNeeded: Boolean,
+            offset: Int,
+            value: ByteArray?
+        ) {
+            super.onCharacteristicWriteRequest(
+                device,
+                requestId,
+                characteristic,
+                preparedWrite,
+                responseNeeded,
+                offset,
+                value
+            )
             Timber.i("onCharacteristicWriteRequest")
             characteristic?.value = value
             if (responseNeeded) {
-                bluetoothGattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
+                bluetoothGattServer?.sendResponse(
+                    device,
+                    requestId,
+                    BluetoothGatt.GATT_SUCCESS,
+                    offset,
+                    value
+                )
             }
         }
 
-        override fun onDescriptorWriteRequest(device: BluetoothDevice?, requestId: Int, descriptor: BluetoothGattDescriptor?, preparedWrite: Boolean, responseNeeded: Boolean, offset: Int, value: ByteArray?) {
+        override fun onDescriptorWriteRequest(
+            device: BluetoothDevice?,
+            requestId: Int,
+            descriptor: BluetoothGattDescriptor?,
+            preparedWrite: Boolean,
+            responseNeeded: Boolean,
+            offset: Int,
+            value: ByteArray?
+        ) {
             super.onDescriptorWriteRequest(
                 device,
                 requestId,
@@ -907,12 +1142,14 @@ class BluetoothService : LocalService<BluetoothService>() {
                         devicesToNotify[characteristicUuid]?.remove(device)
                         devicesToIndicate[characteristicUuid]?.remove(device)
                     }
+
                     Notifications.NOTIFY.descriptorValue.asList() -> {
                         devicesToNotify
                             .getOrPut(characteristicUuid) { mutableSetOf() }
                             .add(device)
                         devicesToIndicate[characteristicUuid]?.remove(device)
                     }
+
                     Notifications.INDICATE.descriptorValue.asList() -> {
                         devicesToIndicate
                             .getOrPut(characteristicUuid) { mutableSetOf() }
@@ -942,7 +1179,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         return devicesToNotify[characteristicUuid] ?: emptySet()
     }
 
-    fun getClientsToIndicate(characteristicUuid: UUID) : Collection<BluetoothDevice> {
+    fun getClientsToIndicate(characteristicUuid: UUID): Collection<BluetoothDevice> {
         return devicesToIndicate[characteristicUuid] ?: emptySet()
     }
 
@@ -1003,14 +1240,20 @@ class BluetoothService : LocalService<BluetoothService>() {
 
         val notification = Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.si_launcher)
-            .setContentTitle(getString(R.string.notification_title_device_has_connected, deviceName))
+            .setContentTitle(
+                getString(
+                    R.string.notification_title_device_has_connected,
+                    deviceName
+                )
+            )
             .setContentText(getString(R.string.notification_note_debug_connection))
             .addAction(buildAction(getString(R.string.button_yes), getYesPendingIntent(device)))
             /* .addAction(buildAction(getString(R.string.notification_button_yes_and_open), getYesAndOpenPendingIntent(device)))*/
             .addAction(buildAction(getString(R.string.button_no), getNoPendingIntent()))
             .build()
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
@@ -1022,11 +1265,12 @@ class BluetoothService : LocalService<BluetoothService>() {
             description = descriptionText
         }
 
-        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
 
-    private fun buildAction(actionText: String, actionIntent: PendingIntent) : Notification.Action {
+    private fun buildAction(actionText: String, actionIntent: PendingIntent): Notification.Action {
         return Notification.Action.Builder(
             R.mipmap.si_launcher,
             actionText,
@@ -1044,13 +1288,15 @@ class BluetoothService : LocalService<BluetoothService>() {
                     }
                     closeGattServerNotification()
                 }
+
                 ACTION_GATT_SERVER_REMOVE_NOTIFICATION -> closeGattServerNotification()
             }
         }
     }
 
     fun closeGattServerNotification() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(NOTIFICATION_ID)
     }
 
@@ -1069,4 +1315,96 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
     }
 
+    private val keyMissingAndEncryptionChangeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                BluetoothDevice.ACTION_KEY_MISSING -> {
+                    // Inform user and guide to re-pair
+                    val message = getString(R.string.bluetooth_key_missing)
+                    val toastIntent = Intent(ACTION_SHOW_CUSTOM_TOAST).apply {
+                        putExtra(EXTRA_TOAST_MESSAGE, message)
+                    }
+                    LocalBroadcastManager.getInstance(this@BluetoothService).sendBroadcast(toastIntent)
+                    // Disconnect all active GATT connections
+                    disconnectAllGatts()
+                    // Launch Bluetooth settings to prompt user to re-pair
+                    val settingsIntent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    startActivity(settingsIntent)
+                }
+                BluetoothDevice.ACTION_ENCRYPTION_CHANGE -> {
+                    // Optionally handle encryption state change
+                    val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    val encrypted: Boolean = intent.getBooleanExtra("android.bluetooth.device.extra.ENCRYPTED", false)
+
+                    val message = if (encrypted) {
+                        getString(R.string.bluetooth_encryption_enabled, device?.name ?: "Device")
+                    } else {
+                        getString(R.string.bluetooth_encryption_disabled, device?.name ?: "Device")
+                    }
+                    val toastIntent = Intent(ACTION_SHOW_CUSTOM_TOAST).apply {
+                        putExtra(EXTRA_TOAST_MESSAGE, message)
+                    }
+                    LocalBroadcastManager.getInstance(this@BluetoothService).sendBroadcast(toastIntent)
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes the Bluetooth bond for a companion device using the new Android 16+ API.
+     * @param associationId The association ID for the companion device.
+     */
+    @RequiresApi(Build.VERSION_CODES.BAKLAVA)
+    fun removeBluetoothBond(associationId: Int) {
+        val cdm = getSystemService(CompanionDeviceManager::class.java)
+        cdm?.removeBond(associationId)
+    }
+
+    /**
+     * Finds the association ID for a Bluetooth device address, if associated.
+     * @param deviceAddress The Bluetooth device MAC address.
+     * @return The association ID, or null if not found.
+     */
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    fun getAssociationIdForDevice(deviceAddress: String): Int? {
+        val cdm = getSystemService(CompanionDeviceManager::class.java)
+        if (cdm != null) {
+            val associations = cdm.myAssociations
+            for (info in associations) {
+                if (info.deviceMacAddress?.toString()?.equals(deviceAddress, ignoreCase = true) == true) {
+                    return info.id
+                }
+            }
+        }
+        return null
+    }
+
+    // Register a receiver to monitor bond state changes
+    private val bondStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == intent?.action) {
+                val reason = intent?.getIntExtra("android.bluetooth.device.extra.REASON", -1) ?: -1
+                // Debug: reason can help diagnose OEM-specific bond loss causes
+                val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                val bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1)
+                val prevBondState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1)
+                // val reason = intent.getIntExtra("android.bluetooth.device.extra.REASON", -1) // Not used
+                if (bondState == BluetoothDevice.BOND_NONE && prevBondState == BluetoothDevice.BOND_BONDED) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        // Custom bond loss handling for Android < 16
+                        device?.let {
+                            disconnectGatt(it.address)
+                        }
+                        val dialogIntent = Intent(ACTION_SHOW_BOND_LOSS_DIALOG)
+                        dialogIntent.putExtra(EXTRA_TOAST_MESSAGE, getString(R.string.bluetooth_bond_lost) + " " + (device?.name ?: "Device"))
+                       // dialogIntent.putExtra(EXTRA_DEVICE_ADDRESS, device?.address)
+                        LocalBroadcastManager.getInstance(this@BluetoothService).sendBroadcast(dialogIntent)
+                    }
+                    // On Android 16+, let the system handle bond loss natively
+                }
+            }
+        }
+    }
 }

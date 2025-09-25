@@ -1,20 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:grid="http://schemas.android.com/apk/res-auto"
-    style="@style/match">
-
-    <androidx.gridlayout.widget.GridLayout
-        android:id="@+id/env_grid"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <!-- Fake Status Bar View -->
+    <View
+        android:id="@+id/fakeStatusBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/iodemo_margin"
-        android:paddingLeft="@dimen/iodemo_margin"
-        android:paddingRight="@dimen/iodemo_margin"
-        android:paddingBottom="@dimen/iodemo_margin"
-        grid:layout_columnWeight="1"
-        grid:columnCount="3">
+        android:layout_height="0dp"
+        android:background="@color/blue_primary" />
 
-    </androidx.gridlayout.widget.GridLayout>
+    <!-- Toolbar just below fake status bar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/blue_primary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-</ScrollView>
+    <ScrollView xmlns:grid="http://schemas.android.com/apk/res-auto"
+        style="@style/match">
+
+        <androidx.gridlayout.widget.GridLayout
+            android:id="@+id/env_grid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/iodemo_margin"
+            android:paddingTop="@dimen/iodemo_margin"
+            android:paddingRight="@dimen/iodemo_margin"
+            android:paddingBottom="@dimen/iodemo_margin"
+            grid:columnCount="3"
+            grid:layout_columnWeight="1">
+
+        </androidx.gridlayout.widget.GridLayout>
+
+    </ScrollView>
+
+</LinearLayout>
 

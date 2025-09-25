@@ -10,27 +10,30 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
+import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
 import com.siliconlabs.bledemo.databinding.ActivityMotionBinding
+import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.activities.ThunderboardActivity
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.utils.SensorChecker
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.utils.SensorChecker.ThunderboardSensor
-import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.adapters.GdxAdapter
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.viewmodels.MotionViewModel
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
+import com.siliconlabs.bledemo.utils.AppUtil
 import timber.log.Timber
 
-class MotionActivity : GdxActivity() {
+class MotionActivity : ThunderboardActivity(), AndroidFragmentApplication.Callbacks {
+    override fun exit() { finish() }
 
     private var calibratingDialog: AlertDialog? = null
-    private var gdxAdapter: GdxAdapter? = null
+    private var gdxFragment: MotionGdxFragment? = null
 
     private lateinit var viewModel: MotionViewModel
     private lateinit var binding: ActivityMotionBinding
@@ -41,14 +44,13 @@ class MotionActivity : GdxActivity() {
             .inflate(LayoutInflater.from(this), null, false)
         mainSection?.addView(binding.root)
         viewModel = ViewModelProvider(this).get(MotionViewModel::class.java)
-
+        prepareToolBar()
         setupClickListeners()
         setupDataListeners()
         setupDataInitialValues()
 
         val modelType = intent.getStringExtra(SelectDeviceDialog.MODEL_TYPE_EXTRA)
-        gdxAdapter = GdxAdapter(getColor(R.color.silabs_white), modelType)
-        initializeAnimation()
+        initializeAnimation(modelType)
 
         findViewById<View>(R.id.divider)?.let {
             it.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
@@ -61,6 +63,27 @@ class MotionActivity : GdxActivity() {
         }
     }
 
+    private fun prepareToolBar() {
+        AppUtil.setEdgeToEdge(window, this)
+
+        // Proper ActionBar
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.apply {
+            setHomeAsUpIndicator(R.drawable.matter_back)
+            setDisplayHomeAsUpEnabled(true)
+            setTitle(R.string.motion_demo_title)
+        }
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
     override fun onResume() {
         super.onResume()
         if (!setup) queueMotionNotificationsSetup()
@@ -89,11 +112,10 @@ class MotionActivity : GdxActivity() {
     // Angles are measured in degrees (-180 to 180)
     private fun setOrientation(x: Float, y: Float, z: Float) {
         val degreeString = getString(R.string.motion_orientation_degree)
-
         binding.motionDemoOrientationParent.orientationX.text = String.format(degreeString, x)
         binding.motionDemoOrientationParent.orientationY.text = String.format(degreeString, y)
         binding.motionDemoOrientationParent.orientationZ.text = String.format(degreeString, z)
-        gdxAdapter?.setOrientation(x, y, z)
+        gdxFragment?.setOrientation(x, y, z)
     }
 
     private fun setupClickListeners() {
@@ -139,24 +161,23 @@ class MotionActivity : GdxActivity() {
             else View.INVISIBLE
     }
 
-    private fun initializeAnimation() {
+    private fun initializeAnimation(modelType: String?) {
         setCalibrateVisible(false)
-        gdxAdapter!!.setOnSceneLoadedListener(object : GdxAdapter.OnSceneLoadedListener {
-            override fun onSceneLoaded() {
-                runOnUiThread { setCalibrateVisible(true) }
-            }
-        })
-
-        val config = AndroidApplicationConfiguration().apply {
-            disableAudio = true
-            hideStatusBar = false
-            useAccelerometer = false
-            useCompass = false
-            useImmersiveMode = false
-            useWakelock = false
+        val color = getColor(R.color.silabs_white)
+        val fragmentTag = "motion_gdx_fragment"
+        val existing = supportFragmentManager.findFragmentByTag(fragmentTag) as? MotionGdxFragment
+        if (existing == null) {
+            val created = MotionGdxFragment.newInstance(color, modelType)
+            supportFragmentManager.beginTransaction()
+                .replace(binding.carAnimation.id, created, fragmentTag)
+                .commit()
+            gdxFragment = created
+        } else {
+            gdxFragment = existing
         }
-        val gdx3dView = initializeForView(gdxAdapter, config)
-       binding.carAnimation .addView(gdx3dView)
+        gdxFragment?.setOnSceneLoadedListener(object : MotionGdxFragment.OnSceneLoadedListener {
+            override fun onSceneLoaded() { runOnUiThread { setCalibrateVisible(true) } }
+        })
     }
 
     @SuppressLint("MissingPermission")

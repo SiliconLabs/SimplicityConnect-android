@@ -72,110 +72,6 @@
             android:exported="true"
             tools:ignore="ExportedService" />
 
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.wifi_throughput.activities.WifiThroughputActivity"
-            android:exported="false"
-            android:theme="@style/MainAppTheme" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.configure.gatt_configurator.activities.GattServerActivity"
-            android:label="@string/title_new_GATT_Server" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.configure.advertiser.activities.AdvertiserConfigActivity"
-            android:label="@string/title_Advertiser" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.scan.browser.activities.UuidDictionaryActivity"
-            android:label="@string/title_uuid_dictionary" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.health_thermometer.activities.HealthThermometerActivity"
-            android:label="@string/title_Health_Thermometer"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.blinky.activities.BlinkyActivity"
-            android:label="@string/title_Blinky"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.connected_lighting.activities.ConnectedLightingActivity"
-            android:label="@string/title_Connected_Lighting"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.range_test.activities.RangeTestActivity"
-            android:label="@string/title_Range_Test"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.throughput.activities.ThroughputActivity"
-            android:label="@string/title_Throughput"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.wifi_commissioning.activities.WifiCommissioningActivity"
-            android:label="@string/wifi_commissioning_label"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.scan.browser.activities.DeviceServicesActivity"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.iop_test.activities.IOPTestActivity"
-            android:label="@string/title_Interoperability_Test"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.thunderboard_demos.demos.motion.activities.MotionActivity"
-            android:label="@string/motion_demo_title"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.thunderboard_demos.demos.environment.activities.EnvironmentActivity"
-            android:label="@string/environment_demo_title"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.thunderboard_demos.demos.blinky_thunderboard.activities.BlinkyThunderboardActivity"
-            android:label="@string/title_Blinky"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.esl_demo.activities.EslDemoActivity"
-            android:label="@string/esl_demo_bar_title"
-            android:screenOrientation="sensorPortrait"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.matter_demo.activities.MatterDemoActivity"
-            android:label="@string/matter_demo_title"
-            android:screenOrientation="sensorPortrait"
-            android:theme="@style/matter_theme"
-            tools:ignore="DiscouragedApi" />
-        <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
-            android:name=".features.demo.devkitsensor917.activities.DevKitSensor917Activity"
-            android:label="Dev kitSensor 917"
-            android:screenOrientation="sensorPortrait"
-            android:theme="@style/matter_theme"
-            tools:ignore="DiscouragedApi" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.siliconlabs.bledemo.provider"
@@ -185,15 +81,117 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider> <!-- REDESIGN 07/22 -->
+        <!--E2E done-->
         <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
+            android:name=".features.demo.wifi_throughput.activities.WifiThroughputActivity"
+            android:exported="false"
+            android:theme="@style/MainAppTheme.NoActionBar" />
+        <!--E2E done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.configure.gatt_configurator.activities.GattServerActivity"
+            android:label="@string/title_new_GATT_Server" />
+        <!--E2E done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.configure.advertiser.activities.AdvertiserConfigActivity"
+            android:label="@string/title_Advertiser" />
+        <!--E2E done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.scan.browser.activities.UuidDictionaryActivity"
+            android:label="@string/title_uuid_dictionary" />
+        <!--E2E done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.demo.health_thermometer.activities.HealthThermometerActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.demo.blinky.activities.BlinkyActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.demo.connected_lighting.activities.ConnectedLightingActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E  done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.demo.range_test.activities.RangeTestActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E  done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.demo.throughput.activities.ThroughputActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E  done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.demo.wifi_commissioning.activities.WifiCommissioningActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.scan.browser.activities.DeviceServicesActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.iop_test.activities.IOPTestActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E  done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.demo.thunderboard_demos.demos.motion.activities.MotionActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.demo.thunderboard_demos.demos.environment.activities.EnvironmentActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E  done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.demo.thunderboard_demos.demos.blinky_thunderboard.activities.BlinkyThunderboardActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E done-->
+        <activity
+            android:theme="@style/MainAppTheme.NoActionBar"
+            android:name=".features.demo.esl_demo.activities.EslDemoActivity"
+            android:screenOrientation="sensorPortrait"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E  done-->
+        <activity
+            android:name=".features.demo.matter_demo.activities.MatterDemoActivity"
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/MainAppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi" />
+        <!--E2E done-->
+        <activity
+            android:name=".features.demo.devkitsensor917.activities.DevKitSensor917Activity"
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/MainAppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi" />
+        <activity
             android:name=".home_screen.activities.MainActivity"
             android:launchMode="singleTop"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/CustomSplashTheme"
+            android:theme="@style/MainAppTheme.NoActionBar"
             tools:ignore="DiscouragedApi" />
         <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
             android:name=".home_screen.activities.SplashActivity"
             android:exported="true"
             android:screenOrientation="sensorPortrait"
@@ -205,24 +203,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!--E2E done-->
         <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
             android:name=".features.configure.advertiser.activities.PendingServerConnectionActivity"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/FullscreenTheme"
+            android:theme="@style/Theme.SiConnectApp"
             tools:ignore="DiscouragedApi" />
+        <!--E2E  done-->
         <activity
             android:name=".features.demo.wifi_provisioning.activities.WiFiProvisioningActivity"
-            android:label="@string/matter_demo_title"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/matter_theme"
+            android:theme="@style/MainAppTheme.NoActionBar"
             tools:ignore="DiscouragedApi"  />
+        <!--E2E done-->
         <activity
-            android:windowOptOutEdgeToEdgeEnforcement="true"
             android:name=".features.demo.awsiot.AWSIOTDemoActivity"
             android:screenOrientation="sensorPortrait"
-            android:theme="@style/FullscreenTheme"
+            android:theme="@style/MainAppTheme.NoActionBar"
             tools:ignore="DiscouragedApi" />
+        <!--E2E not done-->
     </application>
 
 </manifest>

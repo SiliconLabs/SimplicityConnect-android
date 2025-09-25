@@ -43,7 +43,7 @@
             android:layout_height="24dp">
         </ProgressBar>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:visibility="gone"
             android:id="@+id/btn_unbind"
             android:textAllCaps="true"

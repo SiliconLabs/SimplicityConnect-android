@@ -1,16 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:grid="http://schemas.android.com/apk/res-auto"
-    style="@style/match"
-    android:background="@color/sl_light_grey"
-    android:id="@+id/throughput_container">
-    <!--<FrameLayout
-        android:id="@+id/throughput_container"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/throughput_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Fake status bar: gets real height at runtime and paints blue -->
+    <View
+        android:id="@+id/fakeStatusBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"/>-->
+        android:layout_height="0dp"
+        android:background="@color/blue_primary"/>
+
+    <!-- Toolbar that becomes supportActionBar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/blue_primary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <!-- Content below toolbar -->
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/my_composable"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-</FrameLayout>
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+</LinearLayout>

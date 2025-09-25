@@ -182,7 +182,8 @@
             android:textSize="@dimen/advertisement_details_title_text_size"
             android:textStyle="bold" />
 
-        <Button android:id="@+id/otabutton"
+        <Button
+            android:id="@+id/otabutton"
             style="@style/dialog_button_positive_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

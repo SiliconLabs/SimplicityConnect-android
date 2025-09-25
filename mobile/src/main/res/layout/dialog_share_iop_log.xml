@@ -67,7 +67,7 @@
             android:layout_marginTop="@dimen/space_S"
             android:gravity="center_horizontal">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/share_log_cancel"
                 style="@style/dialog_button_negative_action"
                 android:layout_width="wrap_content"

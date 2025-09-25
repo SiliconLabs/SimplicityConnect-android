@@ -8,6 +8,7 @@ import chip.devicecontroller.ICDCheckInDelegate
 import chip.devicecontroller.ICDClientInfo
 import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
+import chip.platform.AndroidNfcCommissioningManager
 import chip.platform.ChipMdnsCallbackImpl
 import chip.platform.DiagnosticDataProviderImpl
 import chip.platform.NsdManagerServiceBrowser
@@ -28,6 +29,8 @@ object ChipClient {
     private lateinit var androidPlatform: AndroidChipPlatform
     private const val VENDOR_ID = 0xFFF4
     private var icdCheckInCallback: ICDCheckInCallback? = null
+    private var androidNfcCommissioningManager: AndroidNfcCommissioningManager =
+        AndroidNfcCommissioningManager()
 
     fun getDeviceController(context: Context): ChipDeviceController {
         getAndroidChipPlatform(context)
@@ -86,7 +89,8 @@ object ChipClient {
         if (!this::androidPlatform.isInitialized && context != null) {
             ChipDeviceController.loadJni()
             androidPlatform = AndroidChipPlatform(
-                AndroidBleManager(),
+                AndroidBleManager(context),
+                androidNfcCommissioningManager,
                 PreferencesKeyValueStoreManager(context),
                 PreferencesConfigurationManager(context),
                 NsdManagerServiceResolver(

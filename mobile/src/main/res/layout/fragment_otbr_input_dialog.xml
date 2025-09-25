@@ -54,7 +54,7 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/negativeBtn"
             style="@style/MatterButtonBlue"
             android:layout_width="wrap_content"
@@ -62,7 +62,7 @@
             android:fontFamily="sans-serif-medium"
             android:text="@string/matter_cancel" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/positiveBtn"
             style="@style/MatterButtonBlue"
             android:layout_width="wrap_content"

@@ -1123,6 +1123,7 @@
     <string name="matter_light_off_status">OFF</string>
     <string name="matter_locked_status">Lock</string>
     <string name="matter_unlock_status">Unlock</string>
+    <string name="matter_unlock_query">Query</string>
     <string name="matter_switch_on">Switch On</string>
     <string name="matter_switch_off">Switch Off</string>
     <string name="matter_device_unpair">Matter Device Unpair</string>
@@ -1210,7 +1211,6 @@
     <string name="matter_total">in total</string>
     <string name="mater_average_energy_per_cycle">average energy per cycle</string>
     <string name="matter_completed_cycle">Completed Cycle:</string>
-
 
 
     <!--    Wi-Fi OTA Firmware Update Demo-->
@@ -1330,6 +1330,7 @@
     <string name="wifi_provisioning_error_400">Request received is incomplete or can\'t be parsed successfully.</string>
     <string name="wifi_provisioning_error_unknown">Could not connect to the server.</string>
 
+    <string name="bluetooth_key_missing"></string>
     <!--   Matter Air Quality Sensor -->
     <string name="matter_air_quality_sensor_list">Air Quality Sensor</string>
     <string name="matter_air_quality_sensor_cluster">Air Quality Sensor</string>
@@ -1354,9 +1355,9 @@
     <string name="connection_successful">Connection successful</string>
     <string name="publish_failed">Publish failed</string>
     <string name="subscription_failed">Subscription failed</string>
-    <string name="loading_data">Loading Data...</string>
+    <string name="loading_data">Loading Data…</string>
     <string name="subscribing_to_the_entered_topic">Subscribing to the entered topic</string>
-    <string name="disconnecting_from_aws_iot">Disconnecting from AWS IOT...</string>
+    <string name="disconnecting_from_aws_iot">Disconnecting from AWS IOT…</string>
     <string name="subscription_timeout">Subscription Timeout</string>
     <string name="no_mess_received_within_thirtysec">No messages received within 30 seconds. Please re-enter publish and subscribe topics.</string>
     <string name="retry">Retry</string>
@@ -1450,4 +1451,7 @@
     <string name="periodic_adv_supported">Periodic Advertisement Supported</string>
     <string name="extended_adv_supported">Extended Advertisement Supported</string>
     <string name="max_data_length">Maximum advertising data length</string>
+    <string name="bluetooth_encryption_enabled"></string>
+    <string name="bluetooth_encryption_disabled"></string>
+    <string name="bluetooth_bond_lost"></string>
 </resources>

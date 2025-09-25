@@ -1,15 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:background="@color/silabs_white"> <!-- Changed from gray to white so only content area is gray -->
+
+    <!-- Fake Status Bar View -->
+    <View
+        android:id="@+id/fakeStatusBar"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/blue_primary" />
+
+    <!-- Toolbar just below fake status bar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_below="@id/fakeStatusBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/blue_primary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <FrameLayout
         android:id="@+id/container"
+        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/ll_iop_footer"
-        android:layout_alignParentTop="true" />
+        android:background="@color/gray_background" />
 
     <LinearLayout
         android:id="@+id/ll_iop_footer"
@@ -18,7 +40,6 @@
         android:layout_alignParentBottom="true"
         android:background="@color/silabs_white"
         android:orientation="horizontal">
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -61,9 +82,13 @@
             android:id="@+id/btn_start_and_stop_test"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/white"
+            android:gravity="center"
             android:layout_marginVertical="@dimen/extended_fab_margin"
             android:layout_marginEnd="@dimen/extended_fab_margin"
             android:text="@string/button_run_test"
+            app:backgroundTint="@color/blue_primary"
             tools:text="@string/btn_create_new"
             tools:style="@style/ExtendedFloatingActionButton" />
 

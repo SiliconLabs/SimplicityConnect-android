@@ -33,6 +33,7 @@ import com.siliconlabs.bledemo.features.demo.awsiot.model.GridItem
 import com.siliconlabs.bledemo.features.demo.awsiot.repository.ConnectionResult
 import com.siliconlabs.bledemo.features.demo.awsiot.viewmodel.MqttViewModel
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.CustomToastManager
 import org.json.JSONException
 import org.json.JSONObject
@@ -76,11 +77,10 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityAwsDemoBinding.inflate(layoutInflater)
-        setSupportActionBar(binding.toolbar)
         setContentView(binding.root)
-
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(binding.toolbar)
         val actionBar = supportActionBar
         actionBar!!.setHomeAsUpIndicator(R.drawable.matter_back)
         actionBar.setDisplayHomeAsUpEnabled(true)
@@ -153,7 +153,6 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
                 }
 
                 ConnectionResult.SubscribeConnected -> {
-                    removeProgress()
                     binding.placeholder.visibility = View.GONE
                     showProgressDialog(getString(R.string.loading_data))
                     // Start timeout timer
@@ -167,9 +166,12 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
 
                         val jsonString = it.toString() // Replace with real JSON source
                         if (isValidJsonObject(jsonString)){
-                            updateGrid(JSONObject(jsonString))
+                            runOnUiThread {
+                                updateGrid(JSONObject(jsonString))
+                            }
+
                         }else{
-                           // do not do anything
+                            // do not do anything
                         }
 
 
@@ -177,7 +179,7 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
                 }
 
                 ConnectionResult.SubscribeConnecting -> {
-                    showProgressDialog(getString(R.string.subscribing_to_the_entered_topic))
+                    CustomToastManager.show(this,getString(R.string.subscribing_to_the_entered_topic),5000)
                 }
 
                 ConnectionResult.Disconnected -> {

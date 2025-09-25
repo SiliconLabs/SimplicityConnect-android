@@ -30,7 +30,7 @@
         android:layout_height="@dimen/matter_1dp"
         android:background="@color/silabs_divider" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnSubmit"
         style="@style/MatterButtonBlue"
         android:layout_width="wrap_content"

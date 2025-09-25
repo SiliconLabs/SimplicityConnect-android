@@ -6,6 +6,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".features.scan.browser.activities.UuidDictionaryActivity">
+    <View
+        android:id="@+id/fakeStatusBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/blue_primary"/>
+
+    <!-- Toolbar that becomes supportActionBar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/blue_primary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/uuid_dictionary_tab_layout"

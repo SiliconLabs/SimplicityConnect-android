@@ -28,6 +28,7 @@ import com.siliconlabs.bledemo.features.demo.wifi_provisioning.adapters.APAdapte
 import com.siliconlabs.bledemo.features.demo.wifi_provisioning.fragment.WiFiInputDialogFragment
 import com.siliconlabs.bledemo.features.demo.wifi_provisioning.interfaces.WiFiProvisionInterface
 import com.siliconlabs.bledemo.features.demo.wifi_provisioning.model.ScanResult
+import com.siliconlabs.bledemo.utils.AppUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -52,8 +53,9 @@ class WiFiProvisioningActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityWifiProvisioningBinding.inflate(layoutInflater)
-        setSupportActionBar(binding.toolbar)
         setContentView(binding.root)
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(binding.toolbar)
         val actionBar = supportActionBar
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.matter_back)

@@ -48,6 +48,7 @@ import com.siliconlabs.bledemo.features.configure.advertiser.presenters.Advertis
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.AdvertiserStorage
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.Translator
 import com.siliconlabs.bledemo.features.configure.advertiser.utils.Validator
+import com.siliconlabs.bledemo.utils.AppUtil
 
 
 class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
@@ -131,6 +132,8 @@ class AdvertiserConfigActivity : BaseActivity(), IAdvertiserConfigActivityView {
     }
 
     private fun prepareToolbar() {
+        AppUtil.setEdgeToEdge(window,this)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)

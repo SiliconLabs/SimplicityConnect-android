@@ -16,7 +16,7 @@
         android:layout_margin="@dimen/matter_5dp"
         android:gravity="center"
         android:textSize="@dimen/text_size_ML"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tv_sub_title"
@@ -25,7 +25,7 @@
         android:layout_gravity="center"
         android:layout_margin="@dimen/matter_5dp"
         android:gravity="center"
-        android:textSize="@dimen/text_size_SM"/>
+        android:textSize="@dimen/text_size_SM" />
 
     <EditText
         android:id="@+id/editText"
@@ -37,12 +37,12 @@
         android:inputType="text"
         android:padding="@dimen/matter_10dp" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button"
+        style="@style/ButtonBlue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/matter_8dp"
-        android:background="@color/silabs_blue"
         android:onClick="onOkButtonClick"
         android:text="@string/matter_custom_alert_add"
         android:textColor="@color/white" />

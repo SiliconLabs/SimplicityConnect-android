@@ -17,21 +17,22 @@ import com.siliconlabs.bledemo.features.scan.browser.utils.GlucoseManagement
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.DialogCharacteristicWriteBinding
 import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import com.siliconlabs.bledemo.utils.UuidUtils
 import kotlin.collections.ArrayList
 
 class CharacteristicWriteDialog(
-        private val listener: WriteDialogListener,
-        private val writeType: FragmentCharacteristicDetail.WriteType,
-        private val characteristic: Characteristic?,
-        private var value: ByteArray,
-        private val mGattService: BluetoothGattService?,
-        private val mGattCharacteristic: BluetoothGattCharacteristic?,
-        private var isRawValue: Boolean = false,
-        private val parseProblem: Boolean
+    private val listener: WriteDialogListener,
+    private val writeType: FragmentCharacteristicDetail.WriteType,
+    private val characteristic: Characteristic?,
+    private var value: ByteArray,
+    private val mGattService: BluetoothGattService?,
+    private val mGattCharacteristic: BluetoothGattCharacteristic?,
+    private var isRawValue: Boolean = false,
+    private val parseProblem: Boolean
 ) : BaseDialogFragment(
-        hasCustomWidth = true,
-        isCanceledOnTouchOutside = false
+    hasCustomWidth = true,
+    isCanceledOnTouchOutside = false
 ) {
 
     private lateinit var _binding: DialogCharacteristicWriteBinding
@@ -44,8 +45,10 @@ class CharacteristicWriteDialog(
     private val editableFields = ArrayList<EditText>()
     var offset = 0
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = DialogCharacteristicWriteBinding.inflate(inflater)
         return _binding.root
     }
@@ -55,8 +58,11 @@ class CharacteristicWriteDialog(
         dialog?.let {
             initValueViews()
             displayWriteMethods(
-                    Common.isSetProperty(Common.PropertyType.WRITE, mGattCharacteristic!!.properties),
-                    Common.isSetProperty(Common.PropertyType.WRITE_NO_RESPONSE, mGattCharacteristic.properties)
+                Common.isSetProperty(Common.PropertyType.WRITE, mGattCharacteristic!!.properties),
+                Common.isSetProperty(
+                    Common.PropertyType.WRITE_NO_RESPONSE,
+                    mGattCharacteristic.properties
+                )
             )
             loadValueViews(isRawValue, parseProblem)
             setupUiListeners()
@@ -68,9 +74,9 @@ class CharacteristicWriteDialog(
             saveBtn.setOnClickListener {
                 if (isInputValid()) {
                     val valueToSet =
-                            if (GlucoseManagement.isRecordAccessControlPoint(characteristic))
-                                GlucoseManagement.updateValueToWrite(value)
-                            else value
+                        if (GlucoseManagement.isRecordAccessControlPoint(characteristic))
+                            GlucoseManagement.updateValueToWrite(value)
+                        else value
                     listener.onNewValueSet(valueToSet, writeType)
                 }
             }
@@ -83,7 +89,7 @@ class CharacteristicWriteDialog(
         }
     }
 
-    private fun isInputValid() : Boolean {
+    private fun isInputValid(): Boolean {
         var isValid = false
 
         if (!isAnyWriteFieldEmpty()) {
@@ -99,27 +105,35 @@ class CharacteristicWriteDialog(
 
     private fun initValueViews() {
         val serviceName = Common.getServiceName(mGattService?.uuid!!, requireContext())
-        val characteristicName = Common.getCharacteristicName(mGattCharacteristic?.uuid, requireContext())
+        val characteristicName =
+            Common.getCharacteristicName(mGattCharacteristic?.uuid, requireContext())
 
         _binding.apply {
             characteristicDialogServiceName.text = serviceName
             characteristicDialogCharacteristicName.text = characteristicName
-            characteristicDialogCharacteristicUuid.text = UuidUtils.getUuidText(mGattCharacteristic?.uuid!!)
+            characteristicDialogCharacteristicUuid.text =
+                UuidUtils.getUuidText(mGattCharacteristic?.uuid!!)
 
             writeMethodRadioGroup.visibility =
-                    if (writeType == FragmentCharacteristicDetail.WriteType.REMOTE_WRITE) View.VISIBLE
-                    else View.GONE
+                if (writeType == FragmentCharacteristicDetail.WriteType.REMOTE_WRITE) View.VISIBLE
+                else View.GONE
 
-            saveBtn.text = requireContext().getString( when (writeType) {
-                FragmentCharacteristicDetail.WriteType.REMOTE_WRITE -> R.string.button_send
-                FragmentCharacteristicDetail.WriteType.LOCAL_WRITE -> R.string.button_save
-                FragmentCharacteristicDetail.WriteType.LOCAL_INDICATE -> R.string.button_indicate
-                FragmentCharacteristicDetail.WriteType.LOCAL_NOTIFY -> R.string.button_notify
-            })
+            saveBtn.text = requireContext().getString(
+                when (writeType) {
+                    FragmentCharacteristicDetail.WriteType.REMOTE_WRITE -> R.string.button_send
+                    FragmentCharacteristicDetail.WriteType.LOCAL_WRITE -> R.string.button_save
+                    FragmentCharacteristicDetail.WriteType.LOCAL_INDICATE -> R.string.button_indicate
+                    FragmentCharacteristicDetail.WriteType.LOCAL_NOTIFY -> R.string.button_notify
+                }
+            )
         }
     }
 
-    fun getChosenWriteMethod() : Int {
+    fun getStatusMethod(): Boolean {
+        return _binding.writeWithRespRadioButton.isChecked
+    }
+
+    fun getChosenWriteMethod(): Int {
         return if (_binding.writeWithRespRadioButton.isChecked) {
             BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         } else {
@@ -140,7 +154,7 @@ class CharacteristicWriteDialog(
         }
     }
 
-    abstract inner class CharacteristicValueListener: ValueView.ValueListener {
+    abstract inner class CharacteristicValueListener : ValueView.ValueListener {
         override fun onRawValueChanged(newValue: ByteArray) {
             value = newValue
         }
@@ -190,12 +204,18 @@ class CharacteristicWriteDialog(
         }
     }
 
-    private fun isAnyInputInvalid() : Boolean {
+    private fun isAnyInputInvalid(): Boolean {
         var validField: Boolean
         for ((_, value1) in fieldsValidMap) {
             validField = value1
             if (!validField) {
-                Toast.makeText(context, R.string.characteristic_dialog_invalid_input, Toast.LENGTH_SHORT).show()
+                /*Toast.makeText(
+                    context,
+                    R.string.characteristic_dialog_invalid_input,
+                    Toast.LENGTH_SHORT
+                ).show()*/
+                CustomToastManager.show(requireContext(), getString(R.string.characteristic_dialog_invalid_input), 5000)
+
                 return true
             }
         }
@@ -204,7 +224,13 @@ class CharacteristicWriteDialog(
         for ((_, value1) in fieldsInRangeMap) {
             entryInRange = value1
             if (!entryInRange) {
-                Toast.makeText(context, R.string.characteristic_dialog_invalid_out_of_range, Toast.LENGTH_SHORT).show()
+                /*Toast.makeText(
+                    context,
+                    R.string.characteristic_dialog_invalid_out_of_range,
+                    Toast.LENGTH_SHORT
+                ).show()*/
+                CustomToastManager.show(requireContext(), getString(R.string.characteristic_dialog_invalid_out_of_range), 5000)
+
                 return true
             }
         }
@@ -244,25 +270,31 @@ class CharacteristicWriteDialog(
                     val currentValue = value
                     val currentOffset = offset
                     val fieldSize = calculateFieldSize(field)
-                    val currentRange = currentValue.copyOfRange(currentOffset, currentOffset + fieldSize)
+                    val currentRange =
+                        currentValue.copyOfRange(currentOffset, currentOffset + fieldSize)
 
                     if (field.bitfield != null) {
-                        BitFieldView(context, field, currentRange).createViewForWrite(currentOffset, valueListener)
+                        BitFieldView(context, field, currentRange).createViewForWrite(
+                            currentOffset,
+                            valueListener
+                        )
                         offset += field.getSizeInBytes()
 
-                    }
-                    else if (field.enumerations != null && field.enumerations?.size!! > 0) {
+                    } else if (field.enumerations != null && field.enumerations?.size!! > 0) {
                         if (field.isNibbleFormat()) {
                             handleNibbleRead(field, currentRange[0])
                         } else {
-                            EnumerationView(context, field, currentRange).createViewForWrite(currentOffset, valueListener)
+                            EnumerationView(context, field, currentRange).createViewForWrite(
+                                currentOffset,
+                                valueListener
+                            )
                             offset += field.getSizeInBytes()
                         }
-                    }
-                    else {
+                    } else {
                         NormalValueView(context, field, currentRange, isLast).createViewForWrite(
-                                currentOffset,
-                                if(isLast and currentRange.isEmpty()) emptyWriteValueListener else valueListener)
+                            currentOffset,
+                            if (isLast and currentRange.isEmpty()) emptyWriteValueListener else valueListener
+                        )
                         offset += fieldSize
                     }
                 }
@@ -272,11 +304,10 @@ class CharacteristicWriteDialog(
         }
     }
 
-    private fun calculateFieldSize(field: Field) : Int {
+    private fun calculateFieldSize(field: Field): Int {
         return if (field.getSizeInBytes() != 0) {
             field.getSizeInBytes()
-        }
-        else when (field.format) {
+        } else when (field.format) {
             "utf8s", "utf16s" -> value.size - offset
             "variable" -> field.getVariableFieldLength(characteristic, value)
             else -> 0
@@ -288,9 +319,15 @@ class CharacteristicWriteDialog(
         val secondNibble = Converters.byteToUnsignedInt(data) and 0x0f
 
         if (fieldViewHelper.isFirstNibbleInByte(field)) {
-            EnumerationView(context, field, byteArrayOf(firstNibble.toByte())).createViewForWrite(offset, valueListener)
+            EnumerationView(context, field, byteArrayOf(firstNibble.toByte())).createViewForWrite(
+                offset,
+                valueListener
+            )
         } else {
-            EnumerationView(context, field, byteArrayOf(secondNibble.toByte())).createViewForWrite(offset, valueListener)
+            EnumerationView(context, field, byteArrayOf(secondNibble.toByte())).createViewForWrite(
+                offset,
+                valueListener
+            )
             offset += field.getSizeInBytes()
         }
     }
@@ -299,13 +336,13 @@ class CharacteristicWriteDialog(
         var nibbleByte = value[fieldOffset].toInt() and 0xff
 
         if (fieldViewHelper.isFirstNibbleInByte(field)) {
-                val firstNibble = newValue.toInt() and 0x0f shl 4
-                nibbleByte = nibbleByte and 0x0f
-                nibbleByte = nibbleByte or firstNibble
+            val firstNibble = newValue.toInt() and 0x0f shl 4
+            nibbleByte = nibbleByte and 0x0f
+            nibbleByte = nibbleByte or firstNibble
         } else {
-                val secondNibble = newValue.toInt() and 0x0f
-                nibbleByte = nibbleByte and 0xf0
-                nibbleByte = nibbleByte or secondNibble
+            val secondNibble = newValue.toInt() and 0x0f
+            nibbleByte = nibbleByte and 0xf0
+            nibbleByte = nibbleByte or secondNibble
         }
         byteArrayOf(nibbleByte.toByte()).copyInto(value, fieldOffset)
     }
@@ -313,7 +350,13 @@ class CharacteristicWriteDialog(
     private fun isAnyWriteFieldEmpty(): Boolean {
         editableFields.forEach {
             if (it.text.toString().isEmpty()) {
-                Toast.makeText(context, R.string.You_cannot_send_empty_value_to_charac, Toast.LENGTH_SHORT).show()
+                /*Toast.makeText(
+                    context,
+                    R.string.You_cannot_send_empty_value_to_charac,
+                    Toast.LENGTH_SHORT
+                ).show()*/
+                CustomToastManager.show(requireContext(), getString(R.string.You_cannot_send_empty_value_to_charac), 5000)
+
                 return true
             }
         }

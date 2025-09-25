@@ -6,12 +6,29 @@
     android:layout_height="match_parent"
     android:focusableInTouchMode="true"
     tools:context=".features.configure.advertiser.activities.AdvertiserConfigActivity">
+    <!-- Fake status bar: gets real height at runtime and paints blue -->
+    <View
+        android:id="@+id/fakeStatusBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/blue_primary"/>
 
+    <!-- Toolbar that becomes supportActionBar -->
+    <androidx.appcompat.widget.Toolbar
+        android:layout_below="@id/fakeStatusBar"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/blue_primary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
     <com.siliconlabs.bledemo.common.views.HorizontalShadow
+        android:id="@+id/horizontalShadow"
+        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <ScrollView
+        android:layout_below="@id/horizontalShadow"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

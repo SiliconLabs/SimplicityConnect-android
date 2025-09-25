@@ -76,7 +76,7 @@
                 android:singleLine="true"
                 android:textSize="@dimen/text_size_M" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/submitEntry"
                 style="@style/MatterButtonBlue"
                 android:layout_width="match_parent"

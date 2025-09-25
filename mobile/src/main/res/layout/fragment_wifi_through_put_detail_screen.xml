@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:fitsSystemWindows="true"
     android:layout_height="wrap_content"
     android:background="@color/sl_light_grey"
     tools:context=".features.demo.wifi_throughput.fragments.WifiThroughPutDetailScreen"
@@ -19,7 +20,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerInParent="true"
             android:layout_marginStart="64dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="64dp" />
     </RelativeLayout>
 
@@ -73,15 +74,14 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/incremental_log"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/final_result_ll"
+        android:layout_height="275dp"
         android:layout_below="@+id/headers" />
 
     <LinearLayout
         android:id="@+id/final_result_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button_actions"
+        android:layout_below="@+id/incremental_log"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -107,10 +107,10 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_alignParentBottom="true"
         android:id="@+id/connection_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button_actions"
         android:layout_marginBottom="@dimen/matter_30dp"
         android:orientation="vertical"
         android:visibility="gone">
@@ -135,7 +135,7 @@
         android:layout_alignParentBottom="true"
         android:gravity="center">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -145,7 +145,7 @@
             android:text="@string/button_cancel"
             android:visibility="gone" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

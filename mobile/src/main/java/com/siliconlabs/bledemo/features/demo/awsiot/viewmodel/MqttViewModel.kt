@@ -1,11 +1,14 @@
 package com.siliconlabs.bledemo.features.demo.awsiot.viewmodel
 
+import android.app.Application
 import android.content.Context
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.siliconlabs.bledemo.features.demo.awsiot.repository.ConnectionResult
 import com.siliconlabs.bledemo.features.demo.awsiot.repository.MqttRepository
 import com.siliconlabs.bledemo.utils.CustomToastManager
+import com.siliconlabs.bledemo.utils.Objects
 import com.siliconlabs.bledemo.utils.Objects.isNetworkAvailable
 
 class MqttViewModel(val context: Context) : ViewModel() {

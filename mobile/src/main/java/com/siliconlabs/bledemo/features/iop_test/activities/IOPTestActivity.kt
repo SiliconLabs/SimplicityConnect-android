@@ -38,11 +38,13 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
 import com.siliconlabs.bledemo.R
@@ -65,8 +67,11 @@ import com.siliconlabs.bledemo.features.iop_test.test_cases.ota.OtaFileSelection
 import com.siliconlabs.bledemo.features.iop_test.test_cases.ota.OtaProgressDialog
 import com.siliconlabs.bledemo.features.iop_test.utils.ErrorCodes
 import com.siliconlabs.bledemo.features.scan.browser.dialogs.OtaLoadingDialog
+import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
 import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import com.siliconlabs.bledemo.utils.Notifications
 import com.siliconlabs.bledemo.utils.UuidConsts
 import kotlinx.coroutines.Dispatchers
@@ -98,7 +103,7 @@ class IOPTestActivity : AppCompatActivity() {
     private var isTestRunning = false
     private var isConnected = false
     private var isTestFinished = false
-    private var readScannerStartTime = true
+    private var readScannerStartTime = Any()
 
     private var mStartTimeScanner: Long = 0
     private var mStartTimeConnection: Long = 0
@@ -181,8 +186,11 @@ class IOPTestActivity : AppCompatActivity() {
 
     private var shareMenuItem: MenuItem? = null
     private lateinit var binding: ActivityIopTestBinding
-    private val lock = Object()
 
+    private var isInAppOTA = false
+    private var ota_alreadyIn_Progress = false
+
+    private val lock = Object()
 
     private val mBondStateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -214,11 +222,14 @@ class IOPTestActivity : AppCompatActivity() {
                     }
                 }, 1600)
             } else if (state == BluetoothDevice.BOND_BONDING) {
-                Toast.makeText(
+               /* Toast.makeText(
                     this@IOPTestActivity,
                     R.string.iop_test_toast_bonding,
                     Toast.LENGTH_LONG
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    this@IOPTestActivity,getString(R.string.iop_test_toast_bonding),5000
+                )
             }
         }
 
@@ -240,11 +251,14 @@ class IOPTestActivity : AppCompatActivity() {
 
         private fun printVariant(variant: Int): String {
             if (variant == BluetoothDevice.PAIRING_VARIANT_PIN) {
-                Toast.makeText(
+                /*Toast.makeText(
                     this@IOPTestActivity,
                     R.string.iop_test_toast_press_passkey,
                     Toast.LENGTH_LONG
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    this@IOPTestActivity,getString(R.string.iop_test_toast_press_passkey),5000
+                )
                 return "PAIRING_VARIANT_PIN"
             }
             return variant.toString()
@@ -365,6 +379,12 @@ class IOPTestActivity : AppCompatActivity() {
 
                 POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
                     iopPhase3IndexStartChildrenTest = 1
+                    if(mBluetoothGatt?.getService(ota_service)
+                            ?.getCharacteristic(ota_data) != null) {
+                        isInAppOTA = true
+                    }else{
+                        isInAppOTA = false
+                    }
                     startOtaTestCase(iopPhase3IndexStartChildrenTest)
                 }
 
@@ -694,65 +714,69 @@ class IOPTestActivity : AppCompatActivity() {
      * DISCONNECTS AND CONNECTS WITH THE SELECTED DELAY
      */
     fun reconnect(delaytoconnect: Long) {
-        mBluetoothDevice = mBluetoothGatt?.device
-        if (mBluetoothService?.isGattConnected()!!) {
-            mBluetoothService?.clearConnectedGatt()
-        }
-
-        mBluetoothGatt?.disconnect()
-        reconnectTimer?.schedule(object : TimerTask() {
-            override fun run() {
-                mBluetoothGatt?.close()
-                mBluetoothBinding?.unbind()
+        if(!isInAppOTA){
+            mBluetoothDevice = mBluetoothGatt?.device
+            if (mBluetoothService?.isGattConnected()!!) {
+                mBluetoothService?.clearConnectedGatt()
             }
-        }, 400)
 
-        reconnectTimer?.schedule(object : TimerTask() {
-            override fun run() {
-                Log.d(TAG, "Attempting connection...")
-                mBluetoothBinding = object : BluetoothService.Binding(applicationContext) {
-                    override fun onBound(service: BluetoothService?) {
-                        service?.isNotificationEnabled = false
-                        mBluetoothGatt = mBluetoothDevice?.connectGatt(
-                            applicationContext,
-                            false,
-                            gattCallback,
-                            BluetoothDevice.TRANSPORT_LE
-                        )
-                    }
+            mBluetoothGatt?.disconnect()
+            reconnectTimer?.schedule(object : TimerTask() {
+                override fun run() {
+                    mBluetoothGatt?.close()
+                    mBluetoothBinding?.unbind()
                 }
-                mBluetoothBinding?.bind()
-            }
-        }, delaytoconnect)
+            }, 400)
+
+            reconnectTimer?.schedule(object : TimerTask() {
+                override fun run() {
+                    Log.d(TAG, "Attempting connection...")
+                    mBluetoothBinding = object : BluetoothService.Binding(applicationContext) {
+                        override fun onBound(service: BluetoothService?) {
+                            service?.isNotificationEnabled = false
+                            mBluetoothGatt = mBluetoothDevice?.connectGatt(
+                                applicationContext,
+                                false,
+                                gattCallback,
+                                BluetoothDevice.TRANSPORT_LE
+                            )
+                        }
+                    }
+                    mBluetoothBinding?.bind()
+                }
+            }, delaytoconnect)
+        }
     }
 
     /**
      * DISCONNECT GATT GENTLY AND CLEAN GLOBAL VARIABLES
      */
     private fun disconnectGatt(gatt: BluetoothGatt?) {
-        val disconnectTimer = Timer()
-        boolOTAbegin = false
-        otaProcess = false
-        disconnectGatt = true
-        if (gatt != null && gatt.device != null) {
-            val btGatt: BluetoothGatt = gatt
-            disconnectTimer.schedule(object : TimerTask() {
-                override fun run() {
-                    //Getting bluetoothDevice to FetchUUID
-                    btGatt.device?.let {
-                        mBluetoothDevice = btGatt.device
+        if (!isInAppOTA){
+            val disconnectTimer = Timer()
+            boolOTAbegin = false
+            otaProcess = false
+            disconnectGatt = true
+            if (gatt != null && gatt.device != null) {
+                val btGatt: BluetoothGatt = gatt
+                disconnectTimer.schedule(object : TimerTask() {
+                    override fun run() {
+                        //Getting bluetoothDevice to FetchUUID
+                        btGatt.device?.let {
+                            mBluetoothDevice = btGatt.device
+                        }
+                        btGatt.disconnect()
+                        mBluetoothService?.clearConnectedGatt()
                     }
-                    btGatt.disconnect()
-                    mBluetoothService?.clearConnectedGatt()
-                }
-            }, 200)
-            disconnectTimer.schedule(object : TimerTask() {
-                override fun run() {
-                    mBluetoothDevice?.fetchUuidsWithSdp()
-                }
-            }, 300)
-        } else {
-            finish()
+                }, 200)
+                disconnectTimer.schedule(object : TimerTask() {
+                    override fun run() {
+                        mBluetoothDevice?.fetchUuidsWithSdp()
+                    }
+                }, 300)
+            } else {
+                finish()
+            }
         }
     }
 
@@ -977,10 +1001,12 @@ class IOPTestActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityIopTestBinding.inflate(LayoutInflater.from(this))
         setContentView(binding.root)
-
+        AppUtil.setEdgeToEdge(window,this)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
+            title = getString(R.string.title_Interoperability_Test)
         }
         checkIfBluetoothIsSupported()
 
@@ -994,8 +1020,23 @@ class IOPTestActivity : AppCompatActivity() {
         registerBroadcastReceivers()
         handleClickEvents()
         startLogCapture()
+        applyGestureNavigationMargin()
     }
-
+    private fun applyGestureNavigationMargin() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.llIopFooter) { v, insets ->
+            val nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            val gestures = insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+            val bottomInset = maxOf(nav.bottom, gestures.bottom)
+            val lp = v.layoutParams as ViewGroup.MarginLayoutParams
+            val extraPaddingDp = 16
+            lp.bottomMargin = if (bottomInset > 0)
+                bottomInset + (extraPaddingDp * resources.displayMetrics.density).toInt()
+            else 0
+            v.layoutParams = lp
+            insets
+        }
+        binding.btnStartAndStopTest.post { ViewCompat.requestApplyInsets(binding.btnStartAndStopTest) }
+    }
     private fun startLogCapture() {
         lifecycleScope.launch(Dispatchers.IO) {
             captureContinuousLogcat("IOPTest").collect { logLine ->
@@ -1020,11 +1061,14 @@ class IOPTestActivity : AppCompatActivity() {
 
     private fun checkIfBluetoothIsSupported() {
         if (BluetoothAdapter.getDefaultAdapter() == null) {
-            Toast.makeText(
+            /*Toast.makeText(
                 this,
                 R.string.iop_test_toast_bluetooth_not_supported,
                 Toast.LENGTH_SHORT
-            ).show()
+            ).show()*/
+            CustomToastManager.show(
+                this@IOPTestActivity,getString(R.string.iop_test_toast_bluetooth_not_supported),5000
+            )
             finish()
         }
     }
@@ -1072,6 +1116,10 @@ class IOPTestActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
+                val dialog = supportFragmentManager.findFragmentByTag("select_device_tag") as? SelectDeviceDialog
+                if (dialog != null && dialog.isVisible) {
+                    dialog.dismiss()
+                }
                 onBackPressed()
                 true
             }
@@ -1205,14 +1253,20 @@ class IOPTestActivity : AppCompatActivity() {
                         otaFileManager?.readFile(it)
                         otaFileSelectionDialog?.enableUploadButton()
                     } else {
-                        Toast.makeText(this, getString(R.string.incorrect_file), Toast.LENGTH_SHORT)
-                            .show()
+                        /*Toast.makeText(this, getString(R.string.incorrect_file), Toast.LENGTH_SHORT)
+                            .show()*/
+                        CustomToastManager.show(
+                            this@IOPTestActivity,getString(R.string.incorrect_file),5000
+                        )
                     }
-                } ?: Toast.makeText(
+                } ?: /*Toast.makeText(
                     this,
                     getString(R.string.chosen_file_not_found),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    this@IOPTestActivity,getString(R.string.chosen_file_not_found),5000
+                )
             }
 
             SAVE_LOG_REQUEST_CODE -> {
@@ -1225,11 +1279,14 @@ class IOPTestActivity : AppCompatActivity() {
                             }
                         }
                     } ?: run {
-                        Toast.makeText(
+                        /*Toast.makeText(
                             this,
                             getString(R.string.chosen_file_not_found),
                             Toast.LENGTH_SHORT
-                        ).show()
+                        ).show()*/
+                        CustomToastManager.show(
+                            this@IOPTestActivity,getString(R.string.chosen_file_not_found),5000
+                        )
                     }
                 }
             }
@@ -1496,7 +1553,9 @@ class IOPTestActivity : AppCompatActivity() {
                                     )
                                 ) {
                                     Log.i(TAG, "onServicesDiscovered Device in DFU Mode")
-                                    mBluetoothGatt?.requestMtu(247)
+                                    if (mIndexRunning == 4 || mIndexRunning == 5){
+                                        mBluetoothGatt?.requestMtu(247)
+                                    }
                                 } else {
                                     Log.i(TAG, "onServicesDiscovered OTA_Control found")
                                     val gattDescriptors = gattCharacteristic.descriptors
@@ -2533,24 +2592,30 @@ class IOPTestActivity : AppCompatActivity() {
                 otaFileSelectionDialog?.dismiss()
                 startOtaProcess()
             } ?: if (otaFileManager?.otaFilename != null) {
-                Toast.makeText(
+                /*Toast.makeText(
                     this@IOPTestActivity,
                     getString(R.string.incorrect_file),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    this@IOPTestActivity,getString(R.string.incorrect_file),5000
+                )
             } else {
-                Toast.makeText(
+                /*Toast.makeText(
                     this@IOPTestActivity,
                     getString(R.string.no_file_chosen),
                     Toast.LENGTH_SHORT
-                ).show()
+                ).show()*/
+                CustomToastManager.show(
+                    this@IOPTestActivity,getString(R.string.no_file_chosen),5000
+                )
             }
         }
 
         override fun onCancelButtonClicked() {
             otaFileSelectionDialog?.dismiss()
             otaFileSelectionDialog = null
-
+            isInAppOTA = false
             checkIOP3OTA(mIndexRunning, Common.IOP3_TC_STATUS_FAILED)
             finishItemTest(mIndexRunning, getSiliconLabsTestInfo().listItemTest[mIndexRunning])
         }
@@ -2648,12 +2713,15 @@ class IOPTestActivity : AppCompatActivity() {
 
             "OTAEND" -> {
                 Log.d(TAG, "OTAEND Called")
+                ota_alreadyIn_Progress = false
+                isInAppOTA = false
                 handler?.postDelayed({ writeOtaControl(0x03.toByte()) }, 1000)
             }
 
             "DISCONNECTION" -> {
                 otaProcess = false
                 boolOTAbegin = false
+                isInAppOTA = false
                 disconnectGatt(mBluetoothGatt)
             }
 
@@ -2667,6 +2735,7 @@ class IOPTestActivity : AppCompatActivity() {
     }
 
     private fun initOtaProgressDialog() {
+        otaProcess = false
         otaProgressDialog = OtaProgressDialog(this)
 
         otaProgressDialog?.btnOtaEnd?.setOnClickListener {
@@ -2681,6 +2750,10 @@ class IOPTestActivity : AppCompatActivity() {
     private fun showOtaProgressDialog() {
         otaProgressDialog?.show()
         dfuMode(OTA_BEGIN)
+    }
+
+    private fun showOtaProgressDialogForRainier() {
+        otaProgressDialog?.show()
     }
 
     private fun showOtaLoadingDialog() {
@@ -2708,12 +2781,14 @@ class IOPTestActivity : AppCompatActivity() {
      * USED TO CLEAN CACHE AND REDISCOVER SERVICES
      */
     private fun refreshServices() {
-        if (mBluetoothGatt != null && mBluetoothGatt?.device != null) {
-            refreshDeviceCache()
-            mBluetoothGatt?.discoverServices()
-        } else if (mBluetoothService != null && mBluetoothService?.connectedGatt != null) {
-            refreshDeviceCache()
-            mBluetoothService?.connectedGatt?.discoverServices()
+        if(!isInAppOTA){
+            if (mBluetoothGatt != null && mBluetoothGatt?.device != null) {
+                refreshDeviceCache()
+                mBluetoothGatt?.discoverServices()
+            } else if (mBluetoothService != null && mBluetoothService?.connectedGatt != null) {
+                refreshDeviceCache()
+                mBluetoothService?.connectedGatt?.discoverServices()
+            }
         }
     }
 
@@ -3065,11 +3140,14 @@ class IOPTestActivity : AppCompatActivity() {
                                         if (discoverTimeout) {
                                             disconnectGatt(gatt)
                                             runOnUiThread {
-                                                Toast.makeText(
+                                                /*Toast.makeText(
                                                     baseContext,
                                                     "DISCOVER SERVICES TIMEOUT",
                                                     Toast.LENGTH_LONG
-                                                ).show()
+                                                ).show()*/
+                                                CustomToastManager.show(
+                                                    this@IOPTestActivity,"DISCOVER SERVICES TIMEOUT",5000
+                                                )
                                             }
                                         }
                                     }, 25000)
@@ -3150,6 +3228,7 @@ class IOPTestActivity : AppCompatActivity() {
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             super.onServicesDiscovered(gatt, status)
+            gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
             Log.d(TAG, "onServicesDiscovered(), status " + Integer.toHexString(status))
             if (mBluetoothGatt != gatt) {
                 mBluetoothGatt = gatt
@@ -3161,11 +3240,14 @@ class IOPTestActivity : AppCompatActivity() {
                 discoverTimeout = false
                 if (status != 0) {
                     runOnUiThread {
-                        Toast.makeText(
+                        /*Toast.makeText(
                             baseContext,
                             ErrorCodes.getErrorName(status),
                             Toast.LENGTH_LONG
-                        ).show()
+                        ).show()*/
+                        CustomToastManager.show(
+                            this@IOPTestActivity,ErrorCodes.getErrorName(status),5000
+                        )
                         updateDataTestFailed(mIndexRunning)
                     }
                     handler?.postDelayed({
@@ -3182,6 +3264,7 @@ class IOPTestActivity : AppCompatActivity() {
                             val homeKitCheck = gatt.getService(homekit_service) != null
                             if (!homeKitCheck) {
                                 ota_mode = true
+                                ota_alreadyIn_Progress = true
                             }
                         } else {
                             if (boolOTAbegin) {
@@ -3190,12 +3273,19 @@ class IOPTestActivity : AppCompatActivity() {
                         }
                     }
 
+                    val otaDataCheck =
+                        gatt.getService(ota_service).getCharacteristic(ota_data) == null
+                    if(!otaDataCheck){
+                        ota_alreadyIn_Progress = false
+                    }
                     //IF DFU_MODE, LAUNCH OTA SETUP AUTOMATICALLY
-                    if (ota_mode && boolOTAbegin) {
+                    if (ota_mode && boolOTAbegin && !ota_alreadyIn_Progress) {
                         handler?.postDelayed({
                             runOnUiThread {
-                                otaLoadingDialog?.toggleLoadingSpinner(isVisible = false)
-                                otaLoadingDialog?.dismiss()
+                                if (otaLoadingDialog?.isShowing() == true){
+                                    otaLoadingDialog?.toggleLoadingSpinner(isVisible = false)
+                                    otaLoadingDialog?.dismiss()
+                                }
                                 showOtaProgressDialog()
                             }
                         }, 1000)
@@ -3255,11 +3345,14 @@ class IOPTestActivity : AppCompatActivity() {
                         if (value[2] == 0x05.toByte()) {
                             Log.e("homekit_descriptor", "Insecure Connection")
                             runOnUiThread {
-                                Toast.makeText(
+                                /*Toast.makeText(
                                     this@IOPTestActivity,
                                     "Error: Not a Homekit Secure Connection",
                                     Toast.LENGTH_SHORT
-                                ).show()
+                                ).show()*/
+                                CustomToastManager.show(
+                                    this@IOPTestActivity,"Error: Not a Homekit Secure Connection",5000
+                                )
                             }
                         } else if (value[2] == 0x04.toByte()) {
                             Log.e("homekit_descriptor", "Wrong Address")
@@ -3307,8 +3400,27 @@ class IOPTestActivity : AppCompatActivity() {
                                 handler?.postDelayed(DFU_OTA_UPLOAD, 500)
                             } else if (!ota_mode && otaProcess) {
                                 runOnUiThread { showOtaLoadingDialog() }
-                                handler?.post {
-                                    reconnect(4000)
+                                if(mBluetoothGatt?.getService(ota_service)
+                                        ?.getCharacteristic(ota_data) == null){
+                                    handler?.post {
+                                        reconnect(4000)
+                                    }
+                                }else{
+                                    if(!ota_alreadyIn_Progress){
+                                        ota_alreadyIn_Progress = true
+                                        runOnUiThread(checkBeginRunnable)
+                                        handler?.removeCallbacks(DFU_OTA_UPLOAD)
+                                        handler?.postDelayed(DFU_OTA_UPLOAD, 500)
+                                        handler?.postDelayed({
+                                            runOnUiThread {
+                                                otaLoadingDialog?.toggleLoadingSpinner(isVisible = false)
+                                                otaLoadingDialog?.dismiss()
+                                                if(!otaProgressDialog!!.isShowing){
+                                                    showOtaProgressDialogForRainier()
+                                                }
+                                            }
+                                        }, 1000)
+                                    }
                                 }
                             }
                         }
@@ -3347,7 +3459,25 @@ class IOPTestActivity : AppCompatActivity() {
                                         otaProgressDialog?.uploadImage?.visibility = View.INVISIBLE
                                     }
                                 }
-                                dfuMode(OTA_END)
+                                handler?.postDelayed({
+                                    dfuMode(OTA_END)
+                                }, 5000)
+                            }
+                        }else{
+                            pack += mtuDivisible
+                            if (pack <= otaFileManager?.otaFile?.size!! - 1) {
+                                otaWriteDataReliable()
+                            } else if (pack > otaFileManager?.otaFile?.size!! - 1) {
+                                handler?.post {
+                                    runOnUiThread {
+                                        otaProgressDialog?.chrono?.stop()
+                                        otaProgressDialog?.uploadImage?.clearAnimation()
+                                        otaProgressDialog?.uploadImage?.visibility = View.INVISIBLE
+                                    }
+                                }
+                                handler?.postDelayed({
+                                    dfuMode(OTA_END)
+                                }, 5000)
                             }
                         }
                     }
@@ -3524,7 +3654,7 @@ class IOPTestActivity : AppCompatActivity() {
                         scanLeDevice(false)
                         handler?.postDelayed({
                             connectToDevice(mBluetoothDevice)
-                        }, 5000)
+                        }, 15000)
                     } else return
                 }
 

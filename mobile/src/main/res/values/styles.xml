@@ -2,7 +2,7 @@
 
     <style name="MainAppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="android:windowBackground">@color/gallery</item>
-        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+       
         <item name="colorPrimary">@color/blue_primary</item>
         <item name="colorOnPrimary">@android:color/white</item>
         <item name="colorPrimaryDark">@color/blue_primary</item>
@@ -18,7 +18,7 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+       
 
     </style>
 
@@ -27,7 +27,7 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+       
 
     </style>
 
@@ -35,7 +35,7 @@
     <style name="SystemSplashTheme" parent="Theme.SplashScreen">
         <item name="android:windowBackground">@drawable/si_connect_app_screen_background</item>
         <item name="postSplashScreenTheme">@style/CustomSplashTheme</item>
-        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+       
 
     </style>
 
@@ -539,9 +539,11 @@
     </style>
 
     <style name="settings_link_button">
+        <item name="backgroundTint">@color/blue_primary</item>
         <item name="android:layout_width">@dimen/settings_link_button_width</item>
         <item name="android:layout_height">@dimen/settings_link_button_height</item>
         <item name="android:layout_marginHorizontal">8dp</item>
+        <item name="android:textColor">@color/silabs_white</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
@@ -551,7 +553,7 @@
         <item name="colorOnPrimary">@android:color/white</item>
         <item name="colorPrimaryDark">@color/blue_primary</item>
         <item name="colorSecondary">@color/blue_primary</item>
-        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+       
     </style>
 
     <style name="CustomAlertDialogProgress" parent="Theme.AppCompat.Light.Dialog.Alert">
@@ -685,5 +687,16 @@
         <item name="android:textSize">@dimen/help_text_size</item>
         <item name="android:textStyle">bold</item>
     </style>
+    <style name="MainAppTheme.NoActionBar" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Required to prevent decor ActionBar -->
+        <item name="windowActionBar">false</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 
+    <style name="Theme.SiConnectApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/blue_primary</item>
+    </style>
 </resources>

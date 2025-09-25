@@ -6,6 +6,8 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
+import androidx.appcompat.widget.Toolbar
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
@@ -14,6 +16,7 @@ import com.siliconlabs.bledemo.features.demo.connected_lighting.presenters.Conne
 import com.siliconlabs.bledemo.features.demo.connected_lighting.models.TriggerSource
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.utils.Notifications
 
@@ -21,7 +24,7 @@ import com.siliconlabs.bledemo.utils.Notifications
 class ConnectedLightingActivity : BaseDemoActivity(), BluetoothController {
     private var presenter: ConnectedLightingPresenter? = null
     private var gattService: GattService? = null
-
+    lateinit var mToolbar: Toolbar
     private var initSourceAddress = false
     private var serviceHasBeenSet = false
     private var updateDelayed = false
@@ -151,8 +154,27 @@ class ConnectedLightingActivity : BaseDemoActivity(), BluetoothController {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_light)
+        mToolbar = findViewById(R.id.toolbar)
+        prepareToolBar()
     }
 
+    private fun prepareToolBar() {
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(mToolbar)
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.matter_back)
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.title = this.getString(R.string.title_Connected_Lighting)
+        }
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == android.R.id.home) {
+            gatt?.disconnect()
+            onBackPressed()
+            true
+        } else super.onOptionsItemSelected(item)
+    }
     override fun onDestroy() {
         super.onDestroy()
         presenter?.cancelPeriodicReads()

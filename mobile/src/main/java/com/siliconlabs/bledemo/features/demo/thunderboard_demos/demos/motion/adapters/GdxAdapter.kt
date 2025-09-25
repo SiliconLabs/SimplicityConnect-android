@@ -200,37 +200,15 @@ class GdxAdapter(private val backgroundColor: Int, modelType: String?) :
 
     // An input processor that doesn't do anything
     internal inner class NullInputProcessor : InputProcessor {
-        override fun keyDown(i: Int): Boolean {
-            return false
-        }
-
-        override fun keyUp(i: Int): Boolean {
-            return false
-        }
-
-        override fun keyTyped(c: Char): Boolean {
-            return false
-        }
-
-        override fun touchDown(i: Int, i1: Int, i2: Int, i3: Int): Boolean {
-            return false
-        }
-
-        override fun touchUp(i: Int, i1: Int, i2: Int, i3: Int): Boolean {
-            return false
-        }
-
-        override fun touchDragged(i: Int, i1: Int, i2: Int): Boolean {
-            return false
-        }
-
-        override fun mouseMoved(i: Int, i1: Int): Boolean {
-            return false
-        }
-
-        override fun scrolled(i: Int): Boolean {
-            return false
-        }
+        override fun keyDown(i: Int): Boolean = false
+        override fun keyUp(i: Int): Boolean = false
+        override fun keyTyped(c: Char): Boolean = false
+        override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = false
+        override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = false
+        override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean = false
+        override fun mouseMoved(screenX: Int, screenY: Int): Boolean = false
+        override fun scrolled(amountX: Float, amountY: Float): Boolean = false
+        override fun touchCancelled(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = false
     }
 
     internal inner class EmissiveShaderProvider @JvmOverloads constructor(

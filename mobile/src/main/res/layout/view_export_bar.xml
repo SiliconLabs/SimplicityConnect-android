@@ -7,7 +7,7 @@
     android:orientation="horizontal"
     android:background="@color/silabs_white">
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/cancel_bar"
         style="@style/ButtonBorderlessBlue"
         android:layout_width="wrap_content"
@@ -17,7 +17,7 @@
         android:textSize="18sp"
         android:text="@string/button_cancel"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/export_bar"
         style="@style/ButtonBlue"
         android:layout_width="wrap_content"

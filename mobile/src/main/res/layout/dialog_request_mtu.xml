@@ -38,14 +38,14 @@
             android:layout_marginHorizontal="@dimen/dialog_margin_horizontal_plus_button_margin_end"
             android:gravity="end">
 
-            <Button android:id="@+id/cancel_request"
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/cancel_request"
                 style="@style/dialog_button_negative_action"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="@dimen/dialog_margin_between_buttons"
                 android:text="@string/button_cancel" />
 
-            <Button android:id="@+id/request"
+            <androidx.appcompat.widget.AppCompatButton android:id="@+id/request"
                 style="@style/dialog_button_positive_action"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"

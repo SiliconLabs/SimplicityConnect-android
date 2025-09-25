@@ -43,7 +43,7 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_on"
                     style="@style/MatterButtonBlue"
                     android:layout_width="match_parent"
@@ -51,7 +51,7 @@
                     android:layout_margin="@dimen/matter_20dp"
                     android:layout_weight="1" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_off"
                     style="@style/MatterButtonBlue"
                     android:layout_width="match_parent"

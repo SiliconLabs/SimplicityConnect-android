@@ -12,7 +12,7 @@ class Common {
         const val WRITE_VALUE_55 = "55"
         const val WRITE_VALUE_66 = "66"
         const val TIME_OUT_TEST = 1000
-        const val TIME_OUT_DISCOVER = 1200
+        const val TIME_OUT_DISCOVER = 5000
         const val TIME_OUT_NOTIFICATION_INDICATE_TEST = 300
         const val IOP3_TC_STATUS_FAILED = 0
         const val IOP3_TC_STATUS_PASS = 1

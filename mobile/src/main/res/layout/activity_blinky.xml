@@ -1,26 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Fake Status Bar View -->
+    <View
+        android:id="@+id/fakeStatusBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/blue_primary" />
+
+    <!-- Toolbar just below fake status bar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_below="@id/fakeStatusBar"
+        android:background="@color/blue_primary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <!-- Main fragment container below Toolbar -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
+        android:name="com.siliconlabs.bledemo.features.demo.blinky.fragments.BlinkyFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.siliconlabs.bledemo.features.demo.blinky.fragments.BlinkyFragment" />
+        android:layout_below="@id/toolbar" />
 
+    <!-- Bottom container (status fragment) -->
     <LinearLayout
+        android:layout_marginBottom="@dimen/matter_50dp"
+        android:id="@+id/thunderboard_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/thunderboard_fragment_container"
         android:layout_alignParentBottom="true"
-        android:visibility="gone" >
+        android:visibility="gone">
 
         <fragment
-            android:name="com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.fragments.StatusFragment"
             android:id="@+id/status_fragment"
+            android:name="com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.fragments.StatusFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>
-
 </RelativeLayout>

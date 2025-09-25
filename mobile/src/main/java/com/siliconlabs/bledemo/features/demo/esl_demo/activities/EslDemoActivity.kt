@@ -11,6 +11,7 @@ import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
 import com.siliconlabs.bledemo.databinding.ActivityEslDemoBinding
 import com.siliconlabs.bledemo.features.demo.esl_demo.fragments.TagDataFragment
 import com.siliconlabs.bledemo.features.demo.esl_demo.model.QrCodeData
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.CustomToastManager
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanCustomCode
@@ -37,6 +38,18 @@ class EslDemoActivity : BaseDemoActivity() {
             setContentView(it.root)
         }
         initDefaultFragment()
+        prepareToolBar()
+    }
+
+    private fun prepareToolBar() {
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(binding.toolbar)
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.matter_back)
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.title = this.getString(R.string.esl_demo_bar_title)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -54,6 +67,11 @@ class EslDemoActivity : BaseDemoActivity() {
                 tagDataFragment.loadTags()
                 true
             }
+           android.R.id.home -> {
+               gatt?.disconnect()
+               onBackPressed()
+               true
+           }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -95,7 +113,7 @@ class EslDemoActivity : BaseDemoActivity() {
     }
 
     private fun handleScanSuccess(result: QRResult.QRSuccess) {
-        val qrCodeData = QrCodeData.decode(result.content.rawValue)
+        val qrCodeData = QrCodeData.decode(result.content.rawValue.toString())
         if (qrCodeData.isValid()) {
             handleScannedQrCode(qrCodeData)
         } else {

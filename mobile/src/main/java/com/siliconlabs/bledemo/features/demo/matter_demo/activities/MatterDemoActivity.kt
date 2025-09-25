@@ -26,6 +26,7 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.model.ProvisionNetworkT
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ChipClient
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.SharedPrefsUtils
+import com.siliconlabs.bledemo.utils.AppUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -64,15 +65,16 @@ class MatterDemoActivity : AppCompatActivity(),
         Timber.tag(TAG).e(" onCreate")
         binding = ActivityMatterDemoBinding.inflate(layoutInflater)
         mPrefs = this.getSharedPreferences("your_preference_name", MODE_PRIVATE)
-        setSupportActionBar(binding.toolbar)
         setContentView(binding.root)
-
+        AppUtil.setEdgeToEdge(window,this)
+        setSupportActionBar(binding.toolbar)
         deviceController = ChipClient.getDeviceController(this)
 
         val actionBar = supportActionBar
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.matter_back)
             actionBar.setDisplayHomeAsUpEnabled(true)
+            title = getString(R.string.matter_demo_title)
         }
         binding.scanQRCode.setOnClickListener {
             val fragment = MatterScannerFragment.newInstance()

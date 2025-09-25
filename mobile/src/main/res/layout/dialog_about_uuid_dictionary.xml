@@ -24,7 +24,7 @@
             android:layout_marginBottom="@dimen/dialog_about_mappings_info_section_and_body_separation"
             android:text="@string/about_mappings_note" />
 
-        <Button android:id="@+id/btn_ok"
+        <androidx.appcompat.widget.AppCompatButton android:id="@+id/btn_ok"
             style="@style/dialog_button_neutral_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -8,7 +8,7 @@ import com.siliconlabs.bledemo.bluetooth.beacon_utils.BleFormat
 data class FilterDeviceParams(
     val name: String?,
     val rssiValue: Pair<Float, Float>?,
-    val isRssiFlag: Boolean,
+    var isRssiFlag: Boolean,
     val bleFormats: List<BleFormat>,
     val isOnlyFavourite: Boolean,
     val isOnlyConnectable: Boolean,

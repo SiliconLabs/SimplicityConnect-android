@@ -25,6 +25,7 @@ import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPres
 import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPresenter.Controller
 import com.siliconlabs.bledemo.features.demo.range_test.presenters.RangeTestPresenter.RangeTestView
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
 import com.siliconlabs.bledemo.utils.CustomToastManager
 import com.siliconlabs.bledemo.utils.Notifications
@@ -127,10 +128,23 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityRangeTestBinding.inflate(LayoutInflater.from(baseContext))
+        binding = ActivityRangeTestBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
         //setContentView(R.layout.activity_range_test)
+        prepareToolBar()
         setupUiListeners()
+    }
+
+    private fun prepareToolBar() {
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(binding.toolbar)
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.matter_back)
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.title = this.getString(R.string.title_Range_Test)
+        }
     }
 
     private fun setupUiListeners() {

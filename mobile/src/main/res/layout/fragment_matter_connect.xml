@@ -16,7 +16,7 @@
         android:hint="Enter OTBR Info"
         android:inputType="text" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:visibility="gone"
             style="@style/ButtonBlue"
             android:layout_marginTop="@dimen/matter_10dp"

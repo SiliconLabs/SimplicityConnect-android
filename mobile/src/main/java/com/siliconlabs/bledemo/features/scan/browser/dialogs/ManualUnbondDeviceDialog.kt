@@ -20,22 +20,23 @@ class ManualUnbondDeviceDialog(val callback: Callback) : BaseDialogFragment() {
     ): View? {
         binding = DialogInfoOkCancelBinding.inflate(inflater, container, false).apply {
 
-            binding.tvDialogTitle.text =
+            tvDialogTitle.text =
                 requireContext().getString(R.string.device_services_title_unbond_device_manual)
-            binding.tvDialogContent.text =
+            tvDialogContent.text =
                 requireContext().getString(R.string.device_services_note_unbond_device_manual)
 
-             binding.btnOk.text = requireContext().getString(R.string.button_proceed)
+            btnOk.text = requireContext().getString(R.string.button_proceed)
 
-             binding.btnOk.setOnClickListener {
-                if (binding.cbDontShowAgain
-                    .isChecked) SharedPrefUtils(requireContext()).setShouldDisplayManualUnbondDeviceDialog(
-                    false
-                )
+            btnOk.setOnClickListener {
+                if (cbDontShowAgain.isChecked)
+                    SharedPrefUtils(requireContext())
+                        .setShouldDisplayManualUnbondDeviceDialog(
+                            false
+                        )
                 callback.onOkClicked()
                 dismiss()
             }
-            binding.btnCancel.setOnClickListener { dismiss() }
+            btnCancel.setOnClickListener { dismiss() }
         }
 
         return binding.root

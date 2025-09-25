@@ -3,8 +3,10 @@ package com.siliconlabs.bledemo.features.demo.blinky.activities
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
@@ -17,6 +19,7 @@ import com.siliconlabs.bledemo.features.demo.blinky.viewmodels.BlinkyViewModel
 import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.fragments.StatusFragment
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models.ThunderBoardDevice
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.utils.Notifications
 import java.util.*
@@ -27,18 +30,37 @@ class BlinkyActivity : BaseDemoActivity() {
     private lateinit var viewModel: BlinkyViewModel
     private val processor = GattProcessor()
     private var isDeviceThunderboard = false
-
+    lateinit var mToolbar: Toolbar
     private var statusFragment: StatusFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_blinky)
         viewModel = ViewModelProvider(this).get(BlinkyViewModel::class.java)
-
+        mToolbar = findViewById(R.id.toolbar)
         val boardType = intent.extras?.getString(SelectDeviceDialog.MODEL_TYPE_EXTRA, "Unknown") ?: "Unknown"
         if (boardType == "BRD4184A" || boardType == "BRD4184B") isDeviceThunderboard = true
-
+        prepareToolBar()
         observeChanges()
+    }
+
+    private fun prepareToolBar() {
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(mToolbar)
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.matter_back)
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.title = this.getString(R.string.title_Blinky)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == android.R.id.home) {
+            gatt?.disconnect()
+            onBackPressed()
+            true
+        } else super.onOptionsItemSelected(item)
     }
 
     override fun onBluetoothServiceBound() {

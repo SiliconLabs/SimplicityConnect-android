@@ -1,85 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".features.demo.matter_demo.activities.MatterDemoActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <!-- Fake Status Bar View -->
+        <View
+            android:id="@+id/fakeStatusBar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            android:background="@color/blue_primary"
+            app:layout_constraintBottom_toTopOf="@+id/toolbar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
-                android:minHeight="?attr/actionBarSize"
-                android:theme="?attr/actionBarTheme"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:title="@string/matter_tile"
-                app:titleTextColor="#ffff" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/blue_primary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="@string/matter_tile"
+            app:titleTextColor="#ffff" />
 
-            <!-- Right most ImageView -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="@dimen/matter_10dp"
-                android:layout_marginEnd="@dimen/matter_20dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="MissingConstraints">
+        <!-- Right most ImageView -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/matter_20dp"
+            android:orientation="horizontal"
+            android:padding="@dimen/matter_10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints">
 
-                <ImageView
-                    android:layout_gravity="center"
-                    android:id="@+id/refresh"
-                    android:padding="3dp"
-                    android:layout_width="@dimen/matter_36dp"
-                    android:layout_height="@dimen/matter_36dp"
-                    android:layout_marginEnd="@dimen/matter_15dp"
-                    android:layout_weight="1"
-                    android:contentDescription="@string/matter_refresh_button"
-                    app:srcCompat="@drawable/ic_refresh" />
+            <ImageView
+                android:id="@+id/refresh"
+                android:layout_width="@dimen/matter_36dp"
+                android:layout_height="@dimen/matter_36dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/matter_15dp"
+                android:layout_weight="1"
+                android:contentDescription="@string/matter_refresh_button"
+                android:padding="3dp"
+                app:srcCompat="@drawable/ic_refresh" />
 
-                <ImageView
-                    android:layout_gravity="center"
-                    android:id="@+id/scanQRCode"
-                    android:layout_width="@dimen/matter_36dp"
-                    android:layout_height="@dimen/matter_36dp"
-                    android:layout_margin="@dimen/matter_10dp"
-                    android:layout_marginEnd="16dp"
-                    android:padding="2dp"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_qr_code_scanner" />
+            <ImageView
+                android:id="@+id/scanQRCode"
+                android:layout_width="@dimen/matter_36dp"
+                android:layout_height="@dimen/matter_36dp"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/matter_10dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:padding="2dp"
+                app:srcCompat="@drawable/ic_qr_code_scanner" />
 
 
-            </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
         android:id="@+id/matter_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="0dp"
         android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
         tools:text="Matter Demo" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="115dp"
     android:layout_height="120dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardview_env_tile"

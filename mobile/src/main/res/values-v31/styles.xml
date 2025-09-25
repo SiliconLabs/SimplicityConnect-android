@@ -5,5 +5,7 @@
         <item name="android:windowBackground">@drawable/si_connect_app_screen_background</item>
         <item name="windowSplashScreenAnimatedIcon">@android:color/transparent</item>
         <item name="postSplashScreenTheme">@style/CustomSplashTheme</item>
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+
     </style>
 </resources>

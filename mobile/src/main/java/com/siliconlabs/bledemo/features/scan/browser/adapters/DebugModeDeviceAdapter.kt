@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.os.ParcelUuid
 import android.text.Html
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,7 @@ import com.siliconlabs.bledemo.bluetooth.parsing.ScanRecordParser
 import com.siliconlabs.bledemo.common.views.DetailsRow
 import com.siliconlabs.bledemo.databinding.AdapterBrowserDeviceBinding
 import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
+import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.utils.RecyclerViewUtils
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToLong
@@ -74,6 +76,7 @@ class DebugModeDeviceAdapter(
                 }
             }
             connectionBtn.setOnClickListener {
+                BLEUtils.IS_FIRMWARE_REBOOTED = false
                 RecyclerViewUtils.withProperAdapterPosition(holder) { pos ->
                     with(chosenDevices[pos].deviceInfo) {
                         when (connectionState) {
@@ -363,6 +366,7 @@ class DebugModeDeviceAdapter(
                 if (scanResult.periodicAdvertisingInterval in 6..65536) {
                     val ms = scanResult.periodicAdvertisingInterval * 1.25
                     append("$ms ms")
+                    Log.e("DebugModeDeviceAdapterXXX","$ms ms")
                 } else {
                     append(context.getString(R.string.advertising_extension_not_present))
                 }

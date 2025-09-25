@@ -59,6 +59,7 @@ import com.siliconlabs.bledemo.databinding.ActivityWifiThroughputBinding
 import com.siliconlabs.bledemo.features.demo.wifi_throughput.fragments.WifiThroughPutDetailScreen
 import com.siliconlabs.bledemo.features.demo.wifi_throughput.utils.ThroughputUtils
 import com.siliconlabs.bledemo.features.iop_test.utils.Utils
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.CustomToastManager
 import java.net.InetAddress
 import java.nio.ByteBuffer
@@ -80,7 +81,16 @@ class WifiThroughputActivity : AppCompatActivity() {
         context = this@WifiThroughputActivity
         binding = ActivityWifiThroughputBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        // Edge-to-edge & insets handling
+        AppUtil.setEdgeToEdge(window, this)
 
+        // Proper ActionBar
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.apply {
+            setHomeAsUpIndicator(R.drawable.matter_back)
+            setDisplayHomeAsUpEnabled(true)
+            setTitle(R.string.wifi_title_Throughput)
+        }
         findViewById<ComposeView>(R.id.my_composable).setContent {
             GridLayout(this, throughPutDemos)
             val isConfirm = remember { isConfirmCalled }
@@ -88,12 +98,6 @@ class WifiThroughputActivity : AppCompatActivity() {
                 //FragmentContainer()
             }
         }
-
-        //setSupportActionBar(binding.toolbar)
-        val actionBar = supportActionBar
-        actionBar!!.setHomeAsUpIndicator(R.drawable.matter_back)
-        actionBar.setDisplayHomeAsUpEnabled(true)
-        actionBar.setTitle(R.string.wifi_title_Throughput)
     }
 
     // Function to update the ActionBar title
@@ -437,4 +441,3 @@ class WifiThroughputActivity : AppCompatActivity() {
         ).hostAddress
     }
 }
-

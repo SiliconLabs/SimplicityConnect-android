@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:text="@string/permissions_rationale_html"/>
 
-        <Button android:id="@+id/btn_understood"
+        <androidx.appcompat.widget.AppCompatButton android:id="@+id/btn_understood"
             style="@style/dialog_button_positive_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

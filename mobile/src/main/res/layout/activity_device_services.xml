@@ -8,6 +8,22 @@
     android:orientation="vertical"
     tools:context=".features.scan.browser.activities.DeviceServicesActivity">
 
+
+    <!-- Fake Status Bar View -->
+    <View
+        android:id="@+id/fakeStatusBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/blue_primary" />
+
+    <!-- Toolbar just below fake status bar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/blue_primary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"

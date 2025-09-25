@@ -58,7 +58,7 @@
             android:layout_marginEnd="@dimen/dialog_button_margin_end"
             android:gravity="end">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_cancel"
                 style="@style/dialog_button_negative_action"
                 android:layout_width="wrap_content"
@@ -66,7 +66,7 @@
                 android:layout_marginEnd="@dimen/dialog_margin_between_buttons"
                 android:text="@string/button_cancel" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_ok"
                 style="@style/dialog_button_positive_action"
                 android:layout_width="wrap_content"

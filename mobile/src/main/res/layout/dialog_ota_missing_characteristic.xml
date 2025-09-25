@@ -25,7 +25,7 @@
             android:layout_marginBottom="@dimen/space_S"
             android:text="@string/ota_characteristic_not_found" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_ok"
             style="@style/dialog_button_neutral_action"
             android:layout_width="wrap_content"

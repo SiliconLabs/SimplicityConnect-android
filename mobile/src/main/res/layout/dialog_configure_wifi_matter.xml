@@ -53,7 +53,7 @@
                 android:gravity="left"
                 android:padding="@dimen/matter_10dp">
 
-                <EditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/editNetworkSSID"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
@@ -89,22 +89,29 @@
                     android:layout_height="wrap_content"
                     app:hintEnabled="false"
                     android:gravity="right|center"
-                    app:passwordToggleContentDescription="@string/password_toggle_content_description"
-                    app:passwordToggleDrawable="@drawable/baseline_remove_red_eye_24"
-                    app:passwordToggleEnabled="true">
+                    app:endIconMode="password_toggle"
+                    app:endIconContentDescription="@string/password_toggle_content_description"
+                    app:endIconDrawable="@drawable/baseline_remove_red_eye_24"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="@color/blue_primary"
+                    app:boxStrokeWidth="1dp"
+                    app:boxStrokeWidthFocused="2dp"
+                    app:boxBackgroundColor="@color/sl_light_grey">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editWiFiPassword"
                         android:layout_width="match_parent"
-                        android:layout_height="34dp"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:autofillHints=""
-                        android:background="@drawable/rounded_background"
+                        android:background="@android:color/transparent"
                         android:gravity="center|left"
                         android:hint="@string/matter_network_password"
                         android:inputType="textPassword"
                         android:textSize="@dimen/text_size_SM"
-                        android:lines="1" />
+                        android:lines="1"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -119,7 +126,7 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/negativeBtn"
             style="@style/MatterButtonBlue"
             android:layout_width="wrap_content"
@@ -127,7 +134,7 @@
             android:layout_margin="@dimen/matter_10dp"
             android:text="@string/matter_cancel" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/positiveBtn"
             style="@style/MatterButtonBlue"
             android:layout_width="wrap_content"

@@ -86,7 +86,7 @@ class MqttRepository(private val context: Context) {
                         Log.e("MQTT", "Connection lost: ${cause?.message}")
                         //CustomToastManager.show(context,"Connection Lost",5000)
                         _connectionState.value =
-                            ConnectionResult.Error("Connection Lost ${cause?.message}")
+                            ConnectionResult.Error("Connection Lost")
                         retryConnection()
                     }
 
@@ -157,7 +157,7 @@ class MqttRepository(private val context: Context) {
                         Log.e("MQTT", "Connection lost: ${cause?.message}")
                         //CustomToastManager.show(context,"Connection lost: ${cause?.message}",5000)
                         _connectionState.value =
-                            ConnectionResult.Error("Connection lost: ${cause?.message}")
+                            ConnectionResult.Error("Connection lost")
 
                     }
 
@@ -208,7 +208,10 @@ class MqttRepository(private val context: Context) {
                 if (mqttClient.isConnected) {
                     val mqttMessage = MqttMessage(message.toByteArray())
                     mqttClient.publish(topic, mqttMessage)
-                    CustomToastManager.show(context, "Publish Successfully", 5000)
+                    withContext(Dispatchers.Main) {
+                        CustomToastManager.show(context, "Publish Successfully", 5000)
+                    }
+
 
                 } else {
                     Log.e("MQTT", "Publish failed: MQTT is not connected")
@@ -233,11 +236,11 @@ class MqttRepository(private val context: Context) {
                                     _connectionState.value = ConnectionResult.Disconnected
                                     coroutineScope.launch {
                                         withContext(Dispatchers.Main) {
-                                            CustomToastManager.show(
+                                            /*CustomToastManager.show(
                                                 context,
                                                 "AWS IoT Disconnected Successfully!",
                                                 3000
-                                            )
+                                            )*/
                                         }
                                     }
                                 }

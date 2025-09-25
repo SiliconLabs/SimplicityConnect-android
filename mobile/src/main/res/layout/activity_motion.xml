@@ -2,10 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/motion_rounded_bg"
     android:orientation="vertical">
+    <!-- Fake Status Bar View -->
+    <View
+        android:id="@+id/fakeStatusBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/blue_primary" />
 
+    <!-- Toolbar just below fake status bar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/blue_primary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
     <FrameLayout
+        android:background="@drawable/motion_rounded_bg"
         android:id="@+id/car_animation"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -18,17 +31,18 @@
     <ScrollView
         android:id="@+id/scrollerViewParent"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:gravity="center"
+        android:layout_height="51dp"
         android:layout_gravity="center"
-        android:layout_weight="0.4">
+        android:layout_weight="0.4"
+        android:fillViewport="true"
+        android:gravity="center">
 
         <LinearLayout
             android:id="@+id/llParent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_gravity="center"
+            android:gravity="center"
             android:orientation="vertical">
 
             <RelativeLayout
@@ -77,7 +91,7 @@
         android:orientation="vertical"
         android:layout_marginBottom="@dimen/space_XS">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/calibrate"
             android:layout_gravity="center"
             android:backgroundTint="@color/blue_primary"

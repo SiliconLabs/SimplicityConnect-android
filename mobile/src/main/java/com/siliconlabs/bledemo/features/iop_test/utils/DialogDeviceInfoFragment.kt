@@ -1,7 +1,5 @@
 package com.siliconlabs.bledemo.features.iop_test.utils
 
-import android.app.AlertDialog
-import android.app.Dialog
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -10,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.DialogDeviceInfoLayoutBinding
 
 class DialogDeviceInfoFragment : DialogFragment() {

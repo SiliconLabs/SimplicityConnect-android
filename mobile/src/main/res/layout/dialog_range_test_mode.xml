@@ -146,7 +146,7 @@
 
         <include layout="@layout/horizontal_separator" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_cancel"
             style="@style/dialog_button_negative_action"
             android:layout_width="wrap_content"

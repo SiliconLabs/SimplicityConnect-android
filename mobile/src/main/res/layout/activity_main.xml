@@ -2,10 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <include android:id="@+id/include_layout_edge_to_edge"
+        layout="@layout/layout_edge_to_edge" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/main_fragment"
@@ -13,7 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-
         app:navGraph="@navigation/navigation_main_activity"
         app:defaultNavHost="true"
         tools:layout="@layout/fragment_scan"/>

@@ -13,6 +13,7 @@ import com.siliconlabs.bledemo.features.scan.browser.fragments.CharacteristicMap
 import com.siliconlabs.bledemo.features.scan.browser.fragments.ServiceMappingsFragment
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.ActivityUuidDictionaryBinding
+import com.siliconlabs.bledemo.utils.AppUtil
 
 
 class UuidDictionaryActivity : AppCompatActivity() {
@@ -63,6 +64,8 @@ class UuidDictionaryActivity : AppCompatActivity() {
     }
 
     private fun setupActionBar() {
+        AppUtil.setEdgeToEdge(window,this)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)

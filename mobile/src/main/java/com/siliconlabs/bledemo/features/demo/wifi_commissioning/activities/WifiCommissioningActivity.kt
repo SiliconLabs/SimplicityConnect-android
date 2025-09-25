@@ -18,19 +18,19 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
-import android.util.Log
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.widget.*
-import androidx.lifecycle.lifecycleScope
 import android.widget.EditText
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.siliconlabs.bledemo.R
+import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
-import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.databinding.ActivityWifiCommissioningBinding
 import com.siliconlabs.bledemo.features.demo.awsiot.AWSIOTDemoActivity
@@ -41,15 +41,8 @@ import com.siliconlabs.bledemo.features.demo.wifi_commissioning.adapters.AccessP
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.AccessPoint
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.BoardCommand
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.SecurityMode
-import com.siliconlabs.bledemo.home_screen.activities.MainActivity.Companion.ACTION_SHOW_CUSTOM_TOAST
-import com.siliconlabs.bledemo.home_screen.activities.MainActivity.Companion.EXTRA_TOAST_MESSAGE
-import com.siliconlabs.bledemo.utils.Constants
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.CustomToastManager
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -103,13 +96,31 @@ class WifiCommissioningActivity : BaseDemoActivity() {
         sharedPref = this.getSharedPreferences("WIFI_Comm_Pref", Context.MODE_PRIVATE)
         _binding = ActivityWifiCommissioningBinding.inflate(layoutInflater)
         setContentView(_binding.root)
+        prepareToolBar()
         connectType =
             ((intent?.getSerializableExtra("connectType") as? BluetoothService.GattConnectType)!!)
         setupRecyclerView()
         setupUiListeners()
     }
 
+    private fun prepareToolBar() {
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(_binding.toolbar)
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.matter_back)
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.title = this.getString(R.string.wifi_commissioning_label)
+        }
+    }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == android.R.id.home) {
+            gatt?.disconnect()
+            onBackPressed()
+            true
+        } else super.onOptionsItemSelected(item)
+    }
     override fun onBluetoothServiceBound() {
         service?.registerGattCallback(mBluetoothGattCallback)
         gatt?.discoverServices()
@@ -154,7 +165,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
 
     private fun showToastOnUi(message: String) {
         runOnUiThread {
-          //  Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            //  Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             CustomToastManager.show(
                 this@WifiCommissioningActivity,message,5000
             )
@@ -272,8 +283,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                 }
 
                 BluetoothService.GattConnectType.DEV_KIT_SENSOR -> {
-                    // println("--------------Connected${connectedAccessPoint!!.ipAddress}")
-                    // println("--------------Connected${clickedAccessPoint!!.ipAddress}")
+
                     val devKitIntent = Intent(
                         this,
                         DevKitSensor917Activity::class.java
@@ -286,8 +296,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                 }
 
                 BluetoothService.GattConnectType.AWS_DEMO -> {
-                    // println("--------------Connected${connectedAccessPoint!!.ipAddress}")
-                    // println("--------------Connected${clickedAccessPoint!!.ipAddress}")
+
                     val devKitIntent = Intent(
                         this,
                         AWSIOTDemoActivity::class.java
@@ -376,11 +385,22 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                     // Toggle password visibility
                     val isPasswordVisible = password.inputType == InputType.TYPE_CLASS_TEXT
                     if (isPasswordVisible) {
-                        password.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                        password.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.visibility_off, 0)
+                        password.inputType =
+                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                        password.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                            0,
+                            0,
+                            R.drawable.visibility_off,
+                            0
+                        )
                     } else {
                         password.inputType = InputType.TYPE_CLASS_TEXT
-                        password.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.baseline_remove_red_eye_24, 0)
+                        password.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                            0,
+                            0,
+                            R.drawable.baseline_remove_red_eye_24,
+                            0
+                        )
                     }
                     // Move cursor to end after changing input type
                     password.setSelection(password.text.length)
@@ -718,6 +738,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
         private const val PADDING_LENGTH = 2
         private const val FIRMWARE_BYTE_START_INDEX = 2
         private const val FIRMWARE_BYTE_END_INDEX = 11
+        const val CLOSE = "close_activity"
     }
 
 }

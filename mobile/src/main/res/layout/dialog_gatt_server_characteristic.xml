@@ -84,7 +84,7 @@
             android:layout_gravity="end"
             android:layout_marginTop="@dimen/dialog_button_margin_top">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_clear"
                 style="@style/dialog_button_negative_action"
                 android:layout_width="wrap_content"
@@ -93,7 +93,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:text="@string/button_clear" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_cancel"
                 style="@style/dialog_button_negative_action"
                 android:layout_width="wrap_content"
@@ -103,7 +103,7 @@
                 android:layout_marginStart="@dimen/dialog_margin_between_buttons"
                 android:text="@string/button_cancel" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_save"
                 style="@style/dialog_button_positive_action"
                 android:layout_width="wrap_content"

@@ -58,13 +58,17 @@ class CharacteristicItemContainer(
         Common.getPropertiesList(characteristic.properties).also { properties ->
             if (isCharacteristicWritable(properties)) { // one "Write" icon for all types
                 properties.remove(Property.RELIABLE_WRITE)
-                properties.remove(Property.WRITE_WITHOUT_RESPONSE)
+               // properties.remove(Property.WRITE_WITHOUT_RESPONSE)
             }
         }.forEach { property ->
             PropertyContainerBinding.inflate(LayoutInflater.from(context)).apply {
-                propertyText.text = context.getString(getIconText(property))
-                propertyIcon.setImageDrawable(ContextCompat.getDrawable(context, getIconDrawable(property)))
-
+                if(context.getString(getIconText(property)).equals(ContextCompat.getString(context,R.string.property_write_no_response),true)){
+                    propertyText.text = context.getString(getIconText(Property.WRITE))
+                    propertyIcon.setImageDrawable(ContextCompat.getDrawable(context, getIconDrawable(Property.WRITE)))
+                }else{
+                    propertyText.text = context.getString(getIconText(property))
+                    propertyIcon.setImageDrawable(ContextCompat.getDrawable(context, getIconDrawable(property)))
+                }
                 if (isMandatorySystemService) {
                     root.isEnabled = false
                     root.alpha = 0.3f // show as disabled
@@ -139,6 +143,7 @@ class CharacteristicItemContainer(
 
     @DrawableRes
     private fun getIconDrawable(property: Property) : Int {
+        println("SI Connect Property ICON:$property")
         return when (property) {
             Property.BROADCAST -> R.drawable.ic_debug_prop_broadcast
             Property.READ -> R.drawable.redesign_ic_property_read
@@ -153,6 +158,7 @@ class CharacteristicItemContainer(
 
     @StringRes
     private fun getIconText(property: Property) : Int {
+        println("SI Connect Property Text:$property")
         return when (property) {
             Property.BROADCAST -> R.string.property_broadcast
             Property.READ -> R.string.property_read

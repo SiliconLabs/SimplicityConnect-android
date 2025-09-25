@@ -17,8 +17,8 @@ import com.siliconlabs.bledemo.utils.RecyclerViewUtils
 import kotlin.math.max
 
 class ScannedDevicesAdapter(
-    private var scannedDemoDevices: MutableList<BluetoothDeviceInfo>,
-    private val demoDeviceCallback: DemoDeviceCallback
+        private var scannedDemoDevices: MutableList<BluetoothDeviceInfo>,
+        private val demoDeviceCallback: DemoDeviceCallback
 ) : RecyclerView.Adapter<ScannedDevicesAdapter.ViewHolder>()
 {
 
@@ -64,8 +64,8 @@ class ScannedDevicesAdapter(
 
     fun updateList(newList: MutableList<BluetoothDeviceInfo>) {
         val listDiff = DiffUtil.calculateDiff(DiffCallback(
-            scannedDemoDevices.toList(),
-            newList.toList()
+                scannedDemoDevices.toList(),
+                newList.toList()
         ), false)
 
         scannedDemoDevices = getDeepCopyList(newList).toMutableList()
@@ -79,8 +79,8 @@ class ScannedDevicesAdapter(
     }
 
     private class DiffCallback(
-        private val oldList: List<BluetoothDeviceInfo>,
-        private val newList: List<BluetoothDeviceInfo>
+            private val oldList: List<BluetoothDeviceInfo>,
+            private val newList: List<BluetoothDeviceInfo>
     ) : DiffUtil.Callback() {
 
         override fun getOldListSize(): Int {
@@ -120,7 +120,7 @@ class ScannedDevicesAdapter(
     }
 
     class ViewHolder(private val viewBinding: AdapterScannedDeviceBinding,val context: Context) : RecyclerView.ViewHolder(viewBinding
-        .root) {
+            .root) {
 
         @SuppressLint("SetTextI18n")
         fun bind(info: BluetoothDeviceInfo) {

@@ -3,6 +3,8 @@ package com.siliconlabs.bledemo.features.demo.throughput.activities
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.os.*
+import android.view.MenuItem
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
@@ -13,6 +15,7 @@ import com.siliconlabs.bledemo.utils.BLEUtils
 import com.siliconlabs.bledemo.features.demo.throughput.models.UpdateTest
 import com.siliconlabs.bledemo.features.demo.throughput.utils.PeripheralManager
 import com.siliconlabs.bledemo.features.demo.throughput.viewmodels.ThroughputViewModel
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.Notifications
 import java.util.*
 import java.util.concurrent.locks.Lock
@@ -24,15 +27,35 @@ class ThroughputActivity : BaseDemoActivity() {
     private var processor = GattProcessor()
     private var serverProcessor = GattServerProcessor()
     private var setupData = true
-
+    lateinit var mToolbar: Toolbar
     private var updateTest: UpdateTest? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_throughput)
+        mToolbar = findViewById(R.id.toolbar)
         viewModel = ViewModelProvider(this).get(ThroughputViewModel::class.java)
+        prepareToolBar()
     }
 
+
+    private fun prepareToolBar() {
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(mToolbar)
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.matter_back)
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.title = this.getString(R.string.title_Throughput)
+        }
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == android.R.id.home) {
+            gatt?.disconnect()
+            onBackPressed()
+            true
+        } else super.onOptionsItemSelected(item)
+    }
 
     override fun onBluetoothServiceBound() {
         PeripheralManager.stopAdvertising(service)

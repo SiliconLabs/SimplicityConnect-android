@@ -23,6 +23,7 @@ import com.siliconlabs.bledemo.home_screen.base.ViewPagerFragment
 import com.siliconlabs.bledemo.home_screen.base.BaseServiceDependentMainMenuFragment
 import com.siliconlabs.bledemo.home_screen.base.BluetoothDependent
 import com.siliconlabs.bledemo.home_screen.base.NotificationDependent
+import com.siliconlabs.bledemo.utils.CustomToastManager
 
 class ConnectionsFragment : BaseServiceDependentMainMenuFragment() {
 
@@ -58,6 +59,9 @@ class ConnectionsFragment : BaseServiceDependentMainMenuFragment() {
 
         override fun onBluetoothStateChanged(isBluetoothOn: Boolean) {
             toggleBluetoothBar(isBluetoothOn, _binding.bluetoothEnable)
+            if(!::service.isInitialized){
+                service = (activity as MainActivity).bluetoothService!!
+            }
             viewModel.updateActiveConnections(service.getActiveConnections())
         }
         override fun onBluetoothPermissionsStateChanged(arePermissionsGranted: Boolean) {
@@ -147,13 +151,20 @@ class ConnectionsFragment : BaseServiceDependentMainMenuFragment() {
     }
 
     private fun showToastMessage(deviceName: String) {
-        Toast.makeText(requireContext(),
+
+        /*Toast.makeText(requireContext(),
                 getString(R.string.device_x_disconnected, deviceName), Toast.LENGTH_SHORT).also {
             if (service.getActiveConnections().isEmpty()) {
                 it.setText(R.string.all_devices_disconnected)
             }
             it.show()
+        }*/
+        val message = if (service.getActiveConnections().isEmpty()) {
+            getString(R.string.all_devices_disconnected)
+        } else {
+            getString(R.string.device_x_disconnected, deviceName)
         }
+        CustomToastManager.show(requireContext(), message, 5000)
 
     }
 

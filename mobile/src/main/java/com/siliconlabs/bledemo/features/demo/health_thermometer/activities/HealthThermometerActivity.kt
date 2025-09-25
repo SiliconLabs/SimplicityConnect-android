@@ -8,6 +8,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.widget.TextView
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
@@ -18,6 +19,7 @@ import com.siliconlabs.bledemo.features.demo.health_thermometer.models.Temperatu
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
 import com.siliconlabs.bledemo.databinding.ActivityThermometerBinding
+import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.BLEUtils.setNotificationForCharacteristic
 import com.siliconlabs.bledemo.utils.Notifications
 
@@ -111,10 +113,35 @@ class HealthThermometerActivity : BaseDemoActivity() {
         binding = ActivityThermometerBinding.inflate(LayoutInflater.from(this))
         setContentView(binding.root)
         //setContentView(R.layout.activity_thermometer)
-
+        prepareToolBar()
         binding.thermoLargeTemperature.setFontFamily("sans-serif-thin", Typeface.NORMAL)
         binding.typeSwitch.setOnCheckedChangeListener { _, isChecked -> onTabClick(isChecked) }
     }
+
+    private fun prepareToolBar() {
+        AppUtil.setEdgeToEdge(window, this)
+        setSupportActionBar(binding.toolbar)
+        val actionBar = supportActionBar
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.matter_back)
+            actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.title = this.getString(R.string.title_Health_Thermometer)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return if (item.itemId == android.R.id.home) {
+            gatt?.disconnect()
+            // Prevent dialog from showing again
+            val dialog = supportFragmentManager.findFragmentByTag("select_device_tag") as? SelectDeviceDialog
+            if (dialog != null && dialog.isVisible) {
+                dialog.dismiss()
+            }
+            onBackPressed()
+            true
+        } else super.onOptionsItemSelected(item)
+    }
+
 
     override fun onResume() {
         super.onResume()

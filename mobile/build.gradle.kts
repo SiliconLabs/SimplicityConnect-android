@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -14,17 +16,31 @@ repositories {
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 36
     namespace = "com.siliconlabs.bledemo"
 
     defaultConfig {
         minSdk = 29
-        targetSdk = 35
+        targetSdk = 36
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        externalNativeBuild {
+            cmake {
+                arguments += listOf("-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZE=0N")
+            }
+        }
     }
 
-    packaging { jniLibs { useLegacyPackaging = true } }
+    packaging {
+        resources {
+            excludes += listOf("META-INF/INDEX.LIST", "META-INF/io.netty.versions.properties")
+
+            jniLibs { useLegacyPackaging = true }
+        }
+    }
+
+
 
     buildTypes {
         release {
@@ -43,6 +59,8 @@ android {
             isDebuggable = true
         }
     }
+
+
 
     applicationVariants.all{
         assembleProvider.get().doLast{
@@ -67,8 +85,8 @@ android {
         create("Si-Connect") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 64
-            versionName = "3.1.1"
+            versionCode = 68
+            versionName = "3.1.2"
         }
     }
 
@@ -97,13 +115,33 @@ android {
         compose = true
     }
 
-    composeOptions {
-        //   kotlinCompilerExtensionVersion = "1.5.15"
+    applicationVariants.all {
+        outputs.all {
+            val apkName = "mobile-${name}-${versionName}.apk"
+            (this as? com.android.build.gradle.internal.api.BaseVariantOutputImpl)?.outputFileName = apkName
+        }
     }
-}
 
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 dependencies {
-    implementation(fileTree(mapOf("include" to listOf("*.jar", "*.so"), "dir" to "libs")))
+    // Exclude local gdx jars so we rely on maven artifacts with natives
+    implementation(fileTree("libs") {
+        include("*.jar", "*.so")
+        exclude("gdx*.jar", "gdx-backend-android*.jar")
+    })
+
+    // LibGDX updated to 1.13.5
+    val gdxVersion = "1.13.5"
+    implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
+    implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
+    implementation("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
+    implementation("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a")
+    implementation("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86")
+    implementation("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64")
 
     // This dependency is downloaded from the Google’s Maven repository.
     // Make sure you also include that repository in your project's build.gradle file.
@@ -117,79 +155,79 @@ dependencies {
     implementation("com.google.android.play:review-ktx:2.0.2")
     implementation("com.google.android.play:app-update-ktx:2.1.0")
     // androidx
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.fragment:fragment:1.8.3")
+    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation("androidx.fragment:fragment:1.8.9")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
-    implementation("androidx.activity:activity-ktx:1.9.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.3")
+    implementation("androidx.activity:activity-ktx:1.10.1")
     implementation("com.google.android.material:material:1.12.0")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     // UI components
-    implementation("androidx.datastore:datastore-preferences:1.1.3")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.3")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
     implementation("androidx.gridlayout:gridlayout:1.0.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
-    implementation("io.github.g00fy2.quickie:quickie-bundled:1.7.0")
+    implementation("io.github.g00fy2.quickie:quickie-bundled:1.11.0")
 
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     //MPAndroidChart is added as jar library file
     //implementation("com.github.PhilJay:MPAndroidChart:v3.0.3")
 
     // Navigation
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.1")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.1")
-    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.8.1")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.9.3")
+    implementation("androidx.navigation:navigation-ui-ktx:2.9.3")
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.9.3")
 
     // Dependency injection
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("com.google.dagger:hilt-android:2.57.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.57.1")
 
     // View binding
     implementation("com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9")
 
     // Logging
-    implementation("com.jakewharton.timber:timber:4.7.1")
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
     // Parsing
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.opencsv:opencsv:5.6")
-    implementation("androidx.activity:activity:1.9.2")
+    implementation("com.google.code.gson:gson:2.13.1")
+    implementation("com.opencsv:opencsv:5.12.0")
+    implementation("androidx.activity:activity:1.10.1")
 
     // Only used for Int.pow() method in a couple of places
-    implementation("com.google.guava:guava:29.0-android")
+    implementation("com.google.guava:guava:33.4.8-android")
 
     // Coil
-    implementation("io.coil-kt:coil:2.4.0")
-    implementation("io.coil-kt:coil-gif:2.4.0")
-    implementation("io.coil-kt:coil-svg:2.4.0")
+    implementation("io.coil-kt:coil:2.7.0")
+    implementation("io.coil-kt:coil-gif:2.7.0")
+    implementation("io.coil-kt:coil-svg:2.7.0")
 
     // instrumented tests
     testImplementation("junit:junit:4.13.2")
-    androidTestUtil("androidx.test:orchestrator:1.5.0")
-    androidTestImplementation("androidx.test:runner:1.6.1")
-    androidTestImplementation("androidx.test:rules:1.6.1")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestUtil("androidx.test:orchestrator:1.6.1")
+    androidTestImplementation("androidx.test:runner:1.7.0")
+    androidTestImplementation("androidx.test:rules:1.7.0")
+    androidTestImplementation("androidx.test.ext:junit:1.3.0")
 
     //Matter
-    implementation("androidx.camera:camera-core:1.3.4")
-    implementation("androidx.camera:camera-camera2:1.3.4")
-    implementation("androidx.camera:camera-lifecycle:1.3.4")
-    implementation("androidx.camera:camera-view:1.3.4")
+    implementation("androidx.camera:camera-core:1.4.2")
+    implementation("androidx.camera:camera-camera2:1.4.2")
+    implementation("androidx.camera:camera-lifecycle:1.4.2")
+    implementation("androidx.camera:camera-view:1.4.2")
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
 
     //DevKitSensor917 Demo
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.3")
 
     implementation ("com.daimajia.swipelayout:library:1.2.0@aar")
     //Material Design
@@ -198,12 +236,8 @@ dependencies {
     implementation ("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
     implementation ("io.github.mayzs:paho.mqtt.android:1.2.1")
     implementation ("androidx.work:work-runtime:2.8.1")
-    // implementation("com.github.hannesa2:paho.mqtt.android:4.4-alpha2")
-    /* implementation 'io.github.mayzs:paho.mqtt.android:1.2.1'
-        implementation 'androidx.work:work-runtime:2.8.1'
-        implementation 'org.bouncycastle:bcprov-jdk15on:1.70' // For PEM support
-        implementation 'org.bouncycastle:bcpkix-jdk15on:1.70' // For PKCS#12 handling
-        implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'*/
+
+
 
     //JetPack compose
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
@@ -216,4 +250,6 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
+    //Dynamic Toast
+    implementation("com.pranavpandey.android:dynamic-toasts:4.3.0")
 }

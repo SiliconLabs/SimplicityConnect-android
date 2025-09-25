@@ -314,8 +314,12 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
         } else {
             println("BLE_PROV demoItem:${demoItem.connectType}")
             BLEUtils.GATT_DEVICE_SELECTED = demoItem.connectType
-            selectDeviceDialog = SelectDeviceDialog.newDialog(demoItem.connectType)
-            selectDeviceDialog?.show(childFragmentManager, "select_device_dialog")
+            // Prevent multiple dialogs
+            val existingDialog = childFragmentManager.findFragmentByTag("select_device_dialog")
+            if (existingDialog == null || !existingDialog.isVisible) {
+                selectDeviceDialog = SelectDeviceDialog.newDialog(demoItem.connectType)
+                selectDeviceDialog?.show(childFragmentManager, "select_device_dialog")
+            }
         }
     }
 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/linear_edge_to_edge_container"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:visibility="visible"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <View
+        android:background="@color/blue_primary"
+        android:id="@+id/fakeStatusBar"
+        android:layout_height="0dp"
+        android:layout_width="match_parent" />
+
+    <!-- Your Toolbar (ActionBar) -->
+    <androidx.appcompat.widget.Toolbar
+        android:background="@color/blue_primary"
+        android:id="@+id/toolbar"
+        android:visibility="gone"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:titleTextColor="@android:color/white" />
+</LinearLayout>

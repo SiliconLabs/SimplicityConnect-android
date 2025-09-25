@@ -63,7 +63,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_add_service"
         style="@style/button_add_data_outlined"
         tools:text="Add Service"

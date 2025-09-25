@@ -54,7 +54,7 @@
         android:layout_alignParentBottom="true"
         android:background="@color/silabs_white">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_start_stop"
             style="@style/ButtonBlue"
             android:layout_width="wrap_content"
