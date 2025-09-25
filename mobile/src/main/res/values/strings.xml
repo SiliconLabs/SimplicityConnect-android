@@ -855,7 +855,7 @@
     <string name="connection_failed">Connection failed</string>
 
     <string name="demo_firmware_name_health_thermometer">Bluetooth - SoC Thermometer</string>
-    <string name="demo_firmware_name_connected_lighting">Bluetooth RAIL DMP - SoC Light Standard\" or \"Connect Bluetooth DMP - SoC Light</string>
+    <string name="demo_firmware_name_connected_lighting">Bluetooth RAIL DMP - SoC Light\" or \"Connect Bluetooth DMP - SoC Light</string>
     <string name="demo_firmware_name_range_test">RAIL Bluetooth DMP - SoC Range Test</string>
     <string name="demo_firmware_name_throughput">Bluetooth - SoC Throughput</string>
     <string name="demo_firmware_name_esl">Bluetooth - NCP ESL Access Point</string>
