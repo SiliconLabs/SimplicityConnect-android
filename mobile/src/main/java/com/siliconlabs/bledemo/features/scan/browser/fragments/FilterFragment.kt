@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.DialogFragment
 import com.siliconlabs.bledemo.bluetooth.beacon_utils.BleFormat
 import com.siliconlabs.bledemo.home_screen.viewmodels.ScanFragmentViewModel
@@ -35,14 +38,75 @@ class FilterFragment : DialogFragment() {
         setHasOptionsMenu(true)
         viewBinding = FragmentFilterBinding.inflate(inflater)
         return viewBinding.root
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.title = getString(R.string.button_filter)
+        handleFilterButtonVisibility()
         setListeners()
         initSeekbarValues()
         loadFilterValues()
+    }
+
+    private fun handleFilterButtonVisibility() {
+        val bottomButtonContainer = viewBinding.btnApplyFilters
+        val rootView = viewBinding.root
+
+        // Get the initial bottom margin from layout params (16dp from XML)
+        val initialBottomMargin = (bottomButtonContainer.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin ?: 0
+
+        // IMMEDIATELY apply navigation bar height to ensure it's set at launch
+        val navigationBarHeight = getNavigationBarHeight()
+        bottomButtonContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            bottomMargin = initialBottomMargin + navigationBarHeight
+        }
+
+        // Create a flag to track if insets have been applied
+        var insetsApplied = false
+
+        // Set up listener for when proper insets become available (to override the manual calculation if needed)
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { _, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            // Apply the system bar insets to the bottom button (this will override the manual calculation)
+            bottomButtonContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = initialBottomMargin + systemBarsInsets.bottom
+            }
+
+            insetsApplied = true
+
+            // Don't consume insets, pass them through
+            insets
+        }
+
+        // Try to request insets in case they become available
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                if (!insetsApplied && rootView.isAttachedToWindow) {
+                    ViewCompat.requestApplyInsets(rootView)
+                }
+            }
+        })
+
+        // Also try with immediate post
+        rootView.post {
+            if (!insetsApplied && rootView.isAttachedToWindow) {
+                ViewCompat.requestApplyInsets(rootView)
+            }
+        }
+    }
+
+    private fun getNavigationBarHeight(): Int {
+        val resources = requireContext().resources
+        val resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
+        return if (resourceId > 0) {
+            resources.getDimensionPixelSize(resourceId)
+        } else {
+            0
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -27,12 +27,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.widget.Toast
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.annotation.RequiresApi
 import androidx.core.location.LocationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -57,7 +59,9 @@ import com.siliconlabs.bledemo.features.scan.browser.models.logs.TimeoutLog
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity.Companion.ACTION_SHOW_CUSTOM_TOAST
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity.Companion.EXTRA_TOAST_MESSAGE
+import com.siliconlabs.bledemo.home_screen.menu_items.HealthThermometer
 import com.siliconlabs.bledemo.utils.BLEUtils
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import com.siliconlabs.bledemo.utils.LocalService
 import com.siliconlabs.bledemo.utils.Notifications
 import com.siliconlabs.bledemo.utils.UuidConsts
@@ -74,11 +78,12 @@ import java.util.UUID
 @SuppressLint("MissingPermission")
 class BluetoothService : LocalService<BluetoothService>() {
 
-    var bluetoothContext:Context? = null
+    var bluetoothContext: Context? = null
 
     companion object {
         private const val RECONNECTION_RETRIES = 3
-        private const val RECONNECTION_DELAY = 1000L //connection drops after ~ 4s when reconnecting without delay
+        private const val RECONNECTION_DELAY =
+            1000L //connection drops after ~ 4s when reconnecting without delay
         private const val CONNECTION_TIMEOUT = 20000L
         private const val RSSI_UPDATE_FREQUENCY = 2000L
         private const val REFRESH_SERVICES_DELAY = 500L // give device time refresh cache
@@ -87,13 +92,15 @@ class BluetoothService : LocalService<BluetoothService>() {
             "com.siliconlabs.bledemo.action.GATT_SERVER_DEBUG_CONNECTION"
         private const val ACTION_GATT_SERVER_REMOVE_NOTIFICATION =
             "com.siliconlabs.bledemo.action.GATT_SERVER_REMOVE_NOTIFICATION"
-        const val ACTION_SHOW_BOND_LOSS_DIALOG = "com.siliconlabs.bledemo.action.SHOW_BOND_LOSS_DIALOG"
+        const val ACTION_SHOW_BOND_LOSS_DIALOG =
+            "com.siliconlabs.bledemo.action.SHOW_BOND_LOSS_DIALOG"
         private const val GATT_SERVER_REMOVE_NOTIFICATION_REQUEST_CODE = 666
         private const val GATT_SERVER_DEBUG_CONNECTION_REQUEST_CODE = 888
         private const val GATT_SERVER_OPEN_CONNECTION_REQUEST_CODE = 777
         private const val NOTIFICATION_ID = 999
         private const val CHANNEL_ID = "DEBUG_CONNECTION_CHANNEL"
         const val EXTRA_BLUETOOTH_DEVICE = "EXTRA_BLUETOOTH_DEVICE"
+        const val EXTRA_DEVICE_ADDRESS = "EXTRA_DEVICE_ADDRESS"
     }
 
     abstract class Binding(context: Context) : LocalService.Binding<BluetoothService>(context) {
@@ -120,6 +127,9 @@ class BluetoothService : LocalService<BluetoothService>() {
         WIFI_THROUGHPUT_TEST,
         AWS_DEMO,
         WIFI_PROVISIONING,
+        SMART_LOCK,
+        CHANNEL_SOUNDING_DEMO,
+        ENERGY_HARVESTING_DEMO,
         NOTHING
     }
 
@@ -221,6 +231,7 @@ class BluetoothService : LocalService<BluetoothService>() {
         }
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate() {
         super.onCreate()
 
@@ -243,6 +254,19 @@ class BluetoothService : LocalService<BluetoothService>() {
         registerReceiver(locationReceiver, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION))
         registerGattServerReceiver()
         initGattServer()
+        // Register for KEY_MISSING and ENCRYPTION_CHANGE intents
+        val filter = IntentFilter().apply {
+            addAction("android.bluetooth.device.action.KEY_MISSING")
+            addAction("android.bluetooth.device.action.ENCRYPTION_CHANGE")
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(keyMissingAndEncryptionChangeReceiver, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(keyMissingAndEncryptionChangeReceiver, filter)
+        }
+
+        // Register bond state receiver
+        registerReceiver(bondStateReceiver, IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED))
     }
 
     fun setAreBluetoothPermissionsGranted(areBluetoothPermissionsGranted: Boolean) {
@@ -334,7 +358,7 @@ class BluetoothService : LocalService<BluetoothService>() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(gattServerBroadcastReceiver, filter, RECEIVER_EXPORTED)
-        }else {
+        } else {
             registerReceiver(gattServerBroadcastReceiver, filter)
         }
 
@@ -346,22 +370,28 @@ class BluetoothService : LocalService<BluetoothService>() {
         AdvertiserService.stopService(applicationContext)
         try {
             unregisterReceiver(scanReceiver)
-        } catch (_: IllegalArgumentException) {}
+        } catch (_: IllegalArgumentException) {
+        }
         try {
             unregisterReceiver(gattServerBroadcastReceiver)
-        } catch (_: IllegalArgumentException) {}
+        } catch (_: IllegalArgumentException) {
+        }
         try {
             unregisterReceiver(bluetoothReceiver)
-        } catch (_: IllegalArgumentException) {}
+        } catch (_: IllegalArgumentException) {
+        }
         try {
             unregisterReceiver(locationReceiver)
-        } catch (_: IllegalArgumentException) {}
+        } catch (_: IllegalArgumentException) {
+        }
         try {
             unregisterReceiver(keyMissingAndEncryptionChangeReceiver)
-        } catch (_: IllegalArgumentException) {}
+        } catch (_: IllegalArgumentException) {
+        }
         try {
             unregisterReceiver(bondStateReceiver)
-        } catch (_: IllegalArgumentException) {}
+        } catch (_: IllegalArgumentException) {
+        }
         bluetoothGattServer?.close()
 
         super.onDestroy()
@@ -451,7 +481,15 @@ class BluetoothService : LocalService<BluetoothService>() {
     }*/
 
     fun startDiscovery(filters: List<ScanFilter>, timeoutInSeconds: Int? = null) {
-        val skipFastScan = when (BLEUtils.GATT_DEVICE_SELECTED) {
+        // Runtime permission guard (Android 12+). Prevent SecurityException and provide user feedback.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                onDiscoveryFailed(ScanError.LeScannerUnavailable)
+                Timber.w("startDiscovery aborted: BLUETOOTH_SCAN permission not granted")
+                return
+            }
+        }
+         val skipFastScan = when (BLEUtils.GATT_DEVICE_SELECTED) {
             GattConnectType.IOP_TEST,
             GattConnectType.THERMOMETER,
             GattConnectType.LIGHT,
@@ -463,7 +501,9 @@ class BluetoothService : LocalService<BluetoothService>() {
             GattConnectType.WIFI_COMMISSIONING,
             GattConnectType.ESL_DEMO,
             GattConnectType.DEV_KIT_SENSOR,
-            GattConnectType.AWS_DEMO -> true
+            GattConnectType.AWS_DEMO,
+            GattConnectType.SMART_LOCK,
+            GattConnectType.CHANNEL_SOUNDING_DEMO -> true
 
             else -> false
         }
@@ -492,7 +532,7 @@ class BluetoothService : LocalService<BluetoothService>() {
                         bleScannerCallback = BleScanCallback(this)
                         val settings = ScanSettings.Builder()
                             .setLegacy(false)
-                            .setReportDelay(getReportDelay())
+                            .setReportDelay(0)
                             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                             .build()
                         adapter.bluetoothLeScanner?.startScan(filters, settings, bleScannerCallback)
@@ -571,7 +611,9 @@ class BluetoothService : LocalService<BluetoothService>() {
             GattConnectType.WIFI_COMMISSIONING,
             GattConnectType.ESL_DEMO,
             GattConnectType.DEV_KIT_SENSOR,
-            GattConnectType.AWS_DEMO -> 0L
+            GattConnectType.AWS_DEMO,
+            GattConnectType.SMART_LOCK,
+            GattConnectType.CHANNEL_SOUNDING_DEMO -> 0L
 
             else -> 1000L
         }
@@ -606,7 +648,8 @@ class BluetoothService : LocalService<BluetoothService>() {
                 bleScannerCallback = null // Clear BLE scanner callback after stopping scan
             } else {
                 if (it.isDiscovering) it.cancelDiscovery()
-                else { /* added to satisfy lambda */ }
+                else { /* added to satisfy lambda */
+                }
             }
         }
     }
@@ -685,17 +728,32 @@ class BluetoothService : LocalService<BluetoothService>() {
         extraCallback: TimeoutGattCallback? = null,
         isConnectionRetry: Boolean = false
     ) {
-        stopDiscovery()
-        extraCallback?.let { extraGattCallback = it }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                Timber.w("connectGatt aborted: BLUETOOTH_CONNECT permission not granted for device ${device.address}")
+                extraCallback?.onConnectionStateChange(connectedGatt, BluetoothGatt.GATT_FAILURE, BluetoothProfile.STATE_DISCONNECTED)
+                return
+            }
+        }
+         stopDiscovery()
+         extraCallback?.let { extraGattCallback = it }
 
-        if (!isConnectionRetry) handler.postDelayed(connectionTimeoutRunnable, CONNECTION_TIMEOUT)
+         if (!isConnectionRetry) handler.postDelayed(connectionTimeoutRunnable, CONNECTION_TIMEOUT)
 
-        /* Invokes onConnectionStateChange() callback */
-        connectedGatt =
-            if (useBLE) device.connectGatt(this, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
-            else device.connectGatt(this, false, gattCallback)
-        connectedGatt?.let { addPendingConnection(GattConnection(it, requestRssiUpdates)) }
-    }
+         /* Invokes onConnectionStateChange() callback */
+        try {
+            connectedGatt = if (useBLE) {
+                device.connectGatt(this, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
+            } else {
+                device.connectGatt(this, false, gattCallback)
+            }
+        } catch (se: SecurityException) {
+            Timber.e(se, "SecurityException while connecting GATT to ${device.address}")
+            extraCallback?.onConnectionStateChange(connectedGatt, BluetoothGatt.GATT_FAILURE, BluetoothProfile.STATE_DISCONNECTED)
+            return
+        }
+         connectedGatt?.let { addPendingConnection(GattConnection(it, requestRssiUpdates)) }
+     }
 
     fun disconnectGatt(deviceAddress: String) {
         getActiveConnection(deviceAddress)?.let {
@@ -848,7 +906,7 @@ class BluetoothService : LocalService<BluetoothService>() {
                     status
                 )
             )
-            gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
+            //gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
             extraGattCallback?.onServicesDiscovered(gatt, status)
         }
 
@@ -864,10 +922,11 @@ class BluetoothService : LocalService<BluetoothService>() {
                     characteristic.uuid
                 }, value = ${characteristic.value?.contentToString()}"
             )
+            val safeValue = characteristic.value ?: ByteArray(0)
             addDeviceLog(
                 GattOperationWithDataLog(
                     gatt, GattOperationLog.Type.READ_CHARACTERISTIC,
-                    status, characteristic.uuid, characteristic.value
+                    status, characteristic.uuid, safeValue
                 )
             )
             extraGattCallback?.onCharacteristicRead(gatt, characteristic, status)
@@ -1324,7 +1383,8 @@ class BluetoothService : LocalService<BluetoothService>() {
                     val toastIntent = Intent(ACTION_SHOW_CUSTOM_TOAST).apply {
                         putExtra(EXTRA_TOAST_MESSAGE, message)
                     }
-                    LocalBroadcastManager.getInstance(this@BluetoothService).sendBroadcast(toastIntent)
+                    LocalBroadcastManager.getInstance(this@BluetoothService)
+                        .sendBroadcast(toastIntent)
                     // Disconnect all active GATT connections
                     disconnectAllGatts()
                     // Launch Bluetooth settings to prompt user to re-pair
@@ -1333,10 +1393,13 @@ class BluetoothService : LocalService<BluetoothService>() {
                     }
                     startActivity(settingsIntent)
                 }
+
                 BluetoothDevice.ACTION_ENCRYPTION_CHANGE -> {
                     // Optionally handle encryption state change
-                    val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                    val encrypted: Boolean = intent.getBooleanExtra("android.bluetooth.device.extra.ENCRYPTED", false)
+                    val device: BluetoothDevice? =
+                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    val encrypted: Boolean =
+                        intent.getBooleanExtra("android.bluetooth.device.extra.ENCRYPTED", false)
 
                     val message = if (encrypted) {
                         getString(R.string.bluetooth_encryption_enabled, device?.name ?: "Device")
@@ -1346,7 +1409,8 @@ class BluetoothService : LocalService<BluetoothService>() {
                     val toastIntent = Intent(ACTION_SHOW_CUSTOM_TOAST).apply {
                         putExtra(EXTRA_TOAST_MESSAGE, message)
                     }
-                    LocalBroadcastManager.getInstance(this@BluetoothService).sendBroadcast(toastIntent)
+                    LocalBroadcastManager.getInstance(this@BluetoothService)
+                        .sendBroadcast(toastIntent)
                 }
             }
         }
@@ -1373,7 +1437,9 @@ class BluetoothService : LocalService<BluetoothService>() {
         if (cdm != null) {
             val associations = cdm.myAssociations
             for (info in associations) {
-                if (info.deviceMacAddress?.toString()?.equals(deviceAddress, ignoreCase = true) == true) {
+                if (info.deviceMacAddress?.toString()
+                        ?.equals(deviceAddress, ignoreCase = true) == true
+                ) {
                     return info.id
                 }
             }
@@ -1387,9 +1453,11 @@ class BluetoothService : LocalService<BluetoothService>() {
             if (BluetoothDevice.ACTION_BOND_STATE_CHANGED == intent?.action) {
                 val reason = intent?.getIntExtra("android.bluetooth.device.extra.REASON", -1) ?: -1
                 // Debug: reason can help diagnose OEM-specific bond loss causes
-                val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                val device: BluetoothDevice? =
+                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                 val bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1)
-                val prevBondState = intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1)
+                val prevBondState =
+                    intent.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1)
                 // val reason = intent.getIntExtra("android.bluetooth.device.extra.REASON", -1) // Not used
                 if (bondState == BluetoothDevice.BOND_NONE && prevBondState == BluetoothDevice.BOND_BONDED) {
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -1398,9 +1466,14 @@ class BluetoothService : LocalService<BluetoothService>() {
                             disconnectGatt(it.address)
                         }
                         val dialogIntent = Intent(ACTION_SHOW_BOND_LOSS_DIALOG)
-                        dialogIntent.putExtra(EXTRA_TOAST_MESSAGE, getString(R.string.bluetooth_bond_lost) + " " + (device?.name ?: "Device"))
-                       // dialogIntent.putExtra(EXTRA_DEVICE_ADDRESS, device?.address)
-                        LocalBroadcastManager.getInstance(this@BluetoothService).sendBroadcast(dialogIntent)
+                        dialogIntent.putExtra(
+                            EXTRA_TOAST_MESSAGE,
+                            getString(R.string.bluetooth_bond_lost) + " " + (device?.name
+                                ?: "Device")
+                        )
+                        // dialogIntent.putExtra(EXTRA_DEVICE_ADDRESS, device?.address)
+                        LocalBroadcastManager.getInstance(this@BluetoothService)
+                            .sendBroadcast(dialogIntent)
                     }
                     // On Android 16+, let the system handle bond loss natively
                 }

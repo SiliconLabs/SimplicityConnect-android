@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Application -->
     <string name="app_name_simplicity_Connect">Si Connect</string>
@@ -133,7 +133,7 @@
         Energy peripheral</string>
     <string name="main_menu_description_thermometer">View readings from the Health Thermometer service</string>
     <string name="main_menu_description_browser">View info about nearby devices and their properties.</string>
-    <string name="main_menu_description_connected_lighting">Control a Dynamic Multiprotocol application of connected lights and switches</string>
+    <string name="main_menu_description_connected_lighting">Control a Dynamic Multiprotocol application of connected Device.</string>
     <string name="main_menu_description_range_test">Evaluate the link budget and range of EFR32</string>
     <string name="main_menu_description_throughput">Measure throughput between the mobile device and EFR32</string>
     <string name="main_menu_description_blinky">Control LED and receive button presses on a Silabs kit</string>
@@ -147,7 +147,7 @@
 
     <!-- Titles -->
     <string name="title_Health_Thermometer">Health Thermometer</string>
-    <string name="title_Connected_Lighting">Connected Lighting</string>
+    <string name="title_Connected_Lighting">Connected Device</string>
     <string name="title_Range_Test">Range Test</string>
     <string name="title_Throughput">Throughput</string>
     <string name="title_Advertiser">Advertiser</string>
@@ -169,6 +169,7 @@
     <string name="demo_connection_progress_dialog_connecting">Connecting…</string>
     <string name="demo_connection_progress_dialog_reading_device_state">"Reading device state…"</string>
     <string name="demo_connection_progress_dialog_loading">Loading…</string>
+    <string name="changing_mode_message">Changing mode…</string>
 
     <!-- OTA -->
     <string name="Preparing_for_OTA">Preparing for OTA</string>
@@ -472,7 +473,7 @@
     <!-- Connected Lighting -->
     <string name="light_demo_on">Light On</string>
     <string name="light_demo_off">Light Off</string>
-    <string name="light_demo_toggle_instructions">Press the bulb icon to toggle light</string>
+    <string name="light_demo_toggle_instructions">Press the bulb or lock/unlock icon to toggle light</string>
     <string name="light_demo_changed_source_unknown">Unknown</string>
     <string name="light_demo_connection_lost">Lost connection to remote device, leaving demo.</string>
     <string name="light_demo_connection_lost_button">OK</string>
@@ -855,7 +856,7 @@
     <string name="connection_failed">Connection failed</string>
 
     <string name="demo_firmware_name_health_thermometer">Bluetooth - SoC Thermometer</string>
-    <string name="demo_firmware_name_connected_lighting">Bluetooth RAIL DMP - SoC Light\" or \"Connect Bluetooth DMP - SoC Light</string>
+    <string name="demo_firmware_name_connected_lighting">Bluetooth RAIL DMP - SoC Light\" or \"Connect Bluetooth DMP - SoC Light" or "Amazon Sidewalk - SoC Dynamic Multiprotocol Light (BLE)" or "Amazon Sidewalk - SoC Dynamic Multiprotocol Light (FSK)" firmware.</string>
     <string name="demo_firmware_name_range_test">RAIL Bluetooth DMP - SoC Range Test</string>
     <string name="demo_firmware_name_throughput">Bluetooth - SoC Throughput</string>
     <string name="demo_firmware_name_esl">Bluetooth - NCP ESL Access Point</string>
@@ -1297,6 +1298,11 @@
     <string name="please_enter_valid_port_number">Please enter valid port number</string>
     <string name="total_bytes_received">Total bytes received</string>
     <string name="total_bytes_sent">Total bytes sent</string>
+    <string name="test_in_progress">Test in progress…</string>
+    <string name="total_data_sent">Total Data Sent</string>
+    <string name="total_data_received">Total Data Received</string>
+    <string name="waiting_for_client">Waiting for client to connect…</string>
+    <string name="waiting_for_server">Waiting for server to connect…</string>
     <string name="throughput_achieved">Throughput achieved</string>
     <string name="mbps_in_30_successfully">Mbps in 30sec successfully</string>
     <string name="connection_couldn_t_be_established">Connection couldn\'t be established</string>
@@ -1370,8 +1376,8 @@
     <string name="aws_gyro">gyro</string>
     <string name="aws_led">LED</string>
     <string name="subscribe_and_publish_topics_should_not_be_empty">Subscribe and publish topics should not be empty</string>
-    <string name="subscribe_topic_should_not_be_empty">Subscribe topic should not be empty</string>
-    <string name="publish_topic_should_not_be_empty">Publish topic should not be empty</string>
+    <string name="subscribe_topic_should_not_be_empty">Subscribe topic cannot be empty</string>
+    <string name="publish_topic_should_not_be_empty">Publish topic cannot be empty</string>
     <string name="icd_registration_completed">ICD device registration completed, How to trigger to switch to Active Mode : %1$s</string>
     <string name="matter_light_switch">Light Switch</string>
     <string name="matter_light_switch_control">Light Switch Binding</string>
@@ -1412,7 +1418,7 @@
     <string name="device_information_xhdpi">xhdpi</string>
     <string name="device_information_xxhdpi">xxhdpi</string>
     <string name="device_information_xxxhdpi">xxxhdpi</string>
-    <string name="device_information_unknown">Unknown</string>
+    <string name="device_information_unknown">UNKNOWN</string>
     <string name="device_information_supported">Supported</string>
     <string name="device_information_unsupported">Unsupported</string>
     <string name="device_information_screen_size_1_33">Older Tablet</string>
@@ -1451,7 +1457,130 @@
     <string name="periodic_adv_supported">Periodic Advertisement Supported</string>
     <string name="extended_adv_supported">Extended Advertisement Supported</string>
     <string name="max_data_length">Maximum advertising data length</string>
-    <string name="bluetooth_encryption_enabled"></string>
-    <string name="bluetooth_encryption_disabled"></string>
-    <string name="bluetooth_bond_lost"></string>
+    <string name="aws_iot_mqtt_dialog_title">Configure AWS IoT</string>
+    <string name="click_on_the_connect_button_nto_connect_your_phone_to_naws_iot">Click on the connect button\nto connect your phone to\nAWS Iot.</string>
+
+    <!--    Smart Lock Demo-->
+    <string name="smart_lock_demo_title">Smart Lock</string>
+    <string name="smart_lock_demo_description">Add/commission smart lock and read/control it over Bluetooth and AWS IoT Cloud.</string>
+    <string name="smart_lock_demo_dashboard">Smart Lock</string>
+    <string name="smart_lock_demo_dialog_btn_ble">BLE</string>
+    <string name="smart_lock_demo_dialog_btn_aws">AWS MQTT</string>
+    <string name="smart_lock_demo_dialog_desc">You can control the Smart Lock via BLE or AWS IoT. Please choose one of the options below.</string>
+    <string name="smart_lock_demo_dialog_select_dialog">"1. The SoC and evaluation board (EVK) must be connected and running the correct firmware.\n\&#10;2. The Wi-Fi network must have internet access to be used for the sensor device's commissioning."</string>
+    <string name="smart_lock_demo_desc">Lock</string>
+    <string name="image">Images</string>
+    <string name="smart_lock_title_name">Smart Lock</string>
+    <string name="smart_lock_status">Status</string>
+    <string name="smart_lock_status_asw_unlock">Status via AWS: Unlock</string>
+    <string name="smart_lock_status_asw_lock">Status via AWS: Lock</string>
+    <string name="smart_lock_status_ble_unlock">Status via BLE: Unlock</string>
+    <string name="smart_lock_status_ble_lock">Status via BLE: Lock</string>
+    <string name="smart_lock_publisher_topic">Publisher Topic</string>
+    <string name="smart_lock_subscriber_topic">Subscriber Topic</string>
+    <string name="smart_lock_aws_sub_title">Click on the connect button\nto connect your phone to\nAWS SMART LOCK.</string>
+    <string name="smart_lock_connecting_to_smart_lock">Connecting to Smart Lock</string>
+    <string name="smart_lock_subscribe_hint">Enter the </string>
+    <string name="smart_lock_subscribed_topic">Ssi91x_status</string>
+    <string name="smart_lock_published_topic">Saws_requests</string>
+    <string name="smart_lock_custom_topic_hint">Enter custom message</string>
+    <string name="smart_lock_subscribe_btn">Subscribe Now</string>
+    <string name="smart_lock_cmd_title">Send your text to AWS </string>
+    <string name="smart_lock_demo_selection_dialog_title">Select your control type</string>
+    <string name="smart_lock_connection_aws">Control via AWS</string>
+    <string name="smart_lock_connection_ble">Control via BLE</string>
+    <string name="timeout_expired">Unable to connect</string>
+    <string name="smart_lock_alert_config_title">Configure Smart Lock</string>
+    <string name="smart_lock_select_p12_file">Select .p12 file</string>
+    <string name="smart_lock_password_title">Enter the Certificate Password</string>
+    <string name="smart_lock_device_connected">The device is connected to the internet.</string>
+    <string name="smart_lock_end_point_url">End Point URL</string>
+    <string name="smart_lock_config_alert_p12_message">Please select a P12 file</string>
+    <string name="smart_lock_config_alert_password_message">Password cannot be blank</string>
+    <string name="smart_lock_config_alert_end_point_message">End Point URL cannot be blank</string>
+    <string name="smart_lock_config_alert_subs_message">Subscribe Topic cannot be blank</string>
+    <string name="smart_lock_config_alert_pub_message">Publish Topic cannot be blank</string>
+    <string name="smart_lock_already_configured_alert">This device is already configured with AWS Smart Lock. Would you like to reconfigure it?</string>
+    <string name="smart_lock_note_hint">* AWS Smart is currently not setup. To configure it, click the settings icon located in the top-right corner.</string>
+    <string name="smart_lock_alert_config_message">Please configure your AWS Smart Lock first. You can do this by clicking the settings button in the top-right corner.</string>
+    <string name="smart_lock_internet_not_available">Internet not available. Kindly check your internet connection on your phone. Thank you!</string>
+    <string name="bluetooth_encryption_change">Bluetooth Encryption Chnaged.</string>
+    <string name="bluetooth_encryption_enabled">%1$s connection is now encrypted</string>
+    <string name="bluetooth_encryption_disabled">%1$s connection is no longer encrypted.</string>
+    <string name="bluetooth_unpaired">Bluetooth Unpaired.</string>
+    <string name="bluetooth_bond_lost">Bluetooth Bond Lost</string>
+
+    <!--    Channel Sounding Demo-->
+    <string name="channel_sounding_screen_name">Channel Sounding</string>
+    <string name="channel_sounding_title">Channel Sounding</string>
+    <string name="channel_sounding_description">Measure distance using Bluetooth Channel Sounding between mobile device and EFRxG24</string>
+    <string name="channel_sounding_demo_dialog_select_dialog">A circuit board (SoC) must be connected and
+        running \"%s\" firmware."</string>
+    <string name="channel_sounding_initiator_title">Initiator</string>
+    <string name="channel_sounding_configure_title">Configure</string>
+    <string name="channel_sounding_config_demo">Bluetooth - SoC CS Reflector</string>
+    <string name="channel_sounding_bond_title">Devices are not bonded</string>
+    <string name="channel_sounding_bond_message">Devices should be bonded for Channel Sounding</string>
+    <string name="channel_sounding_bond_create">Create bond</string>
+    <string name="channel_sounding_connected">Connected</string>
+    <string name="channel_sounding_waiting_for_pairing">Waiting for device to pair</string>
+    <string name="channel_sounding_bond_ignore">Ignore</string>
+    <string name="channel_sounding_bonding_required">Bonding required</string>
+    <string name="channel_sounding_bonding_ok">OK</string>
+    <string name="channel_sounding_default_text_00_00_m">00.00 m</string>
+    <string name="channel_sounding_bonding">Bonded</string>
+    <string name="channel_sounding_alert_title">Devices are not bonded</string>
+    <string name="channel_sounding_alert_bond_message">Devices should be bonded for Channel sounding</string>
+    <string name="channel_sounding_alert_bond_create" tools:ignore="DuplicateDefinition">Create bond</string>
+    <string name="channel_sounding_alert_bond_ignore">Ignore</string>
+    <string name="channel_sounding_config_reset">Reset</string>
+    <string name="channel_sounding_config_save">Save</string>
+    <string name="channel_sounding_config_image_dropdown_arrow">Dropdown Arrow</string>
+    <string name="channel_sounding_config_initiator_details">"     Initiator Details     "</string>
+    <string name="channel_sounding_config_ble_cs_config">"   Params   "</string>
+    <string name="channel_sounding_config_freq_label">Measurement\nFrequency :</string>
+    <string name="channel_sounding_config_duration_label">"Measurement\nCount :"</string>
+    <string name="channel_sounding_config_sensor_enabled_label">"Sensor Fusion:"</string>
+    <string name="channel_sounding_menu_start">Start</string>
+    <string name="channel_sounding_menu_stop">Stop</string>
+    <string name="channel_sounding_stopped_collecting">Measurement collection stopped</string>
+    <string name="channel_sounding_config_location_type_details">"Location Type: "</string>
+    <string name="channel_sounding_config_sight_type_details">"Sight Type : "</string>
+    <string name="channel_sounding_sight_type_unknown">UNKNOWN</string>
+    <string name="channel_sounding_sight_type_in_sight">IN-SIGHT</string>
+    <string name="channel_sounding_sight_type_out_of_sight">OUT-OF-SIGHT</string>
+    <string name="channel_sounding_location_type_unknown">UNKNOWN</string>
+    <string name="channel_sounding_location_type_indoor">INDOOR</string>
+    <string name="channel_sounding_location_type_outdoor">OUTDOOR</string>
+    <string name="channel_sounding_sensor_fusion_enable_true">true</string>
+    <string name="channel_sounding_sensor_fusion_enable_false">false</string>
+    <string name="channel_sounding_duration_10000">10000</string>
+    <string name="channel_sounding_duration_1000">1000</string>
+    <string name="channel_sounding_duration_100">100</string>
+    <string name="channel_sounding_duration_10">10</string>
+    <string name="channel_sounding_duration_5">5</string>
+    <string name="channel_sounding_duration_0">0</string>
+    <string name="channel_sounding_config_security_level_details">"Security Level: "</string>
+    <string name="channel_sounding_confidence_score">Confidence score : </string>
+    <string name="channel_sounding_tooltip_freq">Select the update rate to determine how often the distance is calculated and updated</string>
+    <string name="channel_sounding_tooltip_duration">Specify the number of measurements to collect during sounding.</string>
+    <string name="channel_sounding_tooltip_sensor">True or False to combine data from IMU sensors(Accelerometer, Gyroscope, Magnetometer) to produce a more accurate and robust estimate.</string>
+    <string name="channel_sounding_tooltip_location">Context of the physical environment where the channel sounding measurements are being performed.</string>
+    <string name="channel_sounding_tooltip_sight">Line-of-sight (LoS) condition between the Bluetooth initiator (e.g., smartphone) and the reflector.</string>
+
+
+    <string name="side_walk">IoT SideWalk</string>
+    <string name="light_demo_toggle_hint_light">Press the bulb icon to toggle light</string>
+    <string name="light_demo_toggle_hint_lock">Press the lock icon to toggle lock</string>
+
+    <!--    Matter EVS-->
+    <string name="matter_ev_charger">Electric Vehicles</string>
+    <string name="energy_harvesting_demo_title">Energy Harvesting</string>
+    <string name="title_activity_energy_harvesting">EnergyHarvestingActivity</string>
+    <string name="energy_harvesting_demo_description">Monitor harvested voltage in real time.</string>
+    <string name="light_demo_protocol_aws">AWS\n</string>
+    <string name="smart_lock_demo_protocol_aws_address">AWS Address: %1$s</string>
+
+
+
 </resources>

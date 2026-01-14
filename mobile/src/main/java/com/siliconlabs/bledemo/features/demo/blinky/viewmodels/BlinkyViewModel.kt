@@ -12,6 +12,7 @@ class BlinkyViewModel : ViewModel() {
     private val _isButtonPressed: MutableLiveData<Boolean> = MutableLiveData(false)
     val isButtonPressed: LiveData<Boolean> = _isButtonPressed
 
+
     fun handleButtonStateChanges(characteristic: BluetoothGattCharacteristic) {
         val result = characteristic.value[0].toInt()
         _isButtonPressed.postValue(result == 1)

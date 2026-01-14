@@ -16,10 +16,45 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/blue_primary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment"
-        android:name="com.siliconlabs.bledemo.features.demo.connected_lighting.fragments.ConnectedLightingFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
+    <!-- Content container replacing the direct fragment + overlay stacking -->
+    <FrameLayout
+        android:id="@+id/content_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="50dp"
+        android:layout_weight="1">
+
+        <!-- Fragment (base content) -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment"
+            android:name="com.siliconlabs.bledemo.features.demo.connected_lighting.fragments.ConnectedLightingFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Semi-transparent overlay when showing progress -->
+        <View
+            android:id="@+id/view_progress_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#B3FFFFFF"
+            android:visibility="gone"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Progress bar for showing connection/initialization process -->
+        <ProgressBar
+            android:id="@+id/progress_bar_initialization"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/silabs_dark_blue"
+            android:indeterminateTintMode="src_in"
+            android:contentDescription="@string/loading_ellipsis"
+            android:elevation="8dp"
+            style="?android:attr/progressBarStyleLarge" />
+
+    </FrameLayout>
 </LinearLayout>

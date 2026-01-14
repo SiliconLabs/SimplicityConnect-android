@@ -357,7 +357,7 @@ class GridAdapter(private var items: List<GridItem>,
         // Split the motionData string into Accelerometer and Gyro parts
         Log.e("", "Just Motion Data ${motionData}")
         val sensorData = parseSensorData(motionData)
-        Log.e("", "Sagar Sensor Data ${sensorData.toString()}")
+        Log.e("", "ConnectedLightingScreen Sensor Data ${sensorData.toString()}")
         if (sensorData != null) {
             val accelerometer = sensorData.accelerometer
             val gyro = sensorData.gyro

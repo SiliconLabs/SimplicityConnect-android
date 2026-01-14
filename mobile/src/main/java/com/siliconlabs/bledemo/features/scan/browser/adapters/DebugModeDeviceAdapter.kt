@@ -197,9 +197,8 @@ class DebugModeDeviceAdapter(
                     itemView.context.getString(R.string.unit_value_ms, info.intervalNanos / 1000000)
                 deviceType.text =
                     itemView.context.getString(info.bleFormat?.nameResId ?: R.string.unspecified)
-                tvIsConnectable.text = itemView.context.getString(
-                    if (info.isConnectable) R.string.connectible
-                    else R.string.non_connectible
+                tvIsConnectable.text = context.getString(
+                    if (isEhSensor(info) || !info.isConnectable) R.string.non_connectible else R.string.connectible
                 )
                 favoriteBtn.isChecked = info.isFavorite
                 tvIsBonded.text = getBondedStateText(info.device.bondState)
@@ -217,8 +216,12 @@ class DebugModeDeviceAdapter(
             viewBinding.apply {
                 if (newState.isInfoExpanded != oldState.isInfoExpanded)
                     toggleDetails(shouldShowDetails = newState.isInfoExpanded)
-                if (newInfo.name != oldInfo.name)
+                if (newInfo.name != oldInfo.name) {
                     deviceName.text = newInfo.name
+                    tvIsConnectable.text = context.getString(
+                        if (isEhSensor(newInfo) || !newInfo.isConnectable) R.string.non_connectible else R.string.connectible
+                    )
+                }
                 if (newInfo.rssi != oldInfo.rssi)
                     rssi.text = context.getString(R.string.unit_value_dbm, newInfo.rssi)
                 if (newInfo.intervalNanos != oldInfo.intervalNanos)
@@ -228,6 +231,11 @@ class DebugModeDeviceAdapter(
                     tvIsBonded.text = getBondedStateText(newInfo.device.bondState)
                 if (newInfo.connectionState != oldInfo.connectionState) {
                     refreshConnectionButtonState(newInfo)
+                }
+                if (newInfo.isConnectable != oldInfo.isConnectable) {
+                    tvIsConnectable.text = context.getString(
+                        if (isEhSensor(newInfo) || !newInfo.isConnectable) R.string.non_connectible else R.string.connectible
+                    )
                 }
                 if (newInfo.isFavorite != oldInfo.isFavorite) {
                     favoriteBtn.isChecked = newInfo.isFavorite
@@ -243,11 +251,20 @@ class DebugModeDeviceAdapter(
                             newInfo
                         )
                     )
+                    // Raw data change might influence connectible display for EH Sensor devices.
+                    tvIsConnectable.text = context.getString(
+                        if (isEhSensor(newInfo) || !newInfo.isConnectable) R.string.non_connectible else R.string.connectible
+                    )
                 }
             }
         }
 
         private fun refreshConnectionButtonState(deviceInfo: BluetoothDeviceInfo) {
+            // Hide connection button for EH Sensor devices regardless of reported connectibility.
+            if (isEhSensor(deviceInfo)) {
+                viewBinding.connectionBtn.visibility = View.GONE
+                return
+            }
             viewBinding.connectionBtn.apply {
                 if (deviceInfo.isConnectable) {
                     visibility = View.VISIBLE
@@ -534,6 +551,12 @@ class DebugModeDeviceAdapter(
             }.toString()
 
             rows.add(Pair("AltBeacon data", dataValue))
+        }
+
+        // Identify an EH Sensor (Energy Harvesting) device by name. Assumes device name contains "EH Sensor".
+        private fun isEhSensor(deviceInfo: BluetoothDeviceInfo): Boolean {
+            val name = deviceInfo.name
+            return name.contains("EH Sensor", ignoreCase = true)
         }
     }
 

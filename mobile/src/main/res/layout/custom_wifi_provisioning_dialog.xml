@@ -149,26 +149,29 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/passwordTextInputLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="right|center"
+                app:boxStrokeColor="@color/splash_screen_start_gradient"
+                app:boxStrokeWidth="@dimen/matter_2dp"
+                app:cursorColor="@color/splash_screen_start_gradient"
                 app:hintEnabled="false"
-                app:passwordToggleContentDescription="@string/password_toggle_content_description"
+                app:hintTextColor="@color/splash_screen_start_gradient"
                 app:passwordToggleDrawable="@drawable/baseline_remove_red_eye_24"
                 app:passwordToggleEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editWiFiProvPassword"
                     android:layout_width="match_parent"
-                    android:layout_height="34dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:autofillHints=""
+                    android:fontFamily="sans-serif-medium"
                     android:background="@drawable/rounded_background"
                     android:gravity="center|left"
                     android:hint="@string/wifi_provisioning_password_hint"
                     android:inputType="textPassword"
                     android:lines="1"
-                    android:textSize="@dimen/text_size_SM" />
+                    android:textSize="@dimen/text_size_M" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 

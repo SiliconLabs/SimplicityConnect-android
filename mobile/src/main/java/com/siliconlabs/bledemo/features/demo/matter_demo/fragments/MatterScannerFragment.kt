@@ -61,6 +61,7 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScanned
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DIMMER_SWITCH
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DISHWASHER_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DOOR_LOCK_TYPE
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.ENERGY_EVSE_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.ENHANCED_COLOR_LIGHT_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.GENERIC_SWITCH
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.OCCUPANCY_SENSOR_TYPE
@@ -1027,6 +1028,9 @@ class MatterScannerFragment : ICDCheckInCallback, Fragment() {
                                     ON_OFF_LIGHT_SWITCH ->
                                         device =
                                             requireContext().getString(R.string.matter_light_switch)
+                                ENERGY_EVSE_TYPE  ->
+                                    device =
+                                        requireContext().getString(R.string.matter_ev_charger)
 
                                 else -> device = matterScanDevice.name
 

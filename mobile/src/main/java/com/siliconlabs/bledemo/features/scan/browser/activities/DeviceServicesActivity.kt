@@ -165,7 +165,7 @@ class DeviceServicesActivity : BaseActivity() {
                 MtuReadType.VIEW_INITIALIZATION -> {
                     MTU = if (status == BluetoothGatt.GATT_SUCCESS) mtu
                     else DEFAULT_MTU_VALUE
-                    gatt.requestConnectionPriority(connectionPriority)
+                    //gatt.requestConnectionPriority(connectionPriority)
                 }
 
                 MtuReadType.UPLOAD_INITIALIZATION -> {

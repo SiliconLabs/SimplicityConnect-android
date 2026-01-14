@@ -30,11 +30,13 @@ import com.siliconlabs.bledemo.utils.AppUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @AndroidEntryPoint
@@ -48,7 +50,6 @@ class MatterDemoActivity : AppCompatActivity(),
     MatterWindowCoverFragment.CallBackHandler,
     MatterOccupancySensorFragment.CallBackHandler {
 
-
     private var currentFragment: Fragment? = null
     private lateinit var binding: ActivityMatterDemoBinding
     private var scannedDeviceList = ArrayList<MatterScannedResultModel>()
@@ -58,6 +59,15 @@ class MatterDemoActivity : AppCompatActivity(),
     private var networkType: ProvisionNetworkType? = null
     private var shouldContinueOperation = true
     private var count: Int = 0
+    // Throttle / debounce maps to avoid spamming connection attempts & logs
+    private val lastFailureTimeMs = mutableMapOf<Long, Long>()
+    private val lastAttemptTimeMs = mutableMapOf<Long, Long>()
+    private var pollInProgress = false
+    private var pollJob: Job? = null
+
+    // Backoff settings (tune as needed)
+    private val failureBackoffMs = 15_000L // wait 15s after a failure before retrying that node
+    private val attemptMinIntervalMs = 3_000L // don't attempt the same node more than once every 3s
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,18 +94,11 @@ class MatterDemoActivity : AppCompatActivity(),
         }
         binding.refresh.setOnClickListener {
             count = 0
-            if (SharedPrefsUtils.retrieveSavedDevices(mPrefs).size > 0) {
+            if (SharedPrefsUtils.retrieveSavedDevices(mPrefs).isNotEmpty()) {
                 showMatterProgressDialog(getString(R.string.matter_device_status))
-                CoroutineScope(Dispatchers.Default).launch {
-                    val resultInfo = performLongRunningOperation()
-                    if (resultInfo) {
-                        println("Operation was successful")
-                        removeProgress()
-                        scannedDeviceList = SharedPrefsUtils.retrieveSavedDevices(mPrefs)
-                        prepareList(scannedDeviceList)
-
-                    }
-                }
+                // Cancel any existing poll and force immediate parallel refresh
+                pollJob?.cancel()
+                performLongRunningOperation(force = true)
             }
         }
         startPeriodictFunction()
@@ -105,7 +108,7 @@ class MatterDemoActivity : AppCompatActivity(),
     private fun startPeriodictFunction() {
         CoroutineScope(Dispatchers.Default).launch {
             while (shouldContinueOperation) {
-                performLongRunningOperation() // Call your long-running operation
+                performLongRunningOperation()
                 delay(DELAY_TIMEOUT)
             }
         }
@@ -162,77 +165,102 @@ class MatterDemoActivity : AppCompatActivity(),
     }
 
 
-    private fun performLongRunningOperation(): Boolean {
-        CoroutineScope(Dispatchers.IO).launch {
-            val savedDevices = SharedPrefsUtils.retrieveSavedDevices(mPrefs)
-            for (item in savedDevices) {
-                getStatus(item.deviceId)
+    // Provide ability to force a poll (manual refresh) ignoring backoff/debounce.
+    // Forced mode: runs probes in parallel to minimize total latency.
+    private fun performLongRunningOperation(force: Boolean = false) {
+        if (force) {
+            // Cancel any in-flight poll first for clean parallel attempts
+            pollJob?.cancel()
+            pollInProgress = false
+        } else if (pollInProgress) {
+            Timber.tag(TAG).v("Skip poll: already running")
+            return
+        }
+        val savedDevices = SharedPrefsUtils.retrieveSavedDevices(mPrefs)
+        if (savedDevices.isEmpty()) {
+            removeProgress()
+            return
+        }
+        pollInProgress = true
+        pollJob = CoroutineScope(Dispatchers.IO).launch {
+            try {
+                if (force) {
+                    // Parallel probes
+                    coroutineScope {
+                        savedDevices.forEach { dev ->
+                            launch { getStatus(dev.deviceId, forceAttempt = true) }
+                        }
+                    }
+                } else {
+                    // Sequential probes (periodic)
+                    for (dev in savedDevices) {
+                        getStatus(dev.deviceId, forceAttempt = false)
+                    }
+                }
+            } finally {
+                pollInProgress = false
+                removeProgress()
             }
         }
-        return false
     }
 
-    private suspend fun getStatus(deviceId: Long) = withContext(Dispatchers.Default) {
-        val savedDevices = SharedPrefsUtils.retrieveSavedDevices(mPrefs)
-        val savedDeviceCount = savedDevices.size
-
-        println("Matter Total device found $savedDeviceCount")
+    private suspend fun getStatus(deviceId: Long, forceAttempt: Boolean = false) = withContext(Dispatchers.Default) {
+        val now = System.currentTimeMillis()
+        if (!forceAttempt) {
+            val lastFail = lastFailureTimeMs[deviceId] ?: 0L
+            if (now - lastFail < failureBackoffMs) {
+                Timber.tag(TAG).d("Skipping device $deviceId (backoff ${(failureBackoffMs - (now - lastFail))}ms left)")
+                return@withContext
+            }
+            val lastAttempt = lastAttemptTimeMs[deviceId] ?: 0L
+            if (now - lastAttempt < attemptMinIntervalMs) {
+                Timber.tag(TAG).v("Debouncing attempt for $deviceId (interval ${(attemptMinIntervalMs - (now - lastAttempt))}ms left)")
+                return@withContext
+            }
+        } else {
+            // Forced attempt: clear previous failure timing so item can re-enable instantly
+            lastFailureTimeMs[deviceId] = 0L
+        }
+        lastAttemptTimeMs[deviceId] = now
         try {
-            //  suspendCoroutine<Unit> { continuation ->
             suspendCoroutine { continuation ->
-
-                deviceController.getConnectedDevicePointer(deviceId,
-                    object : GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback {
-                        override fun onDeviceConnected(devicePointer: Long) {
-                            Timber.tag(TAG).e("devicePointer $devicePointer")
-                            SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, true)
-                            if (currentFragment != null) {
-                                when (currentFragment) {
-                                    is MatterScannedResultFragment -> {
-                                        prepareList(SharedPrefsUtils.retrieveSavedDevices(mPrefs))
-                                    }
-                                }
-                            }
-                            count++
-                            println("Matter Success count$count")
-                            if (count >= savedDeviceCount) {
-                                removeProgress()
-                            }
-                            // continuation.resume(Unit)
-                        }
-
-                        override fun onConnectionFailure(
-                            nodeId: Long,
-                            error: java.lang.Exception?
-                        ) {
-                            Timber.tag(TAG).e("nodeId $nodeId  Error $error")
-                            SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
-                            currentFragment =
-                                supportFragmentManager.findFragmentById(R.id.matter_container)
-                            if (currentFragment != null) {
-                                when (currentFragment) {
-                                    is MatterScannedResultFragment -> {
-                                        prepareList(SharedPrefsUtils.retrieveSavedDevices(mPrefs))
-                                    }
-                                }
-
-                            }
-
-                            continuation.resumeWithException(IllegalStateException(error))
-                            count++
-                            println("Matter disconnect count$count")
-                            if (count >= savedDeviceCount) {
-                                removeProgress()
-                            }
-                        }
-
-                    })
+                deviceController.getConnectedDevicePointer(deviceId, object : GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback {
+                    override fun onDeviceConnected(devicePointer: Long) {
+                        SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, true)
+                        updateListIfVisibleSingle(deviceId, true)
+                        continuation.resume(Unit)
+                    }
+                    override fun onConnectionFailure(nodeId: Long, error: java.lang.Exception?) {
+                        Timber.tag(TAG).w("nodeId $nodeId connection failure: ${error?.message}")
+                        markDeviceOffline(deviceId)
+                        lastFailureTimeMs[deviceId] = System.currentTimeMillis()
+                        continuation.resume(Unit)
+                    }
+                })
             }
         } catch (ex: Exception) {
-            Timber.tag(TAG).e("Exception $ex")
+            Timber.tag(TAG).e(ex, "Unexpected exception probing device $deviceId")
+            markDeviceOffline(deviceId)
         }
     }
 
+    private fun updateListIfVisibleSingle(deviceId: Long, isOnline: Boolean) {
+        val fragment = supportFragmentManager.findFragmentById(R.id.matter_container) as? com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment
+        fragment?.applyDeviceOnlineStatus(deviceId, isOnline)
+    }
+
+    // Removed heavy fragment recreation from incremental updates; keep method for full rebuild if needed elsewhere.
+    private fun updateListIfVisibleFull() {
+        val fragment = supportFragmentManager.findFragmentById(R.id.matter_container)
+        if (fragment is com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment) {
+            fragment.refreshAllFromPrefs()
+        }
+    }
+
+    private fun markDeviceOffline(deviceId: Long) {
+        SharedPrefsUtils.updateDeviceByDeviceId(mPrefs, deviceId, false)
+        updateListIfVisibleSingle(deviceId, false)
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -291,17 +319,17 @@ class MatterDemoActivity : AppCompatActivity(),
     }
 
     override fun navigateToDemo(
-        fragment: Fragment,
+        matterDemoFragment: Fragment,
         model: MatterScannedResultModel
     ) {
         val bundle = Bundle()
         bundle.putParcelable(ARG_DEVICE_MODEL, model)
-        fragment.arguments = bundle
+        matterDemoFragment.arguments = bundle
 
         supportFragmentManager.beginTransaction().replace(
             binding.matterContainer.id,
-            fragment,
-            fragment.javaClass.simpleName
+            matterDemoFragment,
+            matterDemoFragment.javaClass.simpleName
         ).addToBackStack(null).commit()
     }
 

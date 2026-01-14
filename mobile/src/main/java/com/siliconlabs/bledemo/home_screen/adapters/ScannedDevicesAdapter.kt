@@ -150,6 +150,18 @@ class ScannedDevicesAdapter(
                             setImageResource(R.drawable.icon_thread)
                             visibility = View.VISIBLE
                         }
+                        it.contains(ParcelUuid(GattService.TheDMP.number)) -> {
+                            setBackgroundResource(R.drawable.btn_rounded_blue)
+                            setImageResource(R.mipmap.ic_aws_iot_icon)
+                            visibility = View.VISIBLE
+                            clipToOutline = true
+                        }
+                        it.contains(ParcelUuid(GattService.TheAmazonSideWalk.number)) -> {
+                            setBackgroundResource(R.drawable.btn_rounded_blue)
+                            setImageResource(R.mipmap.ic_side_walk_icon)
+                            visibility = View.VISIBLE
+                            clipToOutline = true
+                        }
                         else -> {
                             visibility = View.GONE
                         }

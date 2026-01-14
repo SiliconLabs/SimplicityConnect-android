@@ -31,6 +31,7 @@
             android:layout_marginTop="@dimen/matter_25dp"
             android:layout_marginBottom="@dimen/matter_18dp"
             android:adjustViewBounds="true"
+            android:contentDescription="@string/image"
             android:background="@color/silabs_transparent"
             android:scaleType="fitCenter" />
 

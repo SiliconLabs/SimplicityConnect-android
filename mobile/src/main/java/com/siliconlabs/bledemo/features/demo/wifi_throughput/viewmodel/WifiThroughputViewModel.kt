@@ -45,6 +45,8 @@ class WifiThroughputViewModel : ViewModel() {
     private var finalThroughPut = 0
     private var _perSecondLog =  MutableLiveData<MutableList<String>>()
     private var _updateFinalPackets =  MutableLiveData<MutableMap<String,String>>()
+    private var _totalBytesInProgress = MutableLiveData<Long>()
+    private var _waitingForConnection = MutableLiveData<String?>() // null when connected, role when waiting
     var finalBandwidth: Float = 0.0F
     //Tcp Server
     var totalBytesReceived = 0L
@@ -62,7 +64,8 @@ class WifiThroughputViewModel : ViewModel() {
     init {
         _perSecondLog.value = mutableListOf()
         _updateFinalPackets.value = mutableMapOf()
-
+        _totalBytesInProgress.value = 0L
+        _waitingForConnection.value = null
     }
     fun updateSpeed():LiveData<Float>{
         return _updateSpeed
@@ -74,6 +77,14 @@ class WifiThroughputViewModel : ViewModel() {
 
     fun updateFinalResult(): LiveData<MutableMap<String,String>>{
         return _updateFinalPackets
+    }
+
+    fun updateTotalBytesInProgress(): LiveData<Long> {
+        return _totalBytesInProgress
+    }
+
+    fun waitingForConnection(): LiveData<String?> {
+        return _waitingForConnection
     }
 
     fun handleException(): MutableLiveData<Boolean> {
@@ -93,6 +104,10 @@ class WifiThroughputViewModel : ViewModel() {
         isExceptionOccured = false
         count = -1
         finalThroughPut = 0
+        viewModelScope.launch(Dispatchers.Main) {
+            _totalBytesInProgress.value = 0L
+            _waitingForConnection.value = "server" // Waiting for server to accept connection
+        }
         val TEST_TIMEOUT: Long = 30000 // Timeout in milliseconds
         val BYTES_TO_SEND = 536870912.0 //317470020// Example value, set your actual byte count
         val ip = ipAddress // Replace with your server's IP address
@@ -124,8 +139,12 @@ class WifiThroughputViewModel : ViewModel() {
                 outputStream.write(buffer)
                 viewModelScope.launch(Dispatchers.Main) {
                     isConncetedToClient.value = true
+                    _waitingForConnection.value = null // Connected, clear waiting message
                 }
                 totalBytesTransferred += buffer.size
+                viewModelScope.launch(Dispatchers.Main) {
+                    _totalBytesInProgress.value = totalBytesTransferred
+                }
                 addBytesToCount(buffer.size)
 
                 val now = System.currentTimeMillis()
@@ -246,6 +265,8 @@ class WifiThroughputViewModel : ViewModel() {
             _perSecondLog.value = mutableListOf()
             _perSecondLog.value =  _perSecondLog.value
             isConncetedToClient.value = false
+            _totalBytesInProgress.value = 0L
+            _waitingForConnection.value = "client" // Waiting for client to connect
         }
         isExceptionOccured = false
         mobileServerSocket.soTimeout = 30000
@@ -285,12 +306,16 @@ class WifiThroughputViewModel : ViewModel() {
 
     fun incrementBytesReceived(bytes: Int) {
         totalBytesReceived += bytes
+        viewModelScope.launch(Dispatchers.Main) {
+            _totalBytesInProgress.value = totalBytesReceived
+        }
     }
 
     private  fun handleClient(clientSocket: Socket)  {
         println("Client connected: ${clientSocket.inetAddress.hostAddress}")
         viewModelScope.launch(Dispatchers.Main) {
             isConncetedToClient.value = true
+            _waitingForConnection.value = null // Connected, clear waiting message
         }
         startTimer()
         val dataInputStream = DataInputStream(BufferedInputStream(clientSocket.getInputStream()))
@@ -380,6 +405,10 @@ class WifiThroughputViewModel : ViewModel() {
         isExceptionOccured = false
         count = -1
         finalThroughPut = 0
+        viewModelScope.launch(Dispatchers.Main) {
+            _totalBytesInProgress.value = 0L
+            _waitingForConnection.value = "server" // Waiting for server
+        }
         val BYTES_TO_SEND = 536870912.0 //317470020// Example value, set your actual byte count
         val TEST_TIMEOUT: Long = 30000 // Timeout in milliseconds
         val serverAddress: InetAddress
@@ -415,6 +444,11 @@ class WifiThroughputViewModel : ViewModel() {
             while (totalBytesTransferred < BYTES_TO_SEND) {
                 println("Total bytes sent so far : $totalBytesTransferred")
                 socket.send(packet)
+                if (totalBytesTransferred == 0L) {
+                    viewModelScope.launch(Dispatchers.Main) {
+                        _waitingForConnection.value = null // Started sending, clear waiting message
+                    }
+                }
                 val now = System.currentTimeMillis()
 
                 if ((now - start) > TEST_TIMEOUT || count >= 30) {
@@ -436,6 +470,9 @@ class WifiThroughputViewModel : ViewModel() {
                 }
                 totalBytesTransferred += sentBytes
 
+                viewModelScope.launch(Dispatchers.Main) {
+                    _totalBytesInProgress.value = totalBytesTransferred
+                }
                 addBytesToCount(sentBytes)
                 if (sentBytes > 0) {
                     totalBytesSent += sentBytes
@@ -489,6 +526,8 @@ class WifiThroughputViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.Main) {
             _perSecondLog.value = mutableListOf()
             _perSecondLog.value =  _perSecondLog.value
+            _totalBytesInProgress.value = 0L
+            _waitingForConnection.value = "client" // Waiting for client
         }
         // Coroutine to receive UDP packets
         coroutineScope.launch {
@@ -511,6 +550,7 @@ class WifiThroughputViewModel : ViewModel() {
                         if (packet.length > 0){
                             viewModelScope.launch(Dispatchers.Main) {
                                 isConncetedToClient.value = true
+                                _waitingForConnection.value = null // Received data, clear waiting message
                             }
                             udpSocket.soTimeout = 500
                             startTimer()
@@ -518,7 +558,9 @@ class WifiThroughputViewModel : ViewModel() {
                         println("Server Throughput bytes: ${packet.length}")
                         totalBytesReceived += packet.length
                         println("totalBytesReceived  : $totalBytesReceived")
-
+                        viewModelScope.launch(Dispatchers.Main) {
+                            _totalBytesInProgress.value = totalBytesReceived
+                        }
                         incrementBytesReceived(packet.length)
                         addBytesToCount(packet.length)
                     }
@@ -585,6 +627,8 @@ class WifiThroughputViewModel : ViewModel() {
             _perSecondLog.value = mutableListOf()
             _perSecondLog.value =  _perSecondLog.value
             isConncetedToClient.value = false
+            _totalBytesInProgress.value = 0L
+            _waitingForConnection.value = "client" // Waiting for client
         }
         try {
             val sslContext = createSSLContext(context)
@@ -598,6 +642,7 @@ class WifiThroughputViewModel : ViewModel() {
                     println("Accept done")
                     viewModelScope.launch(Dispatchers.Main) {
                         isConncetedToClient.value = true
+                        _waitingForConnection.value = null // Client connected, clear waiting message
                     }
                     // handleTLSClient(socket) // Handle client in separate thread
                     if (!isUpload){
@@ -634,6 +679,10 @@ class WifiThroughputViewModel : ViewModel() {
     fun uploadData(socket: Socket){
         isExceptionOccured = false
         finalThroughPut = 0
+        viewModelScope.launch(Dispatchers.Main) {
+            _totalBytesInProgress.value = 0L
+            _waitingForConnection.value = "server" // TLS client waiting for server (already accepted but starting transfer)
+        }
         val TEST_TIMEOUT: Long = 30000 // Timeout in milliseconds
         val BYTES_TO_SEND = 536870912.0 //317470020// Example value, set your actual byte count
         val buffer = ByteArray(1370)
@@ -660,6 +709,12 @@ class WifiThroughputViewModel : ViewModel() {
                 outputStream = socket.getOutputStream()
                 outputStream!!.write(buffer)
                 totalBytesTransferred += buffer.size
+                viewModelScope.launch(Dispatchers.Main) {
+                    _totalBytesInProgress.value = totalBytesTransferred
+                    if (totalBytesTransferred == buffer.size.toLong()) {
+                        _waitingForConnection.value = null // Started transferring, clear waiting message
+                    }
+                }
                 addBytesToCount(buffer.size)
 
                 val now = System.currentTimeMillis()

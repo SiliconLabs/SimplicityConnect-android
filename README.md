@@ -22,7 +22,7 @@ Simplicity Connect includes many demos to test sample apps in the Silicon Labs G
 - **Throughput**: Measure application data throughput between the BLE hardware 
  and your mobile device in both directions
 - **Health Thermometer**: Connect to a BLE hardware kit and receive the temperature data from the on-board sensor.
-- **Connected Lighting DMP**: Leverage the dynamic multi-protocol (DMP) sample apps to control a DMP light node from a mobile and protocol-specific switch node (Zigbee, proprietary) while keeping the light status in sync across all devices.
+- **Connected Device**: Leverage the dynamic multi-protocol (DMP) sample apps to control a DMP light node from a mobile and protocol-specific switch node (Zigbee, proprietary,Amazon SideWalk,SmartLock) while keeping the light status in sync across all devices.
 - **Range Test**: Visualize the RSSI and other RF performance data on the mobile phone while running the Range Test sample application on a pair of Silicon Labs radio boards.
 - **Motion**: Control a 3D render of a Silicon Labs Thunderboard or Dev Kit that follows the physical board movements.
 - **Environment**: Read and display the data from the on-board sensors on a Silicon Labs Thunderboard or Dev Kit.
@@ -31,9 +31,12 @@ Simplicity Connect includes many demos to test sample apps in the Silicon Labs G
 - **Matter**: Commission and control of the Matter devices over Thread and Wi-Fi.
 - **Wi-Fi OTA Firmware Update**: The Wi-Fi OTA firmware update demo demonstrates how to update the SiWx91x user application firmware over Wi-Fi connection, by downloading the image from the mobile phone.
 - **Wi-Fi 917 Sensors**: The Wi-Fi 917 Sensor demo demonstrates to read and display sensor data from 917 Dev Kit.
-- **Wi-Fi Throughput**: Wi-Fi demo feature for measuring data throughput between Si917/915 device and the mobile phone.
+- **Wi-Fi Throughput**: Wi-Fi demo feature for measuring data throughput between SiWx91x device and the mobile phone.
 - **Wi-Fi Provisioning**: Commission a Wi-Fi device via Access Point.
 - **AWS Demo**: This Demo showcases a system where sensor data is sent to AWS IoT Core using the MQTT protocol. A mobile app subscribes to specific MQTT topics to receive this sensor data in real-time. The app can also publish messages to AWS IoT Core, which are then received by the sensor device's firmware, enabling two-way communication.
+- **Smart Lock**: Add/commission smart lock and read/control it over Bluetooth and AWS IoT Cloud.
+- **Channel Sounding**: Measure distance between your device and EFRxG24 devices using Bluetooth Channel Sounding with configurable parameters.
+- **Energy Harvesting**:Monitor harvested voltage in real time.
 
 ## Development Features
 Simplicity Connect helps developers create and troubleshoot Bluetooth applications running on Silicon Labs’ BLE hardware. Here’s a rundown of some example functionalities.

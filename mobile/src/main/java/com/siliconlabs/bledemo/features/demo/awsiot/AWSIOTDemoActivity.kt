@@ -1,5 +1,6 @@
 package com.siliconlabs.bledemo.features.demo.awsiot
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.NotificationManager
 import android.content.Context
@@ -7,12 +8,17 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
@@ -23,6 +29,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.databinding.ActivityAwsDemoBinding
 import com.siliconlabs.bledemo.features.configure.advertiser.services.MqttForegroundService
@@ -33,20 +40,31 @@ import com.siliconlabs.bledemo.features.demo.awsiot.model.GridItem
 import com.siliconlabs.bledemo.features.demo.awsiot.repository.ConnectionResult
 import com.siliconlabs.bledemo.features.demo.awsiot.viewmodel.MqttViewModel
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.CustomProgressDialog
-import com.siliconlabs.bledemo.utils.AppUtil
+import com.siliconlabs.bledemo.utils.ApppUtil
+import com.siliconlabs.bledemo.features.demo.smartlock.dialogs.SmartLockConfigurationDialog
+import com.siliconlabs.bledemo.features.demo.smartlock.dialogs.SmartLockConfigurationDialog.Companion.PICK_P12_FILE_REQUEST_CODE
 import com.siliconlabs.bledemo.utils.CustomToastManager
 import org.json.JSONException
 import org.json.JSONObject
+import timber.log.Timber
+import java.io.InputStream
+import java.security.KeyStore
+import javax.net.ssl.KeyManagerFactory
+import javax.net.ssl.SSLContext
 
 
 class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
     private lateinit var backPressedCallback: OnBackPressedCallback
-    private val messageTimeoutMillis: Long = 30000L
+    private val messageTimeoutMillis: Long = 60000L
     private val handler = Handler(Looper.getMainLooper())
     private var timeoutRunnable: Runnable? = null
 
     private var publishTopic = ""
     private var subscribeTopic = ""
+    private var p12EndPointURL = ""
+    private var p12FilePathUri: Uri? = null
+    private var p12FilePath: String? = null
+    private var p12FilePassword: String? = ""
     private lateinit var binding: ActivityAwsDemoBinding
 
     private lateinit var sharedPreferences: SharedPreferences
@@ -59,6 +77,8 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
     private var isRedOn = false
     private var isGreenOn = false
     private var isBlueOn = false
+    private var awsConfigDialog: SmartLockConfigurationDialog? = null
+
 
     companion object {
         private const val PREFS_NAME = "MqttPrefs"
@@ -79,7 +99,7 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
         super.onCreate(savedInstanceState)
         binding = ActivityAwsDemoBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        AppUtil.setEdgeToEdge(window, this)
+        ApppUtil.setEdgeToEdge(window, this)
         setSupportActionBar(binding.toolbar)
         val actionBar = supportActionBar
         actionBar!!.setHomeAsUpIndicator(R.drawable.matter_back)
@@ -99,7 +119,7 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
                 Log.d("Activity", "Back button pressed with OnBackPressedDispatcher!")
 
                 //showDisconnectConfirmationDialog()
-                if(null != mqttViewModel){
+                if (null != mqttViewModel) {
                     mqttViewModel.unsubscribeFromTopic()
                     mqttViewModel.disconnect()
                     finish()
@@ -124,8 +144,10 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
 
                     removeProgress()
                     runOnUiThread {
-                        CustomToastManager.show(this,
-                            getString(R.string.connection_successful), 5000)
+                        CustomToastManager.show(
+                            this,
+                            getString(R.string.connection_successful), 5000
+                        )
 
                     }
 
@@ -136,16 +158,22 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
                     // Handle the error
                     println("Connection Error: ${result.message}")
                     result.throwable?.printStackTrace() // Print the stack trace for debugging
-
+                    DynamicToast.makeError(this, result.message, 5000).show()
                     runOnUiThread {
-                        if (result.message.contains(getString(R.string.publish_failed),false) or result.message.contains(
+                        if (result.message.contains(
+                                "MqttException",
+                                false
+                            ) or result.message.contains(
                                 getString(
                                     R.string.subscription_failed
-                                ),false)){
+                                ), false
+                            )
+                        ) {
                             removeProgress()
                             CustomToastManager.show(this, result.message, 5000)
-                            showMqttTopicDialog()
-                        }else{
+                            // showMqttTopicDialog()
+                            initAWSConfigure()
+                        } else {
                             CustomToastManager.show(this, result.message, 5000)
                         }
 
@@ -216,7 +244,8 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
             .setMessage(getString(R.string.no_mess_received_within_thirtysec))
             .setPositiveButton(getString(R.string.retry)) { _, _ ->
                 // Reopen the dialog for topic entry
-                showMqttTopicDialog()
+                // showMqttTopicDialog()
+                initAWSConfigure()
             }
             .setNegativeButton(getString(R.string.cancel)) { _, _ ->
                 this.finish()
@@ -225,9 +254,11 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
     }
 
     private fun updateGrid(jsonObject: JSONObject) {
-        val orderedKeys = listOf(getString(R.string.aws_temperature),
+        val orderedKeys = listOf(
+            getString(R.string.aws_temperature),
             getString(R.string.aws_humidity), getString(R.string.aws_ambient_light),
-            getString(R.string.aws_white_light))
+            getString(R.string.aws_white_light)
+        )
         val newItems = mutableListOf<GridItem>()
         var motionItem: GridItem? = null // Use null to indicate no motion yet
 
@@ -267,7 +298,13 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
             if (jsonObject.has(key)) {
                 val value = jsonObject.get(key)
                 if (value !is JSONObject) {
-                    newItems.add(GridItem(key.replaceFirstChar { it.uppercase().replace("_"," ") }, value.toString(), getIconForKey(key)))
+                    newItems.add(
+                        GridItem(
+                            key.replaceFirstChar { it.uppercase().replace("_", " ") },
+                            value.toString(),
+                            getIconForKey(key)
+                        )
+                    )
                 }
             }
         }
@@ -345,10 +382,10 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
         recyclerView = binding.mqttRv
         recyclerView.layoutManager = GridLayoutManager(this, 3) // 2 columns
 
-        adapter = GridAdapter(emptyList(), this,mqttViewModel,this)
+        adapter = GridAdapter(emptyList(), this, mqttViewModel, this)
         recyclerView.adapter = adapter
-        showMqttTopicDialog()
-
+        // showMqttTopicDialog()
+        initAWSConfigure()
     }
 
 
@@ -356,7 +393,7 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
         return when (item.itemId) {
             android.R.id.home -> {
                 //showDisconnectConfirmationDialog()
-                if(null != mqttViewModel){
+                if (null != mqttViewModel) {
                     mqttViewModel.unsubscribeFromTopic()
                     mqttViewModel.disconnect()
                     finish()
@@ -388,16 +425,24 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
 
     }
 
+    @SuppressLint("MissingInflatedId")
     private fun showMqttTopicDialog() {
+        lateinit var cleanEndPointUrl: String
+
         val builder = AlertDialog.Builder(this)
         val inflater = layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialog_mqtt, null)
         builder.setView(dialogView)
 
+        val titleTextView: TextView = dialogView.findViewById(R.id.mqttDialogTitle)
+        titleTextView.text = getString(R.string.aws_iot_mqtt_dialog_title)
         val subscribeEditText = dialogView.findViewById<TextInputEditText>(R.id.editSubTopic)
         val publishEditText = dialogView.findViewById<TextInputEditText>(R.id.editPubTopic)
         val submitButton: MaterialButton = dialogView.findViewById(R.id.submitMqttButton)
         val cancelButton: TextView = dialogView.findViewById(R.id.submitMqttCancelButton)
+        val filePath = dialogView.findViewById<Button>(R.id.select_p12_file_btn)
+        val p12EndPoint = dialogView.findViewById<TextInputEditText>(R.id.editEndPoint)
+        val password = dialogView.findViewById<TextInputEditText>(R.id.editPassword)
 
         builder.setCancelable(false)
 
@@ -406,11 +451,34 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
         // Load saved topics from SharedPreferences
         loadSavedTopics(subscribeEditText, publishEditText)
 
+        filePath.setOnClickListener {
+           // pickfile()
+        }
+
         submitButton.setOnClickListener { _ ->
-            subscribeTopic = subscribeEditText.text.toString()
-            publishTopic = publishEditText.text.toString()
+            filePath.text = p12FilePathUri?.path ?: ""
+            subscribeTopic = subscribeEditText.text.toString().trim()
+            publishTopic = publishEditText.text.toString().trim()
+            p12FilePassword = password.text.toString().trim()
+            p12EndPointURL = p12EndPoint.text.toString().trim()
 
             when {
+                p12EndPointURL.isBlank() -> {
+                    CustomToastManager.show(
+                        this,
+                        getString(R.string.smart_lock_config_alert_end_point_message),
+                        5000
+                    )
+                }
+
+                p12FilePassword?.isBlank() == true -> {
+                    CustomToastManager.show(
+                        this,
+                        getString(R.string.smart_lock_config_alert_password_message),
+                        5000
+                    )
+                }
+
                 subscribeTopic.isBlank() && publishTopic.isBlank() -> {
                     // Both are empty or contain only whitespace
                     CustomToastManager.show(
@@ -439,16 +507,18 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
                 }
 
 
-
                 else -> {
                     // Both are valid
-                    //mqttViewModel.subscribe(subscribeTopic)
-                    if(areMqttTopicsValid(publishTopic, subscribeTopic)){
-                        mqttViewModel.connect(subscribeTopic)
+                    cleanEndPointUrl = SmartLockConfigurationDialog.removeProtocols(
+                        p12EndPointURL
+                    )
+                    filePath.text = p12FilePathUri?.path ?: ""
+                    if (areMqttTopicsValid(publishTopic, subscribeTopic)) {
+                        processP12File(p12FilePathUri, cleanEndPointUrl, p12FilePassword)
+                        // mqttViewModel.connect(subscribeTopic, p12EndPointURL,p12FilePassword)
                         saveTopics(subscribeTopic, publishTopic)
                         dialog.dismiss()
                     }
-
                 }
             }
         }
@@ -458,6 +528,107 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
         }
 
         dialog.show()
+    }
+
+    private fun processP12File(
+        fileUri: Uri?,
+        endPoint: String,
+        certificatePassword: String?
+    ): SSLContext? {
+        val inputStream: InputStream? = contentResolver?.openInputStream(fileUri!!)
+        return inputStream?.use { stream ->
+            try {
+                val keyStore = KeyStore.getInstance("PKCS12")
+                val password = certificatePassword?.toCharArray() // Replace with actual password
+                keyStore.load(stream, password)
+
+                val keyManagerFactory =
+                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
+                keyManagerFactory.init(keyStore, password)
+
+                val sslContext = SSLContext.getInstance("TLS")
+                sslContext.init(keyManagerFactory.keyManagers, null, null)
+                println("SSLContext ${sslContext.toString()}")
+                if(isNetworkAvailable(this)) {
+                    runOnUiThread {
+                        DynamicToast.makeSuccess(
+                            this,
+                            getString(R.string.smart_lock_device_connected),
+                            5000
+                        )
+                    }
+                    mqttViewModel.connect(subscribeTopic, endPoint, sslContext)
+                    sslContext
+                }else{
+                    runOnUiThread {
+                        DynamicToast.makeError(
+                            this,
+                            getString(R.string.smart_lock_internet_not_available),
+                            5000
+                        )
+                    }
+                    null
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Timber.tag("AWSIOT").e("Error reading the .p12 file: $e")
+                runOnUiThread {
+                    DynamicToast.makeError(this, "Error reading the .p12 file: $e", 5000).show()
+                }
+                null
+            }
+        }
+    }
+
+    private fun isNetworkAvailable(context: Context?): Boolean {
+        if (context == null) return false
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (capabilities != null) {
+                when {
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
+                        return true
+                    }
+                }
+            }
+        } else {
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+            if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
+                return true
+            }
+        }
+        return false
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        when (requestCode) {
+            PICK_P12_FILE_REQUEST_CODE -> {
+                intent?.data?.let {
+                    if (resultCode == RESULT_OK) {
+                        // Handle the selected file URI
+                        val fileUri = it
+                        Timber.tag("AWSIOTDemoActivity").d("Selected file: $fileUri")
+                        p12FilePathUri = it
+                        p12FilePath = awsConfigDialog?.readFilename(it)
+                        awsConfigDialog?.uriSelected(it)
+                        awsConfigDialog?.changeFileName(
+                            p12FilePath
+                        )
+                        loadSubPubSavedTopics()
+
+                    } else {
+                        runOnUiThread {
+                            // DynamicToast.make(this, getString(R.string.file_selection_cancelled), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
@@ -489,10 +660,31 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
         val isPublishValid = isValidPublishTopic(publishTopic)
         val isSubscribeValid = isValidSubscribeTopic(subscribeTopic)
 
-        if (!isPublishValid) CustomToastManager.show(this,"Invalid Publish Topic: $publishTopic",5000)
-        if (!isSubscribeValid) CustomToastManager.show(this,"Invalid Subscribe Topic: $subscribeTopic",5000)
+        if (!isPublishValid) CustomToastManager.show(
+            this,
+            "Invalid Publish Topic: $publishTopic",
+            5000
+        )
+        if (!isSubscribeValid) CustomToastManager.show(
+            this,
+            "Invalid Subscribe Topic: $subscribeTopic",
+            5000
+        )
 
         return isPublishValid && isSubscribeValid
+    }
+
+    private fun loadSubPubSavedTopics() {
+        // Load saved topics from SharedPreferences
+        val savedSubscribeTopic = sharedPreferences.getString(KEY_SUBSCRIBE_TOPIC, "")
+        val savedPublishTopic = sharedPreferences.getString(KEY_PUBLISH_TOPIC, "")
+
+        if (awsConfigDialog != null) {
+            awsConfigDialog?.displaySubscribeTopic(savedSubscribeTopic ?: "")
+            awsConfigDialog?.displayPublishTopic(savedPublishTopic ?: "")
+        } else {
+            Timber.tag("AWSIOTDemoActivity").e("awsConfigDialog is null or not showing")
+        }
     }
 
     private fun loadSavedTopics(
@@ -584,8 +776,7 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
             isGreenOn = false
         }
 
-        if (mqttMessage!= null)
-        {
+        if (mqttMessage != null) {
             mqttViewModel.publish(topic = publishTopic, message = mqttMessage)
         }
     }
@@ -605,14 +796,83 @@ class AWSIOTDemoActivity : AppCompatActivity(), OnMqttGridItemClickListener {
         cancelNotification()
         super.onDestroy()
     }
+
     private fun Context.stopMqttForegroundService() {
         val intent = Intent(this, MqttForegroundService::class.java)
         this.stopService(intent)
     }
+
     private fun cancelNotification() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(NOTIFICATION_ID)
     }
+
+    private fun initAWSConfigure() {
+        awsConfigDialog = SmartLockConfigurationDialog(
+            this, getString(R.string.aws_iot_mqtt_dialog_title),
+            listener = fileSelectionListener
+        ).also {
+            it.show(supportFragmentManager, "SmartLockConfigurationDialog")
+        }
+    }
+
+    private fun closeApp() {
+        this.finish()
+    }
+
+    private val fileSelectionListener =
+        object : SmartLockConfigurationDialog.FileSelectionListener {
+            override fun onSelectFileButtonClicked() {
+                Intent(Intent.ACTION_OPEN_DOCUMENT)
+                    .apply {
+                        type = "application/x-pkcs12"
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                    }.also {
+                        startActivityForResult(
+                            Intent.createChooser(
+                                it,
+                                getString(R.string.ota_choose_file)
+                            ), SmartLockConfigurationDialog.PICK_P12_FILE_REQUEST_CODE
+                        )
+                    }
+            }
+
+            override fun onCancelButtonClicked() {
+                if (awsConfigDialog != null && awsConfigDialog?.isShowing() == true) {
+                    awsConfigDialog?.dismiss()
+                    awsConfigDialog = null
+                }
+                closeApp()
+            }
+
+            override fun onConnectButtonClicked(
+                uriPath: Uri?,
+                password: String?,
+                endPoint: String,
+                subcribeTopic: String,
+                pubTopic: String
+            ) {
+
+                subscribeTopic = subcribeTopic
+                publishTopic = pubTopic
+                if (uriPath != null) {
+                    p12FilePathUri = uriPath
+                }
+                p12FilePassword = password
+                p12EndPointURL = endPoint
+
+                if (areMqttTopicsValid(publishTopic, subscribeTopic)) {
+                    saveTopics(subscribeTopic, publishTopic)
+                    processP12File(p12FilePathUri, p12EndPointURL, p12FilePassword)
+
+                }
+                if (awsConfigDialog != null && awsConfigDialog?.isShowing() == true) {
+                    awsConfigDialog?.dismiss()
+                }
+            }
+
+        }
 }
 
 class MqttViewModelFactory(private val context: Context) : ViewModelProvider.Factory {

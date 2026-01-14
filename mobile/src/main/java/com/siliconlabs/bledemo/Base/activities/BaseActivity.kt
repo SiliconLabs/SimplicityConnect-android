@@ -66,21 +66,18 @@ abstract class BaseActivity : AppCompatActivity() {
 
     fun showMessage(message: String) {
         runOnUiThread {
-            //Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             CustomToastManager.show(this@BaseActivity,message,5000)
         }
     }
 
     fun showMessage(stringResId: Int) {
         runOnUiThread {
-            //Toast.makeText(this, stringResId, Toast.LENGTH_SHORT).show()
             CustomToastManager.show(this@BaseActivity,getString(stringResId),5000)
         }
     }
 
     fun showLongMessage(message: String) {
         runOnUiThread {
-            //Toast.makeText(this, message, Toast.LENGTH_LONG).show()
             CustomToastManager.show(this@BaseActivity,message,5000)
         }
     }

@@ -44,8 +44,12 @@ class SelectDeviceViewModel : ScannerViewModel() {
             if (connectType != null && connectType == BluetoothService.GattConnectType.BLINKY) {
                 if (deviceName != null) {
                     if (context != null) {
-                        if (!deviceName.startsWith(context.getString(R.string.blinky_service_name),ignoreCase = true)
-                            &&  !matchesManufacturerData(result, manufacturerDataFilter)) {
+                        if (!deviceName.startsWith(
+                                context.getString(R.string.blinky_service_name),
+                                ignoreCase = true
+                            )
+                            && !matchesManufacturerData(result, manufacturerDataFilter)
+                        ) {
                             shouldAddDevice = false
                         }
                     }
@@ -55,42 +59,117 @@ class SelectDeviceViewModel : ScannerViewModel() {
             if (connectType != null && connectType == BluetoothService.GattConnectType.THERMOMETER) {
                 if (deviceName != null && context != null) {
                     if (!deviceName.startsWith("Thermometer", ignoreCase = true)
-                        && !matchesManufacturerData(result, manufacturerDataFilter)) {
+                        && !matchesManufacturerData(result, manufacturerDataFilter)
+                    ) {
+                        shouldAddDevice = false
+                    }
+                }
+            }
+            if (connectType != null && connectType == BluetoothService.GattConnectType.CHANNEL_SOUNDING_DEMO) {
+                if (deviceName != null && context != null) {
+                    if (!deviceName.startsWith("CS RFLCT", ignoreCase = true)
+                        && !matchesManufacturerData(result, manufacturerDataFilter)
+                    ) {
+                        shouldAddDevice = false
+                    }
+                }
+            }
+            if (connectType != null && connectType == BluetoothService.GattConnectType.SMART_LOCK) {
+                if (deviceName != null && context != null) {
+                    if (!deviceName.startsWith("BLE_CONFIGURATOR", ignoreCase = true)
+                        && !matchesManufacturerData(result, manufacturerDataFilter)
+                    ) {
+                        shouldAddDevice = false
+                    }
+                }
+            }
+            if (connectType != null && connectType == BluetoothService.GattConnectType.RANGE_TEST) {
+                if (deviceName != null && context != null) {
+                    if (!deviceName.startsWith("DMP", ignoreCase = true)
+                        && !matchesManufacturerData(result, manufacturerDataFilter)
+                    ) {
                         shouldAddDevice = false
                     }
                 }
             }
 
-
             if (connectType != null && connectType == BluetoothService.GattConnectType.LIGHT) {
-                shouldAddDevice = false
-                val serviceUuids = result.scanRecord?.serviceUuids
-                val lightServiceUuids = listOf(
-                    GattService.ProprietaryLightService.number,
-                    GattService.ConnectLightService.number,
-                    GattService.ThreadLightService.number,
-                    GattService.ZigbeeLightService.number
-                )
-                if (serviceUuids != null) {
-                    for (uuid in serviceUuids) {
-                        if (uuid.uuid in lightServiceUuids) {
-                            shouldAddDevice = true
-                            break
-                        }
+                if (deviceName != null) {
+                    val matchesDMP = deviceName.startsWith("DMP", ignoreCase = true)
+                    val matchesConfigurator =
+                        deviceName.startsWith("BLE_CONFIGURATOR", ignoreCase = true)
+                    val matchesAWS = deviceName.startsWith("BLE", ignoreCase = true) //sidewalk
+                    val matchesZigbee = deviceName.startsWith("Zig", ignoreCase = true)
+                    val matchesManufacturer =
+                        matchesManufacturerData(result, manufacturerDataFilter)
+
+                    if (!matchesDMP && !matchesConfigurator && !matchesAWS && !matchesZigbee
+                        && !matchesManufacturer
+                    ) {
+                        shouldAddDevice = false
                     }
                 }
             }
+
             if (connectType != null && connectType == BluetoothService.GattConnectType.THROUGHPUT_TEST) {
                 if (deviceName != null) {
                     if (context != null) {
-                        if (!deviceName.startsWith("Throughput",ignoreCase = true)
-                            &&  !matchesManufacturerData(result, manufacturerDataFilter)) {
+                        if (!deviceName.startsWith("Throughput", ignoreCase = true)
+                            && !matchesManufacturerData(result, manufacturerDataFilter)
+                        ) {
                             shouldAddDevice = false
                         }
                     }
                 }
             }
 
+            if (connectType != null && connectType == BluetoothService.GattConnectType.MOTION) {
+                if (deviceName != null) {
+                    val matchesDev = deviceName.startsWith("DEV", ignoreCase = true)
+                    val matchesThunder =
+                        deviceName.startsWith("Thunder", ignoreCase = true)
+
+                    val matchesManufacturer =
+                        matchesManufacturerData(result, manufacturerDataFilter)
+
+                    if (!matchesDev && !matchesThunder && !matchesManufacturer
+                    ) {
+                        shouldAddDevice = false
+                    }
+                }
+            }
+
+
+
+            if (connectType != null && connectType == BluetoothService.GattConnectType.AWS_DEMO) {
+                if (deviceName != null) {
+                    if (!deviceName.equals("BLE_CONFIGURATOR", ignoreCase = true)) {
+                        shouldAddDevice = false
+                    }
+                } else {
+                    shouldAddDevice = false
+                }
+            }
+
+            if (connectType != null && connectType == BluetoothService.GattConnectType.WIFI_COMMISSIONING) {
+                if (deviceName != null) {
+                    if (!deviceName.equals("BLE_CONFIGURATOR", ignoreCase = true)) {
+                        shouldAddDevice = false
+                    }
+                } else {
+                    shouldAddDevice = false
+                }
+            }
+
+            if (connectType != null && connectType == BluetoothService.GattConnectType.SMART_LOCK) {
+                if (deviceName != null) {
+                    if (!deviceName.equals("BLE_CONFIGURATOR", ignoreCase = true)) {
+                        shouldAddDevice = false
+                    }
+                } else {
+                    shouldAddDevice = false
+                }
+            }
 
             if (shouldAddDevice) {
                 _scannedDevices.value?.apply {
@@ -118,7 +197,7 @@ class SelectDeviceViewModel : ScannerViewModel() {
         _numberOfDevices.postValue(0)
     }
 
-    fun getScannedDevicesList() : List<BluetoothDeviceInfo> {
+    fun getScannedDevicesList(): List<BluetoothDeviceInfo> {
         return _scannedDevices.value?.values?.toList() ?: listOf()
     }
 

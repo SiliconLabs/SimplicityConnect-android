@@ -12,13 +12,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.GridLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.databinding.FragmentDemoBinding
+import com.siliconlabs.bledemo.features.demo.channel_sounding.utils.ChannelSoundingDetectorUtils
+import com.siliconlabs.bledemo.features.demo.energyharvesting.EnergyHarvestingActivity
 import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoActivity
 import com.siliconlabs.bledemo.features.demo.range_test.activities.RangeTestActivity
 import com.siliconlabs.bledemo.features.demo.wifi_ota_update.AlertErrorDialog
@@ -34,9 +35,11 @@ import com.siliconlabs.bledemo.home_screen.base.LocationDependent
 import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import com.siliconlabs.bledemo.home_screen.menu_items.AWSIOTDemo
 import com.siliconlabs.bledemo.home_screen.menu_items.Blinky
+import com.siliconlabs.bledemo.home_screen.menu_items.ChannelSoundingDemo
 import com.siliconlabs.bledemo.home_screen.menu_items.ConnectedLighting
 import com.siliconlabs.bledemo.home_screen.menu_items.DemoMenuItem
 import com.siliconlabs.bledemo.home_screen.menu_items.DevKitSensorDemo
+import com.siliconlabs.bledemo.home_screen.menu_items.EnergyHarvestingDemo
 import com.siliconlabs.bledemo.home_screen.menu_items.Environment
 import com.siliconlabs.bledemo.home_screen.menu_items.EslDemo
 import com.siliconlabs.bledemo.home_screen.menu_items.HealthThermometer
@@ -44,6 +47,7 @@ import com.siliconlabs.bledemo.home_screen.menu_items.MatterDemo
 import com.siliconlabs.bledemo.home_screen.menu_items.Motion
 import com.siliconlabs.bledemo.home_screen.menu_items.OTADemo
 import com.siliconlabs.bledemo.home_screen.menu_items.RangeTest
+import com.siliconlabs.bledemo.home_screen.menu_items.SmartLockDemo
 import com.siliconlabs.bledemo.home_screen.menu_items.Throughput
 import com.siliconlabs.bledemo.home_screen.menu_items.WiFiProvisioning
 import com.siliconlabs.bledemo.home_screen.menu_items.WiFiThroughput
@@ -76,6 +80,7 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
 
     private var otaProgressDialog: WiFiOtaProgressDialog? = null
     private var otaFileSelectionDialog: WiFiOtaFileSelectionDialog? = null
+
     private var otaFileManager: WiFiOtaFileManager? = null
     private var otaFilePath: Uri? = null
     private var socket: Socket? = null
@@ -91,6 +96,7 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
         otaFileManager = WiFiOtaFileManager(requireContext())
         initOtaProgressDialog()
 
+
         list.apply {
             add(
                 HealthThermometer(
@@ -102,7 +108,7 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
             add(
                 ConnectedLighting(
                     R.drawable.redesign_ic_demo_connected_lighting,
-                    getString(R.string.title_Connected_Lighting),
+                    "Connected Device",
                     getString(R.string.main_menu_description_connected_lighting)
                 )
             )
@@ -197,7 +203,30 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                     getString(R.string.aws_desc)
                 )
             )
+            add(
+                SmartLockDemo(
+                    R.drawable.ic_smartlock_icon,
+                    getString(R.string.smart_lock_demo_title),
+                    getString(R.string.smart_lock_demo_description)
+                )
+            )
 
+
+            add(
+                ChannelSoundingDemo(
+                    R.drawable.ic_channel_sound,
+                    getString(R.string.channel_sounding_title),
+                    getString(R.string.channel_sounding_description)
+                )
+            )
+
+            add(
+                EnergyHarvestingDemo(
+                    R.drawable.ic_energy_icon,
+                    getString(R.string.energy_harvesting_demo_title),
+                    getString(R.string.energy_harvesting_demo_description)
+                )
+            )
         }
     }
 
@@ -268,11 +297,16 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
 
 
     override fun onDemoItemClicked(demoItem: DemoMenuItem) {
+
+
         if (demoItem.connectType == BluetoothService.GattConnectType.MATTER_DEMO) {
             requireContext().startActivity(Intent(requireContext(), MatterDemoActivity::class.java))
         } else if (demoItem.connectType == BluetoothService.GattConnectType.RANGE_TEST) {
             BLEUtils.GATT_DEVICE_SELECTED = BluetoothService.GattConnectType.RANGE_TEST
             startActivity(Intent(requireContext(), RangeTestActivity::class.java))
+        } else if (demoItem.connectType == BluetoothService.GattConnectType.ENERGY_HARVESTING_DEMO) {
+            BLEUtils.GATT_DEVICE_SELECTED = BluetoothService.GattConnectType.ENERGY_HARVESTING_DEMO
+            startActivity(Intent(requireContext(), EnergyHarvestingActivity::class.java))
         } else if (demoItem.connectType == BluetoothService.GattConnectType.WIFI_OTA_UPDATE) {
             if (isNetworkAvailable(context)) {
                 otaFileSelectionDialog = WiFiOtaFileSelectionDialog(
@@ -312,7 +346,16 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                 CustomToastManager.show(requireContext(), getString(R.string.turn_on_wifi), 5000)
             }
         } else {
-            println("BLE_PROV demoItem:${demoItem.connectType}")
+
+            val csSupported =
+                ChannelSoundingDetectorUtils.isBleChannelSoundingSupported(requireContext())
+            if (!csSupported && demoItem.connectType == BluetoothService.GattConnectType.CHANNEL_SOUNDING_DEMO) {
+                CustomToastManager.showError(
+                    requireContext(),
+                    "Channel Sounding Demo is not supported in this Device"
+                )
+                return
+            }
             BLEUtils.GATT_DEVICE_SELECTED = demoItem.connectType
             // Prevent multiple dialogs
             val existingDialog = childFragmentManager.findFragmentByTag("select_device_dialog")
@@ -382,11 +425,6 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                 otaFileManager?.otaFile?.let {
                     startOtaProcess()
                 } ?: if (otaFileManager?.otaFilename != null) {
-                    /*Toast.makeText(
-                        requireContext(),
-                        getString(R.string.incorrect_file),
-                        Toast.LENGTH_SHORT
-                    ).show()*/
                     CustomToastManager.show(
                         requireContext(),
                         getString(R.string.incorrect_file),
@@ -394,11 +432,6 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                     )
 
                 } else {
-                    /*Toast.makeText(
-                        requireContext(),
-                        getString(R.string.no_file_chosen),
-                        Toast.LENGTH_SHORT
-                    ).show()*/
                     CustomToastManager.show(
                         requireContext(),
                         getString(R.string.no_file_chosen),
@@ -407,11 +440,6 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
 
                 }
             } else {
-                /*Toast.makeText(
-                    requireContext(),
-                    getString(R.string.port_id_validation),
-                    Toast.LENGTH_SHORT
-                ).show()*/
                 CustomToastManager.show(
                     requireContext(),
                     getString(R.string.port_id_validation),
@@ -717,23 +745,13 @@ class DemoFragment : BaseServiceDependentMainMenuFragment(), DemoAdapter.OnDemoI
                         otaFileManager?.readFile(it).toString()
                         otaFileSelectionDialog?.enableUploadButton()
                     } else {
-                        /*Toast.makeText(
-                            requireContext(),
-                            getString(R.string.incorrect_file),
-                            Toast.LENGTH_SHORT
-                        ).show()*/
                         CustomToastManager.show(
                             requireContext(),
                             getString(R.string.incorrect_file),
                             5000
                         )
                     }
-                } ?: /*Toast.makeText(
-                    requireContext(),
-                    getString(R.string.chosen_file_not_found),
-                    Toast.LENGTH_SHORT
-                ).show()*/
-                CustomToastManager.show(
+                } ?: CustomToastManager.show(
                     requireContext(),
                     getString(R.string.chosen_file_not_found),
                     5000

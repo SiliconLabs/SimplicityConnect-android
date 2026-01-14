@@ -129,6 +129,35 @@ class WifiThroughPutDetailScreen : Fragment() {
             }
         }
 
+        viewModel.updateTotalBytesInProgress().observe(viewLifecycleOwner) { totalBytes ->
+            // Only show progress if not waiting for connection
+            if (viewModel.waitingForConnection().value == null && totalBytes > 0) {
+                // Update UI with real-time bytes transferred during test
+                val formattedBytes = viewModel.bytesToHumanReadableSize(totalBytes.toFloat())
+                val statusMessage = if (throughPutTestModeDownload) {
+                    "<b><font color=${context?.getColor(R.color.masala)}>${getString(R.string.test_in_progress)}</font> ${getString(R.string.total_data_received)}: $formattedBytes</b>"
+                } else {
+                    "<b><font color=${context?.getColor(R.color.masala)}>${getString(R.string.test_in_progress)}</font> ${getString(R.string.total_data_sent)}: $formattedBytes</b>"
+                }
+                binding.finalBytesSent.text = Html.fromHtml(statusMessage, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                binding.finalResultLl.visibility = View.VISIBLE
+            }
+        }
+
+        viewModel.waitingForConnection().observe(viewLifecycleOwner) { role ->
+            // Show waiting message before connection is established
+            if (role != null) {
+                val waitingMessage = if (role == "client") {
+                    "<b>${getString(R.string.waiting_for_client)}</b>"
+                } else {
+                    "<b>${getString(R.string.waiting_for_server)}</b>"
+                }
+                binding.finalBytesSent.text = Html.fromHtml(waitingMessage, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                binding.finalResultLl.visibility = View.VISIBLE
+            }
+            // When role is null (connected), the progress observer will take over
+        }
+
         viewModel.handleException().observe(viewLifecycleOwner){
             if (it){
                 binding.start.isEnabled = true
@@ -174,10 +203,12 @@ class WifiThroughPutDetailScreen : Fragment() {
                 ) {
                     throughPutTestModeDownload = false
                     //set the actionBar title
-                    (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
-                    binding.connectionStatus.visibility = View.VISIBLE
-                    if(binding.connectionStatus.isVisible){
-                        binding.connectionStatusTv.text = getString(R.string.waiting_for_client_to_connect)
+                    withContext(Dispatchers.Main) {
+                        (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
+                        binding.connectionStatus.visibility = View.VISIBLE
+                        if(binding.connectionStatus.isVisible){
+                            binding.connectionStatusTv.text = getString(R.string.waiting_for_client_to_connect)
+                        }
                     }
                     viewModel.tcpClient(
                         it.getString(ThroughputUtils.ipAddress)!!,
@@ -189,11 +220,13 @@ class WifiThroughPutDetailScreen : Fragment() {
                     ) == true
                 ) {
                     //set the actionBar title
-                    (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
                     throughPutTestModeDownload = true
-                    binding.connectionStatus.visibility = View.VISIBLE
-                    if(binding.connectionStatus.isVisible){
-                        binding.connectionStatusTv.text = getString(R.string.wifi_throughput_connecting_status)
+                    withContext(Dispatchers.Main) {
+                        (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
+                        binding.connectionStatus.visibility = View.VISIBLE
+                        if(binding.connectionStatus.isVisible){
+                            binding.connectionStatusTv.text = getString(R.string.wifi_throughput_connecting_status)
+                        }
                     }
 
                     viewModel.tcpServer(it.getString(ThroughputUtils.portNumber)!!.toInt())
@@ -203,12 +236,14 @@ class WifiThroughPutDetailScreen : Fragment() {
                     ) == true
                 ) {
                     //set the actionBar title
-                    (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
                     throughPutTestModeDownload = false
-                    binding.connectionStatus.visibility = View.VISIBLE
-                    if(binding.connectionStatus.isVisible){
-                        binding.connectionStatusTv.text = getString(R.string.waiting_for_client_to_connect)
-                        binding.connectionStatusTv.visibility = View.GONE
+                    withContext(Dispatchers.Main) {
+                        (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
+                        binding.connectionStatus.visibility = View.VISIBLE
+                        if(binding.connectionStatus.isVisible){
+                            binding.connectionStatusTv.text = getString(R.string.waiting_for_client_to_connect)
+                            binding.connectionStatusTv.visibility = View.GONE
+                        }
                     }
 
                     viewModel.udpClient(
@@ -221,12 +256,14 @@ class WifiThroughPutDetailScreen : Fragment() {
                     ) == true
                 ) {
                     //set the actionBar title
-                    (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
                     throughPutTestModeDownload = true
-                    binding.connectionStatus.visibility = View.VISIBLE
-                    if(binding.connectionStatus.isVisible){
-                        binding.connectionStatusTv.text = getString(R.string.wifi_throughput_connecting_status)
-                        //binding.connectionStatusTv.visibility = View.GONE
+                    withContext(Dispatchers.Main) {
+                        (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
+                        binding.connectionStatus.visibility = View.VISIBLE
+                        if(binding.connectionStatus.isVisible){
+                            binding.connectionStatusTv.text = getString(R.string.wifi_throughput_connecting_status)
+                            //binding.connectionStatusTv.visibility = View.GONE
+                        }
                     }
 
                     viewModel.udpServer(it.getString(ThroughputUtils.portNumber)!!.toInt())
@@ -237,11 +274,13 @@ class WifiThroughPutDetailScreen : Fragment() {
                     ) == true
                 ) {
                     //set the actionBar title
-                    (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
                     throughPutTestModeDownload = false
-                    binding.connectionStatus.visibility = View.VISIBLE
-                    if(binding.connectionStatus.isVisible){
-                        binding.connectionStatusTv.text = getString(R.string.waiting_for_client_to_connect)
+                    withContext(Dispatchers.Main) {
+                        (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
+                        binding.connectionStatus.visibility = View.VISIBLE
+                        if(binding.connectionStatus.isVisible){
+                            binding.connectionStatusTv.text = getString(R.string.waiting_for_client_to_connect)
+                        }
                     }
 
                     viewModel.startTLSServer(
@@ -255,11 +294,13 @@ class WifiThroughPutDetailScreen : Fragment() {
                     ) == true
                 ) {
                     //set the actionBar title
-                    (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
                     throughPutTestModeDownload = true
-                    binding.connectionStatus.visibility = View.VISIBLE
-                    if(binding.connectionStatus.isVisible){
-                        binding.connectionStatusTv.text = getString(R.string.waiting_for_client_to_connect)
+                    withContext(Dispatchers.Main) {
+                        (activity as? WifiThroughputActivity)?.updateActionBarTitle(it.getString(ThroughputUtils.throughPutType).toString())
+                        binding.connectionStatus.visibility = View.VISIBLE
+                        if(binding.connectionStatus.isVisible){
+                            binding.connectionStatusTv.text = getString(R.string.waiting_for_client_to_connect)
+                        }
                     }
 
                     viewModel.startTLSServer(

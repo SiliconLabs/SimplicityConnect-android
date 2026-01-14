@@ -28,21 +28,29 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.siliconlabs.bledemo.R
 import com.siliconlabs.bledemo.base.activities.BaseDemoActivity
+import com.pranavpandey.android.dynamic.toasts.DynamicToast
 import com.siliconlabs.bledemo.bluetooth.ble.GattCharacteristic
 import com.siliconlabs.bledemo.bluetooth.ble.GattService
 import com.siliconlabs.bledemo.bluetooth.ble.TimeoutGattCallback
 import com.siliconlabs.bledemo.bluetooth.services.BluetoothService
 import com.siliconlabs.bledemo.databinding.ActivityWifiCommissioningBinding
 import com.siliconlabs.bledemo.features.demo.awsiot.AWSIOTDemoActivity
+import com.siliconlabs.bledemo.features.demo.connected_lighting.activities.ConnectedLightingActivity
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.activities.DevKitSensor917Activity
 import com.siliconlabs.bledemo.features.demo.devkitsensor917.activities.DevKitSensor917Activity.Companion.IP_ADDRESS
-import com.siliconlabs.bledemo.utils.Converters
+import com.siliconlabs.bledemo.features.demo.smartlock.activities.SmartLockActivity
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.adapters.AccessPointsAdapter
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.AccessPoint
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.BoardCommand
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.SecurityMode
 import com.siliconlabs.bledemo.utils.AppUtil
 import com.siliconlabs.bledemo.utils.CustomToastManager
+import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog.Companion.CONNECTION_SUPPORTED
+import com.siliconlabs.bledemo.home_screen.menu_items.ConnectedLighting
+import com.siliconlabs.bledemo.utils.Converters
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -124,7 +132,8 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     override fun onBluetoothServiceBound() {
         service?.registerGattCallback(mBluetoothGattCallback)
         gatt?.discoverServices()
-        showProgressDialog(getString(R.string.ble_detail_device_connection))
+        showProgressDialogWithTimeout(getString(R.string.ble_detail_device_connection))
+       // showProgressDialog(getString(R.string.ble_detail_device_connection))
     }
 
     private fun setupRecyclerView() {
@@ -152,9 +161,27 @@ class WifiCommissioningActivity : BaseDemoActivity() {
         }
     }
 
+    private fun showProgressDialogWithTimeout(message: String) {
+        runOnUiThread {
+            progressDialog?.dismiss()
+            progressDialog =
+                ProgressDialog.show(this, getString(R.string.empty_description), message)
+            lifecycleScope.launch {
+                delay(35000) // Show progress dialog for 35 seconds
+                if (progressDialog?.isShowing == true) {
+                    progressDialog?.dismiss()
+                    progressDialog =null
+                    DynamicToast.make(this@WifiCommissioningActivity, "Timeout Expired", 3000).show()
+                    finish()
+                }
+            }
+        }
+    }
+
     private fun dismissProgressDialog() {
         runOnUiThread { progressDialog?.dismiss() }
     }
+
 
     private fun onAccessPointClicked(position: Int) {
         isItemClicked = true
@@ -165,7 +192,6 @@ class WifiCommissioningActivity : BaseDemoActivity() {
 
     private fun showToastOnUi(message: String) {
         runOnUiThread {
-            //  Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             CustomToastManager.show(
                 this@WifiCommissioningActivity,message,5000
             )
@@ -181,6 +207,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     fun onAccessPointConnection(isSuccessful: Boolean) {
         dismissProgressDialog()
         if (isSuccessful) {
+            println("DMP Connect Type : ${connectType}")
             when (connectType) {
                 BluetoothService.GattConnectType.WIFI_COMMISSIONING -> {
                     showToastOnUi(getString(R.string.ap_connect))
@@ -224,9 +251,38 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                         println("BLE_PROV ipAddress:${clickedAccessPoint!!.ipAddress}")
                         startActivity(devKitIntent)
                         this.finish()
-                    },5000)
+                    }, 5000)
+                }
 
+                BluetoothService.GattConnectType.SMART_LOCK -> {
+                    showToastOnUi(getString(R.string.ap_connect))
+                    connectedAccessPoint = clickedAccessPoint
+                    connectedAccessPoint?.status = true
+                    val devKitIntent = Intent(
+                        this,
+                        SmartLockActivity::class.java
+//                        SmartActivity::class.java
+                    ).apply {
+                        putExtra(IP_ADDRESS, clickedAccessPoint?.ipAddress)
+                    }
+                    storeInfo(clickedAccessPoint!!.ipAddress!!)
+                    println("BLE_PROV ipAddress:${clickedAccessPoint!!.ipAddress}")
+                    activityLauncher.launch(devKitIntent)
 
+                }
+                BluetoothService.GattConnectType.LIGHT -> {
+                    showToastOnUi(getString(R.string.ap_connect))
+                    connectedAccessPoint = clickedAccessPoint
+                    connectedAccessPoint?.status = true
+                    val devKitIntent = Intent(
+                        this,
+                        ConnectedLightingActivity::class.java
+                    ).apply {
+                        putExtra(IP_ADDRESS, clickedAccessPoint?.ipAddress)
+                    }
+                    storeInfo(clickedAccessPoint!!.ipAddress!!)
+                    println("DMP BLE_PROV ipAddress:${clickedAccessPoint!!.ipAddress}")
+                    activityLauncher.launch(devKitIntent)
 
                 }
 
@@ -256,6 +312,20 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                 }
 
                 BluetoothService.GattConnectType.AWS_DEMO -> {
+                    connectedAccessPoint = null
+                    scanForAccessPoints()
+                    toggleMainView(isAccessPointConnected = false)
+                    showToastOnUi(getString(R.string.ap_disconnect_success))
+                }
+
+                BluetoothService.GattConnectType.SMART_LOCK -> {
+                    connectedAccessPoint = null
+                    scanForAccessPoints()
+                    toggleMainView(isAccessPointConnected = false)
+                    showToastOnUi(getString(R.string.ap_disconnect_success))
+                }
+
+                BluetoothService.GattConnectType.LIGHT -> {
                     connectedAccessPoint = null
                     scanForAccessPoints()
                     toggleMainView(isAccessPointConnected = false)
@@ -308,6 +378,30 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                     this.finish()
                 }
 
+                BluetoothService.GattConnectType.SMART_LOCK -> {
+                    val intent = Intent(
+                        this,
+                        SmartLockActivity::class.java
+                        // SmartActivity::class.java
+                    ).apply {
+                        putExtra(IP_ADDRESS, getInfo())
+                    }
+                    println("BLE_PROV ipAddress:${getInfo()}")
+                    activityLauncher.launch(intent)
+                }
+
+                BluetoothService.GattConnectType.LIGHT -> {
+                    val intent = Intent(
+                        this,
+                        ConnectedLightingActivity::class.java
+
+                    ).apply {
+                        putExtra(IP_ADDRESS, getInfo())
+                    }
+                    println("DMP BLE_PROV ipAddress:${getInfo()}")
+                    activityLauncher.launch(intent)
+                }
+
                 else -> null
             }
         } else {
@@ -346,7 +440,9 @@ class WifiCommissioningActivity : BaseDemoActivity() {
             setMessage(dialogMessage)
             setPositiveButton(getString(R.string.yes)) { dialog: DialogInterface, _: Int ->
                 showProgressDialog(getString(R.string.disconnect_ap))
-                if(connectType == BluetoothService.GattConnectType.AWS_DEMO){
+                if (connectType == BluetoothService.GattConnectType.AWS_DEMO
+                    || connectType == BluetoothService.GattConnectType.SMART_LOCK || connectType == BluetoothService.GattConnectType.LIGHT
+                ) {
                     handler.postDelayed(timeoutRunnable, twentySeconds) // Schedule timeout
                     // handler.postDelayed({
                     writeCommand(BoardCommand.Send.DISCONNECTION)
@@ -355,7 +451,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
                         showTimeOutMessageAndFinish()
                     }*/
                     //}, twentySeconds)
-                }else{
+                } else {
                     writeCommand(BoardCommand.Send.DISCONNECTION)
                     dialog.cancel()
                 }
@@ -370,7 +466,6 @@ class WifiCommissioningActivity : BaseDemoActivity() {
             }
         }
     }
-
 
 
     private fun showPasswordDialog() {
@@ -442,7 +537,9 @@ class WifiCommissioningActivity : BaseDemoActivity() {
         clickedAccessPoint = null
         accessPoints.clear()
         runOnUiThread { accessPointsAdapter?.notifyDataSetChanged() }
-        showProgressDialog(getString(R.string.scanning_for_access_points))
+        //showProgressDialog(getString(R.string.scanning_for_access_points))
+        showProgressDialogWithTimeout(getString(R.string.scanning_for_access_points))
+        //handlePopup(this,getString(R.string.scanning_for_access_points))
         writeCommand(BoardCommand.Send.SCAN)
     }
 
@@ -457,7 +554,7 @@ class WifiCommissioningActivity : BaseDemoActivity() {
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             Timber.d("onServicesDiscovered; status = $status")
-
+            gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
             gatt.getService(GattService.WifiCommissioningService.number)?.let {
                 characteristicWrite =
                     it.getCharacteristic(GattCharacteristic.WifiCommissioningWrite.uuid)
@@ -732,6 +829,22 @@ class WifiCommissioningActivity : BaseDemoActivity() {
     private fun getInfo(): String? {
         return sharedPref.getString("ipaddress", "")
     }
+
+
+    private val activityLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+        { result ->
+            if (result.resultCode == RESULT_OK) {
+                val data = result.data
+                if (data != null) {
+                    val close = result.data?.getBooleanExtra(CLOSE, false) ?: false
+                    if (close) {
+                        this.finish()
+                    }
+                }
+            }
+        }
+    )
 
     companion object {
         private const val RADIX_HEX = 16

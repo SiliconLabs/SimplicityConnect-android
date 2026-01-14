@@ -163,6 +163,7 @@
         android:text="@string/advertiser_label_advertising_time_limit" />
 
     <RadioButton
+        style="@style/radio_button_bg"
         android:id="@+id/rb_no_limit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -178,6 +179,7 @@
         android:orientation="horizontal">
 
         <RadioButton
+            style="@style/radio_button_bg"
             android:id="@+id/rb_time_limit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -205,6 +207,7 @@
         android:orientation="horizontal">
 
         <RadioButton
+            style="@style/radio_button_bg"
             android:id="@+id/rb_event_limit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

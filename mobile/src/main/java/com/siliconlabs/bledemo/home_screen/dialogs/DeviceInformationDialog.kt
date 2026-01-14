@@ -52,7 +52,6 @@ class DeviceInformationDialog : DialogFragment() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.buttonClose.setOnClickListener { dismiss() }
@@ -135,31 +134,39 @@ class DeviceInformationDialog : DialogFragment() {
             binding.maximumAdvertisingDataLengthInfo.text = isMaxAdvDataLengthSupported
         }
 
-        //Bluetooth Audio
-        val bleAudioSupported =
-            activity?.let {
-                isLEAudioSupported(it)
+        //Bluetooth Audio (only on Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val bleAudioSupported =
+                activity?.let {
+                    isLEAudioSupported(it)
+                }
+            if (bleAudioSupported != null) {
+                setTextColor(bleAudioSupported, binding.leAudioSupportedInfo)
             }
-        if (bleAudioSupported != null) {
-            setTextColor(bleAudioSupported, binding.leAudioSupportedInfo)
-        }
 
-        val bleAudioBroadcastSupport =
-            activity?.let { isLEAudioBroadcastSupported(it) }
-        if (bleAudioBroadcastSupport != null) {
-            setTextColor(bleAudioBroadcastSupport, binding.leAudioBroadcastSourceSupportedInfo)
+            val bleAudioBroadcastSupport =
+                activity?.let { isLEAudioBroadcastSupported(it) }
+            if (bleAudioBroadcastSupport != null) {
+                setTextColor(bleAudioBroadcastSupport, binding.leAudioBroadcastSourceSupportedInfo)
 
-        }
+            }
 
-        val bleAudioBroadcastAssistSupported =
-            activity?.let { isLEAudioBroadcastAssistSupported(it) }
-        if (bleAudioBroadcastAssistSupported != null) {
-            setTextColor(
-                bleAudioBroadcastAssistSupported,
-                binding.leAudioBroadcastAssistSupportedInfo
-            )
+            val bleAudioBroadcastAssistSupported =
+                activity?.let { isLEAudioBroadcastAssistSupported(it) }
+            if (bleAudioBroadcastAssistSupported != null) {
+                setTextColor(
+                    bleAudioBroadcastAssistSupported,
+                    binding.leAudioBroadcastAssistSupportedInfo
+                )
+            }
+            binding.maxConnectAudioDeviceInfo.text = getBluetoothMaxConnection()
+        } else {
+            // For devices below Android 13, show "Not Supported"
+            binding.leAudioSupportedInfo.text = "API < 33"
+            binding.leAudioBroadcastSourceSupportedInfo.text = "API < 33"
+            binding.leAudioBroadcastAssistSupportedInfo.text = "API < 33"
+            binding.maxConnectAudioDeviceInfo.text = "N/A"
         }
-        binding.maxConnectAudioDeviceInfo.text = getBluetoothMaxConnection()
 
 
         //Screen
@@ -359,7 +366,6 @@ class DeviceInformationDialog : DialogFragment() {
         return (px / resources.displayMetrics.density).toInt()
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun getBluetoothLowEnergySupported(): String {
         val hasBLE =
             requireActivity().packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
@@ -435,7 +441,8 @@ class DeviceInformationDialog : DialogFragment() {
                 "API < 26"
             }
         } catch (e: Exception) {
-            "UNKNOWN"
+            //"UNKNOWN"
+            resources.getString(R.string.device_information_screen_size_unknown)
         }
     }
 
@@ -452,10 +459,10 @@ class DeviceInformationDialog : DialogFragment() {
                     NO
                 }
             } else {
-                "NA"
+                NA
             }
         } catch (e: Exception) {
-            "UNKNOWN"
+            resources.getString(R.string.device_information_screen_size_unknown)
         }
     }
 
@@ -470,7 +477,7 @@ class DeviceInformationDialog : DialogFragment() {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (adapter.isLeExtendedAdvertisingSupported) YES else NO
         } else {
-            "NA"
+            NA
         }
     }
 
@@ -500,7 +507,7 @@ class DeviceInformationDialog : DialogFragment() {
                 "31"
             }
         } else {
-            "UNKNOWN"
+            UNKNOWN
         }
     }
 
@@ -508,9 +515,14 @@ class DeviceInformationDialog : DialogFragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val dm = requireActivity().getSystemService(DisplayManager::class.java)
             val display = dm?.getDisplay(Display.DEFAULT_DISPLAY)
-            val hrdSupported = display?.hdrCapabilities
-            val supportedHRDTypes = hrdSupported?.supportedHdrTypes
-            return supportedHRDTypes?.isNotEmpty()
+            val hrdSupported = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                display?.mode?.supportedHdrTypes
+            } else {
+                display?.hdrCapabilities?.supportedHdrTypes
+            }
+            //val supportedHRDpes = hrdSupported
+            println("HRD Supported Types: $hrdSupported")
+            return hrdSupported?.isNotEmpty()
         }
         return false
     }
@@ -539,10 +551,12 @@ class DeviceInformationDialog : DialogFragment() {
     companion object {
         const val NO = "NO"
         const val YES = "YES"
+        const val UNKNOWN = "UNKNOWN"
+        const val NA = "N/A"
         const val FEATURE_SUPPORTED = 10
         const val FEATURE_NOT_SUPPORTED = 11
         const val FEATURE_NOT_CONFIGURE = 30
-        const val DIA_WINDOW_SIZE = 0.85
+        const val DIA_WINDOW_SIZE = 0.9f
         private val TAG = Companion::class.java.simpleName.toString()
     }
 }

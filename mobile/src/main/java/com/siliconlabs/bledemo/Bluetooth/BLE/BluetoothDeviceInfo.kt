@@ -88,9 +88,18 @@ class BluetoothDeviceInfo(var device: BluetoothDevice, var isFavorite: Boolean =
             scanInfo?.rssi = rssi
         }
 
+    /**
+     * Returns the best available display name for the device.
+     * Priority:
+     * 1. Complete / Short Local Name from current advertisement (scan record parsed)
+     * 2. BluetoothDevice.name (may be null on first sightings or if name not cached)
+     * 3. "N/A" fallback
+     */
     val name: String
         @SuppressLint("MissingPermission")
-        get() = device.name ?: "N/A"
+        get() = scanInfo?.scanRecord?.deviceName
+            ?: device.name
+            ?: "N/A"
 
     val address: String
         get() = device.address

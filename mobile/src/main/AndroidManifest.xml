@@ -27,6 +27,12 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RANGING" />
+    <uses-permission android:name="android.permission.UWB_RANGING" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
@@ -47,6 +53,9 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup"
         tools:targetApi="tiramisu">
+        <activity
+            android:name=".features.demo.energyharvesting.EnergyHarvestingActivity"
+            android:exported="false" />
         <!-- MqttService -->
         <service
             android:name=".features.configure.advertiser.services.MqttForegroundService"
@@ -71,7 +80,12 @@
             android:name=".features.scan.browser.services.ShareLogServices"
             android:exported="true"
             tools:ignore="ExportedService" />
+        <service
+            android:name=".features.demo.energyharvesting.bluetooth.EnergyHarvestingBluetoothService"
+            android:exported="false"
+            android:foregroundServiceType="location|dataSync">
 
+        </service>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.siliconlabs.bledemo.provider"
@@ -222,6 +236,18 @@
             android:theme="@style/MainAppTheme.NoActionBar"
             tools:ignore="DiscouragedApi" />
         <!--E2E not done-->
+        <activity
+            android:name=".features.demo.smartlock.activities.SmartLockActivity"
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/MainAppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi"/>
+
+        <!--E2E not done-->
+        <activity
+            android:name=".features.demo.channel_sounding.activities.ChannelSoundingActivity"
+            android:screenOrientation="sensorPortrait"
+            android:theme="@style/MainAppTheme.NoActionBar"
+            tools:ignore="DiscouragedApi"/>
     </application>
 
 </manifest>

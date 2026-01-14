@@ -46,6 +46,9 @@
 
     <color name="silabs_click_grey">#28000000</color>
 
+    <!-- Semi-transparent overlay for progress indication -->
+    <color name="silabs_white_alpha_70">#B3FFFFFF</color>
+
     <!--============================= DELETE IN THE FUTURE ==============================-->
     <color name="gallery">#FFF1EFEF</color>
     <color name="masala">#FF504E4E</color>
@@ -136,4 +139,9 @@
     <color name="green_text">#18A918</color>
     <color name="blue_text">#0000FF</color>
     <color name="black_text">#000000</color>
+
+    <color name="chip_background">#cdcdcd</color>
+    <color name="cs_silabs_blue_high">#0F62FE</color>
+    <color name="cs_silabs_blue_mid">#4169E1</color>
+    <color name="cs_silabs_blue_low">#87CEEB</color>
 </resources>

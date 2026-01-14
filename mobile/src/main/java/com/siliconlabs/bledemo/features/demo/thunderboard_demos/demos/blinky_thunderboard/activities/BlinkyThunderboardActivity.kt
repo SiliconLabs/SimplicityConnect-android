@@ -27,6 +27,8 @@ import com.siliconlabs.bledemo.home_screen.dialogs.SelectDeviceDialog
 import com.siliconlabs.bledemo.utils.AppUtil
 import java.util.UUID
 
+import com.siliconlabs.bledemo.utils.ApppUtil
+import java.util.*
 
 class BlinkyThunderboardActivity : ThunderboardActivity(), ColorLEDControlListener {
 

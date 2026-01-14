@@ -66,7 +66,7 @@ class PendingServerConnectionActivity : BaseActivity() {
     private fun showServicesActivity(gatt: BluetoothGatt) {
         Intent(this, DeviceServicesActivity::class.java).apply {
             putExtra(DeviceServicesActivity.CONNECTED_DEVICE, gatt.device)
-            //flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }.also {
             Handler(Looper.getMainLooper()).postDelayed({
                 startActivity(it)

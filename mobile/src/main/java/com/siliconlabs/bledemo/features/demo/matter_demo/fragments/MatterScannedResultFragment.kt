@@ -27,6 +27,7 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.activities.MatterDemoAc
 import com.siliconlabs.bledemo.features.demo.matter_demo.adapters.MatterScannedResultAdapter
 import com.siliconlabs.bledemo.features.demo.matter_demo.dishwasher_demo.view.MatterDishwasherFragment
 import com.siliconlabs.bledemo.features.demo.matter_demo.dishwasher_demo.view.MatterDishwasherFragment.Companion.DISHWASHER_PREF
+import com.siliconlabs.bledemo.features.demo.matter_demo.evse.ui.EVFragment
 import com.siliconlabs.bledemo.features.demo.matter_demo.model.MatterScannedResultModel
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.ChipClient
 import com.siliconlabs.bledemo.features.demo.matter_demo.utils.FragmentUtils
@@ -310,6 +311,13 @@ class MatterScannedResultFragment : Fragment() {
                     ).navigateToDemo(matterLightControlSwitch,model)
                 }
 
+            ENERGY_EVSE_TYPE -> {
+                val evFragment = EVFragment()
+                FragmentUtils.getHost(
+                    this@MatterScannedResultFragment,
+                    Callback::class.java
+                ).navigateToDemo(evFragment, model)
+            }
 
             else -> {
                 println("Unhandled Operation....")
@@ -332,6 +340,45 @@ class MatterScannedResultFragment : Fragment() {
             model: MatterScannedResultModel
         )
 
+    }
+
+    /**
+     * Fast path: update a single device's online status in place (no full list rebuild).
+     */
+    fun applyDeviceOnlineStatus(deviceId: Long, isOnline: Boolean) {
+        if (!this::matterAdapter.isInitialized) return
+        val idx = deviceList.indexOfFirst { it.deviceId == deviceId }
+        if (idx >= 0) {
+            val model = deviceList[idx]
+            if (model.isDeviceOnline != isOnline) {
+                model.isDeviceOnline = isOnline
+                if (isAdded) {
+                    requireActivity().runOnUiThread {
+                        matterAdapter.notifyItemChanged(idx)
+                    }
+                } else {
+                    matterAdapter.notifyItemChanged(idx)
+                }
+            }
+        }
+    }
+
+    /**
+     * Slow path fallback: re-sync all device models from SharedPrefs without fragment recreation.
+     */
+    fun refreshAllFromPrefs() {
+        val updated = SharedPrefsUtils.retrieveSavedDevices(mPrefs)
+        val map = updated.associateBy { it.deviceId }
+        var anyChanged = false
+        deviceList.forEachIndexed { i, existing ->
+            val fresh = map[existing.deviceId] ?: return@forEachIndexed
+            if (existing.isDeviceOnline != fresh.isDeviceOnline) {
+                existing.isDeviceOnline = fresh.isDeviceOnline
+                anyChanged = true
+                matterAdapter.notifyItemChanged(i)
+            }
+        }
+        if (anyChanged) Timber.tag(TAG).d("Device statuses refreshed in-place")
     }
 
     companion object {
@@ -403,6 +450,9 @@ class MatterScannedResultFragment : Fragment() {
         const val ROOM_AIR_CONDITIONER_TYPE =114
         const val LAUNDRY_WASHER_TYPE = 115
         const val DISHWASHER_TYPE = 117
+
+        //Energy EVSE
+        const val ENERGY_EVSE_TYPE = 1293//1292
 
         //Hyperlink const
         private const val HYPERLINK_START = 89

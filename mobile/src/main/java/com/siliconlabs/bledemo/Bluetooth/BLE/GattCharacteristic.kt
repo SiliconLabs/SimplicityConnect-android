@@ -103,7 +103,12 @@ enum class GattCharacteristic {
     WifiCommissioningNotify("00001cc1-0000-1000-8000-00805f9b34fb", "custom.type"),
 
     EslControlPoint("35100002-4b1d-b16b-00b1-35018badf00d", "custom.type"),
-    EslTransferImage("c40b5253-18b6-47bb-a6cc-52a4ac4c6fc3", "custom.type");
+    EslTransferImage("c40b5253-18b6-47bb-a6cc-52a4ac4c6fc3", "custom.type"),
+
+    DMPPoint("0000fd63-0000-1000-8000-00805f9b34fb", "custom.type");
+
+
+
 
     /**
      * The so-called "Assigned Number" of this characteristic.

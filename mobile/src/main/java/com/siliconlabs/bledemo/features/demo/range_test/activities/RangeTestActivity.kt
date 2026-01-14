@@ -351,11 +351,6 @@ class RangeTestActivity : BaseDemoActivity(), Controller {
 
     private fun handleConnectionError() {
         runOnUiThread {
-            /*Toast.makeText(
-                this@RangeTestActivity,
-                R.string.demo_range_toast_error,
-                Toast.LENGTH_SHORT
-            ).show()*/
             CustomToastManager.show(
                 this@RangeTestActivity,getString(R.string.demo_range_toast_error),5000
             )

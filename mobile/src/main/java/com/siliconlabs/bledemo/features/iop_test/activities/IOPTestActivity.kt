@@ -222,13 +222,13 @@ class IOPTestActivity : AppCompatActivity() {
                     }
                 }, 1600)
             } else if (state == BluetoothDevice.BOND_BONDING) {
-               /* Toast.makeText(
-                    this@IOPTestActivity,
-                    R.string.iop_test_toast_bonding,
-                    Toast.LENGTH_LONG
-                ).show()*/
+                /* Toast.makeText(
+                     this@IOPTestActivity,
+                     R.string.iop_test_toast_bonding,
+                     Toast.LENGTH_LONG
+                 ).show()*/
                 CustomToastManager.show(
-                    this@IOPTestActivity,getString(R.string.iop_test_toast_bonding),5000
+                    this@IOPTestActivity, getString(R.string.iop_test_toast_bonding), 5000
                 )
             }
         }
@@ -257,7 +257,7 @@ class IOPTestActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()*/
                 CustomToastManager.show(
-                    this@IOPTestActivity,getString(R.string.iop_test_toast_press_passkey),5000
+                    this@IOPTestActivity, getString(R.string.iop_test_toast_press_passkey), 5000
                 )
                 return "PAIRING_VARIANT_PIN"
             }
@@ -326,7 +326,7 @@ class IOPTestActivity : AppCompatActivity() {
      */
     private fun startItemTest(item: Int) {
         lifecycleScope.launch {
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 mListener?.scrollViewToPosition(item)
             }
         }
@@ -379,10 +379,11 @@ class IOPTestActivity : AppCompatActivity() {
 
                 POSITION_TEST_IOP3_OTA_WITHOUT_ACK -> {
                     iopPhase3IndexStartChildrenTest = 1
-                    if(mBluetoothGatt?.getService(ota_service)
-                            ?.getCharacteristic(ota_data) != null) {
+                    if (mBluetoothGatt?.getService(ota_service)
+                            ?.getCharacteristic(ota_data) != null
+                    ) {
                         isInAppOTA = true
-                    }else{
+                    } else {
                         isInAppOTA = false
                     }
                     startOtaTestCase(iopPhase3IndexStartChildrenTest)
@@ -714,7 +715,7 @@ class IOPTestActivity : AppCompatActivity() {
      * DISCONNECTS AND CONNECTS WITH THE SELECTED DELAY
      */
     fun reconnect(delaytoconnect: Long) {
-        if(!isInAppOTA){
+        if (!isInAppOTA) {
             mBluetoothDevice = mBluetoothGatt?.device
             if (mBluetoothService?.isGattConnected()!!) {
                 mBluetoothService?.clearConnectedGatt()
@@ -752,7 +753,7 @@ class IOPTestActivity : AppCompatActivity() {
      * DISCONNECT GATT GENTLY AND CLEAN GLOBAL VARIABLES
      */
     private fun disconnectGatt(gatt: BluetoothGatt?) {
-        if (!isInAppOTA){
+        if (!isInAppOTA) {
             val disconnectTimer = Timer()
             boolOTAbegin = false
             otaProcess = false
@@ -1001,7 +1002,7 @@ class IOPTestActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityIopTestBinding.inflate(LayoutInflater.from(this))
         setContentView(binding.root)
-        AppUtil.setEdgeToEdge(window,this)
+        AppUtil.setEdgeToEdge(window, this)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
@@ -1022,6 +1023,7 @@ class IOPTestActivity : AppCompatActivity() {
         startLogCapture()
         applyGestureNavigationMargin()
     }
+
     private fun applyGestureNavigationMargin() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.llIopFooter) { v, insets ->
             val nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
@@ -1037,6 +1039,7 @@ class IOPTestActivity : AppCompatActivity() {
         }
         binding.btnStartAndStopTest.post { ViewCompat.requestApplyInsets(binding.btnStartAndStopTest) }
     }
+
     private fun startLogCapture() {
         lifecycleScope.launch(Dispatchers.IO) {
             captureContinuousLogcat("IOPTest").collect { logLine ->
@@ -1067,7 +1070,9 @@ class IOPTestActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()*/
             CustomToastManager.show(
-                this@IOPTestActivity,getString(R.string.iop_test_toast_bluetooth_not_supported),5000
+                this@IOPTestActivity,
+                getString(R.string.iop_test_toast_bluetooth_not_supported),
+                5000
             )
             finish()
         }
@@ -1116,7 +1121,8 @@ class IOPTestActivity : AppCompatActivity() {
             }
 
             android.R.id.home -> {
-                val dialog = supportFragmentManager.findFragmentByTag("select_device_tag") as? SelectDeviceDialog
+                val dialog =
+                    supportFragmentManager.findFragmentByTag("select_device_tag") as? SelectDeviceDialog
                 if (dialog != null && dialog.isVisible) {
                     dialog.dismiss()
                 }
@@ -1256,7 +1262,7 @@ class IOPTestActivity : AppCompatActivity() {
                         /*Toast.makeText(this, getString(R.string.incorrect_file), Toast.LENGTH_SHORT)
                             .show()*/
                         CustomToastManager.show(
-                            this@IOPTestActivity,getString(R.string.incorrect_file),5000
+                            this@IOPTestActivity, getString(R.string.incorrect_file), 5000
                         )
                     }
                 } ?: /*Toast.makeText(
@@ -1265,7 +1271,7 @@ class IOPTestActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()*/
                 CustomToastManager.show(
-                    this@IOPTestActivity,getString(R.string.chosen_file_not_found),5000
+                    this@IOPTestActivity, getString(R.string.chosen_file_not_found), 5000
                 )
             }
 
@@ -1285,7 +1291,7 @@ class IOPTestActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()*/
                         CustomToastManager.show(
-                            this@IOPTestActivity,getString(R.string.chosen_file_not_found),5000
+                            this@IOPTestActivity, getString(R.string.chosen_file_not_found), 5000
                         )
                     }
                 }
@@ -1389,6 +1395,10 @@ class IOPTestActivity : AppCompatActivity() {
         value: String?,
         byteValues: ByteArray?
     ) {
+        if (characteristic == null) {
+            Timber.tag(TAG).e("writeValueToCharacteristic called with null characteristic")
+            return
+        }
         var newValue: ByteArray? = null
         if (byteValues != null) {
             newValue = byteValues
@@ -1553,7 +1563,7 @@ class IOPTestActivity : AppCompatActivity() {
                                     )
                                 ) {
                                     Log.i(TAG, "onServicesDiscovered Device in DFU Mode")
-                                    if (mIndexRunning == 4 || mIndexRunning == 5){
+                                    if (mIndexRunning == 4 || mIndexRunning == 5) {
                                         mBluetoothGatt?.requestMtu(247)
                                     }
                                 } else {
@@ -2327,7 +2337,8 @@ class IOPTestActivity : AppCompatActivity() {
                     handler?.postDelayed({
                         Log.d(TAG, "Write operation successful")
 
-                        connectToDevice(mBluetoothDevice,
+                        connectToDevice(
+                            mBluetoothDevice,
                             onConnectionSuccess = {
                                 // Code to execute after successful connection
                                 handler?.postDelayed({
@@ -2598,7 +2609,7 @@ class IOPTestActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()*/
                 CustomToastManager.show(
-                    this@IOPTestActivity,getString(R.string.incorrect_file),5000
+                    this@IOPTestActivity, getString(R.string.incorrect_file), 5000
                 )
             } else {
                 /*Toast.makeText(
@@ -2607,7 +2618,7 @@ class IOPTestActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()*/
                 CustomToastManager.show(
-                    this@IOPTestActivity,getString(R.string.no_file_chosen),5000
+                    this@IOPTestActivity, getString(R.string.no_file_chosen), 5000
                 )
             }
         }
@@ -2781,7 +2792,7 @@ class IOPTestActivity : AppCompatActivity() {
      * USED TO CLEAN CACHE AND REDISCOVER SERVICES
      */
     private fun refreshServices() {
-        if(!isInAppOTA){
+        if (!isInAppOTA) {
             if (mBluetoothGatt != null && mBluetoothGatt?.device != null) {
                 refreshDeviceCache()
                 mBluetoothGatt?.discoverServices()
@@ -3146,7 +3157,9 @@ class IOPTestActivity : AppCompatActivity() {
                                                     Toast.LENGTH_LONG
                                                 ).show()*/
                                                 CustomToastManager.show(
-                                                    this@IOPTestActivity,"DISCOVER SERVICES TIMEOUT",5000
+                                                    this@IOPTestActivity,
+                                                    "DISCOVER SERVICES TIMEOUT",
+                                                    5000
                                                 )
                                             }
                                         }
@@ -3246,7 +3259,7 @@ class IOPTestActivity : AppCompatActivity() {
                             Toast.LENGTH_LONG
                         ).show()*/
                         CustomToastManager.show(
-                            this@IOPTestActivity,ErrorCodes.getErrorName(status),5000
+                            this@IOPTestActivity, ErrorCodes.getErrorName(status), 5000
                         )
                         updateDataTestFailed(mIndexRunning)
                     }
@@ -3272,17 +3285,20 @@ class IOPTestActivity : AppCompatActivity() {
                             }
                         }
                     }
-
-                    val otaDataCheck =
-                        gatt.getService(ota_service).getCharacteristic(ota_data) == null
-                    if(!otaDataCheck){
+                    try {
+                        val otaDataCheck =
+                            gatt.getService(ota_service).getCharacteristic(ota_data) == null
+                        if (!otaDataCheck) {
+                            ota_alreadyIn_Progress = false
+                        }
+                    } catch (e: Exception) {
                         ota_alreadyIn_Progress = false
                     }
                     //IF DFU_MODE, LAUNCH OTA SETUP AUTOMATICALLY
                     if (ota_mode && boolOTAbegin && !ota_alreadyIn_Progress) {
                         handler?.postDelayed({
                             runOnUiThread {
-                                if (otaLoadingDialog?.isShowing() == true){
+                                if (otaLoadingDialog?.isShowing() == true) {
                                     otaLoadingDialog?.toggleLoadingSpinner(isVisible = false)
                                     otaLoadingDialog?.dismiss()
                                 }
@@ -3351,7 +3367,9 @@ class IOPTestActivity : AppCompatActivity() {
                                     Toast.LENGTH_SHORT
                                 ).show()*/
                                 CustomToastManager.show(
-                                    this@IOPTestActivity,"Error: Not a Homekit Secure Connection",5000
+                                    this@IOPTestActivity,
+                                    "Error: Not a Homekit Secure Connection",
+                                    5000
                                 )
                             }
                         } else if (value[2] == 0x04.toByte()) {
@@ -3400,13 +3418,14 @@ class IOPTestActivity : AppCompatActivity() {
                                 handler?.postDelayed(DFU_OTA_UPLOAD, 500)
                             } else if (!ota_mode && otaProcess) {
                                 runOnUiThread { showOtaLoadingDialog() }
-                                if(mBluetoothGatt?.getService(ota_service)
-                                        ?.getCharacteristic(ota_data) == null){
+                                if (mBluetoothGatt?.getService(ota_service)
+                                        ?.getCharacteristic(ota_data) == null
+                                ) {
                                     handler?.post {
                                         reconnect(4000)
                                     }
-                                }else{
-                                    if(!ota_alreadyIn_Progress){
+                                } else {
+                                    if (!ota_alreadyIn_Progress) {
                                         ota_alreadyIn_Progress = true
                                         runOnUiThread(checkBeginRunnable)
                                         handler?.removeCallbacks(DFU_OTA_UPLOAD)
@@ -3415,7 +3434,7 @@ class IOPTestActivity : AppCompatActivity() {
                                             runOnUiThread {
                                                 otaLoadingDialog?.toggleLoadingSpinner(isVisible = false)
                                                 otaLoadingDialog?.dismiss()
-                                                if(!otaProgressDialog!!.isShowing){
+                                                if (!otaProgressDialog!!.isShowing) {
                                                     showOtaProgressDialogForRainier()
                                                 }
                                             }
@@ -3463,7 +3482,7 @@ class IOPTestActivity : AppCompatActivity() {
                                     dfuMode(OTA_END)
                                 }, 5000)
                             }
-                        }else{
+                        } else {
                             pack += mtuDivisible
                             if (pack <= otaFileManager?.otaFile?.size!! - 1) {
                                 otaWriteDataReliable()
@@ -3610,7 +3629,7 @@ class IOPTestActivity : AppCompatActivity() {
                     characteristicsPhase3Security.clear()
                     characteristicIOPPhase3Control = null
                     refreshServices()
-                }, 5000)
+                }, 20000)
             }
             if (otaProcess) {
                 mBluetoothGatt?.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
@@ -3710,7 +3729,7 @@ class IOPTestActivity : AppCompatActivity() {
         private const val POSITION_TEST_IOP3_OTA_ACK = 4
         private const val POSITION_TEST_IOP3_OTA_WITHOUT_ACK = 5
 
-        private const val SCAN_PERIOD: Long = 10000
+        private const val SCAN_PERIOD: Long = 20000
         private const val CONNECTION_PERIOD: Long = 10000
         private const val BLUETOOTH_SETTINGS_REQUEST_CODE = 100
 

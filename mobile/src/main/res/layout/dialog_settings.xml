@@ -44,6 +44,7 @@
                 android:orientation="horizontal">
 
                 <RadioButton
+                    android:buttonTint="@color/silabs_dark_blue"
                     android:layout_marginTop="@dimen/space_XXXS"
                     android:layout_marginBottom="@dimen/space_XXXS"
                     android:layout_marginStart="@dimen/space_XXXS"
@@ -59,6 +60,7 @@
                     android:textColor="@color/silabs_black" />
 
                 <RadioButton
+                    android:buttonTint="@color/silabs_dark_blue"
                     android:layout_marginEnd="@dimen/space_XXXS"
                     android:layout_marginTop="@dimen/space_XXXS"
                     android:layout_marginBottom="@dimen/space_XXXS"

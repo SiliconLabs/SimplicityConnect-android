@@ -60,6 +60,7 @@ import com.siliconlabs.bledemo.features.demo.wifi_throughput.fragments.WifiThrou
 import com.siliconlabs.bledemo.features.demo.wifi_throughput.utils.ThroughputUtils
 import com.siliconlabs.bledemo.features.iop_test.utils.Utils
 import com.siliconlabs.bledemo.utils.AppUtil
+import com.siliconlabs.bledemo.utils.ApppUtil
 import com.siliconlabs.bledemo.utils.CustomToastManager
 import java.net.InetAddress
 import java.nio.ByteBuffer
@@ -122,6 +123,7 @@ class WifiThroughputActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+
         resetActionBarTitle()
         val myFragment: WifiThroughPutDetailScreen? =
             supportFragmentManager.findFragmentByTag("tag") as WifiThroughPutDetailScreen?

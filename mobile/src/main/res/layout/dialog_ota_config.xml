@@ -57,6 +57,7 @@
                         android:orientation="horizontal">
 
                         <RadioButton
+                            android:buttonTint="@color/silabs_dark_blue"
                             android:id="@+id/rb_type_partial"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -67,6 +68,7 @@
                             android:text="@string/ota_type_partial" />
 
                         <RadioButton
+                            android:buttonTint="@color/silabs_dark_blue"
                             android:id="@+id/rb_type_full"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -97,6 +99,7 @@
                         android:orientation="horizontal">
 
                         <RadioButton
+                            android:buttonTint="@color/silabs_dark_blue"
                             android:id="@+id/reliability_radio_button"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -107,6 +110,7 @@
                             android:text="@string/Reliability" />
 
                         <RadioButton
+                            android:buttonTint="@color/silabs_dark_blue"
                             android:id="@+id/speed_radio_button"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"

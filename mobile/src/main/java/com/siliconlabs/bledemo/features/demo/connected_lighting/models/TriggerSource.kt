@@ -11,7 +11,9 @@ enum class TriggerSource(val value: Int, @DrawableRes val iconId: Int, @StringRe
     BUTTON(2, android.R.color.transparent, R.string.light_demo_local_control),
     PROPRIETARY(5, R.drawable.icon_proprietary, R.string.light_demo_protocol_proprietary),
     CONNECT(6, R.drawable.icon_proprietary, R.string.light_demo_protocol_connect),
-    THREAD(7, R.drawable.icon_thread, R.string.light_demo_protocol_thread);
+    THREAD(7, R.drawable.icon_thread, R.string.light_demo_protocol_thread),
+    AWS(1, R.drawable.ic_aws_iot_icon, R.string.smart_lock_demo_dialog_btn_aws),
+    SMART_LOCK(9, R.drawable.ic_smartlock_icon, R.string.smart_lock_demo_dashboard);
 
     companion object {
         fun forValue(value: Int): TriggerSource {

@@ -412,7 +412,7 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
     }
 
     private fun setPer(per: Float) {
-        binding.tvRangeTestMa.text = String.format(Locale.US, "%.1f", per).plus("%")
+        binding.tvRangeTestPer.text = String.format(Locale.US, "%.1f", per).plus("%")
     }
 
     private fun setValue(view: TextView, resId: Int, vararg args: Any) {
@@ -795,3 +795,4 @@ class RangeTestFragment : Fragment(), RangeTestPresenter.RangeTestView {
         private const val SERIES_2_REGEX = "BRD41(71|80|81)"
     }
 }
+

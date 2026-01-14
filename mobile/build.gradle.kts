@@ -1,5 +1,3 @@
-import com.android.build.api.dsl.Packaging
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -20,7 +18,7 @@ android {
     namespace = "com.siliconlabs.bledemo"
 
     defaultConfig {
-        minSdk = 29
+        minSdk = 30
         targetSdk = 36
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -85,8 +83,8 @@ android {
         create("Si-Connect") {
             dimension = versionDim
             applicationId = "com.siliconlabs.bledemo"
-            versionCode = 68
-            versionName = "3.1.2"
+            versionCode = 74
+            versionName = "3.2.0"
         }
     }
 
@@ -190,6 +188,11 @@ dependencies {
     // Dependency injection
     implementation("com.google.dagger:hilt-android:2.57.1")
     kapt("com.google.dagger:hilt-android-compiler:2.57.1")
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.material3:material3")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
 
     // View binding
     implementation("com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9")
@@ -238,6 +241,8 @@ dependencies {
     implementation ("androidx.work:work-runtime:2.8.1")
 
 
+    //Channel Sounding
+    implementation("com.github.skydoves:balloon:1.4.7")
 
     //JetPack compose
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
@@ -247,9 +252,15 @@ dependencies {
     implementation("androidx.compose.material:material")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.activity:activity-compose")
+    // Material 3
+    implementation("androidx.compose.material3:material3")
+    // Optional – Material Icons (if you need them)
+    implementation("androidx.compose.material:material-icons-extended")
+    // Lifecycle integration
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
-    //Dynamic Toast
     implementation("com.pranavpandey.android:dynamic-toasts:4.3.0")
+
 }

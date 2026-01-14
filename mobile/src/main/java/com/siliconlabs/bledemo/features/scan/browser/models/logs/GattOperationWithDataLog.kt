@@ -10,7 +10,7 @@ class GattOperationWithDataLog(
         type: Type,
         private val status: Int? = null,
         private val uuid: UUID,
-        private val value: ByteArray
+        private val value: ByteArray?
 ) : GattOperationLog(gatt, type) {
 
     override fun generateLogInfo(): String {
@@ -23,7 +23,7 @@ class GattOperationWithDataLog(
     }
 
     private fun getGattDataInfo(): String {
-        return if (value.isEmpty()) "data: Empty data."
+        return if (null == value) "data: Empty data."
         else {
             val hexData = "0x".plus(Converters.bytesToHex(value).uppercase(Locale.getDefault())).plus(" (hex)")
             val asciiData = Converters.getAsciiValue(value).plus(" (ascii)")

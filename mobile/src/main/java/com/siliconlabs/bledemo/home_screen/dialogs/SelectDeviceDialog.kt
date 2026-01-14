@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Box
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +38,7 @@ import com.siliconlabs.bledemo.features.demo.throughput.utils.PeripheralManager
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.base.models.ThunderBoardDevice
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.blinky_thunderboard.activities.BlinkyThunderboardActivity
 import com.siliconlabs.bledemo.databinding.DialogSelectDeviceBinding
+import com.siliconlabs.bledemo.features.demo.channel_sounding.activities.ChannelSoundingActivity
 import com.siliconlabs.bledemo.features.demo.esl_demo.activities.EslDemoActivity
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.environment.activities.EnvironmentActivity
 import com.siliconlabs.bledemo.features.demo.thunderboard_demos.demos.motion.activities.MotionActivity
@@ -44,6 +46,7 @@ import com.siliconlabs.bledemo.features.demo.wifi_commissioning.activities.WifiC
 import com.siliconlabs.bledemo.features.iop_test.activities.IOPTestActivity
 import com.siliconlabs.bledemo.features.iop_test.models.IOPTest
 import com.siliconlabs.bledemo.home_screen.activities.MainActivity
+import com.siliconlabs.bledemo.utils.CustomToastManager
 import timber.log.Timber
 
 @SuppressLint("MissingPermission")
@@ -61,6 +64,7 @@ class SelectDeviceDialog(
 
     private var currentDeviceInfo: BluetoothDeviceInfo? = null
     private var connectType: GattConnectType? = null
+
 
     private var cachedBoardType: String? = null
 
@@ -185,6 +189,7 @@ class SelectDeviceDialog(
             startActivity(intent)
         }
         (activity as BaseActivity).dismissModalDialog()
+        stopDiscovery()
         dismiss()
     }
 
@@ -350,10 +355,24 @@ class SelectDeviceDialog(
                     getString(R.string.aws_iot_selection_ble_title)
                 }
 
+                GattConnectType.SMART_LOCK -> {
+                    getString(R.string.smart_lock_demo_dialog_select_dialog)
+                }
+
+                GattConnectType.CHANNEL_SOUNDING_DEMO -> {
+                    getString(
+                        R.string.channel_sounding_demo_dialog_select_dialog,
+                        getString(R.string.channel_sounding_config_demo)
+                    )
+
+                }
+
                 else -> getString(R.string.empty_description)
             }
 
-            if (connectType == GattConnectType.WIFI_COMMISSIONING || connectType == GattConnectType.AWS_DEMO) {
+            if (connectType == GattConnectType.WIFI_COMMISSIONING
+                || connectType == GattConnectType.AWS_DEMO
+            ) {
                 movementMethod = LinkMovementMethod.getInstance() // react to clicking the link
             }
         }
@@ -380,6 +399,7 @@ class SelectDeviceDialog(
             bluetoothService?.startDiscovery(applyDemoFilters())
         }, 300)
     }
+
     private fun stopDiscovery() {
         bluetoothService?.let {
             it.removeListener(this)
@@ -435,6 +455,10 @@ class SelectDeviceDialog(
         )
 
         when (connectType) {
+            GattConnectType.CHANNEL_SOUNDING_DEMO -> {
+              // add(buildFilter(BuildFilterName.CHANNEL_SOUNDING_TEST))
+            }
+
             GattConnectType.THERMOMETER -> {
                 add(buildFilter(GattService.HealthThermometer))
             }
@@ -444,6 +468,8 @@ class SelectDeviceDialog(
                 add(buildFilter(GattService.ZigbeeLightService))
                 add(buildFilter(GattService.ConnectLightService))
                 add(buildFilter(GattService.ThreadLightService))
+                add(buildFilter(GattService.TheDMP))
+                add(buildFilter(GattService.TheAmazonSideWalk))
             }
 
             GattConnectType.RANGE_TEST -> {
@@ -482,9 +508,17 @@ class SelectDeviceDialog(
             GattConnectType.DEV_KIT_SENSOR -> {
                 add(buildFilter(BuildFilterName.DEV_KIT_SENSOR))
             }
+
             GattConnectType.AWS_DEMO -> {
                 add(buildFilter(BuildFilterName.BLE_CONFIGURATOR))
             }
+
+            GattConnectType.SMART_LOCK -> {
+                add(buildFilter(BuildFilterName.BLE_CONFIGURATOR))
+            }
+
+
+
             else -> Unit
         }
     }
@@ -528,7 +562,7 @@ class SelectDeviceDialog(
     private fun getIntent(connectType: GattConnectType?): Intent? {
         val clazz = when (connectType) {
             GattConnectType.THERMOMETER -> HealthThermometerActivity::class.java
-            GattConnectType.LIGHT -> ConnectedLightingActivity::class.java
+            GattConnectType.LIGHT -> determineLightActivityClass()
             GattConnectType.BLINKY -> BlinkyActivity::class.java
             GattConnectType.BLINKY_THUNDERBOARD -> BlinkyThunderboardActivity::class.java
             GattConnectType.THROUGHPUT_TEST -> ThroughputActivity::class.java
@@ -539,16 +573,50 @@ class SelectDeviceDialog(
             GattConnectType.ESL_DEMO -> EslDemoActivity::class.java
             GattConnectType.DEV_KIT_SENSOR -> WifiCommissioningActivity::class.java
             GattConnectType.AWS_DEMO -> WifiCommissioningActivity::class.java
+            GattConnectType.SMART_LOCK -> WifiCommissioningActivity::class.java
+            GattConnectType.CHANNEL_SOUNDING_DEMO -> ChannelSoundingActivity::class.java
+
 
             else -> null
         }
-
         val intent = clazz?.let { Intent(activity, it) }
-        if (connectType == GattConnectType.WIFI_COMMISSIONING || connectType == GattConnectType.DEV_KIT_SENSOR || connectType == GattConnectType.AWS_DEMO)  {
+        if (connectType == GattConnectType.WIFI_COMMISSIONING
+            || connectType == GattConnectType.DEV_KIT_SENSOR
+            || connectType == GattConnectType.AWS_DEMO
+            || connectType == GattConnectType.SMART_LOCK
+            || connectType == GattConnectType.LIGHT
+
+        ) {
             intent?.putExtra("connectType", connectType)
         }
         return intent
     }
+
+    // Decide which Activity to launch for LIGHT connect type based on advertised services.
+    // Priority: TheDMP -> WifiCommissioningActivity; otherwise any listed lighting protocol -> ConnectedLightingActivity.
+    private fun determineLightActivityClass(): Class<out Any>? {
+        val uuids =
+            currentDeviceInfo?.scanInfo?.scanRecord?.serviceUuids?.map { it.uuid } ?: return null
+        val lightingServices = listOf(
+            GattService.ProprietaryLightService.number,
+            GattService.ConnectLightService.number,
+            GattService.ThreadLightService.number,
+            GattService.ZigbeeLightService.number,
+            GattService.TheAmazonSideWalk.number
+        )
+        // Prefer lighting protocol services if any are present
+        if (uuids.any { it in lightingServices }) return ConnectedLightingActivity::class.java
+        // Fall back to DMP only if no lighting protocol service was found
+        return if (uuids.contains(GattService.TheDMP.number)) WifiCommissioningActivity::class.java else null
+    }
+
+    // Returns true if current selected LIGHT device advertises the DMP service UUID (unused after refactor but kept if needed elsewhere)
+    private fun isDmpLightDevice(): Boolean {
+        val uuids = currentDeviceInfo?.scanInfo?.scanRecord?.serviceUuids ?: return false
+        return uuids.any { it.uuid == GattService.TheDMP.number }
+    }
+
+
 
     interface RangeTestCallback {
         fun onCancel()
@@ -570,10 +638,13 @@ class SelectDeviceDialog(
 
     override fun onDiscoveryTimeout() {
         /* Scanning through this dialog is always indefinite. */
+        CustomToastManager.show(requireContext(), "Discovery Timeout", 4000)
+
     }
 
-    companion   object {
+    companion object {
         private const val CONN_TYPE_INFO = "_conn_type_info_"
+        const val CONNECTION_SUPPORTED = "connection_supported"
 
         const val MODEL_TYPE_EXTRA = "model_type"
         const val POWER_SOURCE_EXTRA = "power_source"
@@ -590,6 +661,7 @@ class SelectDeviceDialog(
                 }
             }
         }
+
     }
 
     private enum class BuildFilterName(val value: String) {
@@ -600,7 +672,9 @@ class SelectDeviceDialog(
         IOP_TEST_UPDATE("IOP Test Update"),
         IOP_TEST_NO_1("IOP_Test_1"),
         IOP_TEST_NO_2("IOP_Test_2"),
-        DEV_KIT_SENSOR("WIFI_SENSOR")
-
+        DEV_KIT_SENSOR("WIFI_SENSOR"),
+        CHANNEL_SOUNDING_TEST("CS RFLCT")
     }
 }
+
+

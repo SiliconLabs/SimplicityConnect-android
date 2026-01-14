@@ -17,6 +17,7 @@ import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScanned
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DIMMABLE_PLUG_IN_UNIT_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.COLOR_TEMPERATURE_LIGHT_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.DIMMER_SWITCH
+import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.ENERGY_EVSE_TYPE
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.GENERIC_SWITCH
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.ON_OFF_LIGHT_SWITCH
 import com.siliconlabs.bledemo.features.demo.matter_demo.fragments.MatterScannedResultFragment.Companion.TEMPERATURE_SENSOR_TYPE
@@ -48,6 +49,7 @@ class MatterItemViewModel(
             DIMMABLE_PLUG_IN_UNIT_TYPE -> binding.imageView.setImageResource(R.drawable.matter_plug_off)
             DISHWASHER_TYPE -> binding.imageView.setImageResource(R.drawable.matter_dishwasher_list)
             AIR_QUALITY_SENSOR_TYPE -> binding.imageView.setImageResource(R.drawable.matter_air_quality_sensor)
+            ENERGY_EVSE_TYPE -> binding.imageView.setImageResource(R.drawable.ic_electric_charging_station)
             GENERIC_SWITCH,  COLOR_DIMMER_SWITCH  ->{
                 binding.imageView.setImageResource(R.drawable.matter_thermostat)
             }

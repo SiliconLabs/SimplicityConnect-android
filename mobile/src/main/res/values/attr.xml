@@ -7,4 +7,11 @@
     <declare-styleable name="MainActionButton" >
         <attr name="is_action_on" format="boolean" />
     </declare-styleable>
+    <declare-styleable name="DynamicRippleView">
+        <attr name="rippleColor" format="color" />
+        <attr name="rippleDuration" format="integer" />
+        <attr name="rippleAmount" format="integer" />
+        <attr name="rippleRadius" format="dimension" />
+        <attr name="rippleScale" format="float" />
+    </declare-styleable>
 </resources>

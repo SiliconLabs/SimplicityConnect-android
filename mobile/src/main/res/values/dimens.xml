@@ -336,4 +336,8 @@
     <!-- wifi sensors -->
     <dimen name="wifi_sensor_grid_width">100dp</dimen>
     <dimen name="wifi_sensor_grid_height">125dp</dimen>
+    <dimen name="cs_top_margin">-50dp</dimen>
+
+<!--channel sounding-->
+    <dimen name="channel_sounding_distance_text_size">55sp</dimen>
 </resources>

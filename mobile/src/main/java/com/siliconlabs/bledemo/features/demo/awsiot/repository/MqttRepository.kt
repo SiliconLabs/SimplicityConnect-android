@@ -1,19 +1,8 @@
 package com.siliconlabs.bledemo.features.demo.awsiot.repository
 
-import android.Manifest
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
-import android.widget.Toast
-import androidx.annotation.RequiresPermission
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.siliconlabs.bledemo.R
@@ -21,9 +10,7 @@ import com.siliconlabs.bledemo.features.configure.advertiser.services.MqttForegr
 import com.siliconlabs.bledemo.utils.CustomToastManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,6 +22,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallback
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttMessage
+import timber.log.Timber
 import java.io.InputStream
 import java.security.KeyStore
 import java.util.UUID
@@ -43,23 +31,30 @@ import javax.net.ssl.SSLContext
 
 class MqttRepository(private val context: Context) {
 
-    private val mqttClient =
-        MqttAndroidClient(context, "ssl://$AWS_END_POINT:8883", UUID.randomUUID().toString())
+    private lateinit var mqttClient: MqttAndroidClient
+    private lateinit var endPoint: String
+    private lateinit var sslContext: SSLContext
+
+    // AWS IoT endpoint
+//        MqttAndroidClient(context, "ssl://$AWS_END_POINT:8883", UUID.randomUUID().toString(),null,MqttAndroidClient.Ack.AUTO_ACK)
     private val _mqttMessageLiveData = MutableLiveData<String>()
     val mqttMessageLiveData: LiveData<String> = _mqttMessageLiveData
     private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     var oldTopic = MutableLiveData<String>()
-    var oldPublishTopic  = MutableLiveData<String>()
+    var oldPublishTopic = MutableLiveData<String>()
 
     private val _connectionState = MutableLiveData<ConnectionResult>()
     val connectionState: LiveData<ConnectionResult> = _connectionState
 
     private var options = MqttConnectOptions().apply {
         isCleanSession = true
-        isAutomaticReconnect = false // Manual retry logic for better control
+        isAutomaticReconnect = true // Manual retry logic for better control
         keepAliveInterval = 30
-        socketFactory = createSSLContext(context).socketFactory
+        connectionTimeout = 60
+        maxRetryDelay = 60000L // Maximum retry delay of 30 seconds
+        retryDelay = 1000L // Initial retry delay
+      //  socketFactory = createSSLContext(context).socketFactory
         setWill("debug/status", "Client disconnected unexpectedly".toByteArray(), 1, true)
     }
 
@@ -67,26 +62,35 @@ class MqttRepository(private val context: Context) {
     private var retryDelay = 1000L // Start with 1 second
     private val maxRetryDelay = 30000L // Cap retry at 30 seconds
 
-    fun connect(subscribeTopic: String) {
+    fun connect(subscribeTopic: String, endPoint: String, sslContext: SSLContext) {
         // Show foreground notification when connecting
+        this@MqttRepository.endPoint = endPoint
+        this@MqttRepository.sslContext = sslContext
+        mqttClient = MqttAndroidClient(
+            context,
+            "ssl://$endPoint:8883",
+            UUID.randomUUID().toString(),
+            null,
+            MqttAndroidClient.Ack.AUTO_ACK
+        )
         coroutineScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 context.startMqttForegroundService()
             }
         }
         coroutineScope.launch {
-            withContext(Dispatchers.Main){
-                _connectionState.value = ConnectionResult.Connecting
+            withContext(Dispatchers.IO) {
+                //_connectionState.value = ConnectionResult.Connecting
+                _connectionState.postValue(ConnectionResult.Connecting)
             }
         }
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
                 mqttClient.setCallback(object : MqttCallback {
                     override fun connectionLost(cause: Throwable?) {
-                        Log.e("MQTT", "Connection lost: ${cause?.message}")
-                        //CustomToastManager.show(context,"Connection Lost",5000)
-                        _connectionState.value =
-                            ConnectionResult.Error("Connection Lost")
+                        Timber.tag(TAG).e("Connection lost: ${cause?.message}")
+
+                        ConnectionResult.Error("Connection Lost ${cause?.message}")
                         retryConnection()
                     }
 
@@ -95,13 +99,16 @@ class MqttRepository(private val context: Context) {
                     }
 
                     override fun deliveryComplete(token: IMqttDeliveryToken?) {}
+
+
                 })
 
                 try {
                     mqttClient.connect(options, null, object : IMqttActionListener {
                         override fun onSuccess(asyncActionToken: IMqttToken?) {
-                            Log.d("MQTT", "Connected successfully")
-                            //CustomToastManager.show(context,"Connected successfully",5000)
+
+                            Timber.tag(TAG).d("Connected successfully")
+
                             _connectionState.value = ConnectionResult.Connected
                             retryDelay = 1000L // Reset retry delay after success
                             oldTopic.value = subscribeTopic
@@ -113,19 +120,20 @@ class MqttRepository(private val context: Context) {
                             asyncActionToken: IMqttToken?,
                             exception: Throwable?
                         ) {
-                            Log.e("MQTT", "Connection failed: ${exception?.message}")
-                            //CustomToastManager.show(context,"Connection failed: ${exception?.message}",5000)
-                            _connectionState.value =
+                            Timber.tag(TAG).e("Connection failed: ${exception?.message}")
+
+                            _connectionState.postValue(
                                 ConnectionResult.Error("Connection failed: ${exception?.message}")
-                            retryConnection()
+                            )
+                            //retryConnection()
                         }
                     })
-                } catch (e: Exception) {
-                    Log.e("MQTT", "Exception in connect: ${e.message}")
-                    //CustomToastManager.show(context,"Exception in connect: ${e.message}",5000)
-                    _connectionState.value =
-                        ConnectionResult.Error("Exception in connect: ${e.message}")
+                } catch (e: MqttException) {
+                    Timber.tag(TAG).e("Exception in connect: ${e.message}")
 
+                    _connectionState.postValue(
+                        ConnectionResult.Error("Exception in connect: ${e.message}")
+                    )
                     retryConnection()
                 }
             }
@@ -138,14 +146,16 @@ class MqttRepository(private val context: Context) {
             try {
                 mqttClient.subscribe(topic, 1, null, object : IMqttActionListener {
                     override fun onSuccess(asyncActionToken: IMqttToken?) {
-                        Log.d("MQTT", "Subscribed to $topic successfully")
+                        Timber.tag(TAG).d("Subscribed to $topic successfully")
+
                         _connectionState.value = ConnectionResult.SubscribeConnected
                         CustomToastManager.show(context, "Subscribed to $topic successfully", 5000)
 
                     }
 
                     override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                        Log.e("MQTT", "Subscription failed: ${exception?.message}")
+
+                        Timber.tag(TAG).e("Subscription failed: ${exception?.message}")
                         //CustomToastManager.show(context,"Subscription failed: ${exception?.message}",5000)
                         _connectionState.value =
                             ConnectionResult.Error("Subscription failed: ${exception?.message}")
@@ -154,16 +164,15 @@ class MqttRepository(private val context: Context) {
 
                 mqttClient.setCallback(object : MqttCallback {
                     override fun connectionLost(cause: Throwable?) {
-                        Log.e("MQTT", "Connection lost: ${cause?.message}")
-                        //CustomToastManager.show(context,"Connection lost: ${cause?.message}",5000)
+                        Timber.tag(TAG).e("Connection lost: ${cause?.message}")
+
                         _connectionState.value =
-                            ConnectionResult.Error("Connection lost")
+                            ConnectionResult.Error("Connection lost: ${cause?.message}")
 
                     }
 
                     override fun messageArrived(topic: String, message: MqttMessage) {
-                        Log.d("MQTT", "Message received: ${message.toString()}")
-
+                        Timber.tag(TAG).d("Message received: ${message.toString()}")
 
                         // Post to LiveData on the Main Thread
                         CoroutineScope(Dispatchers.Main).launch {
@@ -172,14 +181,14 @@ class MqttRepository(private val context: Context) {
                     }
 
                     override fun deliveryComplete(token: IMqttDeliveryToken?) {
-                        Log.d("MQTT", "Message delivery complete")
+                        Timber.tag(TAG).d("Message delivery complete")
                         CustomToastManager.show(context, "Message delivery complete", 5000)
 
                     }
                 })
             } catch (e: Exception) {
-                Log.e("MQTT", "Error in subscription: ${e.message}")
-                //CustomToastManager.show(context,"Error in subscription: ${e.message}",5000)
+                Timber.tag(TAG).e("Error in subscription: ${e.message}")
+
                 _connectionState.value =
                     ConnectionResult.Error("Error in subscription: ${e.message}")
             }
@@ -190,14 +199,15 @@ class MqttRepository(private val context: Context) {
         _connectionState.value = ConnectionResult.Connecting
         coroutineScope.launch {
             delay(retryDelay)
-            Log.d("MQTT", "Retrying connection in ${retryDelay / 1000} seconds...")
+            Timber.tag(TAG).d("Retrying connection in ${retryDelay / 1000} seconds...")
+
             CustomToastManager.show(
                 context,
                 "Retrying connection in ${retryDelay / 1000} seconds...",
                 5000
             )
             retryDelay = (retryDelay * 2).coerceAtMost(maxRetryDelay) // Exponential backoff
-            connect(oldTopic.value.toString())
+            connect(oldTopic.value.toString(), endPoint, sslContext)
         }
     }
 
@@ -214,17 +224,19 @@ class MqttRepository(private val context: Context) {
 
 
                 } else {
-                    Log.e("MQTT", "Publish failed: MQTT is not connected")
-                    // CustomToastManager.show(context,"Publish failed: MQTT is not connected",5000)
-                    _connectionState.value =
+
+                    Timber.tag(TAG).e("Publish failed: MQTT is not connected")
+                    _connectionState.postValue(
                         ConnectionResult.Error("Publish failed: MQTT is not connected")
+                    )
                 }
             }
         }
     }
 
     fun disconnect() {
-        _connectionState.value = ConnectionResult.Disconnecting
+        //_connectionState.value = ConnectionResult.Disconnecting
+        _connectionState.postValue(ConnectionResult.Disconnecting)
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
                 try {
@@ -249,13 +261,14 @@ class MqttRepository(private val context: Context) {
                                     asyncActionToken: IMqttToken?,
                                     exception: Throwable?
                                 ) {
-                                    Log.e("MQTT", "Disconnection Failure")
+                                    Timber.tag(TAG).e("Disconnection failed: ${exception?.message}")
                                     _connectionState.value = ConnectionResult.DisconnectionError
                                 }
 
                             })
                         } catch (e: MqttException) {
-                            Log.e("Mqtt Disconnection", "" + e.message)
+                            Timber.tag(TAG).e("MqttException during disconnect: ${e.message}")
+
                             _connectionState.value = ConnectionResult.DisconnectionError
                         }
                     } else {
@@ -263,46 +276,80 @@ class MqttRepository(private val context: Context) {
                     }
 
                 } catch (e: Exception) {
-                    Log.e("MQTT", "Error during disconnect: ${e.message}")
-                    _connectionState.value = ConnectionResult.DisconnectionError
-                    _connectionState.value =
-                        ConnectionResult.Error("Error during disconnect: ${e.message}")
+                    Timber.tag(TAG).e("Error during disconnect: ${e.message}")
+
+                    coroutineScope.launch {
+                        withContext(Dispatchers.Main) {
+                            _connectionState.postValue(ConnectionResult.DisconnectionError)
+                            _connectionState.postValue(ConnectionResult.Error("Error during disconnect: ${e.message}"))
+                        }
+                    }
+                } finally {
+                    // Stop the foreground service after disconnecting
+                    context.stopService(Intent(context, MqttForegroundService::class.java))
+                }
+            }
+        }
+    }
+
+    fun unregisterMQTTServices() {
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    mqttClient.disconnect()
+                    mqttClient.unregisterResources()
+                    mqttClient.close()
+                    Timber.tag(TAG).d("MQTT resources unregistered successfully")
+                } catch (e: Exception) {
+                    Timber.tag(TAG).e("Error unregistering MQTT resources: ${e.message}")
                 }
             }
         }
     }
 
     companion object {
+        private const val TAG = "MqttRepository"
 
-        const val AWS_END_POINT = "a2m21kovu9tcsh-ats.iot.us-east-2.amazonaws.com"
+        // const val AWS_END_POINT = "a2m21kovu9tcsh-ats.iot.us-east-2.amazonaws.com"
 
 
-        fun createSSLContext(context: Context): SSLContext {
-            val keyStore = KeyStore.getInstance("PKCS12")
-            val password =
-                "1234567890".toCharArray() // Use the same password you used to create the .p12 file
-
-            val inputStream: InputStream =
-                context.resources.openRawResource(R.raw.silabsawsiot) // Put server.p12 in res/raw
-            keyStore.load(inputStream, password)
-
-            val keyManagerFactory =
-                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
-            keyManagerFactory.init(keyStore, password)
-
-            val sslContext = SSLContext.getInstance("TLS")
-            sslContext.init(keyManagerFactory.keyManagers, null, null)
-
-            return sslContext
-        }
+//        fun createSSLContext(context: Context): SSLContext {
+//            val keyStore = KeyStore.getInstance("PKCS12")
+//            val password =
+//                "1234567890".toCharArray() // Use the same password you used to create the .p12 file
+//
+//            val inputStream: InputStream =
+//                context.resources.openRawResource(R.raw.silabsawsiot) // Put server.p12 in res/raw
+//            keyStore.load(inputStream, password)
+//
+//            val keyManagerFactory =
+//                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
+//            keyManagerFactory.init(keyStore, password)
+//
+//            val sslContext = SSLContext.getInstance("TLS")
+//            sslContext.init(keyManagerFactory.keyManagers, null, null)
+//
+//            return sslContext
+//        }
     }
 
 
-    fun unsubscribeFromTopic(){
+    fun unsubscribeFromTopic() {
         coroutineScope.launch {
-            withContext(Dispatchers.IO){
-                if(null != mqttClient){
-                    mqttClient.unsubscribe(oldTopic.value)
+            withContext(Dispatchers.IO) {
+                if (null != mqttClient) {
+                    mqttClient.unsubscribe(oldTopic.value, null, object : IMqttActionListener {
+                        override fun onSuccess(asyncActionToken: IMqttToken?) {
+                            Timber.tag(TAG).d("Unsubscribed from topic: ${oldTopic.value}")
+                        }
+
+                        override fun onFailure(
+                            asyncActionToken: IMqttToken?,
+                            exception: Throwable?
+                        ) {
+                            Timber.tag(TAG).e("Unsubscribe failed: ${exception?.message}")
+                        }
+                    })
                 }
             }
         }
@@ -326,5 +373,5 @@ sealed class ConnectionResult {
     object SubscribeConnected : ConnectionResult()
     object Disconnecting : ConnectionResult()
     object Disconnected : ConnectionResult()
-    object DisconnectionError: ConnectionResult()
+    object DisconnectionError : ConnectionResult()
 }

@@ -7,9 +7,19 @@ import java.util.*
 class ConnectedLightingPresenter internal constructor(private val view: View, private val bluetoothController: BluetoothController) {
 
     interface View {
-        fun showLightState(lightOn: Boolean)
+        fun showLightState(
+            lightOn: Boolean,
+            triggerSource: TriggerSource,
+            gattService: GattService?
+        )
 
-        fun showTriggerSourceDetails(source: TriggerSource?)
+        fun showLightStateWithSource(
+            lightOn: Boolean,
+            source: TriggerSource,
+            gattService: GattService?
+        ) // new method for protocol-specific UI
+
+        fun showTriggerSourceDetails(source: TriggerSource?, gattService: GattService?)
 
         fun showTriggerSourceAddress(sourceAddress: String, source: TriggerSource?)
 
@@ -42,10 +52,12 @@ class ConnectedLightingPresenter internal constructor(private val view: View, pr
 
     fun onLightUpdated(isLightOn: Boolean) {
         lightOn = isLightOn
-        view.showLightState(lightOn)
+        // Pass both light state and trigger source to the view for protocol-specific UI
+        view.showLightStateWithSource(lightOn, triggerSource,gattService)
     }
 
     fun onSourceUpdated(value: TriggerSource) {
+        println("ConnectedLightingScreen:onSourceUpdated: $value")
         triggerSource = value
         if (gattService === GattService.ProprietaryLightService && value == TriggerSource.ZIGBEE) {
             triggerSource = TriggerSource.PROPRIETARY
@@ -53,8 +65,10 @@ class ConnectedLightingPresenter internal constructor(private val view: View, pr
             triggerSource = TriggerSource.CONNECT
         } else if (gattService === GattService.ThreadLightService) {
             triggerSource = TriggerSource.THREAD
-        }
-        view.showTriggerSourceDetails(triggerSource)
+        } /*else if(gattService === GattService.TheDMP){
+            triggerSource = TriggerSource.AWS
+        }*/
+        view.showTriggerSourceDetails(triggerSource,gattService)
     }
 
     fun onSourceAddressUpdated(sourceAddress: String) {
@@ -92,8 +106,8 @@ class ConnectedLightingPresenter internal constructor(private val view: View, pr
 
     init {
         //light_on will be set according to what we read from bluetooth, just hardcoding to start with off for now
-        view.showLightState(lightOn)
-        view.showTriggerSourceDetails(triggerSource)
+        view.showLightState(lightOn,triggerSource, gattService)
+        view.showTriggerSourceDetails(triggerSource, gattService)
         view.showTriggerSourceAddress(sourceAddress, triggerSource)
         bluetoothController.setPresenter(this)
         periodicReadTimer = Timer()
