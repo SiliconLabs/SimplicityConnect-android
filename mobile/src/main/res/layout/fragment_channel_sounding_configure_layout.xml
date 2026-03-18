@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
     android:background="@color/silabs_white"
-    android:orientation="vertical">
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:paddingBottom="16dp">
 
     <TextView
         android:id="@+id/configure_title"
@@ -153,7 +160,98 @@
                 </RelativeLayout>
             </LinearLayout>
 
+            <!--Kalman Filter-->
+            <LinearLayout
+                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/matter_5dp"
+                android:layout_marginBottom="@dimen/matter_10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                tools:ignore="UselessParent">
 
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/kalmanFilterLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/channel_sounding_config_kalman_filter_label"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivInfoKalmanFilter"
+                    android:layout_width="@dimen/matter_15dp"
+                    android:layout_height="@dimen/matter_15dp"
+                    android:layout_margin="@dimen/matter_5dp"
+                    android:layout_marginEnd="@dimen/matter_15dp"
+                    android:background="@drawable/ad_info"
+                    android:tooltipText="@string/channel_sounding_tooltip_kalman_filter" />
+
+
+
+                <!-- Keep switch for backward compatibility but hide it -->
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switchKalmanFilter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/matter_15dp"
+                    android:visibility="gone"
+                    android:checked="true"
+                    app:thumbTint="@color/switch_thumb_color_selector"
+                    app:trackTint="@color/switch_track_color_selector" />
+
+            </LinearLayout>
+
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/linear_filtering"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:id="@+id/textFilteringLevel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/channel_sounding_config_filtering_level_label"
+                    android:textSize="16sp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="3dp"
+                    android:background="@drawable/channel_sounding_spinner_borders"
+                    android:orientation="horizontal">
+
+                    <Spinner
+                        android:id="@+id/spinnerFilteringLevel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="5dp"
+                        android:background="@android:color/transparent"
+                        android:gravity="center"
+                        android:minWidth="200dp"
+                        android:spinnerMode="dropdown" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/channel_sounding_config_image_dropdown_arrow"
+                        android:src="@drawable/channel_sounding_arrow_dropdown"
+                        tools:ignore="ContentDescription" />
+
+                </RelativeLayout>
+            </androidx.appcompat.widget.LinearLayoutCompat>
         </LinearLayout>
 
         <TextView
@@ -164,6 +262,303 @@
             android:background="@color/silabs_white"
             android:fontFamily="sans-serif-condensed-light"
             android:text="@string/channel_sounding_config_initiator_details"
+            android:textColor="@color/black_text"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <!-- Kalman Filter Settings Section -->
+    <RelativeLayout
+        android:id="@+id/kalmanSettingsSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/channel_sound_border"
+            android:orientation="vertical"
+            android:padding="25dp">
+
+            <!-- Outlier Detection -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/matter_5dp"
+                android:layout_marginBottom="@dimen/matter_10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                tools:ignore="UselessParent">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/outlierDetectionLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/channel_sounding_config_outlier_detection_label"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivInfoOutlierDetection"
+                    android:layout_width="@dimen/matter_15dp"
+                    android:layout_height="@dimen/matter_15dp"
+                    android:layout_margin="@dimen/matter_5dp"
+                    android:layout_marginEnd="@dimen/matter_15dp"
+                    android:background="@drawable/ad_info"
+                    android:tooltipText="@string/channel_sounding_tooltip_outlier_detection" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switchOutlierDetection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/matter_15dp"
+                    android:checked="true" />
+
+            </LinearLayout>
+
+            <!-- Adaptive Filtering -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/matter_5dp"
+                android:layout_marginBottom="@dimen/matter_10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                tools:ignore="UselessParent">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/adaptiveFilteringLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/channel_sounding_config_adaptive_filtering_label"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivInfoAdaptiveFiltering"
+                    android:layout_width="@dimen/matter_15dp"
+                    android:layout_height="@dimen/matter_15dp"
+                    android:layout_margin="@dimen/matter_5dp"
+                    android:layout_marginEnd="@dimen/matter_15dp"
+                    android:background="@drawable/ad_info"
+                    android:tooltipText="@string/channel_sounding_tooltip_adaptive_filtering" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switchAdaptiveFiltering"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/matter_15dp"
+                    android:checked="true" />
+
+            </LinearLayout>
+
+            <!-- Process Noise -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/matter_5dp"
+                android:layout_marginBottom="@dimen/matter_10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                tools:ignore="UselessParent">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/processNoiseLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/channel_sounding_config_process_noise_label"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivInfoProcessNoise"
+                    android:layout_width="@dimen/matter_15dp"
+                    android:layout_height="@dimen/matter_15dp"
+                    android:layout_margin="@dimen/matter_5dp"
+                    android:layout_marginEnd="@dimen/matter_15dp"
+                    android:background="@drawable/ad_info"
+                    android:tooltipText="@string/channel_sounding_tooltip_process_noise" />
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/matter_15dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight=".38"
+                    android:background="@drawable/channel_sounding_spinner_borders"
+                    android:orientation="horizontal">
+
+                    <Spinner
+                        android:id="@+id/spinnerProcessNoise"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="5dp"
+                        android:background="@android:color/transparent"
+                        android:gravity="center"
+                        android:spinnerMode="dropdown" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/channel_sounding_config_image_dropdown_arrow"
+                        android:src="@drawable/channel_sounding_arrow_dropdown"
+                        tools:ignore="ContentDescription" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <!-- Measurement Noise -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/matter_5dp"
+                android:layout_marginBottom="@dimen/matter_10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                tools:ignore="UselessParent">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/measurementNoiseLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/channel_sounding_config_measurement_noise_label"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivInfoMeasurementNoise"
+                    android:layout_width="@dimen/matter_15dp"
+                    android:layout_height="@dimen/matter_15dp"
+                    android:layout_margin="@dimen/matter_5dp"
+                    android:layout_marginEnd="@dimen/matter_15dp"
+                    android:background="@drawable/ad_info"
+                    android:tooltipText="@string/channel_sounding_tooltip_measurement_noise" />
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/matter_15dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight=".38"
+                    android:background="@drawable/channel_sounding_spinner_borders"
+                    android:orientation="horizontal">
+
+                    <Spinner
+                        android:id="@+id/spinnerMeasurementNoise"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="5dp"
+                        android:background="@android:color/transparent"
+                        android:gravity="center"
+                        android:spinnerMode="dropdown" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/channel_sounding_config_image_dropdown_arrow"
+                        android:src="@drawable/channel_sounding_arrow_dropdown"
+                        tools:ignore="ContentDescription" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <!-- Outlier Threshold -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/matter_5dp"
+                android:layout_marginBottom="@dimen/matter_10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                tools:ignore="UselessParent">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/outlierThresholdLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/channel_sounding_config_outlier_threshold_label"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivInfoOutlierThreshold"
+                    android:layout_width="@dimen/matter_15dp"
+                    android:layout_height="@dimen/matter_15dp"
+                    android:layout_margin="@dimen/matter_5dp"
+                    android:layout_marginEnd="@dimen/matter_15dp"
+                    android:background="@drawable/ad_info"
+                    android:tooltipText="@string/channel_sounding_tooltip_outlier_threshold" />
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/matter_15dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight=".38"
+                    android:background="@drawable/channel_sounding_spinner_borders"
+                    android:orientation="horizontal">
+
+                    <Spinner
+                        android:id="@+id/spinnerOutlierThreshold"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="5dp"
+                        android:background="@android:color/transparent"
+                        android:gravity="center"
+                        android:spinnerMode="dropdown" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/channel_sounding_config_image_dropdown_arrow"
+                        android:src="@drawable/channel_sounding_arrow_dropdown"
+                        tools:ignore="ContentDescription" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="15dp"
+            android:background="@color/silabs_white"
+            android:fontFamily="sans-serif-condensed-light"
+            android:text="@string/channel_sounding_config_kalman_settings"
             android:textColor="@color/black_text"
             android:textSize="17sp"
             android:textStyle="bold" />
@@ -503,3 +898,4 @@
             android:text="@string/channel_sounding_config_save" />
     </LinearLayout>
 </LinearLayout>
+</ScrollView>

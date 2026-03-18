@@ -47,6 +47,14 @@ class ChannelSoundingDistanceMeasurementManager(
     private var targetDevice: BluetoothDevice? = null
     private var session: RangingSession? = null
 
+    // Flag to track if session is currently stopping - prevents race conditions
+    @Volatile
+    private var isSessionStopping = false
+
+    // Flag to ignore onStop callbacks from previous sessions when restarting
+    @Volatile
+    private var ignoreStopCallback = false
+
     private val PERM_RANGING = "android.permission.RANGING"
 
     init {
@@ -180,6 +188,7 @@ class ChannelSoundingDistanceMeasurementManager(
 
     @RequiresPermission(android.Manifest.permission.BLUETOOTH_CONNECT)
     fun stop() {
+        isSessionStopping = true
         if (cancellationSignal.get() != null) {
             Timber.tag(TAG).d("CS Stopping ranging session")
             Timber.tag(TAG).d("CS Stop ranging with device: ${targetDevice?.name}")
@@ -198,6 +207,12 @@ class ChannelSoundingDistanceMeasurementManager(
             }
         }
         session = null
+        // Ensure UI always transitions to STOPPED so "Start" works again (e.g. after
+        // stall/out-of-range when platform may never call onClosed/onStopped).
+        activity.runOnUiThread {
+            isSessionStopping = false
+            callback.onStop(StopReason.REASON_LOCAL_REQUEST)
+        }
     }
 
     private fun getRangingTechnologyName(technology: Int): String {
@@ -344,7 +359,13 @@ class ChannelSoundingDistanceMeasurementManager(
             return false
         }
 
+        // Reset stopping state and ignore any pending stop callbacks from previous session
+        isSessionStopping = false
+        ignoreStopCallback = true
+
         Timber.tag(TAG).d("CS Start ranging with device: ${targetDevice!!.name}")
+
+        // Create a fresh session for each start
         session = rangingManager.createRangingSession(
             Executors.newSingleThreadExecutor(), rangeSessionCallback
         )
@@ -392,17 +413,29 @@ class ChannelSoundingDistanceMeasurementManager(
     private val rangeSessionCallback = @RequiresApi(Build.VERSION_CODES.BAKLAVA)
     object : RangingSession.Callback {
         override fun onClosed(reason: Int) {
-            Timber.tag(TAG).e("DistanceMeasurementManager onClosed! $reason")
-            callback.onStop()
+            // Map platform reason to our StopReason constants
+            val mappedReason = mapPlatformReason(reason)
+            Timber.tag(TAG).e("CS_DBG_010 onClosed reason=$reason (${StopReason.toString(mappedReason)}), ignoreStopCallback=$ignoreStopCallback, isRecoverable=${StopReason.isRecoverable(mappedReason)}")
+            // Only notify stop if we're not in the process of restarting
+            if (!ignoreStopCallback) {
+                isSessionStopping = false
+                callback.onStop(mappedReason)
+            } else {
+                Timber.tag(TAG).d("CS Ignoring onClosed callback from previous session")
+            }
         }
 
         override fun onOpenFailed(reason: Int) {
             Timber.tag(TAG).e("DistanceMeasurementManager onOpenFailed! $reason")
+            ignoreStopCallback = false
+            isSessionStopping = false
             callback.onStartFail(listOf("Ranging session open failed reason=$reason"))
         }
 
         override fun onOpened() {
             Timber.tag(TAG).d("CS DistanceMeasurementManager onOpened! ")
+            // Reset ignore flag once new session is opened
+            ignoreStopCallback = false
         }
 
         override fun onResults(
@@ -423,22 +456,96 @@ class ChannelSoundingDistanceMeasurementManager(
         override fun onStarted(peer: RangingDevice, technology: Int) {
             Timber.tag(TAG)
                 .d("DistanceMeasurementManager onStarted ! ")
+            ignoreStopCallback = false
             callback.onStartSuccess()
         }
 
         override fun onStopped(peer: RangingDevice, technology: Int) {
             Timber.tag(TAG)
-                .e("DistanceMeasurementManager onStopped!  $technology")
-            callback.onStop()
+                .e("CS_DBG_011 onStopped technology=$technology, ignoreStopCallback=$ignoreStopCallback (platform-initiated)")
+            // Only notify stop if we're not in the process of restarting
+            // onStopped from platform is always a platform-initiated stop (out of range, etc.)
+            if (!ignoreStopCallback) {
+                isSessionStopping = false
+                callback.onStop(StopReason.REASON_PLATFORM)
+            } else {
+                Timber.tag(TAG).d("CS Ignoring onStopped callback from previous session")
+            }
         }
 
+    }
+
+    /**
+     * Map platform RangingSession.Callback reason to our StopReason constants
+     */
+    private fun mapPlatformReason(platformReason: Int): Int {
+        // RangingSession.Callback reason constants (from API 36):
+        // REASON_LOCAL_REQUEST = 1, REASON_REMOTE_REQUEST = 2, REASON_SYSTEM_POLICY = 3,
+        // REASON_NO_PEERS_FOUND = 4, REASON_UNKNOWN = 5, REASON_UNSUPPORTED = 6
+        return when (platformReason) {
+            1 -> StopReason.REASON_LOCAL_REQUEST  // App called stop
+            2 -> StopReason.REASON_REMOTE_REQUEST // Remote peer stopped
+            3 -> StopReason.REASON_SYSTEM_POLICY  // System policy (airplane mode, etc.)
+            4 -> StopReason.REASON_NO_PEERS_FOUND // Out of range
+            5 -> StopReason.REASON_UNKNOWN        // Unknown
+            6 -> StopReason.REASON_UNSUPPORTED    // Unsupported params
+            else -> StopReason.REASON_PLATFORM    // Default to platform stop
+        }
     }
 
     interface Callback {
         fun onStartSuccess()
         fun onStartFail(reasons: List<String> = emptyList())
-        fun onStop()
+        /**
+         * Called when the ranging session stops.
+         * @param reason The reason for stopping. Use [StopReason] constants.
+         *               REASON_LOCAL_REQUEST (1) = app called stop()
+         *               REASON_PLATFORM (0) = platform stopped session (out of range, remote request, etc.)
+         */
+        fun onStop(reason: Int = StopReason.REASON_LOCAL_REQUEST)
         fun onDistanceResult(distanceMeter: Double?, confidence: Integer?)
+    }
+
+    /**
+     * Constants for session stop reasons
+     */
+    object StopReason {
+        /** Session stopped by app (user or manual stop) */
+        const val REASON_LOCAL_REQUEST = 1
+        /** Session stopped by platform (out of range, remote request, etc.) */
+        const val REASON_PLATFORM = 0
+        /** Session closed due to no peers found (out of range) */
+        const val REASON_NO_PEERS_FOUND = 2
+        /** Session closed due to remote request (reflector stopped) */
+        const val REASON_REMOTE_REQUEST = 3
+        /** Session closed due to system policy (airplane mode, etc.) */
+        const val REASON_SYSTEM_POLICY = 4
+        /** Unknown reason */
+        const val REASON_UNKNOWN = 5
+        /** Unsupported parameters */
+        const val REASON_UNSUPPORTED = 6
+
+        /**
+         * Check if the stop reason is recoverable (auto-restart should be attempted)
+         */
+        fun isRecoverable(reason: Int): Boolean = when (reason) {
+            REASON_LOCAL_REQUEST, REASON_UNSUPPORTED -> false
+            else -> true
+        }
+
+        /**
+         * Convert reason to human-readable string
+         */
+        fun toString(reason: Int): String = when (reason) {
+            REASON_LOCAL_REQUEST -> "LOCAL_REQUEST"
+            REASON_PLATFORM -> "PLATFORM"
+            REASON_NO_PEERS_FOUND -> "NO_PEERS_FOUND"
+            REASON_REMOTE_REQUEST -> "REMOTE_REQUEST"
+            REASON_SYSTEM_POLICY -> "SYSTEM_POLICY"
+            REASON_UNKNOWN -> "UNKNOWN"
+            REASON_UNSUPPORTED -> "UNSUPPORTED"
+            else -> "UNKNOWN($reason)"
+        }
     }
 
     companion object {

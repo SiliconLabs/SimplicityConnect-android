@@ -18,13 +18,13 @@ import java.util.*
  * Created by harika on 18-04-2016.
  */
 class AccessPointsAdapter(
-        private val accessPoints: ArrayList<AccessPoint>,
-        private val listener: OnItemClickListener
+    private val accessPoints: ArrayList<AccessPoint>,
+    private val listener: OnItemClickListener
 ) : RecyclerView.Adapter<AccessPointViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccessPointViewHolder {
         val itemView = LayoutInflater.from(parent.context)
-                .inflate(R.layout.adapter_access_point, parent, false)
+            .inflate(R.layout.adapter_access_point, parent, false)
         return AccessPointViewHolder(itemView)
     }
 
@@ -50,6 +50,14 @@ class AccessPointsAdapter(
             SecurityMode.EAP_WPA -> R.string.security_mode_eap_wpa
             SecurityMode.EAP_WPA2 -> R.string.security_mode_eap_wpa2
             SecurityMode.WPA_WPA2 -> R.string.status_wpa_wpa2
+            SecurityMode.WPA2_WPA3 -> R.string.security_mode_wpa2_wpa3
+            SecurityMode.OWE -> R.string.security_mode_enhanced_open
+            SecurityMode.OWE_TRANSITION -> R.string.security_mode_enhanced_open_transition
+            SecurityMode.WPA3_EAP -> R.string.security_mode_enhanced_wpa3_enterprise
+            SecurityMode.WPA3_EAP_192 -> R.string.security_mode_enhanced_wpa3_enterprise_192
+            SecurityMode.WPA2_WPA3_EAP -> R.string.security_mode_enhanced_wpa3_enterprise_transition
+            SecurityMode.WPA3_SAE_EXT -> R.string.security_mode_enhanced_wpa3_personal_swe
+
             else -> R.string.security_mode_unknown
         }
     }
@@ -75,7 +83,7 @@ class AccessPointsAdapter(
             this.securityMode.setText(securityMode)
 
             if (accessPoints[position].status) {
-                Log.e("ACCESS_POINT_ADAPTER","Hello!!!!")
+                Log.e("ACCESS_POINT_ADAPTER", "Hello!!!!")
                 statusImage.setImageResource(R.drawable.icon_connected)
                 if (accessPoints[position].macAddress != null) {
                     macAddress.text = accessPoints[position].macAddress

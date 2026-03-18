@@ -7,9 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.siliconlabs.bledemo.R
-import com.siliconlabs.bledemo.features.demo.wifi_commissioning.adapters.AccessPointsAdapter.OnItemClickListener
 import com.siliconlabs.bledemo.features.demo.wifi_commissioning.models.SecurityMode
-
 import com.siliconlabs.bledemo.features.demo.wifi_provisioning.adapters.APAdapter.APViewHolder
 import com.siliconlabs.bledemo.features.demo.wifi_provisioning.model.ScanResult
 
@@ -46,6 +44,13 @@ class APAdapter(private var scanResults: List<ScanResult>,
             SecurityMode.EAP_WPA -> R.string.security_mode_eap_wpa
             SecurityMode.EAP_WPA2 -> R.string.security_mode_eap_wpa2
             SecurityMode.WPA_WPA2 -> R.string.status_wpa_wpa2
+            SecurityMode.WPA2_WPA3 -> R.string.security_mode_wpa2_wpa3
+            SecurityMode.OWE -> R.string.security_mode_enhanced_open
+            SecurityMode.OWE_TRANSITION -> R.string.security_mode_enhanced_open_transition
+            SecurityMode.WPA3_EAP -> R.string.security_mode_enhanced_wpa3_enterprise
+            SecurityMode.WPA3_EAP_192 -> R.string.security_mode_enhanced_wpa3_enterprise_192
+            SecurityMode.WPA2_WPA3_EAP -> R.string.security_mode_enhanced_wpa3_enterprise_transition
+            SecurityMode.WPA3_SAE_EXT -> R.string.security_mode_enhanced_wpa3_personal_swe
             else -> R.string.security_mode_unknown
         }
     }

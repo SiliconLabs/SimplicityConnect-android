@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Checked state (ON) - silabs_blue -->
+    <item android:color="@color/silabs_dark_blue" android:state_checked="true" />
+    <!-- Unchecked state (OFF) - grey -->
+    <item android:color="#9E9E9E" android:state_checked="false" />
+</selector>

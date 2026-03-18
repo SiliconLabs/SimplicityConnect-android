@@ -753,7 +753,7 @@
     <!--WifiCommissioningActivity-->
     <string name="hint_password">password</string>
     <string name="security_mode_unknown">Unknown</string>
-    <string name="status_wpa_wpa2">WPA_WPA2_Mixed</string>
+    <string name="status_wpa_wpa2">WPA/WPA2</string>
     <string name="security_mode_eap_wpa2">EAP_WPA2</string>
     <string name="security_mode_eap_wpa">EAP_WPA</string>
     <string name="security_mode_wep">WEP</string>
@@ -762,6 +762,14 @@
     <string name="security_mode_wpa">WPA</string>
     <string name="security_mode_open">OPEN</string>
     <string name="connect_btn_txt">CONNECT</string>
+    <string name="security_mode_wpa2_wpa3">WPA3 Transition</string>
+    <string name="security_mode_enhanced_open">OWE</string>
+    <string name="security_mode_enhanced_open_transition">OWE Transition</string>
+    <string name="security_mode_enhanced_wpa3_enterprise">WPA3-Enterprise</string>
+    <string name="security_mode_enhanced_wpa3_enterprise_192">WPA3-Enterprise 192 bits</string>
+    <string name="security_mode_enhanced_wpa3_enterprise_transition" tools:ignore="DuplicateDefinition">WPA2/WPA3-Enterprise Transition</string>
+    <string name="security_mode_enhanced_wpa3_personal_swe">WPA3-Personal w/ SAE H2E</string>
+    <string name="security_mode_accesspoint">AccessPoint</string>
 
     <string name="ble_detail_device_connection">Connecting to device…</string>
     <string name="scanning_for_access_points">Scanning for access points…</string>
@@ -1543,7 +1551,26 @@
     <string name="channel_sounding_config_sensor_enabled_label">"Sensor Fusion:"</string>
     <string name="channel_sounding_menu_start">Start</string>
     <string name="channel_sounding_menu_stop">Stop</string>
+    <string name="channel_sounding_menu_pause">Pause</string>
+    <string name="channel_sounding_menu_resume">Resume</string>
+    <string name="channel_sounding_measurements_paused">Measurements paused</string>
     <string name="channel_sounding_stopped_collecting">Measurement collection stopped</string>
+    <string name="channel_sounding_connection_lost_title">Connection Lost</string>
+    <string name="channel_sounding_connection_lost_message">The connection to the device was lost.\n\nYou can go back to the demo screen and start a new Channel Sounding session to reconnect and pair to the reflector.</string>
+    <string name="channel_sounding_go_to_demo">Back to demo</string>
+    <string name="channel_sounding_session_stall_title">Session Stalled</string>
+    <string name="channel_sounding_session_stall_message">Measurements have stopped. Press RECONNECT to restart the session and get fresh measurements.</string>
+    <string name="channel_sounding_reconnect">Reconnect</string>
+    
+    <!-- Ranging Status (toolbar subtitle) -->
+    <string name="channel_sounding_ranging_paused">ResumingΓÇª</string>
+    <string name="channel_sounding_ranging_resumed">Ready</string>
+    <string name="channel_sounding_cancel">Cancel</string>
+    
+    <!-- Ranging Failed (when max retries exhausted but BLE still connected) -->
+    <string name="channel_sounding_ranging_failed_title">Ranging Unavailable</string>
+    <string name="channel_sounding_ranging_failed_message">Unable to resume distance measurement.\n\nThe device is still connected. You can try again or go back to the demo screen.</string>
+    <string name="channel_sounding_try_again">Try Again</string>
     <string name="channel_sounding_config_location_type_details">"Location Type: "</string>
     <string name="channel_sounding_config_sight_type_details">"Sight Type : "</string>
     <string name="channel_sounding_sight_type_unknown">UNKNOWN</string>
@@ -1562,13 +1589,45 @@
     <string name="channel_sounding_duration_0">0</string>
     <string name="channel_sounding_config_security_level_details">"Security Level: "</string>
     <string name="channel_sounding_confidence_score">Confidence score : </string>
+    <string name="channel_sounding_chart_x_axis_label">Time (seconds)</string>
+    <string name="channel_sounding_chart_y_axis_label">Distance (meters)</string>
+    <string name="channel_sounding_chart_marker_spike">ΓÜá∩╕Å Spike</string>
+    <string name="channel_sounding_chart_marker_smoothing">~ Smoothing</string>
+    <string name="channel_sounding_chart_marker_stable">Γ£ô Stable</string>
+    <string name="channel_sounding_chart_marker_distance">Distance</string>
     <string name="channel_sounding_tooltip_freq">Select the update rate to determine how often the distance is calculated and updated</string>
     <string name="channel_sounding_tooltip_duration">Specify the number of measurements to collect during sounding.</string>
     <string name="channel_sounding_tooltip_sensor">True or False to combine data from IMU sensors(Accelerometer, Gyroscope, Magnetometer) to produce a more accurate and robust estimate.</string>
     <string name="channel_sounding_tooltip_location">Context of the physical environment where the channel sounding measurements are being performed.</string>
     <string name="channel_sounding_tooltip_sight">Line-of-sight (LoS) condition between the Bluetooth initiator (e.g., smartphone) and the reflector.</string>
+    <string name="channel_sounding_config_kalman_filter_label">"Kalman Filter :"</string>
+    <string name="channel_sounding_config_filtering_level_label">Filtering Level:</string>
+    <string name="channel_sounding_tooltip_kalman_filter">Select filtering level: Light (fast response), Medium (balanced), or Heavy (maximum smoothing). Filtering is always enabled.</string>
 
+    <!-- Kalman Filter Configuration Section -->
+    <string name="channel_sounding_config_kalman_settings">Kalman Filter Settings</string>
+    <string name="channel_sounding_config_outlier_detection_label">"Outlier Detection :"</string>
+    <string name="channel_sounding_tooltip_outlier_detection">Detects and filters out anomalous measurements that deviate significantly from expected values.</string>
+    <string name="channel_sounding_config_adaptive_filtering_label">"Adaptive Filtering :"</string>
+    <string name="channel_sounding_tooltip_adaptive_filtering">Automatically adjusts filter parameters based on measurement patterns for faster tracking of real changes.</string>
+    <string name="channel_sounding_config_process_noise_label">"Process Noise :"</string>
+    <string name="channel_sounding_tooltip_process_noise">Higher values make the filter more responsive but noisier. Lower values provide smoother output but slower response. Default: 0.12</string>
+    <string name="channel_sounding_config_measurement_noise_label">"Measurement Noise :"</string>
+    <string name="channel_sounding_tooltip_measurement_noise">Higher values make the filter trust measurements less. Lower values trust measurements more. Default: 0.05</string>
+    <string name="channel_sounding_config_outlier_threshold_label">"Outlier Threshold :"</string>
+    <string name="channel_sounding_tooltip_outlier_threshold">Measurements with Mahalanobis distance above this threshold are treated as outliers. Default: 2.5</string>
+    <string name="channel_sounding_outlier_detected">Outlier detected! Raw: %.2f m, Filtered: %.2f m</string>
+    <string name="channel_sounding_poor_signal">Poor signal. Try moving to open area.</string>
+    <string name="channel_sounding_stall_stopped_message">Poor signal or out of range. Click Start to try again.</string>
+    <string name="channel_sounding_too_close_title">Too Close to Device</string>
+    <string name="channel_sounding_measurements_near_range">Your phone is very close to the reflector. This affects the accuracy of distance measurements.Please move slightly away to continue.</string>
+    <!-- Updated stall message showing attempt count -->
+    <string name="channel_sounding_session_stall_message_retry">Measurements have stopped. Press RECONNECT to restart the session and get fresh measurements.\n\nAttempt %1$d of %2$d</string>
 
+    <!-- New "no HIGH confidence" dialog -->
+    <string name="channel_sounding_no_high_confidence_title">Unable to Acquire Signal</string>
+    <string name="channel_sounding_no_high_confidence_message">HIGH confidence data is not being received from the CS board after multiple attempts.\n\nThis may be due to:\nΓÇó Distance too far or too close\nΓÇó Environmental interference\nΓÇó Antenna positioning\n\nPlease restart the Channel Sounding session from the demo screen.</string>
+    <string name="channel_sounding_waiting_for_high_confidence">Waiting for high-confidence score dataΓÇª</string>
     <string name="side_walk">IoT SideWalk</string>
     <string name="light_demo_toggle_hint_light">Press the bulb icon to toggle light</string>
     <string name="light_demo_toggle_hint_lock">Press the lock icon to toggle lock</string>
@@ -1580,7 +1639,6 @@
     <string name="energy_harvesting_demo_description">Monitor harvested voltage in real time.</string>
     <string name="light_demo_protocol_aws">AWS\n</string>
     <string name="smart_lock_demo_protocol_aws_address">AWS Address: %1$s</string>
-
 
 
 </resources>

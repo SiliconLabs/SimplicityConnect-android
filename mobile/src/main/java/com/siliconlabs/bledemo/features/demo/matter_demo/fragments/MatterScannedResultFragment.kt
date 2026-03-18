@@ -87,7 +87,7 @@ class MatterScannedResultFragment : Fragment() {
     private fun showMessages(msgId: Int) {
         if (isAdded) { // Check if the Fragment is attached
             requireActivity().runOnUiThread {
-                if(isAdded){
+                if (isAdded) {
                     val resString = requireContext().getString(msgId)
                     if (resString.isNotEmpty()) { // Check for an empty string
                         CustomToastManager.show(
@@ -201,7 +201,7 @@ class MatterScannedResultFragment : Fragment() {
 
                     matterAdapter.notifyDataSetChanged()
                     SharedPrefsUtils.saveDevicesToPref(mPrefs, deviceList)
-                    if(null != dishwasherPref){
+                    if (null != dishwasherPref) {
                         SharedPrefsUtils.clearDishwasherSharedPreferences(dishwasherPref)
                     }
                     if (deviceList.isEmpty()) {
@@ -219,7 +219,7 @@ class MatterScannedResultFragment : Fragment() {
 
     private fun navigateToDemos(model: MatterScannedResultModel) {
         deviceType = model.deviceType
-        Log.e("MATTER_SCANNED_RESULT","MODEL DEVICE TYPE::--${model.deviceType}")
+        Log.e("MATTER_SCANNED_RESULT", "MODEL DEVICE TYPE::--${model.deviceType}")
         when (deviceType) {
 
             THERMOSTAT_TYPE -> {
@@ -231,7 +231,7 @@ class MatterScannedResultFragment : Fragment() {
             }
 
             DIMMABLE_Light_TYPE, ENHANCED_COLOR_LIGHT_TYPE, ON_OFF_LIGHT_TYPE, COLOR_TEMPERATURE_LIGHT_TYPE -> {
-             val matterLightFragment = MatterLightFragment.newInstance()
+                val matterLightFragment = MatterLightFragment.newInstance()
                 FragmentUtils.getHost(
                     this@MatterScannedResultFragment,
                     Callback::class.java
@@ -294,7 +294,7 @@ class MatterScannedResultFragment : Fragment() {
                 ).navigateToDemo(matterDishwasherFragment, model)
             }
 
-            AIR_QUALITY_SENSOR_TYPE ->{
+            AIR_QUALITY_SENSOR_TYPE -> {
                 val matterAirQualitySensorFragment = MatterAirQualitySensorFragment.newInstance()
                 FragmentUtils.getHost(
                     this@MatterScannedResultFragment,
@@ -303,13 +303,13 @@ class MatterScannedResultFragment : Fragment() {
             }
 
             GENERIC_SWITCH, ON_OFF_LIGHT_SWITCH, DIMMER_SWITCH,
-                COLOR_DIMMER_SWITCH ->{
-                    val matterLightControlSwitch = MatterLightControlSwitchFragment.newInstance()
-                    FragmentUtils.getHost(
-                        this@MatterScannedResultFragment,
-                        Callback::class.java
-                    ).navigateToDemo(matterLightControlSwitch,model)
-                }
+            COLOR_DIMMER_SWITCH -> {
+                val matterLightControlSwitch = MatterLightControlSwitchFragment.newInstance()
+                FragmentUtils.getHost(
+                    this@MatterScannedResultFragment,
+                    Callback::class.java
+                ).navigateToDemo(matterLightControlSwitch, model)
+            }
 
             ENERGY_EVSE_TYPE -> {
                 val evFragment = EVFragment()
@@ -319,8 +319,10 @@ class MatterScannedResultFragment : Fragment() {
                 ).navigateToDemo(evFragment, model)
             }
 
+
             else -> {
                 println("Unhandled Operation....")
+                Timber.tag(TAG).e("Unhandled Operation....")
             }
         }
 
@@ -447,12 +449,15 @@ class MatterScannedResultFragment : Fragment() {
         //appliances
         const val REFRIGERATOR_TYPE = 112
         const val TEMPERATURE_CONTROLLED_CABINET_TYPE = 113
-        const val ROOM_AIR_CONDITIONER_TYPE =114
+        const val ROOM_AIR_CONDITIONER_TYPE = 114
         const val LAUNDRY_WASHER_TYPE = 115
         const val DISHWASHER_TYPE = 117
+        const val MICROWAVE_OVEN = 121
+        const val OVEN = 123
 
         //Energy EVSE
-        const val ENERGY_EVSE_TYPE = 1293//1292
+        const
+        val ENERGY_EVSE_TYPE = 1293//1292
 
         //Hyperlink const
         private const val HYPERLINK_START = 89

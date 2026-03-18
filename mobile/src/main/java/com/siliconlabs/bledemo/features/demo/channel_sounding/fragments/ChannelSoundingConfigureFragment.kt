@@ -20,6 +20,8 @@ import com.siliconlabs.bledemo.databinding.FragmentChannelSoundingConfigureLayou
 import com.siliconlabs.bledemo.features.demo.channel_sounding.activities.ChannelSoundingActivity
 import com.siliconlabs.bledemo.features.demo.channel_sounding.activities.ChannelSoundingActivity.Companion.HIGH_FREQUENCY
 
+import com.siliconlabs.bledemo.features.demo.channel_sounding.models.FilteringLevel
+import com.siliconlabs.bledemo.features.demo.channel_sounding.models.KalmanFilterConfig
 import com.siliconlabs.bledemo.features.demo.channel_sounding.utils.ChannelSoundingConfigureParameters
 import com.siliconlabs.bledemo.features.demo.channel_sounding.viewmodels.ChannelSoundingBleConnectViewModel
 import com.siliconlabs.bledemo.features.demo.channel_sounding.viewmodels.ChannelSoundingDistanceMeasurementViewModel
@@ -41,7 +43,12 @@ class ChannelSoundingConfigureFragment : Fragment() {
     private lateinit var spinnerSecurityLevelAdapter: ArrayAdapter<String>
     private lateinit var spinnerLocationTypeSAdapter: ArrayAdapter<String>
     private lateinit var spinnerSightTypeAdapter: ArrayAdapter<String>
+    private lateinit var spinnerFilteringLevelAdapter: ArrayAdapter<String>
+    private lateinit var spinnerProcessNoiseAdapter: ArrayAdapter<String>
+    private lateinit var spinnerMeasurementNoiseAdapter: ArrayAdapter<String>
+    private lateinit var spinnerOutlierThresholdAdapter: ArrayAdapter<String>
     private val configurationParameters = AtomicReference<ChannelSoundingConfigureParameters?>(null)
+    private var currentKalmanConfig: KalmanFilterConfig = KalmanFilterConfig.getDefault()
 
 
     @RequiresApi(Build.VERSION_CODES.BAKLAVA)
@@ -152,6 +159,17 @@ class ChannelSoundingConfigureFragment : Fragment() {
             .setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
             .setTextSize(14f)
             .build()
+        val tooltipKalmanFilter = Balloon.Builder(requireContext())
+            .setText(requireContext().getString(R.string.channel_sounding_tooltip_kalman_filter))
+            .setArrowSize(10)
+            .setWidthRatio(0.5f)
+            .setHeight(100)
+            .setCornerRadius(4f)
+            .setAutoDismissDuration(TIME_OUT)
+            .setBackgroundColor(ContextCompat.getColor(requireContext(),R.color.blue_teal))
+            .setTextColor(ContextCompat.getColor(requireContext(),R.color.black))
+            .setTextSize(14f)
+            .build()
 
         binding.ivInfoFreq.setOnClickListener {
             tooltipFreq.showAlignTop(binding.ivInfoFreq)
@@ -172,6 +190,49 @@ class ChannelSoundingConfigureFragment : Fragment() {
         binding.ivInfoSecuity.setOnClickListener {
             tooltipSecurity.showAlignTop(binding.ivInfoSecuity)
         }
+        binding.ivInfoKalmanFilter.setOnClickListener {
+            tooltipKalmanFilter.showAlignTop(binding.ivInfoKalmanFilter)
+        }
+
+        // Load Kalman filter configuration first
+        currentKalmanConfig = KalmanFilterConfig.load(requireContext())
+
+        // Initialize filtering level spinner (replaces on/off toggle)
+        spinnerFilteringLevelAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            KalmanFilterConfig.getFilteringLevelDisplayStrings()
+        ).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
+        binding.spinnerFilteringLevel.adapter = spinnerFilteringLevelAdapter
+        
+        // Set current filtering level
+        val currentLevelIndex = FilteringLevel.values().indexOf(currentKalmanConfig.filteringLevel)
+            .takeIf { it >= 0 } ?: FilteringLevel.MEDIUM.ordinal
+        binding.spinnerFilteringLevel.setSelection(currentLevelIndex)
+        
+        // Apply filtering level when changed
+        binding.spinnerFilteringLevel.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+                val selectedLevel = FilteringLevel.values()[position]
+                currentKalmanConfig = currentKalmanConfig.copy(filteringLevel = selectedLevel)
+                viewModelDM.setFilteringLevel(selectedLevel)
+                // Save config
+                currentKalmanConfig.save(requireContext())
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+        
+        // Hide the old toggle switch (filtering is always enabled now)
+        binding.switchKalmanFilter.visibility = android.view.View.GONE
+        
+        // Apply the initial filtering level to the filter
+        viewModelDM.setFilteringLevel(currentKalmanConfig.filteringLevel)
+
+
+        // Initialize Kalman filter settings section
+        initializeKalmanFilterSettings()
 
 
         // Frequency Spinner
@@ -369,6 +430,11 @@ class ChannelSoundingConfigureFragment : Fragment() {
             }
             saveDuration(requireContext(), durationInt)
             configurationParameters.get()?.saveInstance(requireContext())
+
+            // Save Kalman filter configuration
+            currentKalmanConfig.save(requireContext())
+            viewModelDM.applyKalmanFilterConfig(currentKalmanConfig)
+
             viewModel.message.value = "Configuration Saved"
             CustomToastManager.show(requireContext(), "Configuration Saved")
             requireActivity().supportFragmentManager.popBackStack()
@@ -383,8 +449,229 @@ class ChannelSoundingConfigureFragment : Fragment() {
             )
             saveFrequency(requireContext(), HIGH_FREQUENCY)
             saveDuration(requireContext(), 0)
+
+            // Reset Kalman filter configuration
+            currentKalmanConfig = currentKalmanConfig.resetToDefault(requireContext())
+            populateKalmanFilterUI()
+
+            // Use configureKalmanFilter for quick noise parameter reset
+            viewModelDM.configureKalmanFilter(
+                currentKalmanConfig.processNoise,
+                currentKalmanConfig.measurementNoise
+            )
+            // Apply full configuration for all other settings
+            viewModelDM.applyKalmanFilterConfig(currentKalmanConfig)
+
             populateDefaultUI()
         }
+    }
+
+    /**
+     * Initialize Kalman filter settings section with spinners and switches
+     */
+    @RequiresApi(Build.VERSION_CODES.BAKLAVA)
+    private fun initializeKalmanFilterSettings() {
+        // Create tooltips for Kalman filter settings
+        val tooltipOutlierDetection = Balloon.Builder(requireContext())
+            .setText(requireContext().getString(R.string.channel_sounding_tooltip_outlier_detection))
+            .setArrowSize(10)
+            .setWidthRatio(0.5f)
+            .setHeight(100)
+            .setCornerRadius(4f)
+            .setAutoDismissDuration(TIME_OUT)
+            .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue_teal))
+            .setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+            .setTextSize(14f)
+            .build()
+
+        val tooltipAdaptiveFiltering = Balloon.Builder(requireContext())
+            .setText(requireContext().getString(R.string.channel_sounding_tooltip_adaptive_filtering))
+            .setArrowSize(10)
+            .setWidthRatio(0.5f)
+            .setHeight(100)
+            .setCornerRadius(4f)
+            .setAutoDismissDuration(TIME_OUT)
+            .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue_teal))
+            .setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+            .setTextSize(14f)
+            .build()
+
+        val tooltipProcessNoise = Balloon.Builder(requireContext())
+            .setText(requireContext().getString(R.string.channel_sounding_tooltip_process_noise))
+            .setArrowSize(10)
+            .setWidthRatio(0.5f)
+            .setHeight(100)
+            .setCornerRadius(4f)
+            .setAutoDismissDuration(TIME_OUT)
+            .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue_teal))
+            .setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+            .setTextSize(14f)
+            .build()
+
+        val tooltipMeasurementNoise = Balloon.Builder(requireContext())
+            .setText(requireContext().getString(R.string.channel_sounding_tooltip_measurement_noise))
+            .setArrowSize(10)
+            .setWidthRatio(0.5f)
+            .setHeight(100)
+            .setCornerRadius(4f)
+            .setAutoDismissDuration(TIME_OUT)
+            .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue_teal))
+            .setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+            .setTextSize(14f)
+            .build()
+
+        val tooltipOutlierThreshold = Balloon.Builder(requireContext())
+            .setText(requireContext().getString(R.string.channel_sounding_tooltip_outlier_threshold))
+            .setArrowSize(10)
+            .setWidthRatio(0.5f)
+            .setHeight(100)
+            .setCornerRadius(4f)
+            .setAutoDismissDuration(TIME_OUT)
+            .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue_teal))
+            .setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+            .setTextSize(14f)
+            .build()
+
+        // Set up tooltip click listeners
+        binding.ivInfoOutlierDetection.setOnClickListener {
+            tooltipOutlierDetection.showAlignTop(binding.ivInfoOutlierDetection)
+        }
+        binding.ivInfoAdaptiveFiltering.setOnClickListener {
+            tooltipAdaptiveFiltering.showAlignTop(binding.ivInfoAdaptiveFiltering)
+        }
+        binding.ivInfoProcessNoise.setOnClickListener {
+            tooltipProcessNoise.showAlignTop(binding.ivInfoProcessNoise)
+        }
+        binding.ivInfoMeasurementNoise.setOnClickListener {
+            tooltipMeasurementNoise.showAlignTop(binding.ivInfoMeasurementNoise)
+        }
+        binding.ivInfoOutlierThreshold.setOnClickListener {
+            tooltipOutlierThreshold.showAlignTop(binding.ivInfoOutlierThreshold)
+        }
+
+        // Initialize Outlier Detection switch
+        binding.switchOutlierDetection.isChecked = currentKalmanConfig.outlierDetectionEnabled
+        binding.switchOutlierDetection.setOnCheckedChangeListener { _, isChecked ->
+            currentKalmanConfig = currentKalmanConfig.copy(outlierDetectionEnabled = isChecked)
+            // Apply immediately for real-time feedback
+            viewModelDM.setOutlierDetectionEnabled(isChecked)
+        }
+
+        // Initialize Adaptive Filtering switch
+        binding.switchAdaptiveFiltering.isChecked = currentKalmanConfig.adaptiveFilteringEnabled
+        binding.switchAdaptiveFiltering.setOnCheckedChangeListener { _, isChecked ->
+            currentKalmanConfig = currentKalmanConfig.copy(adaptiveFilteringEnabled = isChecked)
+            // Apply immediately for real-time feedback
+            viewModelDM.setAdaptiveFilteringEnabled(isChecked)
+        }
+
+        // Initialize Process Noise Spinner
+        spinnerProcessNoiseAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            KalmanFilterConfig.getProcessNoiseDisplayStrings()
+        )
+        spinnerProcessNoiseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerProcessNoise.adapter = spinnerProcessNoiseAdapter
+        binding.spinnerProcessNoise.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedNoise = KalmanFilterConfig.PROCESS_NOISE_OPTIONS[position]
+                currentKalmanConfig = currentKalmanConfig.copy(processNoise = selectedNoise)
+                // Apply immediately for real-time feedback
+                viewModelDM.setProcessNoise(selectedNoise)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        // Initialize Measurement Noise Spinner
+        spinnerMeasurementNoiseAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            KalmanFilterConfig.getMeasurementNoiseDisplayStrings()
+        )
+        spinnerMeasurementNoiseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerMeasurementNoise.adapter = spinnerMeasurementNoiseAdapter
+        binding.spinnerMeasurementNoise.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedNoise = KalmanFilterConfig.MEASUREMENT_NOISE_OPTIONS[position]
+                currentKalmanConfig = currentKalmanConfig.copy(measurementNoise = selectedNoise)
+                // Apply immediately for real-time feedback
+                viewModelDM.setMeasurementNoise(selectedNoise)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        // Initialize Outlier Threshold Spinner
+        spinnerOutlierThresholdAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            KalmanFilterConfig.getOutlierThresholdDisplayStrings()
+        )
+        spinnerOutlierThresholdAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerOutlierThreshold.adapter = spinnerOutlierThresholdAdapter
+        binding.spinnerOutlierThreshold.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedThreshold = KalmanFilterConfig.OUTLIER_THRESHOLD_OPTIONS[position]
+                currentKalmanConfig = currentKalmanConfig.copy(outlierThreshold = selectedThreshold)
+                // Apply immediately for real-time feedback
+                viewModelDM.setOutlierThreshold(selectedThreshold)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        // Populate UI with current configuration
+        populateKalmanFilterUI()
+
+        // Filtering is always enabled now, so settings section is always visible
+        updateKalmanSettingsSectionVisibility(true)
+    }
+
+    /**
+     * Update the visibility of the Kalman filter settings section.
+     * Filtering is always enabled now, so this always shows the section.
+     */
+    private fun updateKalmanSettingsSectionVisibility(isEnabled: Boolean) {
+        // Filtering is always enabled, so section is always visible
+        binding.kalmanSettingsSection.visibility = View.GONE
+    }
+
+    /**
+     * Populate the Kalman filter UI elements with current configuration values.
+     * Uses the ViewModel's getKalmanFilterConfig() to ensure synchronization with actual filter state.
+     */
+    @RequiresApi(Build.VERSION_CODES.BAKLAVA)
+    private fun populateKalmanFilterUI() {
+        // Get the actual filter configuration from ViewModel for synchronization
+        val actualConfig = viewModelDM.getKalmanFilterConfig()
+
+        // Update local config to match actual filter state
+        currentKalmanConfig = actualConfig
+
+        // Set filtering level spinner
+        val currentLevel = viewModelDM.getFilteringLevel()
+        val levelIndex = FilteringLevel.values().indexOf(currentLevel)
+            .takeIf { it >= 0 } ?: FilteringLevel.MEDIUM.ordinal
+        binding.spinnerFilteringLevel.setSelection(levelIndex)
+        
+        // Set other switch states using ViewModel's query methods for verification
+        binding.switchOutlierDetection.isChecked = viewModelDM.isOutlierDetectionEnabled()
+        binding.switchAdaptiveFiltering.isChecked = viewModelDM.isAdaptiveFilteringEnabled()
+
+        // Set spinner positions based on actual filter configuration
+        val processNoiseIndex = KalmanFilterConfig.PROCESS_NOISE_OPTIONS.indexOfFirst {
+            it == actualConfig.processNoise
+        }.takeIf { it >= 0 } ?: 2 // Default to index 2 (0.12)
+        binding.spinnerProcessNoise.setSelection(processNoiseIndex)
+
+        val measurementNoiseIndex = KalmanFilterConfig.MEASUREMENT_NOISE_OPTIONS.indexOfFirst {
+            it == actualConfig.measurementNoise
+        }.takeIf { it >= 0 } ?: 2 // Default to index 2 (0.05)
+        binding.spinnerMeasurementNoise.setSelection(measurementNoiseIndex)
+
+        val outlierThresholdIndex = KalmanFilterConfig.OUTLIER_THRESHOLD_OPTIONS.indexOfFirst {
+            it == actualConfig.outlierThreshold
+        }.takeIf { it >= 0 } ?: 2 // Default to index 2 (2.5)
+        binding.spinnerOutlierThreshold.setSelection(outlierThresholdIndex)
     }
 
     @RequiresApi(Build.VERSION_CODES.BAKLAVA)
@@ -521,6 +808,18 @@ class ChannelSoundingConfigureFragment : Fragment() {
             saveDuration(context, 0)
             val sharedPref = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
             return sharedPref.getInt("duration", 0).toString()
+        }
+
+        fun saveKalmanFilterEnabled(context: Context, enabled: Boolean) {
+            val sharedPref = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+            sharedPref.edit {
+                putBoolean("kalman_filter_enabled", enabled)
+            }
+        }
+
+        fun getKalmanFilterEnabled(context: Context): Boolean {
+            val sharedPref = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+            return sharedPref.getBoolean("kalman_filter_enabled", true) // Enabled by default
         }
     }
 
